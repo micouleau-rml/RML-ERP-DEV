@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#113a5d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>RML ERP — V0.2</title>
+<style>
+:root{--navy:#113a5d;--navy2:#0a2840;--bg:#edf2f6;--card:#fff;--line:#d8e0e7;--text:#1b2730;--muted:#687480;--ok:#177245;--warn:#a55d00;--danger:#b42318;--soft:#f5f8fa}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text)}body{padding-bottom:env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+header{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,var(--navy2),var(--navy));color:white;padding:calc(14px + env(safe-area-inset-top)) 14px 14px;box-shadow:0 3px 14px rgba(0,0,0,.18)}
+.header{max-width:1240px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand h1{margin:0;font-size:27px}.brand p{margin:4px 0 0;font-size:12px;opacity:.88}.badge{border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800;white-space:nowrap}
+main{max-width:1240px;margin:18px auto;padding:0 12px 40px}.statusbar{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}.pill{background:white;border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800}.pill.ok{color:var(--ok)}.pill.warn{color:var(--warn)}
+nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--line);padding:8px;border-radius:14px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}nav button{border:0;background:transparent;color:var(--navy);font-weight:800;padding:10px 14px;border-radius:10px}nav button.active{background:var(--navy);color:white}
+.view{display:none}.view.active{display:block}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 3px 14px rgba(0,0,0,.06);margin-bottom:15px}.panel h2,.panel h3{margin-top:0;color:var(--navy)}.muted{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric{background:white;border:1px solid var(--line);border-radius:15px;padding:15px}.metric strong{display:block;font-size:28px;color:var(--navy)}.metric span{font-size:13px;color:var(--muted)}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.toolbar input,.toolbar select{min-width:210px;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px;background:white}.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:800;background:var(--navy);color:white}.btn.secondary{background:#e8eef3;color:var(--navy)}.btn.danger{background:var(--danger)}.btn.ok{background:var(--ok)}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.table{width:100%;border-collapse:collapse;background:white;min-width:760px}.table th,.table td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}.table th{background:#edf4f9;color:var(--navy2);position:sticky;top:0}.table tr:last-child td{border-bottom:0}.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{border:0;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:800;background:#e8eef3;color:var(--navy)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:800;color:var(--navy2)}.field input,.field select,.field textarea{border:1px solid var(--line);border-radius:10px;padding:10px;background:white}.field textarea{min-height:84px;resize:vertical}.full{grid-column:1/-1}
+.modal{position:fixed;inset:0;background:rgba(10,27,40,.5);z-index:100;display:none;align-items:flex-end;justify-content:center;padding:14px}.modal.open{display:flex}.modal-card{width:min(760px,100%);max-height:92vh;overflow:auto;background:white;border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.28)}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.modal-head h3{margin:0;color:var(--navy)}.close{border:0;background:#eef3f6;color:var(--navy);border-radius:9px;padding:8px 10px;font-weight:900}
+.empty{padding:28px;text-align:center;color:var(--muted)}.status{display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800;background:#edf3f7}.status.actif{color:var(--ok);background:#e8f5ee}.status.archive{color:#6b7280}.status.termine{color:#6750a4;background:#f1edff}.status.attente{color:var(--warn);background:#fff3df}
+.notice{background:#fff8e7;border:1px solid #efd49a;border-radius:12px;padding:11px 13px;color:#7a5200;font-size:13px;line-height:1.4}.module-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.module{border:1px solid var(--line);background:white;border-radius:15px;padding:15px}.module h3{margin:0 0 7px}.module p{font-size:13px;color:var(--muted);min-height:55px}.module button{width:100%}.module.disabled{opacity:.55}
+@media(max-width:900px){.cards{grid-template-columns:1fr 1fr}.module-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.header{align-items:flex-start}.brand h1{font-size:23px}.badge{font-size:10px}.cards,.grid2,.module-grid{grid-template-columns:1fr}.toolbar input,.toolbar select{min-width:100%}main{margin-top:12px}.modal{padding:0}.modal-card{border-radius:18px 18px 0 0;max-height:94vh}}
+</style>
+</head>
+<body>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.2</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<main>
+<div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div class="pill ok">Stockage local de test : actif</div><div class="pill warn">Supabase ERP DEV : non connecté</div></div>
+<nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button data-view="modules">Modules ERP</button></nav>
+
+<section id="dashboard" class="view active">
+  <div class="cards">
+    <div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div>
+    <div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div>
+    <div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div>
+    <div class="metric"><strong id="mModules">1/9</strong><span>modules opérationnels</span></div>
+  </div>
+  <div class="panel" style="margin-top:15px"><h2>Référentiel central</h2><p class="muted">La V0.2 met en place la première brique réelle du futur ERP : un client peut posséder plusieurs chantiers, et chaque chantier disposera ensuite de ses modules Préparation, Suivi, Commandes, Pliage, Heures, Planning, Matériel et Analyse.</p><div class="notice">Les données saisies dans cette V0.2 restent uniquement dans le navigateur. Aucune donnée des applications RML actuelles n’est lue, modifiée ou synchronisée.</div></div>
+  <div class="panel"><h2>Derniers chantiers</h2><div id="recentJobs"></div></div>
+</section>
+
+<section id="clients" class="view">
+  <div class="panel"><div class="toolbar"><input id="clientSearch" placeholder="Rechercher un client, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><button class="btn" id="newClientBtn">+ Nouveau client</button></div><div id="clientsTable"></div></div>
+</section>
+
+<section id="chantiers" class="view">
+  <div class="panel"><div class="toolbar"><input id="jobSearch" placeholder="Rechercher un chantier, client, adresse…"><select id="jobFilter"><option value="actif">Actifs</option><option value="attente">En attente</option><option value="termine">Terminés</option><option value="archive">Archivés</option><option value="tous">Tous</option></select><button class="btn" id="newJobBtn">+ Nouveau chantier</button></div><div id="jobsTable"></div></div>
+</section>
+
+<section id="modules" class="view">
+  <div class="panel"><h2>Modules du futur ERP</h2><div class="module-grid">
+    <div class="module"><h3>Clients & Chantiers</h3><p>Référentiel commun déjà fonctionnel dans cette V0.2.</p><button class="btn ok" data-go="chantiers">Opérationnel</button></div>
+    <div class="module disabled"><h3>Préparation chantier</h3><p>À intégrer par copie depuis l’application existante.</p><button class="btn secondary" disabled>À venir</button></div>
+    <div class="module disabled"><h3>Suivi chantier</h3><p>Îlots, prévu, posé, reste, notes et avancement.</p><button class="btn secondary" disabled>À venir</button></div>
+    <div class="module disabled"><h3>Commandes fournisseurs</h3><p>Fournisseurs, produits, récapitulatif et historique.</p><button class="btn secondary" disabled>À venir</button></div>
+    <div class="module disabled"><h3>Atelier / Pliage</h3><p>Pièces, favoris, dessin, développé et calepinage.</p><button class="btn secondary" disabled>À venir</button></div>
+    <div class="module disabled"><h3>Heures & Absences</h3><p>Chantier, route, formation, maladie, CP et AT.</p><button class="btn secondary" disabled>À venir</button></div>
+    <div class="module disabled"><h3>Planning équipes</h3><p>Affectations des salariés par chantier et date.</p><button class="btn secondary" disabled>À venir</button></div>
+    <div class="module disabled"><h3>Matériel</h3><p>Véhicules, machines, contrôles et maintenance.</p><button class="btn secondary" disabled>À venir</button></div>
+    <div class="module disabled"><h3>Analyse chantier</h3><p>Heures, achats, avancement et indicateurs de production.</p><button class="btn secondary" disabled>À venir</button></div>
+  </div></div>
+</section>
+</main>
+
+<div class="modal" id="clientModal"><div class="modal-card"><div class="modal-head"><h3 id="clientModalTitle">Nouveau client</h3><button class="close" data-close="clientModal">Fermer</button></div><form id="clientForm" class="grid2" style="margin-top:14px"><input type="hidden" id="clientId"><div class="field"><label>Nom du client *</label><input id="clientNom" required></div><div class="field"><label>Code client</label><input id="clientCode"></div><div class="field"><label>Téléphone</label><input id="clientTel" inputmode="tel"></div><div class="field"><label>E-mail</label><input id="clientEmail" type="email"></div><div class="field full"><label>Adresse</label><input id="clientAdresse"></div><div class="field full"><label>Notes</label><textarea id="clientNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer</button><button class="btn secondary" type="button" data-close="clientModal">Annuler</button></div></form></div></div>
+
+<div class="modal" id="jobModal"><div class="modal-card"><div class="modal-head"><h3 id="jobModalTitle">Nouveau chantier</h3><button class="close" data-close="jobModal">Fermer</button></div><form id="jobForm" class="grid2" style="margin-top:14px"><input type="hidden" id="jobId"><div class="field"><label>Client *</label><select id="jobClient" required></select></div><div class="field"><label>Nom du chantier *</label><input id="jobNom" required></div><div class="field full"><label>Adresse du chantier</label><input id="jobAdresse"></div><div class="field"><label>Contact chantier</label><input id="jobContact"></div><div class="field"><label>Téléphone contact</label><input id="jobTel" inputmode="tel"></div><div class="field"><label>Responsable / chef d’équipe</label><input id="jobChef"></div><div class="field"><label>Statut</label><select id="jobStatut"><option value="actif">Actif</option><option value="attente">En attente</option><option value="termine">Terminé</option><option value="archive">Archivé</option></select></div><div class="field"><label>Date de début</label><input id="jobDebut" type="date"></div><div class="field"><label>Date de fin</label><input id="jobFin" type="date"></div><div class="field full"><label>Notes</label><textarea id="jobNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer</button><button class="btn secondary" type="button" data-close="jobModal">Annuler</button></div></form></div></div>
+
+<script>
+const KEY='rml_erp_v02';
+let db=loadDB();
+function loadDB(){try{return JSON.parse(localStorage.getItem(KEY))||{clients:[],chantiers:[]}}catch(e){return{clients:[],chantiers:[]}}}
+function saveDB(){localStorage.setItem(KEY,JSON.stringify(db));renderAll()}
+function uid(){return (crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2))}
+function esc(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function now(){return new Date().toISOString()}
+function clientName(id){return db.clients.find(c=>c.id===id)?.nom||'Client inconnu'}
+function go(view){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='chantiers')renderJobs()}
+document.getElementById('mainNav').addEventListener('click',e=>{if(e.target.dataset.view)go(e.target.dataset.view)});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+function openModal(id){document.getElementById(id).classList.add('open')}function closeModal(id){document.getElementById(id).classList.remove('open')}document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
+function resetClientForm(){clientForm.reset();clientId.value='';clientModalTitle.textContent='Nouveau client'}
+newClientBtn.onclick=()=>{resetClientForm();openModal('clientModal')}
+clientForm.onsubmit=e=>{e.preventDefault();let id=clientId.value;let item={id:id||uid(),nom:clientNom.value.trim(),code:clientCode.value.trim(),telephone:clientTel.value.trim(),email:clientEmail.value.trim(),adresse:clientAdresse.value.trim(),notes:clientNotes.value.trim(),actif:true,updated_at:now()};if(!item.nom)return;if(id){let old=db.clients.find(c=>c.id===id);Object.assign(old,item)}else{item.created_at=now();db.clients.push(item)}saveDB();closeModal('clientModal')}
+function editClient(id){let c=db.clients.find(x=>x.id===id);if(!c)return;clientId.value=c.id;clientNom.value=c.nom||'';clientCode.value=c.code||'';clientTel.value=c.telephone||'';clientEmail.value=c.email||'';clientAdresse.value=c.adresse||'';clientNotes.value=c.notes||'';clientModalTitle.textContent='Modifier le client';openModal('clientModal')}
+function toggleClient(id){let c=db.clients.find(x=>x.id===id);if(!c)return;c.actif=!c.actif;c.updated_at=now();saveDB()}
+function renderClients(){let q=clientSearch.value.trim().toLowerCase(),f=clientFilter.value;let rows=db.clients.filter(c=>{let hit=!q||[c.nom,c.code,c.telephone,c.email,c.adresse].join(' ').toLowerCase().includes(q);let stat=f==='tous'||(f==='actifs'&&c.actif)||(f==='archives'&&!c.actif);return hit&&stat}).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));if(!rows.length){clientsTable.innerHTML='<div class="empty">Aucun client correspondant.</div>';return}clientsTable.innerHTML='<div class="tablewrap"><table class="table"><thead><tr><th>Client</th><th>Contact</th><th>Adresse</th><th>Chantiers</th><th>Actions</th></tr></thead><tbody>'+rows.map(c=>`<tr><td><strong>${esc(c.nom)}</strong><br><span class="muted">${esc(c.code||'')}</span></td><td>${esc(c.telephone||'')}<br>${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td><td>${db.chantiers.filter(j=>j.client_id===c.id).length}</td><td><div class="actions"><button onclick="editClient('${c.id}')">Modifier</button><button onclick="prefillJob('${c.id}')">+ Chantier</button><button onclick="toggleClient('${c.id}')">${c.actif?'Archiver':'Réactiver'}</button></div></td></tr>`).join('')+'</tbody></table></div>'}
+clientSearch.oninput=renderClients;clientFilter.onchange=renderClients;
+function fillClientSelect(selected=''){let active=db.clients.filter(c=>c.actif||c.id===selected).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));jobClient.innerHTML='<option value="">Sélectionner…</option>'+active.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.nom)}</option>`).join('')}
+function resetJobForm(){jobForm.reset();jobId.value='';jobModalTitle.textContent='Nouveau chantier';fillClientSelect();jobStatut.value='actif'}
+newJobBtn.onclick=()=>{if(!db.clients.some(c=>c.actif)){alert('Crée d’abord au moins un client actif.');go('clients');return}resetJobForm();openModal('jobModal')}
+function prefillJob(client){go('chantiers');resetJobForm();fillClientSelect(client);openModal('jobModal')}
+jobForm.onsubmit=e=>{e.preventDefault();let id=jobId.value;let item={id:id||uid(),client_id:jobClient.value,nom:jobNom.value.trim(),adresse:jobAdresse.value.trim(),contact_nom:jobContact.value.trim(),contact_telephone:jobTel.value.trim(),chef_equipe:jobChef.value.trim(),statut:jobStatut.value,date_debut:jobDebut.value||null,date_fin:jobFin.value||null,notes:jobNotes.value.trim(),updated_at:now()};if(!item.client_id||!item.nom)return;if(id){Object.assign(db.chantiers.find(j=>j.id===id),item)}else{item.created_at=now();db.chantiers.push(item)}saveDB();closeModal('jobModal')}
+function editJob(id){let j=db.chantiers.find(x=>x.id===id);if(!j)return;jobId.value=j.id;fillClientSelect(j.client_id);jobNom.value=j.nom||'';jobAdresse.value=j.adresse||'';jobContact.value=j.contact_nom||'';jobTel.value=j.contact_telephone||'';jobChef.value=j.chef_equipe||'';jobStatut.value=j.statut||'actif';jobDebut.value=j.date_debut||'';jobFin.value=j.date_fin||'';jobNotes.value=j.notes||'';jobModalTitle.textContent='Modifier le chantier';openModal('jobModal')}
+function openJob(id){let j=db.chantiers.find(x=>x.id===id);if(!j)return;alert('Fiche chantier « '+j.nom+' » : dans la prochaine étape, cette fiche donnera accès aux modules Préparation, Suivi, Commandes, Pliage, Heures, Planning, Matériel et Analyse.');}
+function renderJobs(){let q=jobSearch.value.trim().toLowerCase(),f=jobFilter.value;let rows=db.chantiers.filter(j=>{let hit=!q||[j.nom,j.adresse,j.contact_nom,j.chef_equipe,clientName(j.client_id)].join(' ').toLowerCase().includes(q);return hit&&(f==='tous'||j.statut===f)}).sort((a,b)=>(b.updated_at||'').localeCompare(a.updated_at||''));if(!rows.length){jobsTable.innerHTML='<div class="empty">Aucun chantier correspondant.</div>';return}jobsTable.innerHTML='<div class="tablewrap"><table class="table"><thead><tr><th>Chantier</th><th>Client</th><th>Responsable</th><th>Statut</th><th>Dates</th><th>Actions</th></tr></thead><tbody>'+rows.map(j=>`<tr><td><strong>${esc(j.nom)}</strong><br><span class="muted">${esc(j.adresse||'')}</span></td><td>${esc(clientName(j.client_id))}</td><td>${esc(j.chef_equipe||'')}</td><td><span class="status ${esc(j.statut)}">${esc(j.statut)}</span></td><td>${esc(j.date_debut||'')}<br>${esc(j.date_fin||'')}</td><td><div class="actions"><button onclick="openJob('${j.id}')">Ouvrir</button><button onclick="editJob('${j.id}')">Modifier</button></div></td></tr>`).join('')+'</tbody></table></div>'}
+jobSearch.oninput=renderJobs;jobFilter.onchange=renderJobs;
+function renderDashboard(){mClients.textContent=db.clients.filter(c=>c.actif).length;mChantiers.textContent=db.chantiers.filter(j=>j.statut==='actif').length;mArchives.textContent=db.chantiers.filter(j=>['archive','termine'].includes(j.statut)).length;let rows=[...db.chantiers].sort((a,b)=>(b.updated_at||'').localeCompare(a.updated_at||'')).slice(0,5);recentJobs.innerHTML=rows.length?'<div class="tablewrap"><table class="table" style="min-width:600px"><thead><tr><th>Chantier</th><th>Client</th><th>Statut</th><th></th></tr></thead><tbody>'+rows.map(j=>`<tr><td><strong>${esc(j.nom)}</strong><br><span class="muted">${esc(j.adresse||'')}</span></td><td>${esc(clientName(j.client_id))}</td><td><span class="status ${esc(j.statut)}">${esc(j.statut)}</span></td><td><div class="actions"><button onclick="go('chantiers');editJob('${j.id}')">Modifier</button></div></td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Aucun chantier pour le moment.</div>'}
+function renderAll(){renderDashboard();renderClients();renderJobs();fillClientSelect(jobClient?.value||'')}
+renderAll();
+</script>
+</body>
+</html>
