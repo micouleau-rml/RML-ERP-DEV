@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>RML ERP — V0.6.8</title>
+<title>RML ERP — V0.6.9</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -43,7 +43,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.6.8</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.6.9</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button data-view="modules">Modules ERP</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button></nav>
@@ -232,7 +232,15 @@ clientExcelFile.onchange=async()=>{
     const wb=XLSX.read(data,{type:'array'});
     const preferred=wb.SheetNames.find(n=>normHeader(n)==='import clients')||wb.SheetNames[0];
     const ws=wb.Sheets[preferred];
-    const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+    // Le modèle RML contient un titre et une notice avant les vrais en-têtes.
+    // On détecte automatiquement la ligne qui contient « Nom client » / « Client ».
+    const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
+    let headerRowIndex=matrix.findIndex(r=>r.some(v=>{
+      const h=normHeader(v);
+      return h==='nom client' || h==='nom' || h==='client' || h==='raison sociale';
+    }));
+    if(headerRowIndex<0)headerRowIndex=0;
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,range:headerRowIndex});
     pendingClientImport=rows.map(excelRowToClient).filter(Boolean);
     const existingOldCodes=new Set(db.clients.map(c=>oldClientCodeFromNotes(c.notes)).filter(Boolean));
     const existingNames=new Set(db.clients.map(c=>c.nom.trim().toLowerCase()));
