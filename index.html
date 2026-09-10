@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>RML ERP — V0.6.6</title>
+<title>RML ERP — V0.6.8</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -36,20 +36,20 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée au nouvel environnement de développement V0.6.6.</p>
+    <p>Connexion sécurisée au nouvel environnement de développement V0.6.8.</p>
     <div class="field"><label>Adresse e-mail</label><input id="loginEmail" type="email" autocomplete="username" required></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.6.6</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.6.8</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button data-view="modules">Modules ERP</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button></nav>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>2/9</strong><span>modules opérationnels</span></div></div>
-  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.6.7 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
+  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.6.8 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
   <div class="panel"><h2>Derniers chantiers</h2><div id="recentJobs"></div></div>
 </section>
 <section id="clients" class="view"><div class="panel"><div class="toolbar"><input id="clientSearch" placeholder="Rechercher un client, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn danger" id="deleteLastImportBtn">Supprimer l'import Excel</button><button class="btn" id="newClientBtn">+ Nouveau client</button><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden></div><div class="notice" style="margin-bottom:12px">Import Excel accepté : la première ligne doit contenir les en-têtes. Colonnes reconnues automatiquement : <b>Nom / Client</b>, Responsable, Catégorie, Téléphone, E-mail, Adresse et Notes. Le code client est attribué automatiquement par l’ERP.</div><div id="clientsTable"></div></div></section>
@@ -173,12 +173,123 @@ async function getJobDataCount(jobIds){if(!jobIds?.length)return 0;const {count,
 async function deleteJob(id){if(!hasPerm('chantiers'))return;const j=db.chantiers.find(x=>x.id===id);if(!j)return;try{const count=await getJobDataCount([id]);if(count>0){alert(`Suppression bloquée : le chantier « ${j.nom} » contient déjà des données enregistrées dans un module ERP.\n\nPour éviter une perte accidentelle, il ne peut pas être supprimé directement.`);return}if(!confirm(`Supprimer définitivement le chantier « ${j.nom} » ?\n\nAucune donnée métier n'est enregistrée sur ce chantier. Cette suppression est irréversible.`))return;const {error}=await sb.from('erp_chantiers').delete().eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}closeModal('jobCardModal');await refreshData()}catch(err){alert('Erreur Supabase : '+err.message)}}
 async function deleteClient(id){if(!hasPerm('clients'))return;const c=db.clients.find(x=>x.id===id);if(!c)return;const linked=db.chantiers.filter(j=>j.client_id===id);if(linked.length){try{const count=await getJobDataCount(linked.map(j=>j.id));if(count>0){alert(`Suppression bloquée : ${c.nom} possède ${linked.length} chantier(s), dont au moins un contient déjà des données métier.\n\nTu peux archiver le client, mais la suppression complète est protégée.`);return}if(!confirm(`Supprimer définitivement le client « ${c.nom} » ET ses ${linked.length} chantier(s) vide(s) / test ?\n\nAucune donnée métier n'est enregistrée sur ces chantiers. Cette suppression est irréversible.`))return;const {error:jobErr}=await sb.from('erp_chantiers').delete().in('id',linked.map(j=>j.id));if(jobErr){alert('Erreur Supabase : '+jobErr.message);return}const {error}=await sb.from('erp_clients').delete().eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}await refreshData();return}catch(err){alert('Erreur Supabase : '+err.message);return}}if(!confirm(`Supprimer définitivement le client « ${c.nom} » ?\n\nCette suppression est irréversible.`))return;const {error}=await sb.from('erp_clients').delete().eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}await refreshData()}
 let pendingClientImport=[];
-function normHeader(v){return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,' ')}
-function pickCol(row,aliases){for(const [k,v] of Object.entries(row)){const nk=normHeader(k);if(aliases.some(a=>nk===a||nk.includes(a)))return v}return ''}
-function excelRowToClient(row){const nom=String(pickCol(row,['nom','nom client','client','raison sociale','societe','entreprise'])||'').trim();if(!nom)return null;return {nom,code:null,responsable:String(pickCol(row,['responsable','contact','contact principal','responsable client','nom responsable'])||'').trim()||null,categorie:String(pickCol(row,['categorie','catégorie','type client','categorie client','catégorie client'])||'').trim()||null,telephone:String(pickCol(row,['telephone','tel','portable','mobile'])||'').trim()||null,email:String(pickCol(row,['e mail','email','mail','courriel'])||'').trim()||null,adresse:String(pickCol(row,['adresse','address'])||'').trim()||null,notes:String(pickCol(row,['notes','note','commentaire','commentaires'])||'').trim()||null,actif:true}}
+function normHeader(v){return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ')}
+function pickCol(row,aliases){for(const [k,v] of Object.entries(row)){const nk=normHeader(k);if(aliases.some(a=>nk===normHeader(a)))return v}return ''}
+function excelRowToClient(row){
+  const nom=String(pickCol(row,['nom','nom client','nom client *','client','raison sociale','societe','entreprise'])||'').trim();
+  if(!nom)return null;
+  return {
+    nom,
+    code:null,
+    responsable:String(pickCol(row,['responsable','responsable / contact principal','contact','contact principal','responsable client','nom responsable'])||'').trim()||null,
+    categorie:String(pickCol(row,['categorie','catégorie','type client','categorie client','catégorie client'])||'').trim()||null,
+    telephone:String(pickCol(row,['telephone','téléphone','tel','portable','mobile'])||'').trim()||null,
+    email:String(pickCol(row,['e mail','e-mail','email','mail','courriel'])||'').trim()||null,
+    adresse:String(pickCol(row,['adresse','address'])||'').trim()||null,
+    notes:String(pickCol(row,['notes','note','commentaire','commentaires'])||'').trim()||null,
+    actif:true
+  }
+}
+function oldClientCodeFromNotes(notes=''){
+  const m=String(notes||'').match(/ancien\s+code\s+client\s*:\s*([^|\n\r]+)/i);
+  return m?m[1].trim().toLowerCase():'';
+}
+function normalizeClientCategory(value=''){
+  const v=String(value||'').trim();
+  if(!v)return null;
+  const n=normHeader(v);
+  const map={
+    'architecte':'Architecte','architect':'Architecte',
+    'maitre d oeuvre':"Maître d’œuvre",'maitre oeuvre':"Maître d’œuvre",
+    'charpentier':'Charpentier','charpentiers':'Charpentier',
+    'macon':'Maçon','maconnerie':'Maçon',
+    'constructeur maison':'Constructeur maison','constructeurs':'Constructeur maison','constructeur':'Constructeur maison',
+    'constructeur metallique':'Constructeur métallique','charpentiers metallique':'Constructeur métallique','charpentier metallique':'Constructeur métallique',
+    'professionnel divers':'Professionnel divers','general':'Professionnel divers',
+    'particulier':'Particulier'
+  };
+  return map[n]||v;
+}
+function mergeImportFields(existing,incoming){
+  return {
+    responsable:incoming.responsable||existing.responsable||null,
+    categorie:normalizeClientCategory(incoming.categorie)||existing.categorie||null,
+    telephone:incoming.telephone||existing.telephone||null,
+    email:incoming.email||existing.email||null,
+    adresse:incoming.adresse||existing.adresse||null,
+    notes:incoming.notes||existing.notes||null,
+    actif:true
+  }
+}
+async function runInChunks(items,size,worker){
+  for(let i=0;i<items.length;i+=size){await worker(items.slice(i,i+size),i)}
+}
 importClientsBtn.onclick=()=>{if(!hasPerm('clients'))return;clientExcelFile.value='';clientExcelFile.click()}
-clientExcelFile.onchange=async()=>{const file=clientExcelFile.files?.[0];if(!file)return;try{const data=await file.arrayBuffer();const wb=XLSX.read(data,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{defval:''});const parsed=rows.map(excelRowToClient).filter(Boolean);const seen=new Set();pendingClientImport=parsed.filter(c=>{const key=c.nom.trim().toLowerCase();if(seen.has(key))return false;seen.add(key);return true});const existing=new Set(db.clients.map(c=>c.nom.trim().toLowerCase()));const newCount=pendingClientImport.filter(c=>!existing.has(c.nom.trim().toLowerCase())).length;clientImportSummary.innerHTML=`<b>${pendingClientImport.length}</b> client(s) reconnu(s) dans le fichier, dont <b>${newCount}</b> nouveau(x). Les doublons de nom seront ignorés. Les codes clients seront créés automatiquement à l’import.`;const preview=pendingClientImport.slice(0,20);clientImportPreview.innerHTML=preview.length?'<div class="tablewrap"><table class="table" style="min-width:650px"><thead><tr><th>Nom</th><th>Code</th><th>Responsable</th><th>Catégorie</th><th>Téléphone</th><th>E-mail</th><th>Adresse</th></tr></thead><tbody>'+preview.map(c=>`<tr><td><strong>${esc(c.nom)}</strong></td><td><span class="muted">Automatique</span></td><td>${esc(c.responsable||'')}</td><td>${esc(c.categorie||'')}</td><td>${esc(c.telephone||'')}</td><td>${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Aucun client reconnu. Vérifie la colonne Nom / Client.</div>';confirmClientImportBtn.disabled=!pendingClientImport.length;openModal('clientImportModal')}catch(err){console.error(err);alert('Impossible de lire ce fichier Excel : '+err.message)}}
-confirmClientImportBtn.onclick=async()=>{if(!hasPerm('clients')||!pendingClientImport.length)return;const existing=new Set(db.clients.map(c=>c.nom.trim().toLowerCase()));const toInsert=pendingClientImport.filter(c=>!existing.has(c.nom.trim().toLowerCase()));if(!toInsert.length){alert('Tous les clients de ce fichier existent déjà.');return}confirmClientImportBtn.disabled=true;confirmClientImportBtn.textContent='Import en cours…';let codes;try{codes=await generateClientCodes(toInsert.length)}catch(err){confirmClientImportBtn.disabled=false;confirmClientImportBtn.textContent='Importer dans Supabase';alert('Erreur Supabase lors de la création des codes clients : '+err.message);return}const batchId=(crypto?.randomUUID?crypto.randomUUID():(Date.now()+'-'+Math.random().toString(16).slice(2)));const importedAt=new Date().toISOString();const sourceFile=clientExcelFile.files?.[0]?.name||'Import Excel';toInsert.forEach((c,i)=>{c.code=codes[i];c.import_batch_id=batchId;c.imported_at=importedAt;c.import_filename=sourceFile});const {error}=await sb.from('erp_clients').insert(toInsert);confirmClientImportBtn.disabled=false;confirmClientImportBtn.textContent='Importer dans Supabase';if(error){alert('Erreur Supabase pendant l’import : '+error.message);return}closeModal('clientImportModal');pendingClientImport=[];await refreshData();alert(`${toInsert.length} client(s) importé(s) avec succès. Codes créés de ${codes[0]} à ${codes[codes.length-1]}.`)}
+clientExcelFile.onchange=async()=>{
+  const file=clientExcelFile.files?.[0];if(!file)return;
+  try{
+    const data=await file.arrayBuffer();
+    const wb=XLSX.read(data,{type:'array'});
+    const preferred=wb.SheetNames.find(n=>normHeader(n)==='import clients')||wb.SheetNames[0];
+    const ws=wb.Sheets[preferred];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+    pendingClientImport=rows.map(excelRowToClient).filter(Boolean);
+    const existingOldCodes=new Set(db.clients.map(c=>oldClientCodeFromNotes(c.notes)).filter(Boolean));
+    const existingNames=new Set(db.clients.map(c=>c.nom.trim().toLowerCase()));
+    let updates=0,newRows=0;
+    pendingClientImport.forEach(c=>{
+      const oldCode=oldClientCodeFromNotes(c.notes);
+      if((oldCode&&existingOldCodes.has(oldCode))||(!oldCode&&existingNames.has(c.nom.toLowerCase())))updates++;else newRows++;
+    });
+    const withEmail=pendingClientImport.filter(c=>c.email).length;
+    const withCategory=pendingClientImport.filter(c=>c.categorie).length;
+    const withResp=pendingClientImport.filter(c=>c.responsable).length;
+    clientImportSummary.innerHTML=`<b>${pendingClientImport.length}</b> ligne(s) client reconnue(s). <b>${newRows}</b> nouveau(x) client(s) et <b>${updates}</b> client(s) existant(s) à compléter / mettre à jour.<br><span class="muted">Données détectées : ${withEmail} e-mail(s), ${withCategory} catégorie(s), ${withResp} responsable(s). L'import conserve toutes les lignes du fichier et traite les données par lots.</span>`;
+    const preview=pendingClientImport.slice(0,20);
+    clientImportPreview.innerHTML=preview.length?'<div class="tablewrap"><table class="table" style="min-width:650px"><thead><tr><th>Nom</th><th>Responsable</th><th>Catégorie</th><th>Téléphone</th><th>E-mail</th><th>Adresse</th></tr></thead><tbody>'+preview.map(c=>`<tr><td><strong>${esc(c.nom)}</strong></td><td>${esc(c.responsable||'')}</td><td>${esc(c.categorie||'')}</td><td>${esc(c.telephone||'')}</td><td>${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td></tr>`).join('')+'</tbody></table></div>':'<div class="empty">Aucun client reconnu. Vérifie la feuille IMPORT CLIENTS.</div>';
+    confirmClientImportBtn.disabled=!pendingClientImport.length;
+    openModal('clientImportModal');
+  }catch(err){console.error(err);alert('Impossible de lire ce fichier Excel : '+err.message)}
+}
+confirmClientImportBtn.onclick=async()=>{
+  if(!hasPerm('clients')||!pendingClientImport.length)return;
+  confirmClientImportBtn.disabled=true;confirmClientImportBtn.textContent='Import en cours…';
+  try{
+    const byOldCode=new Map();
+    const byName=new Map();
+    db.clients.forEach(c=>{
+      const oc=oldClientCodeFromNotes(c.notes);if(oc&&!byOldCode.has(oc))byOldCode.set(oc,c);
+      const nm=String(c.nom||'').trim().toLowerCase();if(nm&&!byName.has(nm))byName.set(nm,c);
+    });
+    const toUpdate=[];const toInsert=[];
+    pendingClientImport.forEach(c=>{
+      const oldCode=oldClientCodeFromNotes(c.notes);
+      const existing=(oldCode&&byOldCode.get(oldCode))||(!oldCode&&byName.get(c.nom.trim().toLowerCase()));
+      if(existing)toUpdate.push({id:existing.id,data:mergeImportFields(existing,c)});
+      else toInsert.push({...c,categorie:normalizeClientCategory(c.categorie)});
+    });
+    const batchId=(crypto?.randomUUID?crypto.randomUUID():(Date.now()+'-'+Math.random().toString(16).slice(2)));
+    const importedAt=new Date().toISOString();
+    const sourceFile=clientExcelFile.files?.[0]?.name||'Import Excel';
+    let updateDone=0;
+    await runInChunks(toUpdate,100,async chunk=>{
+      await Promise.all(chunk.map(async u=>{const {error}=await sb.from('erp_clients').update(u.data).eq('id',u.id);if(error)throw error;updateDone++}));
+      confirmClientImportBtn.textContent=`Mise à jour ${updateDone}/${toUpdate.length}…`;
+    });
+    let inserted=0;let codes=[];
+    if(toInsert.length){
+      codes=await generateClientCodes(toInsert.length);
+      toInsert.forEach((c,i)=>{c.code=codes[i];c.import_batch_id=batchId;c.imported_at=importedAt;c.import_filename=sourceFile});
+      await runInChunks(toInsert,200,async chunk=>{
+        const {error}=await sb.from('erp_clients').insert(chunk);if(error)throw error;
+        inserted+=chunk.length;confirmClientImportBtn.textContent=`Import ${inserted}/${toInsert.length}…`;
+      });
+    }
+    closeModal('clientImportModal');pendingClientImport=[];await refreshData();
+    alert(`Import terminé avec succès.\n\n${toUpdate.length} client(s) existant(s) complété(s) / mis à jour.\n${toInsert.length} nouveau(x) client(s) créé(s).\n\nLes e-mails, catégories, responsables, téléphones, adresses et notes du fichier ont été repris.`);
+  }catch(err){console.error(err);alert('Erreur pendant l’import : '+err.message)}
+  finally{confirmClientImportBtn.disabled=false;confirmClientImportBtn.textContent='Importer dans Supabase'}
+}
 
 function importBatches(){
   const map=new Map();
