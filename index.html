@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>RML ERP — V0.7.1</title>
+<title>RML ERP — V0.7.2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -56,10 +56,10 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button data-view="modules">Modules ERP</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>4/9</strong><span>modules opérationnels</span></div></div>
-  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.7.1 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
+  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.7.2 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
   <div class="panel"><h2>Derniers chantiers</h2><div id="recentJobs"></div></div>
 </section>
-<section id="clients" class="view"><div class="panel"><div class="toolbar"><input id="clientSearch" placeholder="Rechercher un client, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn danger" id="deleteLastImportBtn">Supprimer l'import Excel</button><button class="btn" id="newClientBtn">+ Nouveau client</button><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden></div><div class="notice" style="margin-bottom:12px">Import Excel accepté : la première ligne doit contenir les en-têtes. Colonnes reconnues automatiquement : <b>Nom / Client</b>, Responsable, Catégorie, Téléphone, E-mail, Adresse et Notes. Le code client est attribué automatiquement par l’ERP.</div><div id="clientsTable"></div></div></section>
+<section id="clients" class="view"><div class="panel"><div class="toolbar"><input id="clientSearch" placeholder="Rechercher un client, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer l'import Excel</button><button class="btn" id="newClientBtn">+ Nouveau client</button><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div><div class="notice" style="margin-bottom:12px">Import Excel accepté : la première ligne doit contenir les en-têtes. Colonnes reconnues automatiquement : <b>Nom / Client</b>, Responsable, Catégorie, Téléphone, E-mail, Adresse et Notes. Le code client est attribué automatiquement par l’ERP.</div><div id="clientsTable"></div></div></section>
 <section id="chantiers" class="view"><div class="panel"><div class="toolbar"><input id="jobSearch" placeholder="Rechercher un chantier, client, adresse…"><select id="jobFilter"><option value="actif">Actifs</option><option value="attente">En attente</option><option value="termine">Terminés</option><option value="archive">Archivés</option><option value="tous">Tous</option></select><button class="btn" id="newJobBtn">+ Nouveau chantier</button></div><div id="jobsTable"></div></div></section>
 <section id="modules" class="view"><div class="panel"><h2>Modules du futur ERP</h2><div class="module-grid">
 <div class="module" data-permission="chantiers"><h3>Clients & Chantiers</h3><p>Référentiel commun synchronisé avec Supabase DEV et fiche chantier centrale.</p><button class="btn ok" data-go="chantiers">Opérationnel</button></div>
@@ -120,6 +120,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 <div class="modal" id="resetConfirmModal"><div class="modal-card"><div class="modal-head"><h3 id="resetConfirmTitle">Confirmation de réinitialisation</h3><button class="close" data-close="resetConfirmModal">Fermer</button></div><div id="resetConfirmText" class="reset-warning" style="margin-top:14px"></div><div class="reset-confirm-box"><div class="field"><label>Pour confirmer, saisis exactement :</label><code id="resetPhraseLabel"></code><input id="resetPhraseInput" autocomplete="off" spellcheck="false" style="margin-top:8px"></div></div><div class="actions" style="margin-top:14px"><button id="executeResetBtn" class="btn danger" type="button">Confirmer la réinitialisation</button><button class="btn secondary" type="button" data-close="resetConfirmModal">Annuler</button></div></div></div>
 <div class="modal" id="prepSelectModal"><div class="modal-card"><div class="modal-head"><h3>Ouvrir une préparation chantier</h3><button class="close" data-close="prepSelectModal">Fermer</button></div><div class="field" style="margin-top:14px"><label>Chantier</label><select id="prepJobSelect"></select></div><div class="actions" style="margin-top:14px"><button class="btn" type="button" onclick="openSelectedPreparation()">Ouvrir la préparation</button><button class="btn secondary" type="button" data-close="prepSelectModal">Annuler</button></div></div></div>
 <div class="modal" id="suiviSelectModal"><div class="modal-card"><div class="modal-head"><h3>Ouvrir un suivi chantier</h3><button class="close" data-close="suiviSelectModal">Fermer</button></div><div class="field" style="margin-top:14px"><label>Chantier</label><select id="suiviJobSelect"></select></div><div class="actions" style="margin-top:14px"><button class="btn" type="button" onclick="openSelectedSuivi()">Ouvrir le suivi</button><button class="btn secondary" type="button" data-close="suiviSelectModal">Annuler</button></div></div></div>
+<div class="modal" id="chantierImportModal"><div class="modal-card" style="max-width:900px"><div class="modal-head"><h3>Import ancienne application Chantier</h3><button class="close" data-close="chantierImportModal">Fermer</button></div><div class="notice" style="margin-top:14px">Cet import lit une sauvegarde complète RML Préparation Chantier. Il crée/rattache les clients, crée les chantiers manquants et enregistre chaque fiche dans le module Préparation de RML ERP DEV. Aucun fichier de production n'est modifié.</div><div id="chantierImportSummary" style="margin-top:14px"></div><div id="chantierImportPreview" style="max-height:380px;overflow:auto;margin-top:12px"></div><div class="actions" style="margin-top:14px"><button class="btn ok" id="executeChantierImportBtn" type="button">Importer dans ERP DEV</button><button class="btn secondary" type="button" data-close="chantierImportModal">Annuler</button></div></div></div>
 <div class="modal" id="jobCardModal"><div class="modal-card"><div class="modal-head"><h3>Fiche chantier</h3><button class="close" data-close="jobCardModal">Fermer</button></div><div id="jobCardContent" style="margin-top:14px"></div></div></div>
 <script>
 const SUPABASE_URL='https://jbtsncvuobptxyzcoqpf.supabase.co';
@@ -203,7 +204,7 @@ function applyAccessUI(){
   usersNavBtn.style.display=hasPerm('utilisateurs')?'':'none';
   if(window.securityNavBtn)securityNavBtn.style.display=currentAccess?.role==='administrateur'?'':'none';
   newClientBtn.style.display=hasPerm('clients')?'':'none';
-  importClientsBtn.style.display=hasPerm('clients')?'':'none';if(window.deleteLastImportBtn)deleteLastImportBtn.style.display=hasPerm('clients')?'':'none';
+  importClientsBtn.style.display=hasPerm('clients')?'':'none';if(window.importChantierBackupBtn)importChantierBackupBtn.style.display=(hasPerm('clients')&&hasPerm('chantiers')&&hasPerm('preparation'))?'':'none';if(window.deleteLastImportBtn)deleteLastImportBtn.style.display=hasPerm('clients')?'':'none';
   newJobBtn.style.display=hasPerm('chantiers')?'':'none';
   document.querySelectorAll('#modules [data-permission]').forEach(el=>el.style.display=hasPerm(el.dataset.permission)?'':'none');
 }
@@ -282,6 +283,79 @@ function mergeImportFields(existing,incoming){
 async function runInChunks(items,size,worker){
   for(let i=0;i<items.length;i+=size){await worker(items.slice(i,i+size),i)}
 }
+let pendingChantierBackup=null;
+function normText(v=''){return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
+function parseLegacyBackup(raw){
+  if(!raw||raw.app!=='RML Préparation Chantier')throw new Error('Ce fichier n’est pas une sauvegarde RML Préparation Chantier reconnue.');
+  let folders={},projects={};
+  try{folders=JSON.parse(raw.localStorage?.rmlPreparationChantierFoldersV1||'{}')}catch(e){}
+  try{projects=JSON.parse(raw.localStorage?.rmlPreparationChantierProjectsV2||'{}')}catch(e){}
+  const folderNames=Object.fromEntries(Object.values(folders).map(f=>[f.id,f.name||'']));
+  const rows=Object.values(projects).map(pr=>{
+    const d=pr.data||{}, info=d.info||{}, folder=folderNames[pr.folderId]||d._libraryFolderName||'';
+    const client=(info.client||folder||'CLIENT À CLASSER').trim();
+    const chantier=(info.chantier||pr.name||'CHANTIER SANS NOM').trim();
+    return {legacyId:pr.id,folder,projectName:pr.name||chantier,client,chantier,adresse:(info.adresse||'').trim(),info,sections:d.sections||{},savedAt:pr.updatedAt||pr.savedAt||d.savedAt||null};
+  });
+  return {raw,folders,rows};
+}
+function findLegacyClient(row,clients=db.clients){
+  const names=[row.client,row.folder].map(normText).filter(Boolean);
+  return clients.find(c=>names.includes(normText(c.nom)))||null;
+}
+function findLegacyJob(row,clientId,jobs=db.chantiers){
+  const n=normText(row.chantier), a=normText(row.adresse);
+  return jobs.find(j=>j.client_id===clientId && normText(j.nom)===n && (!a||!normText(j.adresse)||normText(j.adresse)===a))||null;
+}
+function legacyPrepPayload(row){
+  const i=row.info||{};
+  return {version:'ERP-LEGACY-V25',legacy_import:true,legacy_project_id:row.legacyId,legacy_saved_at:row.savedAt,info:{type_fiche:i.type_fiche||'preparation',date:i.date||'',horaires:i.horaires||'',acces:i.acces||'',chef:i.chef||'',telephone:i.telephone||'',contact_chantier:i.contact_chantier||'',telephone_contact:i.telephone_contact||'',remarques:i.remarques||''},sections:row.sections||{}};
+}
+function previewLegacyImport(parsed){
+  let newClients=0,newJobs=0,existingJobs=0;const virtualClients=[...db.clients],virtualJobs=[...db.chantiers];
+  const details=parsed.rows.map((r,idx)=>{
+    let c=findLegacyClient(r,virtualClients),clientStatus='existant';
+    if(!c){c={id:'virtual-client-'+idx,nom:r.client};virtualClients.push(c);newClients++;clientStatus='à créer'}
+    let j=findLegacyJob(r,c.id,virtualJobs),jobStatus='existant';
+    if(!j){j={id:'virtual-job-'+idx,client_id:c.id,nom:r.chantier,adresse:r.adresse};virtualJobs.push(j);newJobs++;jobStatus='à créer'}else existingJobs++;
+    return {...r,clientStatus,jobStatus};
+  });
+  return {details,newClients,newJobs,existingJobs};
+}
+function renderLegacyPreview(parsed){
+  const p=previewLegacyImport(parsed);pendingChantierBackup={...parsed,preview:p};
+  chantierImportSummary.innerHTML=`<div class="stats"><div class="stat"><b>${p.details.length}</b><span>fiches trouvées</span></div><div class="stat"><b>${p.newClients}</b><span>clients à créer</span></div><div class="stat"><b>${p.newJobs}</b><span>chantiers à créer</span></div><div class="stat"><b>${p.existingJobs}</b><span>chantiers déjà présents</span></div></div>`;
+  chantierImportPreview.innerHTML=`<table><thead><tr><th>Client</th><th>Chantier</th><th>Adresse</th><th>Client ERP</th><th>Chantier ERP</th></tr></thead><tbody>${p.details.map(r=>`<tr><td>${esc(r.client)}</td><td>${esc(r.chantier)}</td><td>${esc(r.adresse)}</td><td>${esc(r.clientStatus)}</td><td>${esc(r.jobStatus)}</td></tr>`).join('')}</tbody></table>`;
+}
+importChantierBackupBtn.onclick=()=>{if(!hasPerm('clients')||!hasPerm('chantiers')||!hasPerm('preparation')){alert('Il faut les droits Clients, Chantiers et Préparation pour effectuer cet import.');return}chantierBackupFile.value='';chantierBackupFile.click()}
+chantierBackupFile.onchange=async()=>{const f=chantierBackupFile.files?.[0];if(!f)return;try{const raw=JSON.parse(await f.text());const parsed=parseLegacyBackup(raw);if(!parsed.rows.length)throw new Error('Aucune fiche enregistrée trouvée dans cette sauvegarde.');renderLegacyPreview(parsed);openModal('chantierImportModal')}catch(err){alert('Import impossible : '+err.message)}}
+executeChantierImportBtn.onclick=async()=>{
+  if(!pendingChantierBackup)return;
+  if(!confirm(`Importer ${pendingChantierBackup.rows.length} fiche(s) dans RML ERP DEV ?\n\nLes clients/chantiers existants seront réutilisés quand ils correspondent. Les préparations existantes sur un chantier correspondant seront mises à jour avec la fiche importée.`))return;
+  executeChantierImportBtn.disabled=true;executeChantierImportBtn.textContent='Import en cours…';
+  try{
+    await refreshData();let createdClients=0,createdJobs=0,savedPreps=0;const clientCache=[...db.clients],jobCache=[...db.chantiers];
+    for(const r of pendingChantierBackup.rows){
+      let c=findLegacyClient(r,clientCache);
+      if(!c){
+        const clientRow={nom:r.client,telephone:r.info?.telephone||null,adresse:null,notes:'Créé depuis sauvegarde RML Préparation Chantier',actif:true};
+        const {data,error}=await sb.from('erp_clients').insert(clientRow).select('*').single();if(error)throw error;c=data;clientCache.push(c);createdClients++;
+      }
+      let j=findLegacyJob(r,c.id,jobCache);
+      if(!j){
+        const jobRow={client_id:c.id,nom:r.chantier,adresse:r.adresse||null,contact_nom:r.info?.contact_chantier||null,contact_telephone:r.info?.telephone_contact||null,chef_equipe:r.info?.chef||null,statut:'actif',date_debut:r.info?.date||null,notes:r.info?.remarques||null};
+        const {data,error}=await sb.from('erp_chantiers').insert(jobRow).select('*').single();if(error)throw error;j=data;jobCache.push(j);createdJobs++;
+      }else{
+        const patch={};if(!j.adresse&&r.adresse)patch.adresse=r.adresse;if(!j.contact_nom&&r.info?.contact_chantier)patch.contact_nom=r.info.contact_chantier;if(!j.contact_telephone&&r.info?.telephone_contact)patch.contact_telephone=r.info.telephone_contact;if(!j.chef_equipe&&r.info?.chef)patch.chef_equipe=r.info.chef;if(!j.date_debut&&r.info?.date)patch.date_debut=r.info.date;
+        if(Object.keys(patch).length){const {error}=await sb.from('erp_chantiers').update(patch).eq('id',j.id);if(error)throw error;Object.assign(j,patch)}
+      }
+      const moduleRow={chantier_id:j.id,module:'preparation',entity_type:'chantier',entity_id:j.id,payload:legacyPrepPayload(r),deleted:false};
+      const {error}=await sb.from('erp_modules_data').upsert(moduleRow,{onConflict:'module,entity_type,entity_id'});if(error)throw error;savedPreps++;
+    }
+    await refreshData();closeModal('chantierImportModal');pendingChantierBackup=null;alert(`Import terminé.\n\n${createdClients} client(s) créé(s)\n${createdJobs} chantier(s) créé(s)\n${savedPreps} préparation(s) enregistrée(s)`);
+  }catch(err){console.error(err);alert('Erreur pendant l’import : '+err.message)}finally{executeChantierImportBtn.disabled=false;executeChantierImportBtn.textContent='Importer dans ERP DEV'}
+}
+
 importClientsBtn.onclick=()=>{if(!hasPerm('clients'))return;clientExcelFile.value='';clientExcelFile.click()}
 clientExcelFile.onchange=async()=>{
   const file=clientExcelFile.files?.[0];if(!file)return;
