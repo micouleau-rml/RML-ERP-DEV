@@ -284,6 +284,33 @@ body.erp-embedded #erpMonthlyNeeds{display:block}
 #erpMonthlyNeeds .months{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
 #erpMonthlyNeeds button{border:1px solid #cbd5e1;background:#fff;border-radius:999px;padding:6px 10px;cursor:pointer;font-weight:700}
 </style>
+
+<style id="erp-v087-real-header-fix">
+.top{display:none!important}
+#erpCompactCommandesBar{
+ display:flex!important;
+ min-height:0!important;
+ padding:6px 12px!important;
+ align-items:center!important;
+ justify-content:center!important;
+ gap:10px!important;
+ background:#b8bcc4!important;
+ position:sticky!important;
+ top:0!important;
+ z-index:120!important;
+}
+#erpMonthlyNeeds{
+ display:block!important;
+ padding:5px 12px 7px!important;
+ background:#f8fafc!important;
+ position:sticky!important;
+ top:38px!important;
+ z-index:119!important;
+}
+#erpMonthlyNeeds b{font-size:13px!important}
+#erpMonthlyNeeds .months{margin-top:4px!important}
+#erpMonthlyNeeds button{padding:4px 9px!important;font-size:12px!important}
+</style>
 </head>
 <body>
 <div id="erpCompactCommandesBar">
@@ -7964,7 +7991,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
     const j=msg.chantier,needs=Array.isArray(msg.needs)?msg.needs:[];
     if(!j){box.innerHTML='<div style="padding:12px"><b>Prévision ERP</b><div style="font-size:12px;margin-top:5px">Ouvre Commandes depuis un dossier chantier pour recevoir les besoins.</div></div>';return}
     const rows=needs.map(n=>`<tr><td style="padding:5px;border-bottom:1px solid #ddd">${escRml(n.nom)}${n.color?`<div style="font-size:11px;color:#666">${escRml(n.color)}</div>`:''}</td><td style="padding:5px;border-bottom:1px solid #ddd;text-align:right"><b>${escRml(n.total)} ${escRml(n.unite)}</b></td></tr>`).join('');
-    box.innerHTML=`<div style="padding:10px 12px;background:#ecfdf5;border-radius:12px 12px 0 0"><b>Prévision matériaux — ERP V0.8.6</b><div style="font-size:12px;margin-top:3px">${escRml(j.client)} — ${escRml(j.nom)}</div></div><div style="padding:10px 12px"><div style="font-size:12px;margin-bottom:7px">Besoins issus de <b>Préparation chantier</b>. Ils servent de référence avant la commande réelle.</div>${needs.length?`<table style="width:100%;border-collapse:collapse;font-size:12px">${rows}</table>`:'<div style="padding:8px;background:#fff7ed;border-radius:8px">Aucun matériau renseigné dans Préparation.</div>'}<button onclick="document.getElementById('rmlErpForecast').style.display='none'" style="margin-top:9px;padding:7px 10px;border:0;border-radius:8px;cursor:pointer">Réduire</button></div>`;
+    box.innerHTML=`<div style="padding:10px 12px;background:#ecfdf5;border-radius:12px 12px 0 0"><b>Prévision matériaux — ERP V0.8.7</b><div style="font-size:12px;margin-top:3px">${escRml(j.client)} — ${escRml(j.nom)}</div></div><div style="padding:10px 12px"><div style="font-size:12px;margin-bottom:7px">Besoins issus de <b>Préparation chantier</b>. Ils servent de référence avant la commande réelle.</div>${needs.length?`<table style="width:100%;border-collapse:collapse;font-size:12px">${rows}</table>`:'<div style="padding:8px;background:#fff7ed;border-radius:8px">Aucun matériau renseigné dans Préparation.</div>'}<button onclick="document.getElementById('rmlErpForecast').style.display='none'" style="margin-top:9px;padding:7px 10px;border:0;border-radius:8px;cursor:pointer">Réduire</button></div>`;
     box.style.display='block';
   }
   window.addEventListener('message',e=>{if(e.data?.type==='RML_ERP_COMMANDES_CONTEXT')renderRmlForecast(e.data)});
