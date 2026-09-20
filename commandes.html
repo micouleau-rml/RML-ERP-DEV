@@ -246,10 +246,7 @@ th{background:#f8fafc}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<style id="v080cmd">
-html,body{height:100%!important;min-height:0!important;overflow:hidden!important}
-#rmlV080Scroll{height:100%;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-</style></head>
+</head>
 <body>
 
 <input id="excelImportInput"
@@ -7913,18 +7910,16 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
   function escRml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
   function renderRmlForecast(msg){
     let box=document.getElementById('rmlErpForecast');
-    if(!box){box=document.createElement('div');box.id='rmlErpForecast';box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:999999;width:min(430px,calc(100vw - 24px));height:min(620px,calc(100vh - 24px));overflow:hidden;background:#fff;border:2px solid #0f766e;border-radius:14px;box-shadow:0 12px 35px #0003;font-family:Arial,sans-serif;display:flex;flex-direction:column';document.body.appendChild(box)}
+    if(!box){box=document.createElement('div');box.id='rmlErpForecast';box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:999999;width:min(430px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;background:#fff;border:2px solid #0f766e;border-radius:14px;box-shadow:0 12px 35px #0003;font-family:Arial,sans-serif';document.body.appendChild(box)}
     const j=msg.chantier,needs=Array.isArray(msg.needs)?msg.needs:[];
     if(!j){box.innerHTML='<div style="padding:12px"><b>Prévision ERP</b><div style="font-size:12px;margin-top:5px">Ouvre Commandes depuis un dossier chantier pour recevoir les besoins.</div></div>';return}
     const rows=needs.map(n=>`<tr><td style="padding:5px;border-bottom:1px solid #ddd">${escRml(n.nom)}${n.color?`<div style="font-size:11px;color:#666">${escRml(n.color)}</div>`:''}</td><td style="padding:5px;border-bottom:1px solid #ddd;text-align:right"><b>${escRml(n.total)} ${escRml(n.unite)}</b></td></tr>`).join('');
-    box.innerHTML=`<div style="padding:10px 12px;background:#ecfdf5;border-radius:12px 12px 0 0;flex:0 0 auto"><b>Prévision matériaux — ERP V0.8.0</b><div style="font-size:12px;margin-top:3px">${escRml(j.client)} — ${escRml(j.nom)}</div></div><div style="padding:10px 12px;overflow-y:auto;min-height:0;flex:1 1 auto"><div style="font-size:12px;margin-bottom:7px">Besoins issus de <b>Préparation chantier</b>. Ils servent de référence avant la commande réelle.</div>${needs.length?`<table style="width:100%;border-collapse:collapse;font-size:12px">${rows}</table>`:'<div style="padding:8px;background:#fff7ed;border-radius:8px">Aucun matériau renseigné dans Préparation.</div>'}</div><div style="padding:9px 12px;border-top:1px solid #ddd;background:#fff;flex:0 0 auto"><button onclick="document.getElementById('rmlErpForecast').style.display='none'" style="width:100%;padding:9px 10px;border:0;border-radius:8px;cursor:pointer">Fermer la prévision</button></div>`;
+    box.innerHTML=`<div style="padding:10px 12px;background:#ecfdf5;border-radius:12px 12px 0 0"><b>Prévision matériaux — ERP V0.8.1</b><div style="font-size:12px;margin-top:3px">${escRml(j.client)} — ${escRml(j.nom)}</div></div><div style="padding:10px 12px"><div style="font-size:12px;margin-bottom:7px">Besoins issus de <b>Préparation chantier</b>. Ils servent de référence avant la commande réelle.</div>${needs.length?`<table style="width:100%;border-collapse:collapse;font-size:12px">${rows}</table>`:'<div style="padding:8px;background:#fff7ed;border-radius:8px">Aucun matériau renseigné dans Préparation.</div>'}<button onclick="document.getElementById('rmlErpForecast').style.display='none'" style="margin-top:9px;padding:7px 10px;border:0;border-radius:8px;cursor:pointer">Réduire</button></div>`;
     box.style.display='block';
   }
   window.addEventListener('message',e=>{if(e.data?.type==='RML_ERP_COMMANDES_CONTEXT')renderRmlForecast(e.data)});
 })();
 </script>
 
-<script>
-(function(){function init(){if(document.getElementById('rmlV080Scroll'))return;const sc=document.createElement('div');sc.id='rmlV080Scroll';const nodes=[...document.body.childNodes].filter(n=>!(n.nodeType===1&&n.id==='rmlErpForecast')&&!(n.nodeType===1&&n.tagName==='SCRIPT'));if(nodes.length){document.body.insertBefore(sc,nodes[0]);nodes.forEach(n=>sc.appendChild(n));}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();})();
-</script></body>
+</body>
 </html>
