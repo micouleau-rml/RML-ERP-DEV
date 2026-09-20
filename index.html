@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>RML ERP — V0.8.4</title>
+<title>RML ERP — V0.8.5</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -40,7 +40,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 </style>
 
 <style>
-/* V0.8.4 — Commandes intégrées : défilement interne */
+/* V0.8.5 — Commandes intégrées : défilement interne */
 #commandes{height:calc(100vh - 205px);min-height:560px;overflow:hidden}
 #commandes .card{height:100%;display:flex;flex-direction:column;overflow:hidden}
 #commandesFrame{display:block;width:100%;height:100%;min-height:0;flex:1 1 auto;border:0;overflow:auto}
@@ -62,56 +62,10 @@ body.commandes-mode #commandes>.card{height:100%!important;min-height:0!importan
 body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!important;min-height:0!important;border:0!important}
 #jobCardModal .module-card,#jobCardModal .module-tile{display:flex!important;flex-direction:column!important}
 #jobCardModal .module-card button,#jobCardModal .module-tile button{margin-top:auto!important}
-</style>
-<style id="v084-commandes-overlay">
-body.rml-cmd-overlay{
-  overflow:hidden!important;
-  height:100dvh!important;
-}
-body.rml-cmd-overlay #commandes{
-  display:flex!important;
-  flex-direction:column!important;
-  position:fixed!important;
-  z-index:5000!important;
-  left:0!important;
-  right:0!important;
-  top:196px!important;
-  bottom:0!important;
-  width:auto!important;
-  height:auto!important;
-  max-height:none!important;
-  margin:0!important;
-  padding:12px 3.5% 0!important;
-  overflow:hidden!important;
-  background:#eef2f6!important;
-}
-body.rml-cmd-overlay #commandes>.card{
-  flex:1 1 auto!important;
-  height:auto!important;
-  min-height:0!important;
-  max-height:none!important;
-  margin:0!important;
-  overflow:hidden!important;
-  display:flex!important;
-  flex-direction:column!important;
-}
-body.rml-cmd-overlay #commandesFrame{
-  display:block!important;
-  flex:1 1 0!important;
-  width:100%!important;
-  height:0!important;
-  min-height:0!important;
-  max-height:none!important;
-  border:0!important;
-  overflow:auto!important;
-}
-@media(max-width:800px){
- body.rml-cmd-overlay #commandes{top:176px!important;padding:8px 10px 0!important}
-}
+</style><style id="v085-card-align">
 #jobCardModal .module-card,#jobCardModal .module-tile{display:flex!important;flex-direction:column!important}
 #jobCardModal .module-card button,#jobCardModal .module-tile button{margin-top:auto!important}
-</style>
-</head>
+</style></head>
 <body>
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
@@ -123,16 +77,16 @@ body.rml-cmd-overlay #commandesFrame{
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.8.4</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.8.5</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button data-view="modules">Modules ERP</button><button onclick="openMonthlyForecast()">Prévision commandes</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>4/9</strong><span>modules opérationnels</span></div></div>
-  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.8.4 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
+  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.8.5 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
   <div class="panel"><h2>Derniers chantiers</h2><div id="recentJobs"></div></div>
 </section>
-<section id="clients" class="view"><div class="panel"><div class="toolbar"><input id="clientSearch" placeholder="Rechercher un client, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer l'import Excel</button><button class="btn" id="newClientBtn">+ Nouveau client</button><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div><div class="notice" style="margin-bottom:12px">Import Excel accepté : la première ligne doit contenir les en-têtes. Colonnes reconnues automatiquement : <b>Nom / Client</b>, Responsable, Catégorie, Téléphone, E-mail, Adresse et Notes. Le code client est attribué automatiquement par l’ERP.</div><div class="notice" style="margin-bottom:12px"><b>Classement ERP :</b> ouvre un client pour retrouver tous ses chantiers à l’intérieur de son dossier. La V0.8.4 charge désormais la totalité des clients Supabase, au-delà de la limite de 1000 lignes.</div><div id="clientsTable"></div></div></section>
+<section id="clients" class="view"><div class="panel"><div class="toolbar"><input id="clientSearch" placeholder="Rechercher un client, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer l'import Excel</button><button class="btn" id="newClientBtn">+ Nouveau client</button><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div><div class="notice" style="margin-bottom:12px">Import Excel accepté : la première ligne doit contenir les en-têtes. Colonnes reconnues automatiquement : <b>Nom / Client</b>, Responsable, Catégorie, Téléphone, E-mail, Adresse et Notes. Le code client est attribué automatiquement par l’ERP.</div><div class="notice" style="margin-bottom:12px"><b>Classement ERP :</b> ouvre un client pour retrouver tous ses chantiers à l’intérieur de son dossier. La V0.8.5 charge désormais la totalité des clients Supabase, au-delà de la limite de 1000 lignes.</div><div id="clientsTable"></div></div></section>
 <section id="chantiers" class="view"><div class="panel"><div class="toolbar"><input id="jobSearch" placeholder="Rechercher un chantier, client, adresse…"><select id="jobFilter"><option value="actif">Actifs</option><option value="attente">En attente</option><option value="termine">Terminés</option><option value="archive">Archivés</option><option value="tous">Tous</option></select><button class="btn" id="newJobBtn">+ Nouveau chantier</button></div><div id="jobsTable"></div></div></section>
 <section id="modules" class="view"><div class="panel"><h2>Modules du futur ERP</h2><div class="module-grid">
 <div class="module" data-permission="chantiers"><h3>Clients & Chantiers</h3><p>Référentiel commun synchronisé avec Supabase DEV et fiche chantier centrale.</p><button class="btn ok" data-go="chantiers">Opérationnel</button></div>
@@ -260,6 +214,7 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
     <div id="monthlyForecastModalBody" style="overflow:auto;min-height:0;margin-top:12px"></div>
   </div>
 </div>
+
 </body></html>`);win.document.close()}
 
 
@@ -308,18 +263,18 @@ async function syncPreparationDestinations(jobId,prepPayload){
   try{
     const {data}=await sb.from('erp_modules_data').select('payload').eq('chantier_id',jobId).eq('module','suivi').eq('entity_type','chantier').eq('entity_id',jobId).maybeSingle();
     const merged=mergePreparationIntoSuivi(data?.payload,prepPayload);
-    await sb.from('erp_modules_data').upsert({chantier_id:jobId,module:'suivi',entity_type:'chantier',entity_id:jobId,payload:{...merged,version:'ERP-V0.8.4',saved_at:new Date().toISOString()},deleted:false},{onConflict:'module,entity_type,entity_id'});
+    await sb.from('erp_modules_data').upsert({chantier_id:jobId,module:'suivi',entity_type:'chantier',entity_id:jobId,payload:{...merged,version:'ERP-V0.8.5',saved_at:new Date().toISOString()},deleted:false},{onConflict:'module,entity_type,entity_id'});
   }catch(e){console.warn('Synchronisation suivi',e)}
   // Commandes : conserve un instantané des besoins du chantier dans Supabase.
   try{
     const needs=preparationNeeds(prepPayload);
-    await sb.from('erp_modules_data').upsert({chantier_id:jobId,module:'commandes_prevision',entity_type:'chantier',entity_id:jobId,payload:{version:'ERP-V0.8.4',saved_at:new Date().toISOString(),needs},deleted:false},{onConflict:'module,entity_type,entity_id'});
+    await sb.from('erp_modules_data').upsert({chantier_id:jobId,module:'commandes_prevision',entity_type:'chantier',entity_id:jobId,payload:{version:'ERP-V0.8.5',saved_at:new Date().toISOString(),needs},deleted:false},{onConflict:'module,entity_type,entity_id'});
   }catch(e){console.warn('Synchronisation prévision commandes',e)}
 }
 
 let currentSuiviJobId=null,currentSuiviSourceJobId=null,suiviData=null,suiviSaving=false;
 function suiviUid(){return 's'+Date.now()+Math.floor(Math.random()*1000000)}
-function defaultSuivi(){return {version:'ERP-V0.8.4',locked:false,ilots:[]}}
+function defaultSuivi(){return {version:'ERP-V0.8.5',locked:false,ilots:[]}}
 function normalizeSuivi(payload){const p=payload&&typeof payload==='object'?payload:defaultSuivi();if(!Array.isArray(p.ilots))p.ilots=[];p.locked=!!p.locked;p.ilots.forEach(il=>{if(!il.id)il.id=suiviUid();if(!Array.isArray(il.produits))il.produits=[];il.produits.forEach(pr=>{if(!pr.id)pr.id=suiviUid();pr.total=Number(pr.total||0);pr.pose=Number(pr.pose||0);pr.unite=pr.unite||'u'})});return p}
 function suiviStats(ilots){let total=0,pose=0;(ilots||[]).forEach(il=>(il.produits||[]).forEach(pr=>{total+=Number(pr.total||0);pose+=Number(pr.pose||0)}));return {total,pose,reste:total-pose,pct:total>0?Math.round(pose/total*100):0}}
 function suiviStatus(text,cls=''){suiviSaveStatus.textContent=text;suiviSaveStatus.className='suivi-save-status '+cls}
@@ -330,7 +285,7 @@ function renderSuivi(){if(!currentSuiviJobId||!suiviData){suiviBody.innerHTML=''
 if(!suiviData.ilots.length)h+=`<div class="empty">Aucun îlot. Clique sur <b>+ Ajouter un îlot</b> pour commencer le suivi de ce chantier.</div>`;
 suiviData.ilots.forEach(il=>{const st=suiviStats([il]);h+=`<div class="suivi-ilot"><div class="suivi-ilot-head"><div class="suivi-ilot-name">${esc(il.nom)}${il.autoPreparation?' <span class="suivi-lock">Synchronisé Préparation</span>':''}</div>${il.autoPreparation?'':`<div class="actions structure-action"><button onclick="suiviDuplicateIlot('${il.id}')">Dupliquer</button><button onclick="suiviRenameIlot('${il.id}')">Renommer</button><button style="background:#fdecec;color:var(--danger)" onclick="suiviDeleteIlot('${il.id}')">Supprimer</button></div>`}</div><div class="suivi-summary"><div class="suivi-sum"><span>Total prévu</span><strong>${suiviFmt(st.total)}</strong></div><div class="suivi-sum"><span>Total posé</span><strong>${suiviFmt(st.pose)}</strong></div><div class="suivi-sum"><span>Reste</span><strong class="${st.reste<0?'suivi-neg':st.reste>0?'suivi-warn':'suivi-ok'}">${suiviFmt(st.reste)}</strong></div><div class="suivi-sum"><span>Avancement</span><strong class="suivi-ok">${st.pct}%</strong></div></div>${suiviResteHtml(il)}${il.autoPreparation?'':`<div class="actions structure-action"><button onclick="suiviAddProduct('${il.id}')">+ Produit</button></div>`}`;(il.produits||[]).forEach(pr=>{const r=Number(pr.total||0)-Number(pr.pose||0),pct=Number(pr.total||0)>0?Math.round(Number(pr.pose||0)/Number(pr.total||0)*100):0;h+=`<div class="suivi-product"><div class="suivi-product-grid"><div><strong>${esc(pr.nom)}</strong><div class="muted">Unité : ${esc(pr.unite||'u')}</div></div><div class="suivi-kpi"><span>Prévu</span><input class="structure-action" type="number" inputmode="decimal" value="${esc(pr.total)}" ${pr.fromPreparation?'readonly title="Quantité issue de Préparation chantier"':`onchange="suiviSetTotal('${il.id}','${pr.id}',this.value)"`}></div><div class="suivi-kpi"><span>Posé</span><input type="number" inputmode="decimal" value="${esc(pr.pose)}" onchange="suiviSetPose('${il.id}','${pr.id}',this.value)"></div><div class="suivi-kpi"><span>Reste</span><strong class="${r<0?'suivi-neg':r>0?'suivi-warn':'suivi-ok'}">${suiviFmt(r)} ${esc(pr.unite||'')}</strong></div><div class="suivi-kpi"><span>Avancement</span><strong class="suivi-ok">${pct}%</strong></div></div>${pr.fromPreparation?'':`<div class="actions structure-action" style="margin-top:7px"><button onclick="suiviEditProduct('${il.id}','${pr.id}')">Modifier</button><button style="background:#fdecec;color:var(--danger)" onclick="suiviDeleteProduct('${il.id}','${pr.id}')">Supprimer</button></div>`}</div>`});h+='</div>'});h+='</div>';suiviBody.innerHTML=h}
 async function openSuivi(jobId){if(!hasPerm('suivi')){alert('Accès non autorisé au module Suivi chantier.');return}const job=db.chantiers.find(j=>j.id===jobId);if(!job)return;currentSuiviJobId=jobId;currentSuiviSourceJobId=jobId;suiviStatus('Chargement Préparation + Suivi depuis Supabase…');const [{data,error},prepPayload]=await Promise.all([sb.from('erp_modules_data').select('payload,updated_at').eq('chantier_id',jobId).eq('module','suivi').eq('entity_type','chantier').eq('entity_id',jobId).maybeSingle(),loadPreparationPayload(jobId).catch(()=>null)]);if(error){suiviStatus('Erreur de chargement : '+error.message,'danger');return}suiviData=prepPayload?mergePreparationIntoSuivi(data?.payload,prepPayload):normalizeSuivi(data?.payload);renderSuivi();if(prepPayload)await saveSuivi(false);suiviStatus(prepPayload?'Suivi synchronisé avec la Préparation · quantités prévues à jour.':(data?'Suivi chargé et synchronisé.':'Nouveau suivi — aucune préparation enregistrée.'),prepPayload||data?'ok':'');closeModal('jobCardModal');closeModal('suiviSelectModal');go('suivi')}
-async function saveSuivi(showAlert=false){if(!hasPerm('suivi')||!currentSuiviJobId||!suiviData||suiviSaving)return;suiviSaving=true;suiviStatus('Enregistrement…');const payload={...suiviData,version:'ERP-V0.8.4',saved_at:new Date().toISOString()};const row={chantier_id:currentSuiviJobId,module:'suivi',entity_type:'chantier',entity_id:currentSuiviJobId,payload,deleted:false};const {error}=await sb.from('erp_modules_data').upsert(row,{onConflict:'module,entity_type,entity_id'});suiviSaving=false;if(error){suiviStatus('Erreur Supabase : '+error.message,'danger');if(showAlert)alert('Erreur Supabase : '+error.message);return}suiviStatus('Suivi enregistré et synchronisé.','ok');if(showAlert)alert('Suivi chantier enregistré.')}
+async function saveSuivi(showAlert=false){if(!hasPerm('suivi')||!currentSuiviJobId||!suiviData||suiviSaving)return;suiviSaving=true;suiviStatus('Enregistrement…');const payload={...suiviData,version:'ERP-V0.8.5',saved_at:new Date().toISOString()};const row={chantier_id:currentSuiviJobId,module:'suivi',entity_type:'chantier',entity_id:currentSuiviJobId,payload,deleted:false};const {error}=await sb.from('erp_modules_data').upsert(row,{onConflict:'module,entity_type,entity_id'});suiviSaving=false;if(error){suiviStatus('Erreur Supabase : '+error.message,'danger');if(showAlert)alert('Erreur Supabase : '+error.message);return}suiviStatus('Suivi enregistré et synchronisé.','ok');if(showAlert)alert('Suivi chantier enregistré.')}
 function suiviChanged(){renderSuivi();saveSuivi(false)}
 function closeSuivi(){const id=currentSuiviSourceJobId;go('chantiers');if(id)setTimeout(()=>openJob(id),0)}
 function openSuiviSelector(){if(!hasPerm('suivi'))return;const rows=db.chantiers.filter(j=>j.statut!=='archive').sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));suiviJobSelect.innerHTML='<option value="">Sélectionner un chantier…</option>'+rows.map(j=>`<option value="${j.id}">${esc(clientName(j.client_id))} — ${esc(j.nom)}</option>`).join('');openModal('suiviSelectModal')}
@@ -701,17 +656,17 @@ async function openCommandes(jobId=null){
   const ctx=document.getElementById('commandesContext');
   if(ctx)ctx.textContent=job?`${client?.nom||''} — ${job.nom||''} · prévision matériaux issue de Préparation`:'Application Commandes V18 intégrée dans RML ERP DEV.';
   try{closeModal('jobCardModal')}catch(e){}
-  go('commandes');document.body.classList.add('rml-cmd-overlay');
+  go('commandes');
   const frame=document.getElementById('commandesFrame');
   let prep=null,needs=[];
   if(job){
     try{prep=await loadPreparationPayload(job.id);needs=preparationNeeds(prep);if(prep)await syncPreparationDestinations(job.id,prep)}catch(e){console.warn(e)}
   }
-  const msg={type:'RML_ERP_COMMANDES_CONTEXT',version:'V0.8.4',chantier:job?{id:job.id,nom:job.nom,adresse:job.adresse||'',client:client?.nom||''}:null,needs};
+  const msg={type:'RML_ERP_COMMANDES_CONTEXT',version:'V0.8.5',chantier:job?{id:job.id,nom:job.nom,adresse:job.adresse||'',client:client?.nom||''}:null,needs};
   const send=()=>{try{frame?.contentWindow?.postMessage(msg,'*')}catch(e){}};
   send(); if(frame)frame.onload=()=>send(); setTimeout(send,500);
 }
-function closeCommandes(){document.body.classList.remove('rml-cmd-overlay');
+function closeCommandes(){
   if(currentPrepSourceJobId && db.chantiers.some(j=>j.id===currentPrepSourceJobId)){openJob(currentPrepSourceJobId);go('chantiers');}
   else go('modules');
 }
@@ -821,13 +776,35 @@ async function openMonthlyForecast(){
   await renderMonthlyForecast();
 }
 
-document.addEventListener('click',function(e){
- const el=e.target.closest('button,a'); if(!el)return;
- const t=(el.textContent||'').trim();
- if(/^(Accueil|Clients|Chantiers|Modules ERP|Prévision commandes|Utilisateurs & accès|Sécurité)/i.test(t)){
-   document.body.classList.remove('rml-cmd-overlay');
+(function(){
+ const frame=document.getElementById('commandesFrame');
+ if(!frame)return;
+ let y=0,locked=false;
+ function lockParent(){
+   if(locked)return;
+   y=window.scrollY||document.documentElement.scrollTop||0;
+   document.body.style.overflow='hidden';
+   document.documentElement.style.overflow='hidden';
+   locked=true;
  }
-});
+ function unlockParent(){
+   if(!locked)return;
+   document.body.style.overflow='';
+   document.documentElement.style.overflow='';
+   locked=false;
+   window.scrollTo(0,y);
+ }
+ frame.addEventListener('mouseenter',lockParent);
+ frame.addEventListener('mouseleave',unlockParent);
+ frame.addEventListener('focus',lockParent);
+ window.addEventListener('blur',function(){
+   if(document.activeElement!==frame) unlockParent();
+ });
+ document.addEventListener('click',function(e){
+   const t=(e.target.textContent||'').trim();
+   if(/^(Retour|Accueil|Clients|Chantiers|Modules ERP|Prévision commandes|Utilisateurs & accès|Sécurité)/i.test(t)) unlockParent();
+ });
+})();
 
 </script>
 </body>
