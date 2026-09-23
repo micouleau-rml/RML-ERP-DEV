@@ -1,15 +1,11 @@
-RML ERP DEV — V0.7.0
+RML ERP DEV V0.10 — Atelier + Heures
 
-NOUVEAUTÉ
-- Intégration du module Suivi chantier dans l'ERP DEV.
-- Ouverture depuis la fiche chantier centrale ou depuis Modules ERP.
-- Îlots, duplication d'îlot, produits, prévu, posé, reste à poser, avancement et verrouillage de structure.
-- Posé supérieur au prévu autorisé : le reste peut devenir négatif.
-- Enregistrement automatique dans Supabase ERP DEV, table erp_modules_data, module = suivi.
-- Impression / PDF via le navigateur.
-- Les clients et chantiers viennent du référentiel central ERP.
+Fichiers à remplacer dans GitHub :
+- index.html
+- commandes.html (fourni pour conserver le lot complet)
 
-INSTALLATION
-- Aucun nouveau SQL à exécuter si V0.6.7+ fonctionne déjà.
-- Remplacer uniquement index.html dans le dépôt GitHub RML-ERP-DEV.
-- Cette version ne lit ni ne modifie l'application Suivi Chantier de production.
+Aucun SQL supplémentaire n'est nécessaire pour ces deux modules : ils utilisent erp_modules_data.
+Atelier : module=atelier / entity_type=travail.
+Heures : module=heures / entity_type=saisie.
+
+Environnement DEV uniquement. Aucune application de production n'est modifiée.
