@@ -1,0 +1,2736 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>RML Heures — ERP DEV</title>
+<meta name="application-name" content="RML Heures" />
+
+<style>
+:root{--bg:#eef1f5;--card:#fff;--ink:#151b26;--muted:#6b7280;--nav:#111827;--accent:#b91c1c;--accent2:#1d4ed8;--ok:#15803d;--warn:#b45309;--line:#d7dce3;--shadow:0 10px 30px rgba(15,23,42,.10);--r:18px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#0f172a,#1f2937);color:#fff;padding:14px 16px 12px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.brand{max-width:1250px;margin:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}.brand>div:last-child{display:flex;flex-direction:column;align-items:center}.brand .logo{width:82px;height:82px}.logo{width:46px;height:46px;border-radius:13px;background:#fff;color:#111827;font-weight:900;display:grid;place-items:center;letter-spacing:-1px}.brand h1{font-size:20px;margin:0}.brand small{opacity:.75}
+nav{max-width:1250px;margin:10px auto 0;display:flex;gap:8px;overflow:auto}.tab{border:0;background:rgba(255,255,255,.1);color:#fff;padding:9px 13px;border-radius:999px;font-weight:700;white-space:nowrap}.tab.active{background:#fff;color:#111827}
+main{max-width:1250px;margin:18px auto 80px;padding:0 14px}.view{display:none}.view.active{display:block}.grid{display:grid;gap:14px}.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:var(--card);border:1px solid #e2e6ec;border-radius:var(--r);box-shadow:var(--shadow);padding:16px}.card h2,.card h3{margin:0 0 14px}.section-title{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:800;margin-bottom:8px}
+label{display:block;font-size:12px;font-weight:800;color:#4b5563;margin:0 0 6px}input,select,textarea{width:100%;border:1px solid #cfd5dd;border-radius:12px;padding:11px 12px;background:#fff;color:#111827;font-size:16px;outline:none}input:focus,select:focus,textarea:focus{border-color:#64748b;box-shadow:0 0 0 3px rgba(100,116,139,.12)}.field{margin-bottom:12px}
+button.primary,button.secondary,button.danger{border:0;border-radius:12px;padding:12px 15px;font-weight:800;font-size:15px;cursor:pointer}.primary{background:var(--accent2);color:#fff}.secondary{background:#e5e7eb;color:#111827}.danger{background:#fee2e2;color:#991b1b}.actions{display:flex;gap:10px;flex-wrap:wrap}.actions button{flex:1;min-width:170px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.kpi{border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;padding:13px}.kpi b{display:block;font-size:23px;margin-top:3px}.kpi span{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase}.kpi.sup b{color:var(--accent)}.kpi.route b{color:var(--accent2)}.kpi.real b{color:var(--ok)}
+.note{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:12px;padding:10px 12px;font-size:13px}.muted{color:var(--muted);font-size:13px}.badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800;background:#e5e7eb}.badge.CONT{background:#dbeafe;color:#1e40af}.badge.CLA{background:#ede9fe;color:#5b21b6}.badge.SAM{background:#ffedd5;color:#9a3412}.badge.ABS,.badge.MAL,.badge.AT{background:#fee2e2;color:#991b1b}.badge.CGE{background:#dcfce7;color:#166534}.badge.FORM{background:#fef3c7;color:#92400e}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}th{position:sticky;top:0;background:#f3f4f6;text-align:left;color:#475569;font-size:11px;text-transform:uppercase;padding:10px;border-bottom:1px solid #d9dee5}td{padding:10px;border-bottom:1px solid #edf0f3;white-space:nowrap}.table-wrap{overflow:auto;border:1px solid #e1e5ea;border-radius:14px;max-height:62vh}.row-actions button{border:0;background:#eef2f7;border-radius:8px;padding:6px 8px;cursor:pointer}.empty{text-align:center;color:var(--muted);padding:35px}
+.employee-row{display:grid;grid-template-columns:1fr 140px 42px;gap:8px;align-items:end;margin-bottom:8px}.employee-row button{height:44px;border:0;border-radius:10px;background:#fee2e2;color:#991b1b;font-weight:900}.switchline{display:flex;align-items:center;gap:10px;margin:10px 0}.switchline input{width:auto}
+footer{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-top:1px solid #dce1e8;padding:8px 12px;z-index:9}.footer-inner{max-width:1250px;margin:auto;display:flex;justify-content:space-between;align-items:center;color:#64748b;font-size:12px}
+@media(max-width:800px){.grid2,.grid3{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.brand h1{font-size:17px}.card{padding:14px}.employee-row{grid-template-columns:1fr 95px 42px}}
+
+/* V32 — fiche salarié : nom, taux, date d'entrée et suppression */
+.employee-row{
+ display:grid !important;
+ grid-template-columns:minmax(240px,2.4fr) minmax(120px,.8fr) minmax(180px,1.15fr) 44px !important;
+ gap:10px !important;
+ align-items:end !important;
+ padding:12px 0 !important;
+}
+.employee-row>div{min-width:0}
+.employee-row input{width:100% !important;box-sizing:border-box}
+.employee-row input[type="date"]{
+ min-width:170px !important;
+ width:100% !important;
+}
+.employee-row>button{
+ width:44px !important;
+ min-width:44px !important;
+ max-width:44px !important;
+ height:44px !important;
+ padding:0 !important;
+ margin:0 !important;
+ align-self:end !important;
+ border-radius:10px !important;
+ background:#fee2e2 !important;
+ color:#b91c1c !important;
+ border:1px solid #fecaca !important;
+ font-size:20px !important;
+ line-height:1 !important;
+}
+.employee-row>button:hover{background:#fecaca !important}
+
+@media(max-width:900px){
+ .employee-row{
+  grid-template-columns:minmax(180px,1.7fr) minmax(105px,.75fr) minmax(160px,1.1fr) 44px !important;
+ }
+}
+@media(max-width:650px){
+ .employee-row{
+  grid-template-columns:1fr 1fr !important;
+ }
+ .employee-row>div:first-child{grid-column:1 / -1}
+ .employee-row>div:nth-child(3){grid-column:1 / -1}
+ .employee-row input[type="date"]{min-width:0 !important}
+ .employee-row>button{
+  grid-column:2;
+  justify-self:end;
+ }
+}
+
+
+/* V33 — ligne salarié compacte et alignée */
+.employee-row{
+ display:grid !important;
+ grid-template-columns:minmax(210px,1.55fr) 105px 145px 82px !important;
+ gap:8px !important;
+ align-items:end !important;
+ padding:7px 0 !important;
+}
+.employee-row>div{
+ min-width:0 !important;
+}
+.employee-row label{
+ display:block !important;
+ margin-bottom:4px !important;
+ font-size:12px !important;
+ line-height:1.15 !important;
+}
+.employee-row input{
+ width:100% !important;
+ height:38px !important;
+ min-height:38px !important;
+ padding:7px 10px !important;
+ box-sizing:border-box !important;
+ font-size:14px !important;
+ border-radius:9px !important;
+}
+.employee-row input[type="date"]{
+ min-width:0 !important;
+ width:145px !important;
+}
+.employee-row .employee-delete-btn{
+ width:82px !important;
+ min-width:82px !important;
+ max-width:82px !important;
+ height:38px !important;
+ min-height:38px !important;
+ padding:0 8px !important;
+ margin:0 !important;
+ align-self:end !important;
+ border-radius:9px !important;
+ background:#fee2e2 !important;
+ color:#b91c1c !important;
+ border:1px solid #fecaca !important;
+ font-size:12px !important;
+ font-weight:700 !important;
+ line-height:1 !important;
+}
+.employee-row .employee-delete-btn:hover{
+ background:#fecaca !important;
+}
+
+@media(max-width:1000px){
+ .employee-row{
+  grid-template-columns:minmax(190px,1.45fr) 100px 138px 78px !important;
+  gap:7px !important;
+ }
+ .employee-row input[type="date"]{width:138px !important}
+ .employee-row .employee-delete-btn{
+  width:78px !important;
+  min-width:78px !important;
+  max-width:78px !important;
+  font-size:11px !important;
+ }
+}
+@media(max-width:720px){
+ .employee-row{
+  grid-template-columns:minmax(160px,1fr) 95px 132px !important;
+ }
+ .employee-row .employee-delete-btn{
+  grid-column:3 !important;
+  justify-self:end !important;
+ }
+}
+
+
+/* V36 — Répartition droits congés */
+#leaveRightsSplitBody td{vertical-align:top}
+#leaveRightsSplitBody .badge{display:inline-block;padding:5px 9px;border-radius:999px;font-weight:700}
+
+
+/* V45 — Analyse annuelle / période libre */
+.analysis-filters{align-items:end}
+.analysis-kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.analysis-table td{vertical-align:top}
+.analysis-main{font-weight:900;font-size:15px;white-space:nowrap}
+.analysis-sub{font-size:11px;color:#64748b;margin-top:3px;white-space:nowrap}
+@media(max-width:1000px){.analysis-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:720px){.analysis-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{
+ body.analysis-print header nav,body.analysis-print #analyse .analysis-filters,
+ body.analysis-print #analyse .actions{display:none!important}
+ body.analysis-print .view{display:none!important}
+ body.analysis-print #analyse{display:block!important}
+}
+
+</style>
+<style>
+header{position:relative;overflow:hidden;background:radial-gradient(ellipse at 52% -35%,rgba(0,184,255,.82) 0%,rgba(0,184,255,.24) 31%,transparent 54%),radial-gradient(ellipse at 5% 12%,rgba(63,64,213,.72) 0%,rgba(63,64,213,.22) 35%,transparent 58%),linear-gradient(120deg,#173aa7 0%,#075fc9 48%,#123e9e 100%)!important}
+header:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(155deg,rgba(255,255,255,.06),transparent 42%)}
+header .wrap{position:relative;z-index:1}
+</style>
+<style id="rml-team-v14">
+.entry-mode{display:flex;gap:8px;margin:0 0 14px}
+.entry-mode button{border:0;border-radius:999px;padding:10px 16px;font-weight:800;cursor:pointer;background:#e8edf6;color:#172033}
+.entry-mode button.active{background:#1454e8;color:#fff}
+#teamPanel{display:none;background:#f4f8ff;border:1px solid #dbe7ff;border-radius:14px;padding:14px;margin-bottom:14px}
+#teamPanel.active{display:block}
+.team-members{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:10px}
+.team-check{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #dfe6f2;border-radius:10px;padding:10px 11px;font-weight:700}
+.team-check input{width:18px;height:18px}
+.team-summary{margin-top:10px;font-weight:800;color:#174086}
+.team-settings{margin-top:18px;padding-top:16px;border-top:1px solid #e2e7ef}
+.team-setting-row{border:1px solid #e1e6ef;border-radius:12px;padding:12px;margin:10px 0;background:#fbfcfe}
+.team-setting-head{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.team-setting-head input{flex:1}
+.team-setting-head button{border:0;background:#fbe2e2;color:#a52323;border-radius:9px;padding:8px 11px;font-weight:800;cursor:pointer}
+.team-setting-members{display:flex;flex-wrap:wrap;gap:7px}
+.team-setting-members label{display:flex;align-items:center;gap:6px;border:1px solid #dfe5ef;border-radius:9px;padding:7px 9px;background:#fff}
+@media(max-width:650px){.entry-mode{flex-wrap:wrap}}
+</style>
+
+
+<style id="team-readable-v143">
+.team-setting-members{
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:10px !important;
+}
+.team-setting-members label{
+  display:flex !important;
+  align-items:center !important;
+  gap:10px !important;
+  min-height:46px;
+  padding:10px 12px !important;
+  border:1px solid #dfe5ef !important;
+  border-radius:10px !important;
+  background:#fff !important;
+  font-weight:700 !important;
+  line-height:1.2 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  word-break:normal !important;
+}
+.team-setting-members label input{
+  flex:0 0 auto;
+  width:18px !important;
+  height:18px !important;
+  margin:0 !important;
+}
+.team-setting-row{
+  overflow:visible !important;
+}
+@media(max-width:700px){
+  .team-setting-members{
+    grid-template-columns:1fr !important;
+  }
+}
+</style>
+
+
+<style id="team-collapse-v144">
+.team-settings-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+}
+.team-toggle-btn{
+  border:0;
+  background:#e9eef8;
+  color:#173b82;
+  border-radius:10px;
+  padding:8px 12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.team-settings.collapsed #teamSettingsBody{display:none}
+.team-settings.collapsed{padding-bottom:0}
+</style>
+
+<link rel="apple-touch-icon" sizes="512x512" href="./apple-touch-icon.png?v=145">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=145">
+<link rel="manifest" href="./manifest.webmanifest?v=145">
+<meta name="theme-color" content="#0f5fd0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RML Heures">
+<meta name="application-name" content="RML Heures">
+
+
+<style id="v146-form-conges">
+#absenceRange{display:none;margin-top:10px;padding:12px;border:1px solid #dbe7ff;background:#f4f8ff;border-radius:12px}
+#absenceRange.active{display:block}
+#absenceRange .hint{font-size:12px;color:#5f6b7a;margin-top:6px}
+</style>
+
+<style id="v149-paniers">
+.panier-pill{display:inline-flex;align-items:center;justify-content:center;min-width:34px;padding:4px 8px;border-radius:999px;background:#fff7ed;color:#9a3412;font-weight:800}
+</style>
+
+<style id="v150-report-hours">
+.report-card{margin-top:18px;border-top:1px solid #e4e9f2;padding-top:18px}
+.report-help{margin:0 0 12px;color:#667085;font-size:13px}
+.report-input{width:86px!important;min-width:86px;padding:7px 8px!important;text-align:center;font-weight:800}
+.report-positive{font-weight:900;color:#9a3412}
+.report-zero{font-weight:800;color:#166534}
+.report-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+@media(max-width:800px){.report-input{width:78px!important;min-width:78px}}
+</style>
+
+
+<style id="v151-print">
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+
+  html, body {
+    background:#fff !important;
+    color:#000 !important;
+    width:100% !important;
+    min-width:0 !important;
+    overflow:visible !important;
+  }
+
+  header, nav, footer, .actions, button, .sync, #syncStatus, .no-print {
+    display:none !important;
+  }
+
+  main, .wrap, .container, section, .card, .panel {
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    box-shadow:none !important;
+  }
+
+  .table-wrap {
+    width:100% !important;
+    overflow:visible !important;
+  }
+
+  table {
+    width:100% !important;
+    border-collapse:collapse !important;
+    font-size:8pt !important;
+  }
+
+  th, td {
+    padding:3px 4px !important;
+    white-space:normal !important;
+    overflow:visible !important;
+  }
+
+  th { font-size:7.5pt !important; }
+  tr { page-break-inside:avoid !important; }
+
+  .report-input {
+    border:0 !important;
+    background:transparent !important;
+    padding:0 !important;
+    width:60px !important;
+    min-width:0 !important;
+    font-size:8pt !important;
+  }
+
+  .panier-pill {
+    background:transparent !important;
+    color:#000 !important;
+    padding:0 !important;
+  }
+
+  .muted { color:#555 !important; }
+
+  /* Imprime seulement l'écran actuellement affiché */
+  section { display:none !important; }
+  section.active { display:block !important; }
+
+  /* Le récapitulatif est large : réduction supplémentaire */
+  #recap table { font-size:7.2pt !important; }
+  #recap th, #recap td { padding:2.5px 3px !important; }
+}
+</style>
+
+
+<style id="v153-report-date">
+.report-date-input{min-width:135px;padding:7px 8px!important;font-weight:700}
+.report-positive{font-weight:900;color:#9a3412}
+.report-zero{font-weight:800;color:#166534}
+@media(max-width:900px){.report-date-input{min-width:125px}}
+</style>
+
+<style id="v154-report-month">
+.reported-hours{font-weight:900;color:#9a3412}
+.not-reported{color:#98a2b3}
+</style>
+
+
+<style id="v155-global-report-date">
+.global-report-date{
+  display:flex;
+  align-items:end;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:12px 0 14px;
+  padding:12px;
+  border:1px solid #dbe7ff;
+  background:#f4f8ff;
+  border-radius:12px;
+}
+.global-report-date .field{margin:0;min-width:220px}
+.global-report-date button{white-space:nowrap}
+@media(max-width:700px){
+  .global-report-date{align-items:stretch}
+  .global-report-date .field{width:100%}
+  .global-report-date button{width:100%}
+}
+</style>
+
+
+<style id="v157-report-integrated">
+.report-row td{
+  background:#fff7ed !important;
+  border-top:2px solid #fdba74 !important;
+  border-bottom:2px solid #fdba74 !important;
+}
+.report-row strong{color:#9a3412}
+.report-month-note{font-size:11px;color:#9a3412;font-weight:700}
+</style>
+
+<style id="v166-json-backup">
+.backup-card{
+  margin-top:18px;
+  padding-top:18px;
+  border-top:1px solid #e2e7ef;
+}
+.backup-card h3{margin:0 0 6px}
+.backup-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.backup-actions button{flex:1;min-width:220px}
+.backup-note{
+  margin-top:10px;
+  font-size:12px;
+  color:#667085;
+  line-height:1.4;
+}
+@media(max-width:700px){
+  .backup-actions button{width:100%;min-width:0}
+}
+</style>
+
+
+<style id="v170-new-entry">
+#employee:invalid{color:#98a2b3}
+#employee option{color:#172033}
+#employee option[value=""]{color:#98a2b3}
+</style>
+
+<style>
+.recap-toolbar{display:flex;justify-content:flex-end;gap:10px;margin:10px 0 12px;flex-wrap:wrap}
+.money-col.hidden-money{display:none!important}
+</style>
+<style>
+.recovery-debit{font-weight:900;color:#b42318}
+.recovery-ok{font-weight:800;color:#166534}
+</style>
+
+<style id="v18-version-badge">
+.app-version-top{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:9px;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.30);
+  color:#fff;
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+  vertical-align:middle;
+  letter-spacing:.3px;
+}
+</style>
+
+
+<style id="v20-paid-leave">
+.leave-positive{color:#166534;font-weight:900}
+.leave-warning{color:#b45309;font-weight:900}
+.leave-negative{color:#b42318;font-weight:900}
+.leave-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}
+.leave-summary .kpi b{font-size:22px}
+.leave-right-input{min-width:90px;max-width:115px}
+.leave-period-help{margin-top:8px}
+@media(max-width:760px){
+ .leave-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo" style="overflow:visible;background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220">
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#2349c6"/>
+    <stop offset="1" stop-color="#17388f"/>
+  </linearGradient>
+</defs>
+<rect x="8" y="8" width="204" height="204" rx="42" fill="url(#g)" stroke="white" stroke-width="7"/>
+<circle cx="110" cy="65" r="38" fill="none" stroke="white" stroke-width="7"/>
+<line x1="110" y1="65" x2="110" y2="39" stroke="white" stroke-width="7" stroke-linecap="round"/>
+<line x1="110" y1="65" x2="132" y2="79" stroke="white" stroke-width="7" stroke-linecap="round"/>
+<circle cx="110" cy="65" r="4.5" fill="white"/>
+<text x="110" y="137" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="56" font-weight="900" fill="white">RML</text>
+<text x="110" y="181" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="31" font-weight="900" fill="#ffd400">HEURES</text>
+</svg></div><div><h1>RML HEURES<span class="app-version-top">V46</span></h1><small>Suivi embauche · débauche · heures supplémentaires</small></div></div>
+ <nav>
+  <button class="tab active" data-view="saisie">Saisie</button>
+  <button class="tab" data-view="mois">Mois</button>
+  <button class="tab" data-view="recap">Récapitulatif</button>
+  <button class="tab" data-view="conges">Congés payés</button>
+  <button class="tab" data-view="analyse">Analyse</button>
+  <button class="tab" data-view="reglages">Réglages</button>
+ </nav>
+</header>
+<main>
+<section id="saisie" class="view active">
+ <div class="grid grid2">
+  <div class="card">
+   <h2>Saisie de la journée</h2>
+   <div class="entry-mode">
+    <button type="button" id="singleModeBtn" class="active">Salarié seul</button>
+    <button type="button" id="teamModeBtn">Saisie équipe</button>
+   </div>
+   <div id="teamPanel">
+    <div class="field"><label>Équipe habituelle</label><select id="teamPreset"><option value="">— Sélection libre —</option></select></div>
+    <div class="team-members" id="teamMembers"></div>
+    <div class="team-summary" id="teamSummary">0 salarié sélectionné</div>
+   </div>
+   <div class="grid grid2">
+    <div class="field"><label>Salarié</label><select id="employee" required></select></div>
+    <div class="field"><label>Date</label><input id="date" type="date"></div>
+   <div id="absenceRange">
+    <div class="field" style="margin:0"><label>Date de fin</label><input id="absenceEnd" type="date"></div>
+    <div class="hint">Les samedis et dimanches sont ignorés automatiquement.</div>
+   </div>
+   </div>
+   <div class="field"><label>Type de journée</label><select id="type"><option value="CONT">CONT — Journée continue</option><option value="CLA">CLA — Journée classique</option><option value="SAM">SAM — Samedi</option><option value="ABS">ABS — Absence</option><option value="MAL">MAL — Maladie</option><option value="AT">AT — Accident du travail</option><option value="CGE">CGE — Congés</option><option value="FORM">FORM — En formation</option></select></div>
+   <div id="timeFields">
+    <div class="grid grid2">
+     <div class="field"><label>Heure d'embauche décalée <span class="muted">(facultatif)</span></label><input id="startOverride" type="time"><div class="muted" style="margin-top:5px">La débauche normale est recalculée automatiquement à partir de cette heure.</div></div>
+     <div class="field"><label>Départ chantier ou atelier</label><input id="depart" type="time"></div>
+    </div>
+    <div class="grid grid2">
+     <div class="field"><label>Arrivée dépôt</label><input id="arrivee" type="time"></div>
+     <div class="field"><label>Déduction sur heures sup</label><input id="deduction" type="time" value="00:00"></div>
+    </div>
+   </div>
+   <div class="field"><label>Commentaire</label><textarea id="comment" rows="2" placeholder="Ex. rendez-vous, départ anticipé, observation..."></textarea></div>
+   <div class="actions"><button class="primary" id="saveBtn">Enregistrer la journée</button><button class="secondary" id="clearBtn">Nouvelle saisie</button></div>
+  </div>
+  <div class="card">
+   <div class="section-title">Calcul instantané</div>
+   <h2 id="calcTitle">Résultat</h2>
+   <div class="kpis">
+    <div class="kpi"><span>Horaire normal</span><b id="normalRange">7h15–14h15</b></div>
+    <div class="kpi sup"><span>H sup chantier</span><b id="sup">0h00</b></div>
+    <div class="kpi route"><span>H route</span><b id="route">0h00</b></div>
+    <div class="kpi real"><span>H sup réelles</span><b id="real">0h00</b></div>
+   </div>
+   <div style="height:12px"></div>
+   <div class="kpis">
+    <div class="kpi"><span>Embauche retenue</span><b id="startKept">7h15</b></div>
+    <div class="kpi"><span>Débauche normale</span><b id="endNormal">14h15</b></div>
+    <div class="kpi"><span>Temps présence</span><b id="presence">0h00</b></div>
+    <div class="kpi"><span>Jour</span><b id="weekType">SE</b></div>
+   </div>
+   <div style="height:12px"></div>
+   <div class="note">Principe repris de ton Excel : les heures sup chantier commencent après l'heure normale de débauche. Les heures de route ne retiennent que la partie du retour située après cette heure. La déduction est soustraite des heures sup chantier.</div>
+  </div>
+ </div>
+</section>
+
+<section id="mois" class="view">
+ <div class="card">
+  <div class="grid grid3" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+   <div class="field"><label>Salarié</label><select id="monthEmployee"></select></div>
+   <div class="field"><label>Mois</label><input id="monthPick" type="month"></div>
+   <div class="field"><label>&nbsp;</label><button class="secondary" id="exportCsv">Exporter CSV</button></div>
+  </div>
+  <div id="monthKpis" class="kpis" style="margin-bottom:14px"></div>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Embauche</th><th>Départ</th><th>Arrivée</th><th>H sup</th><th>H route</th><th>Déduction</th><th>H sup nettes</th><th>À reporter</th><th>Panier</th><th>Commentaire</th><th></th></tr></thead><tbody id="monthBody"></tbody></table></div>
+ </div>
+</section>
+
+<section id="recap" class="view">
+ <div class="card">
+  <div class="grid grid2"><div class="field"><label>Mois</label><input id="recapMonth" type="month"></div><div class="field"><label>&nbsp;</label><button class="secondary" id="printRecap">Imprimer / PDF</button></div></div>
+  <div class="recap-toolbar no-print"><button type="button" class="secondary" id="toggleMoneyColumns">Masquer les montants</button></div><div class="table-wrap"><table><thead><tr><th>Salarié</th><th>Taux horaire</th><th>Jours saisis</th><th>Paniers</th><th>H sup chantier</th><th>H route</th><th class="money-col">Montant route</th><th>Déductions</th><th>H sup réelles</th><th>HC 10%</th><th class="money-col">Montant 10%</th><th>HC 25%</th><th class="money-col">Montant 25%</th><th class="money-col">Total HC</th><th>ABS</th><th>MAL</th><th>AT</th><th>CGE</th><th>FORM</th></tr></thead><tbody id="recapBody"></tbody></table></div>
+
+  <div class="report-card">
+   <h2 style="margin-bottom:5px">Report d'heures au mois suivant</h2>
+   <p class="report-help">La date globale peut être choisie librement sur toute l’année. Une date du mois précédent sert uniquement au report entrant payé ce mois-ci et annule toute ancienne coupure du mois affiché. Un report vers le mois suivant n’existe que si une date du mois affiché est choisie.</p>
+   <div class="global-report-date no-print">
+    <div class="field">
+      <label>Date de report pour tout le monde</label>
+      <input type="date" id="globalReportDate">
+    </div>
+    <button type="button" class="secondary" id="applyGlobalReportDate">Appliquer à tous</button>
+    <button type="button" class="secondary" id="clearGlobalReportDate">Effacer pour tous</button>
+   </div>
+   <div class="table-wrap">
+    <table>
+     <thead><tr><th>Salarié</th><th id="reportPrevHead">Report précédent</th><th id="reportCurrentHead">H sup du mois</th><th>Date de début du report</th><th>H avant la date</th><th>H à partir de la date</th><th>Total à payer ce mois</th><th id="reportNextHead">Heures à reporter</th></tr></thead>
+     <tbody id="reportBody"></tbody>
+    </table>
+   </div>
+   <div class="report-actions"><button class="primary" id="saveReports">Enregistrer les reports</button></div>
+  </div>
+ </div>
+</section>
+
+
+<section id="conges" class="view">
+ <div class="card">
+  <h2>Congés payés — suivi BTP</h2>
+  <div class="grid grid3">
+   <div class="field">
+    <label>Période de suivi</label>
+    <select id="leavePeriod"></select>
+    <div class="muted leave-period-help">Période de prise des congés CIBTP du 1er mai au 30 avril. Les samedis sont décomptés, y compris le dernier samedi avant la reprise ; les dimanches et jours fériés légaux sont exclus. Le fractionnement est calculé automatiquement selon les règles CIBTP. Le calcul automatique des droits utilise la date d’entrée du salarié ; la caisse CIBTP reste la référence en cas de droits provenant d’un autre employeur BTP ou de situations particulières.</div>
+   </div>
+   <div class="field">
+    <label>Salarié affiché dans le résumé</label>
+    <select id="leaveEmployee"></select>
+   </div>
+   <div class="field">
+    <label>Calcul des droits acquis</label>
+    <label style="display:flex;gap:9px;align-items:center;padding:10px 12px;border:1px solid #d7deea;border-radius:10px;background:#f8fafc">
+     <input id="paidLeaveAutoRights" type="checkbox" style="width:auto">
+     <span><b>Calcul automatique CIBTP</b><br><span class="muted" style="font-size:11px">Droits acquis sur la période CIBTP précédente, à partir de la date d’entrée, maximum 30 j.</span></span>
+    </label>
+   </div>
+   <div class="field">
+    <label>&nbsp;</label>
+    <button type="button" class="primary" id="saveLeaveRights">Enregistrer les droits / paramètres</button>
+   </div>
+   <div class="field">
+    <label>&nbsp;</label>
+    <button type="button" class="secondary" id="printLeave">Imprimer / PDF</button>
+   </div>
+  </div>
+
+  <div class="leave-summary">
+   <div class="kpi"><span>Droits acquis</span><b id="leaveTotalRights">0 j</b></div>
+   <div class="kpi"><span>Fractionnement</span><b id="leaveTotalFraction">0 j</b></div>
+   <div class="kpi"><span>Congés pris</span><b id="leaveTotalTaken">0 j</b></div>
+   <div class="kpi"><span>Congés planifiés</span><b id="leaveTotalPlanned">0 j</b></div>
+   <div class="kpi"><span>Solde disponible</span><b id="leaveTotalAvailable">0 j</b></div>
+   <div class="kpi"><span>Solde après planifiés</span><b id="leaveTotalBalance">0 j</b></div>
+  </div>
+
+  <div class="note" style="margin:12px 0 14px"><b>Fractionnement CIBTP automatique :</b> 0, 1 ou 2 jours selon les congés réellement pris. Conditions cumulatives : au moins 15 jours acquis, une fraction de 12 jours ouvrables continus avant le 1er novembre, puis 3 à 5 jours du congé principal pris après le 31 octobre = 1 jour supplémentaire ; 6 jours ou plus = 2 jours. La 5e semaine n’ouvre pas de droit au fractionnement.</div>
+
+  <div class="table-wrap">
+   <table>
+    <thead>
+     <tr>
+      <th>Salarié</th>
+      <th>Droits acquis</th>
+      <th>Fractionnement automatique</th>
+      <th>Congés pris</th>
+      <th>Congés planifiés</th>
+      <th>Solde disponible</th>
+      <th>Solde après planifiés</th>
+     </tr>
+    </thead>
+    <tbody id="leaveBody"></tbody>
+   </table>
+  </div>
+
+  <div style="margin-top:18px">
+   <h3>Répartition des droits CIBTP</h3>
+   <div class="muted" style="margin-bottom:10px">
+    Les 24 premiers jours correspondent au congé principal. Les jours 25 à 30 correspondent à la 5e semaine.
+    Le fractionnement est affiché comme « Validé » uniquement lorsque les conditions sont effectivement remplies.
+   </div>
+   <div class="table-wrap">
+    <table>
+     <thead>
+      <tr>
+       <th>Salarié</th>
+       <th>Congé principal<br><span class="muted">24 premiers jours</span></th>
+       <th>5e semaine<br><span class="muted">jours 25 à 30</span></th>
+       <th>Fractionnement</th>
+      </tr>
+     </thead>
+     <tbody id="leaveRightsSplitBody"></tbody>
+    </table>
+   </div>
+  </div>
+
+  <div style="margin-top:18px">
+   <h3>Détail des congés saisis</h3>
+   <div class="muted" style="margin-bottom:10px">Les dates futures saisies en type CGE sont classées automatiquement dans « Congés planifiés ».</div>
+   <div class="table-wrap">
+    <table>
+     <thead><tr><th>Date</th><th>Salarié</th><th>Statut</th><th>Commentaire</th></tr></thead>
+     <tbody id="leaveDetailBody"></tbody>
+    </table>
+   </div>
+  </div>
+ </div>
+</section>
+
+
+<section id="analyse" class="view">
+ <div class="card">
+  <div class="section-title">Analyse des heures et absences</div>
+  <h2>Analyse sur une période</h2>
+  <div class="grid grid3 analysis-filters">
+   <div class="field"><label>Date de début</label><input id="analysisStart" type="date"></div>
+   <div class="field"><label>Date de fin</label><input id="analysisEnd" type="date"></div>
+   <div class="field"><label>Salarié</label><select id="analysisEmployee"><option value="">Tous les salariés</option></select></div>
+  </div>
+  <div class="actions" style="margin-top:6px">
+   <button class="primary" id="analysisRefresh">Actualiser l’analyse</button>
+   <button class="secondary" id="analysisYear">Année en cours</button>
+   <button class="secondary" id="analysisPrint">Imprimer / PDF</button>
+  </div>
+  <div class="muted" style="margin-top:10px">
+   Les heures d'absence correspondent aux heures théoriques qui auraient été travaillées. Les samedis de congés CIBTP restent comptés en jours de congé mais valent 0 h d'absence.
+  </div>
+ </div>
+
+ <div class="card">
+  <div id="analysisPeriodLabel" class="section-title">Période analysée</div>
+  <div class="kpis analysis-kpis" id="analysisKpis"></div>
+ </div>
+
+ <div class="card">
+  <h2>Détail par salarié</h2>
+  <div class="table-wrap">
+   <table class="analysis-table">
+    <thead>
+     <tr>
+      <th>Salarié</th>
+      <th>Travail</th>
+      <th>Formation</th>
+      <th>Maladie</th>
+      <th>AT</th>
+      <th>Congés</th>
+      <th>Absence</th>
+      <th>Route</th>
+      <th>H sup nettes</th>
+      <th>Paniers</th>
+     </tr>
+    </thead>
+    <tbody id="analysisBody"></tbody>
+   </table>
+  </div>
+ </div>
+</section>
+
+<section id="reglages" class="view">
+ <div class="grid grid2">
+  <div class="card">
+   <h2>Horaires de référence</h2>
+   <div class="section-title">Journée continue</div><div class="grid grid2"><div class="field"><label>Embauche</label><input id="contStart" type="time"></div><div class="field"><label>Débauche</label><input id="contEnd" type="time"></div></div>
+   <div class="section-title">Journée classique</div><div class="grid grid2"><div class="field"><label>Embauche</label><input id="claStart" type="time"></div><div class="field"><label>Débauche</label><input id="claEnd" type="time"></div></div><div class="grid grid2"><div class="field"><label>Début pause</label><input id="pauseStart" type="time"></div><div class="field"><label>Fin pause</label><input id="pauseEnd" type="time"></div></div>
+   <div class="section-title">Samedi</div><div class="field"><label>Embauche</label><input id="samStart" type="time"></div>
+   <div class="section-title" style="margin-top:18px">Heures supplémentaires</div>
+   <div class="grid grid3">
+    <div class="field"><label>Majoration tranche 1 (%)</label><input id="otRate1" type="number" min="0" step="0.1"></div>
+    <div class="field"><label>Majoration tranche 2 (%)</label><input id="otRate2" type="number" min="0" step="0.1"></div>
+    <div class="field"><label>Limite tranche 1 / semaine (h)</label><input id="otThreshold" type="number" min="0" step="0.25"></div>
+   </div>
+   <div class="note" style="margin-bottom:14px">Réglage repris de ton tableau : première tranche d'heures complémentaires à 10 %, puis tranche suivante à 25 %. Les pourcentages et la limite hebdomadaire restent modifiables ici.</div>
+   <div class="section-title" style="margin-top:18px">Tolérance autour de l’heure de débauche</div>
+   <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid #d7deea;border-radius:12px;margin-bottom:8px;background:#f8fafc">
+    <input id="otGraceEnabled" type="checkbox" style="width:auto;margin-top:3px">
+    <span><b>Activer la tolérance de 15 minutes</b><br><span class="muted">Si le départ a lieu au maximum 15 min après l’heure de débauche effective : 0 heure supplémentaire. Dès que le dépassement est supérieur à 15 min, tout le temps depuis la débauche effective est compté. Fonctionne aussi avec une embauche décalée plus tôt ou plus tard.</span></span>
+   </label>
+   <div class="actions"><button class="primary" id="saveSettings">Enregistrer les réglages</button><button class="secondary" id="syncNow">Synchroniser maintenant</button></div>
+  </div>
+  <div class="card"><h2>Salariés et taux horaires</h2><div class="note" style="margin-bottom:12px">Le taux horaire est réglé individuellement pour chaque salarié. La <b>date d’entrée</b> sert au calcul automatique des droits à congés CIBTP. Le calcul automatique donne le droit légal théorique de l’entreprise ; les droits transférés d’un précédent employeur BTP ou certaines absences particulières doivent rester contrôlés avec le certificat CIBTP.</div><div id="employeeSettings"></div><div class="actions"><button class="secondary" id="addEmployee">Ajouter un salarié</button><button class="primary" id="saveEmployees">Enregistrer les salariés</button></div>
+<div class="team-settings" id="teamSettingsPanel">
+ <div class="team-settings-header">
+  <div>
+   <h3 style="margin:0 0 5px">Équipes habituelles</h3>
+   <div class="muted">Crée tes équipes habituelles pour saisir une seule fois les mêmes horaires pour 2, 4 ou 5 salariés.</div>
+  </div>
+  <button type="button" class="team-toggle-btn" id="toggleTeamSettings">Fermer</button>
+ </div>
+ <div id="teamSettingsBody">
+  <div id="teamSettingsList"></div>
+  <div class="actions"><button class="secondary" id="addTeam">Ajouter une équipe</button><button class="primary" id="saveTeams">Enregistrer les équipes</button></div>
+ </div>
+</div></div>
+ </div>
+
+<div class="backup-card">
+  <h3>Sauvegarde complète</h3>
+  <div class="muted">Crée une copie JSON complète de l'application pour pouvoir tout restaurer en cas de problème de synchronisation.</div>
+  <div class="backup-actions">
+    <button type="button" class="secondary" id="exportFullBackup">Exporter sauvegarde JSON</button>
+    <button type="button" class="primary" id="importFullBackup">Restaurer sauvegarde JSON</button>
+    <input type="file" id="importBackupFile" accept=".json,application/json" style="display:none">
+  </div>
+  <div class="backup-note">
+    La sauvegarde contient les salariés, taux horaires, réglages, équipes, journées saisies, reports d'heures et paramètres de l'application.
+  </div>
+</div>
+</section>
+</main>
+<footer><div class="footer-inner"><span>RML HEURES — V46</span><span id="syncStatus">Connexion Supabase…</span></div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://jbtsncvuobptxyzcoqpf.supabase.co";
+const SUPABASE_KEY="sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const KEY='rml_heures_v1';
+const defaultEmployees=[
+ {name:'FOUCHER BAPTISTE',rate:12.50},{name:'JULIEN',rate:15.00},{name:'XAVIER',rate:16.88},{name:'GOIRE SYLVAIN',rate:14.70},{name:'QUENTIN',rate:15.82},{name:'MAXIME B',rate:13.16},{name:'CHRISTOPHER LARROZE-JARDINE',rate:14.70},{name:'THUBIN ALEXIS',rate:12.02},{name:'MAXIME MONCHAUX',rate:30.13}
+];
+const defaultState={employees:defaultEmployees,settings:{CONT:{start:'07:15',end:'14:15'},CLA:{start:'07:15',end:'15:00',pauseStart:'12:15',pauseEnd:'13:00'},SAM:{start:'07:00',end:'14:00'},overtime:{rate1:10,rate2:25,thresholdHours:4}},entries:[]};
+let state=load();state.settings=normalizeSettings(state.settings);state.settings.overtime=Object.assign({rate1:10,rate2:25,thresholdHours:4},state.settings.overtime||{});let editId=null;
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));return d&&d.entries?d:structuredClone(defaultState)}catch(e){return structuredClone(defaultState)}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(state))}
+
+function normalizeSettings(raw){
+ const base={
+   CONT:{start:'07:15',end:'14:15'},
+   CLA:{start:'07:15',end:'15:00',pauseStart:'12:15',pauseEnd:'13:00'},
+   SAM:{start:'07:00',end:'14:00'},
+   overtime:{rate1:10,rate2:25,thresholdHours:4,grace15Enabled:true},
+   teams:[],
+   monthlyReports:{},
+   paidLeaveRights:{},
+   paidLeaveFractionnement:{},
+   employeeHireDates:{},
+   paidLeaveAutoRights:true
+ };
+ const s=(raw&&typeof raw==='object')?raw:{};
+ return {
+   ...base,
+   ...s,
+   CONT:{...base.CONT,...(s.CONT||{})},
+   CLA:{...base.CLA,...(s.CLA||{})},
+   SAM:{...base.SAM,...(s.SAM||{})},
+   overtime:{...base.overtime,...(s.overtime||{})},
+   teams:Array.isArray(s.teams)?s.teams:[],
+   monthlyReports:(s.monthlyReports&&typeof s.monthlyReports==='object')?s.monthlyReports:{},
+   paidLeaveRights:(s.paidLeaveRights&&typeof s.paidLeaveRights==='object')?s.paidLeaveRights:{},
+   paidLeaveFractionnement:(s.paidLeaveFractionnement&&typeof s.paidLeaveFractionnement==='object')?s.paidLeaveFractionnement:{},
+   employeeHireDates:(s.employeeHireDates&&typeof s.employeeHireDates==='object')?s.employeeHireDates:{},
+   paidLeaveAutoRights:s.paidLeaveAutoRights!==false
+ };
+}
+
+function setSyncStatus(msg,ok=true,detail=''){
+ const x=el('syncStatus');
+ if(x){x.textContent=msg;x.style.color=ok?'#166534':'#991b1b';x.title=detail||''}
+}
+function hmFromMinutes(m){m=Math.max(0,Number(m)||0);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(Math.round(m%60)).padStart(2,'0')}
+function entryToRow(e){return {entry_date:e.date,employee_name:e.employee,day_type:e.type||null,shifted_start:e.startOverride||null,chantier_depart:e.depart||null,depot_arrival:e.arrivee||null,deduction_minutes:mins(e.deduction)||0,comment:e.comment||null,overtime_minutes:e.sup||0,road_minutes:e.route||0,real_overtime_minutes:e.real||0,updated_at:new Date().toISOString()}}
+function rowToEntry(r){return {id:String(r.id||`${r.employee_name}|${r.entry_date}`),employee:r.employee_name,date:r.entry_date,type:r.day_type||'CONT',startOverride:r.shifted_start||'',depart:r.chantier_depart||'',arrivee:r.depot_arrival||'',deduction:hmFromMinutes(r.deduction_minutes||0),comment:r.comment||'',sup:Number(r.overtime_minutes)||0,route:Number(r.road_minutes)||0,real:Number(r.real_overtime_minutes)||0,presence:0,week:dayKind(r.entry_date)}}
+async function pushEmployees(){const {error:delErr}=await db.from('rml_heures_employees').delete().gte('id',0);if(delErr)throw delErr;if(state.employees.length){const rows=state.employees.map(e=>({name:e.name,hourly_rate:Number(e.rate)||0,active:true,updated_at:new Date().toISOString()}));const {error}=await db.from('rml_heures_employees').insert(rows);if(error)throw error}}
+async function pushSettings(){
+ state.settings=normalizeSettings(state.settings);
+ const {error}=await db.from('rml_heures_settings').upsert({
+   setting_key:'app_settings',
+   setting_value:JSON.stringify(state.settings),
+   updated_at:new Date().toISOString()
+ },{onConflict:'setting_key'});
+ if(error)throw error
+}
+async function pushEntry(e){const {error}=await db.from('rml_heures_entries').upsert(entryToRow(e),{onConflict:'entry_date,employee_name'});if(error)throw error}
+async function pushAllEntries(){if(!state.entries.length)return;const {error}=await db.from('rml_heures_entries').upsert(state.entries.map(entryToRow),{onConflict:'entry_date,employee_name'});if(error)throw error}
+async function syncFromCloud(){if(!navigator.onLine){setSyncStatus('Hors ligne — sauvegarde locale',false);return false}setSyncStatus('Synchronisation…');try{const [er,sr,tr]=await Promise.all([db.from('rml_heures_employees').select('*').order('id'),db.from('rml_heures_settings').select('*').eq('setting_key','app_settings').maybeSingle(),db.from('rml_heures_entries').select('*').order('entry_date')]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(er.data&&er.data.length){state.employees=er.data.filter(x=>x.active!==false).map(x=>({name:x.name,rate:Number(x.hourly_rate)||0}))}else{await pushEmployees()}if(sr.data?.setting_value){
+  try{
+    state.settings=normalizeSettings(JSON.parse(sr.data.setting_value));
+    // Réécrit automatiquement le format actuel dans Supabase :
+    // cela migre les anciens réglages et ajoute teams/overtime manquants.
+    await pushSettings();
+  }catch(e){
+    console.warn('Réglages Supabase invalides, utilisation des valeurs sûres',e);
+    state.settings=normalizeSettings(state.settings);
+    await pushSettings();
+  }
+}else{
+  state.settings=normalizeSettings(state.settings);
+  await pushSettings();
+}if(tr.data&&tr.data.length){state.entries=tr.data.map(rowToEntry)}else if(state.entries.length){await pushAllEntries()}persist();options();ensureEmployeePlaceholder();renderSettings();updateCalc();renderMonth();renderRecap();renderPaidLeave();setSyncStatus('Supabase synchronisé ✓');return true}catch(err){
+ console.error('Erreur synchronisation Supabase :',err);
+ setSyncStatus('Erreur synchro — données locales conservées',false,err?.message||String(err));
+ return false
+}}
+function mins(t){if(!t)return null;const [h,m]=t.split(':').map(Number);return h*60+m}
+function time(m){if(m==null||isNaN(m))return '—';m=Math.max(0,Math.round(m));return Math.floor(m/60)+'h'+String(m%60).padStart(2,'0')}
+function clock(m){if(m==null)return '—';m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function dayKind(date){if(!date)return 'SE';const d=new Date(date+'T12:00:00').getDay();return(d===0||d===6)?'WE':'SE'}
+function calc(){
+ const type=el('type').value,date=el('date').value,s=state.settings[type]||state.settings.CONT;
+ const absence=['ABS','MAL','AT','CGE'].includes(type);
+ const formation=type==='FORM';
+
+ el('timeFields').style.display=(absence||formation)?'none':'block';
+ el('absenceRange')?.classList.toggle('active',['CGE','MAL','AT'].includes(type));
+ if(!['CGE','MAL','AT'].includes(type)&&el('absenceEnd'))el('absenceEnd').value='';
+
+ if(absence){
+   return {sup:0,route:0,real:0,presence:0,start:null,normalEnd:null,ded:0,week:dayKind(date),shifted:false}
+ }
+
+ const referenceStart=mins((formation?state.settings.CONT:s).start);
+ const referenceEnd=mins((formation?state.settings.CONT:s).end||(formation?state.settings.CONT:s).start);
+
+ if(formation){
+   return {
+     sup:0,route:0,real:0,
+     presence:Math.max(0,referenceEnd-referenceStart),
+     start:referenceStart,normalEnd:referenceEnd,ded:0,
+     week:dayKind(date),shifted:false,
+     referenceDuration:Math.max(0,referenceEnd-referenceStart)
+   }
+ }
+
+ const override=mins(el('startOverride').value);
+ const shifted=override!=null;
+ const start=shifted?override:referenceStart;
+ const referenceDuration=Math.max(0,referenceEnd-referenceStart);
+ const normalEnd=shifted ? start+referenceDuration : referenceEnd;
+
+ const depart=mins(el('depart').value);
+ const arrivee=mins(el('arrivee').value);
+ const ded=mins(el('deduction').value)||0;
+
+ let sup=0,route=0,presence=0;
+ const graceEnabled=state.settings.overtime?.grace15Enabled!==false;
+ const graceMinutes=15;
+
+ if(type==='SAM'){
+   if(depart!=null) sup=Math.max(0,depart-start);
+   if(arrivee!=null&&depart!=null) route=Math.max(0,arrivee-depart);
+ }else{
+   if(depart!=null){
+     const overtimeDelta=Math.max(0,depart-normalEnd);
+     // Tolérance : jusqu'à 15 min inclus = 0.
+     // Au-delà de 15 min, on reprend l'intégralité depuis l'heure de débauche effective.
+     sup=(graceEnabled && overtimeDelta<=graceMinutes)?0:overtimeDelta;
+   }
+   if(arrivee!=null){
+     const routeStart=Math.max(depart==null?normalEnd:depart,normalEnd);
+     route=Math.max(0,arrivee-routeStart);
+   }
+ }
+ if(arrivee!=null) presence=Math.max(0,arrivee-start);
+ const real=Math.max(0,sup-ded);
+
+ return {sup,route,real,presence,start,normalEnd,ded,week:dayKind(date),shifted,referenceDuration}
+}
+function updateCalc(){
+ const c=calc(),type=el('type').value;
+ const absence=['ABS','MAL','AT','CGE'].includes(type);
+ el('normalRange').textContent=absence?'—':(clock(c.start).replace(':','h')+'–'+clock(c.normalEnd).replace(':','h'));
+ el('sup').textContent=time(c.sup);
+ el('route').textContent=time(c.route);
+ el('real').textContent=time(c.real);
+ el('startKept').textContent=c.start==null?'—':clock(c.start);
+ el('endNormal').textContent=c.normalEnd==null?'—':clock(c.normalEnd);
+ el('presence').textContent=time(c.presence);
+ el('weekType').textContent=c.week;
+ el('calcTitle').textContent=el('employee').value||'Résultat';
+}
+function el(id){return document.getElementById(id)}
+function options(){const opts=state.employees.map(e=>`<option>${esc(e.name)}</option>`).join('');el('employee').innerHTML=opts;el('monthEmployee').innerHTML=opts}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function setToday(){const d=new Date();el('date').value=d.toISOString().slice(0,10);const ym=d.toISOString().slice(0,7);el('monthPick').value=ym;el('recapMonth').value=ym}
+function easterSunday(year){
+ // Algorithme de Meeus/Jones/Butcher
+ const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4;
+ const f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),hh=(19*a+b-d-g+15)%30;
+ const i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-hh-k)%7,m=Math.floor((a+11*hh+22*l)/451);
+ const month=Math.floor((hh+l-7*m+114)/31);
+ const day=((hh+l-7*m+114)%31)+1;
+ return new Date(year,month-1,day,12,0,0);
+}
+function isoLocalDate(d){
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
+function addDaysDate(d,n){
+ const x=new Date(d);x.setDate(x.getDate()+n);return x
+}
+function frenchPublicHolidays(year){
+ const easter=easterSunday(year);
+ return new Set([
+  `${year}-01-01`,
+  `${year}-05-01`,
+  `${year}-05-08`,
+  `${year}-07-14`,
+  `${year}-08-15`,
+  `${year}-11-01`,
+  `${year}-11-11`,
+  `${year}-12-25`,
+  isoLocalDate(addDaysDate(easter,1)),   // lundi de Pâques
+  isoLocalDate(addDaysDate(easter,39)),  // Ascension
+  isoLocalDate(addDaysDate(easter,50))   // lundi de Pentecôte
+ ])
+}
+function isFrenchPublicHoliday(dateIso){
+ if(!dateIso)return false;
+ return frenchPublicHolidays(Number(dateIso.slice(0,4))).has(dateIso)
+}
+function workingDatesBetween(startDate,endDate){
+ if(!startDate)return [];
+ const end=endDate||startDate;
+ const a=new Date(startDate+'T12:00:00'),b=new Date(end+'T12:00:00');
+ if(b<a)return null;
+ const dates=[];
+ for(let d=new Date(a);d<=b;d.setDate(d.getDate()+1)){
+   const day=d.getDay();
+   if(day!==0&&day!==6)dates.push(isoLocalDate(d));
+ }
+ return dates;
+}
+function paidLeaveDatesBetween(startDate,endDate){
+ if(!startDate)return [];
+ const end=endDate||startDate;
+ const a=new Date(startDate+'T12:00:00'),b=new Date(end+'T12:00:00');
+ if(b<a)return null;
+ const dates=[];
+ for(let d=new Date(a);d<=b;d.setDate(d.getDate()+1)){
+   const iso=isoLocalDate(d);
+   // Congés payés BTP en jours ouvrables : lundi à samedi.
+   // Dimanches et jours fériés légaux ne sont pas décomptés.
+   if(d.getDay()!==0 && !isFrenchPublicHoliday(iso))dates.push(iso);
+ }
+ return dates;
+}
+
+function paidLeaveFinalSaturday(startDate,endDate){
+ if(!startDate||!endDate)return '';
+ const end=new Date(endDate+'T12:00:00');
+ const dow=end.getDay();
+
+ // Fin le vendredi : le samedi suivant est décompté.
+ if(dow===5){
+   const sat=isoLocalDate(addDaysDate(end,1));
+   return isFrenchPublicHoliday(sat)?'':sat;
+ }
+
+ // Fin le jeudi + vendredi férié : le samedi suivant est décompté.
+ if(dow===4){
+   const fri=isoLocalDate(addDaysDate(end,1));
+   if(isFrenchPublicHoliday(fri)){
+     const sat=isoLocalDate(addDaysDate(end,2));
+     return isFrenchPublicHoliday(sat)?'':sat;
+   }
+ }
+ return '';
+}
+
+async function saveEntry(){
+ const c=calc(),type=el('type').value,date=el('date').value;
+ const teamMode=el('teamModeBtn')?.classList.contains('active');
+ const employees=teamMode
+   ? Array.from(document.querySelectorAll('.teamMemberCheck:checked')).map(x=>x.value)
+   : [el('employee').value];
+
+ if(!date)return alert('Choisis la date.');
+ if(!employees.length||!employees[0])return alert(teamMode?'Sélectionne au moins un salarié dans l’équipe.':'Choisis le salarié.');
+
+ let dates=[date];
+ if(['CGE','MAL','AT'].includes(type)&&el('absenceEnd')?.value){
+   dates=type==='CGE'
+     ? paidLeaveDatesBetween(date,el('absenceEnd').value)
+     : workingDatesBetween(date,el('absenceEnd').value);
+   if(dates===null)return alert('La date de fin doit être postérieure ou égale à la date de début.');
+   if(!dates.length)return alert(type==='CGE'?'La période choisie ne contient aucun jour de congé décomptable.':'La période choisie ne contient aucun jour ouvré.');
+
+   // Pour une période de congés payés, mémoriser immédiatement le dernier samedi
+   // lorsque la période se termine le vendredi (ou jeudi + vendredi férié).
+   // Cela évite d'avoir à le reconstruire ensuite.
+   if(type==='CGE'){
+     const finalSaturday=paidLeaveFinalSaturday(date,el('absenceEnd').value);
+     if(finalSaturday && !dates.includes(finalSaturday))dates.push(finalSaturday);
+     dates.sort();
+   }
+ }
+
+ const formation=type==='FORM';
+ const absence=['ABS','MAL','AT','CGE'].includes(type);
+ const saved=[];
+
+ for(const entryDate of dates){
+   const dayCalc=(entryDate===date)?c:{
+     sup:0,route:0,real:0,
+     presence:formation?Math.max(0,mins(state.settings.CONT.end)-mins(state.settings.CONT.start)):0,
+     week:dayKind(entryDate)
+   };
+
+   const finalSaturdayForRange=(type==='CGE' && el('absenceEnd')?.value)
+     ? paidLeaveFinalSaturday(date,el('absenceEnd').value)
+     : '';
+
+   const base={
+     date:entryDate,
+     type,
+     startOverride:(formation||absence)?'':el('startOverride').value,
+     depart:(formation||absence)?'':el('depart').value,
+     arrivee:(formation||absence)?'':el('arrivee').value,
+     deduction:(formation||absence)?'00:00':(el('deduction').value||'00:00'),
+     comment:(type==='CGE' && entryDate===finalSaturdayForRange)
+       ? [el('comment').value,'Dernier samedi de congé décompté'].filter(Boolean).join(' — ')
+       : el('comment').value,
+     sup:dayCalc.sup||0,
+     route:dayCalc.route||0,
+     real:dayCalc.real||0,
+     presence:dayCalc.presence||0,
+     week:dayCalc.week||dayKind(entryDate)
+   };
+
+   for(const employee of employees){
+     const entry={id:(dates.length===1&&!teamMode&&editId)||crypto.randomUUID(),employee,...base};
+     const duplicate=state.entries.findIndex(x=>x.employee===employee&&x.date===entryDate);
+     const i=state.entries.findIndex(x=>x.id===entry.id);
+     if(i>=0)state.entries[i]=entry;
+     else if(duplicate>=0){entry.id=state.entries[duplicate].id;state.entries[duplicate]=entry}
+     else state.entries.push(entry);
+     saved.push(entry);
+   }
+ }
+
+ persist();clearForm();renderMonth();renderRecap();renderPaidLeave();
+ try{
+   await Promise.all(saved.map(pushEntry));
+   setSyncStatus('Supabase synchronisé ✓');
+   if(['CGE','MAL','AT'].includes(type)&&dates.length>1){
+     const labels={CGE:'congés',MAL:'maladie',AT:'accident du travail'};
+     alert(`${dates.length} jours de ${labels[type]} enregistrés pour ${employees.length} salarié${employees.length>1?'s':''}.`);
+   }else{
+     alert(teamMode?`Journée enregistrée pour ${saved.length} salarié${saved.length>1?'s':''}.`:'Journée enregistrée et synchronisée.');
+   }
+ }catch(err){
+   console.error(err);setSyncStatus('Enregistré localement — synchro en attente',false);
+   alert('Journée enregistrée sur cet appareil. La synchronisation Supabase reprendra dès que possible.');
+ }
+}
+function clearForm(){
+ const keepDate=el('date')?.value||'';
+
+ editId=null;
+
+ if(el('employee'))el('employee').value='';
+ if(el('type'))el('type').value='CONT';
+ if(el('startOverride'))el('startOverride').value='';
+ if(el('depart'))el('depart').value='';
+ if(el('arrivee'))el('arrivee').value='';
+ if(el('deduction'))el('deduction').value='00:00';
+ if(el('comment'))el('comment').value='';
+ if(el('absenceEnd'))el('absenceEnd').value='';
+ if(el('leaveEnd'))el('leaveEnd').value='';
+
+ // Désélection des équipes / retour au mode salarié seul
+ document.querySelectorAll('.teamMemberCheck').forEach(cb=>cb.checked=false);
+ if(el('teamPreset'))el('teamPreset').value='';
+ if(typeof teamMode==='function')teamMode(false);
+
+ // Conserver uniquement la date
+ if(el('date'))el('date').value=keepDate;
+
+ updateCalc();
+ if(typeof updateTeamSummary==='function')updateTeamSummary();
+}
+function editEntry(id){const e=state.entries.find(x=>x.id===id);if(!e)return;editId=id;['employee','date','type','startOverride','depart','arrivee','deduction','comment'].forEach(k=>{if(el(k))el(k).value=e[k]||''});el('saveBtn').textContent='Enregistrer les modifications';show('saisie');updateCalc();window.scrollTo({top:0,behavior:'smooth'})}
+async function delEntry(id){if(!confirm('Supprimer cette journée ?'))return;const e=state.entries.find(x=>x.id===id);state.entries=state.entries.filter(x=>x.id!==id);persist();renderMonth();renderRecap();renderPaidLeave();if(e&&navigator.onLine){const {error}=await db.from('rml_heures_entries').delete().eq('entry_date',e.date).eq('employee_name',e.employee);if(error){console.error(error);setSyncStatus('Suppression locale — synchro à vérifier',false)}else setSyncStatus('Supabase synchronisé ✓')}}
+function panierForEntry(e){return ['CONT','CLA','SAM','FORM'].includes(e?.type)?1:0}
+
+
+function incomingReportRows(employee,ym){
+ const prevYm=previousMonth(ym);
+ const rec=reportRecord(prevYm,employee);
+ const cutoff=rec?.cutoffDate||'';
+ if(!cutoff||!validCutoffForMonth(cutoff,prevYm))return [];
+ return state.entries
+  .filter(e=>e.employee===employee&&e.date&&e.date.startsWith(prevYm)&&e.date>=cutoff&&netRealForEntry(e)>0)
+  .sort((a,b)=>a.date.localeCompare(b.date))
+  .map(e=>({...e,real:netRealForEntry(e),sup:netRealForEntry(e),_reportSource:true}));
+}
+function carryOut(employee,ym){
+ const rec=reportRecord(ym,employee);
+ const cutoff=rec?.cutoffDate||'';
+ if(!cutoff||!validCutoffForMonth(cutoff,ym))return 0;
+ return acquiredMinutesFrom(employee,ym,cutoff);
+}
+function entryReportedMinutes(e,ym,employee){
+ const rec=reportRecord(ym,employee);
+ const cutoff=rec?.cutoffDate||'';
+ if(!cutoff||!validCutoffForMonth(cutoff,ym))return 0;
+ return e.date>=cutoff?(Number(e.real)||0):0
+}
+function overtimeAmounts(rows,rate){
+ const cfg=state.settings.overtime||{rate1:10,rate2:25,thresholdHours:4};
+ const sp=splitOvertime(rows);
+ const amount10=(sp.m1/60)*(Number(rate)||0)*(1+Number(cfg.rate1||0)/100);
+ const amount25=(sp.m2/60)*(Number(rate)||0)*(1+Number(cfg.rate2||0)/100);
+ return {sp,amount10,amount25,total:amount10+amount25}
+}
+
+function renderMonth(){
+ const emp=el('monthEmployee').value,ym=el('monthPick').value;
+ const rows=state.entries.filter(e=>e.employee===emp&&e.date.startsWith(ym)).sort((a,b)=>a.date.localeCompare(b.date));
+ const ledger=recoveryLedger(emp);
+ const incomingRows=incomingReportRows(emp,ym);
+ const opening=incomingRows.reduce((a,e)=>a+(Number(e.real)||0),0);
+ let totals={sup:0,route:0,real:0,ded:0,paniers:0};
+ rows.forEach(e=>{totals.sup+=e.sup||0;totals.route+=e.route||0;totals.real+=ledger[e.id]?.netReal ?? (e.real||0);totals.ded+=mins(e.deduction)||0;totals.paniers+=panierForEntry(e)});
+ const employee=state.employees.find(x=>x.name===emp);
+ const rate=Number(employee?.rate)||0;
+ const rec=reportRecord(ym,emp);
+ const cutoff=(rec?.cutoffDate&&validCutoffForMonth(rec.cutoffDate,ym))?rec.cutoffDate:'';
+ const currentPayableRows=(cutoff?rows.filter(e=>e.date<cutoff):rows).map(e=>({...e,real:ledger[e.id]?.netReal ?? (e.real||0),sup:ledger[e.id]?.netReal ?? (e.sup||0)}));
+ const currentReportedRows=(cutoff?rows.filter(e=>e.date>=cutoff):[]).map(e=>({...e,real:ledger[e.id]?.netReal ?? (e.real||0),sup:ledger[e.id]?.netReal ?? (e.sup||0)}));
+ const currentPayable=currentPayableRows.reduce((a,e)=>a+(Number(e.real)||0),0);
+ const outgoing=currentReportedRows.reduce((a,e)=>a+(Number(e.real)||0),0);
+ const payableRows=[...incomingRows,...currentPayableRows];
+ const amounts=overtimeAmounts(payableRows,rate);
+ const cfg=state.settings.overtime||{rate1:10,rate2:25,thresholdHours:4};
+
+ el('monthKpis').innerHTML=`
+  <div class="kpi"><span>Report de ${monthLabelFr(previousMonth(ym))}</span><b>${time(opening)}</b></div>
+  <div class="kpi real"><span>H sup réelles de ${monthLabelFr(ym)}</span><b>${time(totals.real)}</b></div>
+  <div class="kpi"><span>H du mois payées maintenant</span><b>${time(currentPayable)}</b></div>
+  <div class="kpi"><span>Total heures payées ce mois</span><b>${time(opening+currentPayable)}</b></div>
+  <div class="kpi"><span>Report vers ${monthLabelFr(nextMonth(ym))}</span><b>${time(outgoing)}</b></div>
+  <div class="kpi"><span>HC ${cfg.rate1}% payées</span><b>${time(amounts.sp.m1)}</b><small>${money(amounts.amount10)}</small></div>
+  <div class="kpi"><span>HC ${cfg.rate2}% payées</span><b>${time(amounts.sp.m2)}</b><small>${money(amounts.amount25)}</small></div>
+  <div class="kpi"><span>Paniers du mois</span><b>${totals.paniers}</b></div>`;
+
+ let reportRow='';
+ if(opening>0){
+  const prevRec=reportRecord(previousMonth(ym),emp);
+  const prevCutoff=prevRec?.cutoffDate||'';
+  reportRow=`<tr class="report-row">
+   <td>${prevCutoff?new Date(prevCutoff+'T12:00').toLocaleDateString('fr-FR'):'—'}</td>
+   <td><strong>REPORT</strong></td>
+   <td colspan="6"><strong>Heures reportées de ${monthLabelFr(previousMonth(ym))}</strong>${prevCutoff?`<div class="report-month-note">à partir du ${new Date(prevCutoff+'T12:00').toLocaleDateString('fr-FR')} — payées en ${monthLabelFr(ym)}</div>`:''}</td>
+   <td><strong>${time(opening)}</strong></td>
+   <td>—</td><td>—</td><td>Payées ce mois</td><td></td>
+  </tr>`;
+ }
+ const normalRows=rows.map(e=>{
+  const reportMin=(cutoff&&e.date>=cutoff)?(Number(e.real)||0):0;
+  return `<tr>
+   <td>${new Date(e.date+'T12:00').toLocaleDateString('fr-FR')}</td>
+   <td><span class="badge ${e.type}">${e.type}</span></td>
+   <td>${e.startOverride||state.settings[e.type]?.start||'—'}</td>
+   <td>${e.depart||'—'}</td><td>${e.arrivee||'—'}</td>
+   <td>${time(e.sup)}</td><td>${time(e.route)}</td><td>${e.deduction||'00:00'}</td>
+   <td><b>${time(ledger[e.id]?.netReal ?? e.real)}</b>${(ledger[e.id]?.recovered||0)>0?`<div class="muted" style="font-size:11px">${time(ledger[e.id].recovered)} récupérée</div>`:''}</td>
+   <td class="${reportMin>0?'reported-hours':'not-reported'}">${reportMin>0?time(reportMin):'—'}</td>
+   <td><span class="panier-pill">${panierForEntry(e)}</span></td>
+   <td>${esc(e.comment)}</td>
+   <td class="row-actions"><button onclick="editEntry('${e.id}')">✎</button> <button onclick="delEntry('${e.id}')">×</button></td>
+  </tr>`
+ }).join('');
+ el('monthBody').innerHTML=(reportRow+normalRows)||`<tr><td colspan="13" class="empty">Aucune journée enregistrée pour ce mois.</td></tr>`;
+}
+function weekKey(date){const d=new Date(date+'T12:00:00');const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day+3);const first=new Date(d.getFullYear(),0,4);const firstDay=(first.getDay()+6)%7;first.setDate(first.getDate()-firstDay+3);const week=1+Math.round((d-first)/604800000);return d.getFullYear()+'-W'+String(week).padStart(2,'0')}
+function splitOvertime(rows){const cfg=state.settings.overtime||{rate1:10,rate2:25,thresholdHours:4};const limit=(Number(cfg.thresholdHours)||0)*60;const byWeek={};rows.forEach(e=>{const k=weekKey(e.date);(byWeek[k]||(byWeek[k]=[])).push(e)});let m1=0,m2=0;Object.values(byWeek).forEach(list=>{const total=list.reduce((a,e)=>a+(e.real||0),0);m1+=Math.min(total,limit);m2+=Math.max(0,total-limit)});return {m1,m2}}
+function money(n){return Number(n||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
+
+function monthLabelFr(ym){
+ if(!ym)return '';
+ const [y,m]=ym.split('-').map(Number);
+ return new Intl.DateTimeFormat('fr-FR',{month:'long',year:'numeric'}).format(new Date(y,m-1,1));
+}
+function nextMonth(ym){
+ if(!ym)return '';
+ const [y,m]=ym.split('-').map(Number);
+ const d=new Date(y,m,1);
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')
+}
+function previousMonth(ym){
+ if(!ym)return '';
+ const [y,m]=ym.split('-').map(Number);
+ const d=new Date(y,m-2,1);
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')
+}
+function isRealWorkDay(e){
+ return !!e && ['CONT','CLA','SAM'].includes(e.type)
+}
+function earlyLeaveDebit(e){
+ // V44 : la récupération pour retour anticipé au dépôt ne s'applique
+ // qu'aux journées continues (CONT / travail sur chantier).
+ if(!e||!e.date||e.type!=='CONT')return 0;
+
+ const s=state.settings.CONT;
+ const refStart=mins(s.start),refEnd=mins(s.end||s.start);
+ const override=mins(e.startOverride);
+ const start=override!=null?override:refStart;
+ const normalEnd=override!=null?start+Math.max(0,refEnd-refStart):refEnd;
+
+ // V44 — Temps à récupérer, uniquement en journée continue / chantier :
+ // le trajet chantier/atelier -> dépôt reste du temps de travail.
+ // Le débit commence uniquement à l'heure d'arrivée au dépôt.
+ //
+ // Exemple :
+ // départ chantier 13h00, arrivée dépôt 13h30, débauche normale 14h15
+ // => 45 minutes à récupérer, et non 1h15.
+ const arrivee=mins(e.arrivee);
+
+ if(normalEnd==null)return 0;
+
+ // Pour les anciennes journées sans heure d'arrivée dépôt, on conserve
+ // exceptionnellement le départ chantier comme valeur de repli afin de ne
+ // pas effacer leurs anciens débits. Dès qu'une arrivée dépôt existe,
+ // elle devient la seule référence.
+ const depart=mins(e.depart);
+ const recoveryStart=arrivee!=null?arrivee:depart;
+
+ if(recoveryStart==null)return 0;
+ return Math.max(0,normalEnd-recoveryStart)
+}
+function recoveryLedger(employee){
+ const rows=state.entries.filter(e=>e.employee===employee&&e.date).slice().sort((a,b)=>a.date.localeCompare(b.date));
+ let balance=0;const byId={};
+ for(const e of rows){
+  const debit=earlyLeaveDebit(e);
+  balance+=debit;
+  const gross=isRealWorkDay(e)?Math.max(0,Number(e.real)||0):0;
+  const recovered=Math.min(balance,gross);
+  const net=isRealWorkDay(e)?Math.max(0,gross-recovered):Math.max(0,Number(e.real)||0);
+  balance=Math.max(0,balance-recovered);
+  byId[e.id]={debit,grossReal:gross,recovered,netReal:net,balanceAfter:balance};
+ }
+ return byId
+}
+function netRealForEntry(e){
+ const x=recoveryLedger(e.employee)[e.id];
+ return x?x.netReal:Math.max(0,Number(e.real)||0)
+}
+function recoveryBalanceAtEnd(employee,ym){
+ const rows=state.entries.filter(e=>e.employee===employee&&e.date&&e.date<=ym+'-31').slice().sort((a,b)=>a.date.localeCompare(b.date));
+ let balance=0;
+ for(const e of rows){
+  balance+=earlyLeaveDebit(e);
+  const gross=isRealWorkDay(e)?Math.max(0,Number(e.real)||0):0;
+  balance=Math.max(0,balance-Math.min(balance,gross));
+ }
+ return balance
+}
+function acquiredMinutes(employee,ym){
+ const ledger=recoveryLedger(employee);
+ return state.entries
+  .filter(e=>e.employee===employee&&e.date&&e.date.startsWith(ym))
+  .reduce((a,e)=>a+(ledger[e.id]?.netReal ?? (Number(e.real)||0)),0)
+}
+function acquiredMinutesBefore(employee,ym,cutoff){
+ if(!cutoff)return acquiredMinutes(employee,ym);
+ return state.entries.filter(e=>e.employee===employee&&e.date&&e.date.startsWith(ym)&&e.date<cutoff).reduce((a,e)=>a+(Number(e.real)||0),0)
+}
+function acquiredMinutesFrom(employee,ym,cutoff){
+ if(!cutoff)return 0;
+ return state.entries.filter(e=>e.employee===employee&&e.date&&e.date.startsWith(ym)&&e.date>=cutoff).reduce((a,e)=>a+(Number(e.real)||0),0)
+}
+function validCutoffForMonth(cutoff,ym){return !!(cutoff&&ym&&cutoff.startsWith(ym))}
+function reportRecord(ym,employee){
+ state.settings.monthlyReports=state.settings.monthlyReports||{};
+ const month=state.settings.monthlyReports[ym]||{};
+ return month[employee]||null
+}
+function carryInto(employee,ym){
+ if(!ym)return 0;
+ const prev=previousMonth(ym);
+ if(!prev)return 0;
+ const rec=reportRecord(prev,employee);
+ const cutoff=rec?.cutoffDate||'';
+ if(!cutoff||!validCutoffForMonth(cutoff,prev))return 0;
+ return acquiredMinutesFrom(employee,prev,cutoff);
+}
+function parseHoursInput(v){
+ if(v==null||v==='')return 0;
+ const s=String(v).trim().replace(',', '.');
+ if(/^\d+:\d{1,2}$/.test(s)){
+   const [h,m]=s.split(':').map(Number);
+   return Math.max(0,h*60+Math.min(59,m||0))
+ }
+ if(/^\d+h\d{0,2}$/i.test(s)){
+   const [h,m='0']=s.toLowerCase().split('h').map(Number);
+   return Math.max(0,h*60+Math.min(59,m||0))
+ }
+ const n=Number(s);
+ return Number.isFinite(n)?Math.max(0,Math.round(n*60)):0
+}
+function hoursInputValue(minutes){
+ minutes=Math.max(0,Math.round(Number(minutes)||0));
+ return Math.floor(minutes/60)+':'+String(minutes%60).padStart(2,'0')
+}
+function renderReports(){
+ const ym=el('recapMonth')?.value;
+ if(!el('reportBody')||!ym)return;
+
+ const prevYm=previousMonth(ym),nextYm=nextMonth(ym);
+ if(el('reportPrevHead'))el('reportPrevHead').textContent='Heures reportées de '+monthLabelFr(prevYm);
+ if(el('reportCurrentHead'))el('reportCurrentHead').textContent='H sup de '+monthLabelFr(ym);
+ if(el('reportNextHead'))el('reportNextHead').textContent='Heures à reporter';
+
+ el('reportBody').innerHTML=state.employees.map(emp=>{
+   const incoming=carryInto(emp.name,ym);
+   const earned=acquiredMinutes(emp.name,ym);
+   const rec=reportRecord(ym,emp.name);
+
+   let cutoff=rec?.cutoffDate||'';
+   if(!validCutoffForMonth(cutoff,ym))cutoff='';
+   const displayDate=rec?.displayDate||cutoff||'';
+
+   // Logique métier :
+   // le report du mois précédent est payé sur le mois affiché.
+   // Il apparaît dans "H à partir de la date".
+   const hoursBefore=0;
+   const hoursFromDate=incoming;
+
+   // Les heures du mois affiché situées à partir de sa propre date de coupure
+   // constituent, elles, le nouveau report vers le mois suivant.
+   const outgoing=cutoff?acquiredMinutesFrom(emp.name,ym,cutoff):0;
+   const currentPaid=Math.max(0,earned-outgoing);
+   const payable=incoming+currentPaid;
+
+   return `<tr>
+    <td><b>${esc(emp.name)}</b></td>
+    <td>${time(incoming)}${incoming>0?`<div class="muted" style="font-size:11px">payé en ${monthLabelFr(ym)}</div>`:''}</td>
+    <td>${time(earned)}</td>
+    <td><input type="date" class="report-date-input" data-report-cutoff="${esc(emp.name)}" value="${displayDate}"></td>
+    <td>${time(hoursBefore)}</td>
+    <td><b>${time(hoursFromDate)}</b></td>
+    <td><b>${time(payable)}</b></td>
+    <td class="${outgoing>0?'report-positive':'report-zero'}" data-report-carry="${esc(emp.name)}">
+      ${time(outgoing)}
+      ${outgoing>0?`<div class="muted" style="font-size:11px">vers ${monthLabelFr(nextYm)}</div>`:''}
+    </td>
+   </tr>`
+ }).join('');
+
+ refreshGlobalReportDate();
+
+ document.querySelectorAll('[data-report-cutoff]').forEach(inp=>{
+   inp.addEventListener('change',()=>{
+     const emp=inp.dataset.reportCutoff;
+     const chosen=inp.value;
+     const cutoff=validCutoffForMonth(chosen,ym)?chosen:'';
+
+     state.settings.monthlyReports=state.settings.monthlyReports||{};
+     state.settings.monthlyReports[ym]=state.settings.monthlyReports[ym]||{};
+     state.settings.monthlyReports[ym][emp]={
+       ...(state.settings.monthlyReports[ym][emp]||{}),
+       displayDate:chosen,
+       cutoffDate:cutoff,
+       updatedAt:new Date().toISOString()
+     };
+     persist();
+
+     const incoming=carryInto(emp,ym);
+     const earned=acquiredMinutes(emp,ym);
+     const outgoing=cutoff?acquiredMinutesFrom(emp,ym,cutoff):0;
+     const payable=incoming+Math.max(0,earned-outgoing);
+     const row=inp.closest('tr');
+     if(row){
+       row.children[4].textContent=time(0);
+       row.children[5].innerHTML='<b>'+time(incoming)+'</b>';
+       row.children[6].innerHTML='<b>'+time(payable)+'</b>';
+       row.children[7].className=outgoing>0?'report-positive':'report-zero';
+       row.children[7].innerHTML=time(outgoing)+(outgoing>0?`<div class="muted" style="font-size:11px">vers ${monthLabelFr(nextYm)}</div>`:'');
+     }
+   })
+ });
+}
+function refreshGlobalReportDate(){
+ const ym=el('recapMonth')?.value;
+ const input=el('globalReportDate');
+ if(!input||!ym)return;
+
+ const commonDisplay=()=>{
+   const vals=state.employees.map(emp=>reportRecord(ym,emp.name)?.displayDate||'');
+   return vals.length===state.employees.length && vals.every(Boolean) && new Set(vals).size===1 ? vals[0] : '';
+ };
+
+ const commonCutoff=(targetYm)=>{
+   const vals=state.employees.map(emp=>{
+     const d=reportRecord(targetYm,emp.name)?.cutoffDate||'';
+     return validCutoffForMonth(d,targetYm)?d:'';
+   });
+   return vals.length===state.employees.length && vals.every(Boolean) && new Set(vals).size===1 ? vals[0] : '';
+ };
+
+ input.value=commonDisplay()||commonCutoff(ym)||commonCutoff(previousMonth(ym))||'';
+}
+
+async function applyGlobalReportDate(){
+ const displayedYm=el('recapMonth')?.value;
+ const date=el('globalReportDate')?.value||'';
+ if(!displayedYm)return alert('Choisis le mois.');
+ if(!date)return alert('Choisis une date de report.');
+
+ const targetYm=date.slice(0,7);
+
+ state.settings.monthlyReports=state.settings.monthlyReports||{};
+ state.settings.monthlyReports[targetYm]=state.settings.monthlyReports[targetYm]||{};
+ state.settings.monthlyReports[displayedYm]=state.settings.monthlyReports[displayedYm]||{};
+
+ state.employees.forEach(emp=>{
+   // Coupure réelle rattachée au mois de la date.
+   state.settings.monthlyReports[targetYm][emp.name]={
+     ...(state.settings.monthlyReports[targetYm][emp.name]||{}),
+     cutoffDate:date,
+     updatedAt:new Date().toISOString()
+   };
+
+   // Date affichée mémorisée dans le mois actuellement consulté.
+   state.settings.monthlyReports[displayedYm][emp.name]={
+     ...(state.settings.monthlyReports[displayedYm][emp.name]||{}),
+     displayDate:date,
+     cutoffDate:targetYm===displayedYm ? date : '',
+     updatedAt:new Date().toISOString()
+   };
+ });
+
+ persist();
+
+ renderRecap();
+ renderMonth();
+
+ // Après le rendu, les champs restent sur la date choisie.
+ document.querySelectorAll('[data-report-cutoff]').forEach(inp=>{
+   inp.value=date;
+ });
+
+ if(el('globalReportDate'))el('globalReportDate').value=date;
+
+ try{
+   await pushSettings();
+   setSyncStatus('Supabase synchronisé ✓');
+   alert('Date de report appliquée à tous et mémorisée.');
+ }catch(err){
+   console.error(err);
+   setSyncStatus('Date enregistrée localement — synchro en attente',false);
+   alert('Date appliquée localement. La synchronisation reprendra dès que possible.');
+ }
+}
+
+async function clearGlobalReportDate(){
+ const displayedYm=el('recapMonth')?.value;
+ if(!displayedYm)return;
+
+ state.settings.monthlyReports=state.settings.monthlyReports||{};
+ state.settings.monthlyReports[displayedYm]=state.settings.monthlyReports[displayedYm]||{};
+
+ state.employees.forEach(emp=>{
+   state.settings.monthlyReports[displayedYm][emp.name]={
+     ...(state.settings.monthlyReports[displayedYm][emp.name]||{}),
+     displayDate:'',
+     cutoffDate:'',
+     updatedAt:new Date().toISOString()
+   };
+ });
+
+ if(el('globalReportDate'))el('globalReportDate').value='';
+
+ persist();
+ renderRecap();
+ renderMonth();
+
+ try{await pushSettings();setSyncStatus('Supabase synchronisé ✓')}
+ catch(err){console.error(err);setSyncStatus('Modification locale — synchro en attente',false)}
+}
+
+async function saveReports(){
+ const ym=el('recapMonth')?.value;
+ if(!ym)return alert('Choisis le mois.');
+
+ state.settings.monthlyReports=state.settings.monthlyReports||{};
+ state.settings.monthlyReports[ym]=state.settings.monthlyReports[ym]||{};
+
+ for(const emp of state.employees){
+   const input=document.querySelector(`[data-report-cutoff="${CSS.escape(emp.name)}"]`);
+   const chosen=input?.value||'';
+   const targetYm=chosen?chosen.slice(0,7):ym;
+
+   state.settings.monthlyReports[ym][emp.name]={
+     ...(state.settings.monthlyReports[ym][emp.name]||{}),
+     displayDate:chosen,
+     cutoffDate:targetYm===ym ? chosen : '',
+     updatedAt:new Date().toISOString()
+   };
+
+   if(chosen){
+     state.settings.monthlyReports[targetYm]=state.settings.monthlyReports[targetYm]||{};
+     state.settings.monthlyReports[targetYm][emp.name]={
+       ...(state.settings.monthlyReports[targetYm][emp.name]||{}),
+       cutoffDate:chosen,
+       updatedAt:new Date().toISOString()
+     };
+   }
+ }
+
+ persist();
+ renderReports();
+ renderMonth();
+
+ try{
+   await pushSettings();
+   setSyncStatus('Supabase synchronisé ✓');
+   alert('Dates de report enregistrées et synchronisées.');
+ }catch(err){
+   console.error(err);
+   setSyncStatus('Reports sauvegardés localement',false);
+   alert('Reports enregistrés sur cet appareil. La synchronisation reprendra dès que possible.');
+ }
+}
+
+function moneyColumnsHidden(){return localStorage.getItem('rml_heures_hide_money')==='1'}
+function applyMoneyVisibility(){
+ const hidden=moneyColumnsHidden();
+ document.querySelectorAll('.money-col').forEach(x=>x.classList.toggle('hidden-money',hidden));
+ const b=el('toggleMoneyColumns');if(b)b.textContent=hidden?'Afficher les montants':'Masquer les montants'
+}
+function toggleMoneyColumns(){localStorage.setItem('rml_heures_hide_money',moneyColumnsHidden()?'0':'1');applyMoneyVisibility()}
+function optimizeRecapColumns(){
+ const table=el('recapBody')?.closest('table');
+ if(!table)return;
+
+ const rows=Array.from(table.querySelectorAll('tbody tr'));
+ const headers=Array.from(table.querySelectorAll('thead th'));
+ if(!rows.length||!headers.length)return;
+
+ // Colonnes toujours visibles : salarié, taux horaire, jours saisis, paniers.
+ const alwaysVisible=new Set([0,1,2,3]);
+
+ // Colonnes numériques / compteurs qui peuvent être masquées si tout le mois est à zéro.
+ for(let col=0;col<headers.length;col++){
+   if(alwaysVisible.has(col)){
+     headers[col].style.display='';
+     rows.forEach(r=>{ if(r.children[col]) r.children[col].style.display=''; });
+     continue;
+   }
+
+   const hasUsefulValue=rows.some(r=>{
+     const cell=r.children[col];
+     if(!cell)return false;
+     const txt=(cell.textContent||'').trim().toLowerCase();
+
+     // Considère comme vide les variantes courantes de zéro.
+     const zeroLike=[
+       '', '0', '0,00 €', '0.00 €', '0h00', '0:00',
+       '0h00 0,00 €', '0h00 0.00 €'
+     ];
+     if(zeroLike.includes(txt))return false;
+
+     // Ignore aussi les textes constitués uniquement de zéros / séparateurs / symboles.
+     const simplified=txt
+       .replace(/€/g,'')
+       .replace(/h/g,'')
+       .replace(/[:.,\s]/g,'')
+       .replace(/[()]/g,'')
+       .replace(/\+/g,'');
+     if(simplified && /^0+$/.test(simplified))return false;
+
+     return true;
+   });
+
+   const display=hasUsefulValue?'':'none';
+   headers[col].style.display=display;
+   rows.forEach(r=>{ if(r.children[col]) r.children[col].style.display=display; });
+ }
+}
+
+function renderRecap(){
+ const ym=el('recapMonth').value,cfg=state.settings.overtime||{rate1:10,rate2:25,thresholdHours:4};
+ el('recapBody').innerHTML=state.employees.map(emp=>{
+  const r=state.entries.filter(e=>e.employee===emp.name&&e.date.startsWith(ym));
+  const ledger=recoveryLedger(emp.name);
+  const incoming=incomingReportRows(emp.name,ym);
+  const opening=incoming.reduce((a,e)=>a+(Number(e.real)||0),0);
+  const rec=reportRecord(ym,emp.name);
+  const cutoff=(rec?.cutoffDate&&validCutoffForMonth(rec.cutoffDate,ym))?rec.cutoffDate:'';
+  const currentPayable=(cutoff?r.filter(e=>e.date<cutoff):r).map(e=>({...e,real:ledger[e.id]?.netReal ?? (e.real||0),sup:ledger[e.id]?.netReal ?? (e.sup||0)}));
+  const currentReported=(cutoff?r.filter(e=>e.date>=cutoff):[]).map(e=>({...e,real:ledger[e.id]?.netReal ?? (e.real||0),sup:ledger[e.id]?.netReal ?? (e.sup||0)}));
+  const payable=[...incoming,...currentPayable];
+  const sum=k=>r.reduce((a,e)=>a+(e[k]||0),0),ded=r.reduce((a,e)=>a+(mins(e.deduction)||0),0),
+        count=t=>r.filter(e=>e.type===t).length,paniers=r.reduce((a,e)=>a+panierForEntry(e),0),rate=Number(emp.rate)||0;
+  const amounts=overtimeAmounts(payable,rate),sp=amounts.sp;
+  const paidCurrent=currentPayable.reduce((a,e)=>a+(Number(e.real)||0),0);
+  const reportNext=currentReported.reduce((a,e)=>a+(Number(e.real)||0),0);
+  const routeMinutes=sum('route'),routeAmount=(routeMinutes/60)*rate;
+  return `<tr>
+   <td><b>${esc(emp.name)}</b>${opening>0?`<div class="muted" style="font-size:11px">${time(opening)} de ${monthLabelFr(previousMonth(ym))} payé ce mois</div>`:''}</td>
+   <td>${money(rate).replace(' €',' €/h')}</td><td>${r.length}</td><td><b>${paniers}</b></td>
+   <td>${time(sum('sup'))}</td><td>${time(routeMinutes)}</td><td class="money-col"><b>${money(routeAmount)}</b></td>
+   <td>${time(ded)}</td><td><b>${time(opening+paidCurrent)}</b>${reportNext>0?`<div class="muted" style="font-size:11px">${time(reportNext)} reporté</div>`:''}${recoveryBalanceAtEnd(emp.name,ym)>0?`<div class="recovery-debit" style="font-size:11px">${time(recoveryBalanceAtEnd(emp.name,ym))} à récupérer</div>`:''}</td>
+   <td>${time(sp.m1)}</td><td class="money-col"><b>${money(amounts.amount10)}</b></td>
+   <td>${time(sp.m2)}</td><td class="money-col"><b>${money(amounts.amount25)}</b></td>
+   <td class="money-col"><b>${money(amounts.total)}</b></td>
+   <td>${count('ABS')}</td><td>${count('MAL')}</td><td>${count('AT')}</td><td>${count('CGE')}</td><td>${count('FORM')}</td>
+  </tr>`
+ }).join('');
+ renderReports();optimizeRecapColumns();applyMoneyVisibility()
+}
+
+function todayIso(){
+ return new Date().toISOString().slice(0,10)
+}
+function leavePeriodKeyForDate(date){
+ if(!date)return '';
+ const y=Number(date.slice(0,4)),m=Number(date.slice(5,7));
+ return String(m>=5?y:y-1)
+}
+function leavePeriodBounds(key){
+ const y=Number(key);
+ return {start:`${y}-05-01`,end:`${y+1}-04-30`}
+}
+function leavePeriodLabel(key){
+ return `01/05/${key} → 30/04/${Number(key)+1}`
+}
+function initLeavePeriods(){
+ const sel=el('leavePeriod');
+ if(!sel)return;
+
+ // Conserver la période actuellement choisie lors du rafraîchissement du tableau.
+ const previousValue=sel.value;
+
+ const current=Number(leavePeriodKeyForDate(todayIso()));
+ const existing=new Set(Object.keys(state.settings.paidLeaveRights||{}).map(Number).filter(Number.isFinite));
+ for(let y=current-3;y<=current+2;y++)existing.add(y);
+
+ const years=[...existing].sort((a,b)=>b-a);
+ sel.innerHTML=years.map(y=>`<option value="${y}">${leavePeriodLabel(y)}</option>`).join('');
+
+ if(previousValue && years.map(String).includes(String(previousValue))){
+   sel.value=String(previousValue);
+ }else{
+   sel.value=String(current);
+ }
+}
+
+function employeeHireDate(employee){
+ return state.settings.employeeHireDates?.[employee]||''
+}
+function cibpAutoLegalRights(period,employee){
+ const hire=employeeHireDate(employee);
+ if(!hire)return null;
+
+ const y=Number(period);
+ // Pour la période de prise 01/05/Y -> 30/04/Y+1,
+ // les droits proviennent de la période d'acquisition 01/04/Y-1 -> 31/03/Y.
+ const start=`${y-1}-04-01`;
+ const end=`${y}-03-31`;
+ const calcEnd=todayIso()<end?todayIso():end;
+ const calcStart=hire>start?hire:start;
+
+ if(calcEnd<calcStart)return 0;
+
+ const a=new Date(calcStart+'T12:00:00');
+ const b=new Date(calcEnd+'T12:00:00');
+ const calendarDays=Math.max(0,Math.floor((b-a)/86400000)+1);
+
+ // Base théorique : 2,5 jours ouvrables par tranche de 4 semaines, maximum 30.
+ let rights=Math.ceil((calendarDays/28)*2.5-1e-9);
+ rights=Math.max(0,Math.min(30,rights));
+ return rights;
+}
+
+function leaveRights(period,employee){
+ if(state.settings.paidLeaveAutoRights!==false){
+   const auto=cibpAutoLegalRights(period,employee);
+   if(auto!==null)return auto;
+ }
+ return Number(state.settings.paidLeaveRights?.[period]?.[employee])||0
+}
+function fractionLeaveRows(period,employee){
+ // Pour le fractionnement, on ne reconstitue jamais artificiellement
+ // des jours ouvrables absents entre deux saisies CGE.
+ // On utilise uniquement les congés réellement enregistrés + le samedi
+ // légalement décompté lorsqu'il suit immédiatement un vendredi en congé
+ // (ou un jeudi en congé suivi d'un vendredi férié).
+ const {start,end}=leavePeriodBounds(period);
+
+ const actual=state.entries
+   .filter(e=>
+     e.type==='CGE' &&
+     e.employee===employee &&
+     e.date>=start && e.date<=end &&
+     new Date(e.date+'T12:00:00').getDay()!==0 &&
+     !isFrenchPublicHoliday(e.date)
+   )
+   .sort((a,b)=>a.date.localeCompare(b.date));
+
+ const rows=[...actual];
+ const seen=new Set(actual.map(e=>e.date));
+
+ for(const e of actual){
+   const d=new Date(e.date+'T12:00:00');
+   const dow=d.getDay();
+   let saturdayIso='';
+
+   if(dow===5){
+     saturdayIso=isoLocalDate(addDaysDate(d,1));
+   }else if(dow===4){
+     const fri=addDaysDate(d,1);
+     const friIso=isoLocalDate(fri);
+     if(isFrenchPublicHoliday(friIso)){
+       saturdayIso=isoLocalDate(addDaysDate(d,2));
+     }
+   }
+
+   if(!saturdayIso || saturdayIso<start || saturdayIso>end ||
+      isFrenchPublicHoliday(saturdayIso) || seen.has(saturdayIso)) continue;
+
+   const worked=state.entries.some(x=>
+     x.employee===employee &&
+     x.date===saturdayIso &&
+     ['CONT','CLA','SAM','FORM'].includes(x.type)
+   );
+   if(worked)continue;
+
+   rows.push({
+     id:`auto-frac-sat-${employee}-${saturdayIso}`,
+     employee,
+     date:saturdayIso,
+     type:'CGE',
+     comment:'Samedi décompté automatiquement',
+     _autoSaturday:true,
+     _autoRebuilt:true
+   });
+   seen.add(saturdayIso);
+ }
+
+ return rows.sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function hasTwelveContinuousBeforeNovember(period,employee,rows){
+ const y=Number(period);
+ const start=`${y}-05-01`;
+ const end=`${y}-10-31`;
+ const leaveSet=new Set(rows.filter(e=>e.date>=start && e.date<=end).map(e=>e.date));
+
+ let consecutive=0;
+ for(let d=new Date(start+'T12:00:00'); d<=new Date(end+'T12:00:00'); d.setDate(d.getDate()+1)){
+   const iso=isoLocalDate(d);
+   const dow=d.getDay();
+
+   // Dimanche et jour férié ne sont pas des jours ouvrables décomptés :
+   // ils ne font pas perdre la continuité mais ne comptent pas dans les 12 jours.
+   if(dow===0 || isFrenchPublicHoliday(iso)) continue;
+
+   if(leaveSet.has(iso)){
+     consecutive++;
+     if(consecutive>=12)return true;
+   }else{
+     // Tout jour ouvrable non pris en congé coupe la continuité.
+     consecutive=0;
+   }
+ }
+ return false;
+}
+
+function leaveFractionInfo(period,employee){
+ const rights=leaveRights(period,employee);
+ const y=Number(period);
+
+ // Condition n°1
+ if(rights<15){
+   return {days:0,status:'waiting',reason:'Condition 1 non remplie : moins de 15 jours ouvrables de congé légal acquis.'};
+ }
+
+ const today=todayIso();
+ const rows=fractionLeaveRows(period,employee).filter(e=>e.date<=today);
+
+ // Condition n°2
+ if(!hasTwelveContinuousBeforeNovember(period,employee,rows)){
+   return {days:0,status:'waiting',reason:`Condition 2 non remplie : 12 jours ouvrables continus doivent être pris avant le 01/11/${y}.`};
+ }
+
+ // Condition n°3 :
+ // seuls les 24 premiers jours de congé légal constituent le congé principal.
+ // La 5e semaine (jours 25 à 30) est toujours exclue.
+ const principal=rows.slice(0,Math.min(24,Math.floor(rights)));
+ const winter=principal.filter(e=>
+   e.date>=`${y}-11-01` &&
+   e.date<=`${y+1}-04-30`
+ ).length;
+
+ if(winter>=6){
+   return {days:2,status:'validated',reason:`Conditions remplies : ${winter} jours du congé principal pris entre le 01/11/${y} et le 30/04/${y+1}.`};
+ }
+ if(winter>=3){
+   return {days:1,status:'validated',reason:`Conditions remplies : ${winter} jours du congé principal pris entre le 01/11/${y} et le 30/04/${y+1}.`};
+ }
+
+ return {
+   days:0,
+   status:'waiting',
+   reason:`Condition 3 en attente : ${winter} jour${winter>1?'s':''} du congé principal pris après le 31/10/${y} (minimum 3).`
+ };
+}
+
+function leaveFraction(period,employee){
+ return leaveFractionInfo(period,employee).days;
+}
+function leaveEntriesForPeriod(period,employee=''){
+ const {start,end}=leavePeriodBounds(period);
+ const employees=employee?[employee]:state.employees.map(e=>e.name);
+ const result=[];
+
+ for(const empName of employees){
+   const actual=state.entries
+     .filter(e=>
+       e.type==='CGE' &&
+       e.employee===empName &&
+       e.date>=start && e.date<=end &&
+       new Date(e.date+'T12:00:00').getDay()!==0 &&
+       !isFrenchPublicHoliday(e.date)
+     )
+     .sort((a,b)=>a.date.localeCompare(b.date));
+
+   if(!actual.length)continue;
+
+   const seen=new Set(actual.map(e=>e.date));
+   result.push(...actual);
+
+   // V42 : pont explicite jeudi + vendredi férié + samedi + dimanche + lundi en congé.
+   // Exemple : 24/12/2026 CGE, 25/12 férié, 26/12 samedi, 27/12 dimanche,
+   // 28/12/2026 CGE => le samedi 26/12 doit être décompté.
+   for(const e of actual){
+     const d=new Date(e.date+'T12:00:00');
+     if(d.getDay()!==4)continue; // jeudi uniquement
+
+     const fri=addDaysDate(d,1);
+     const sat=addDaysDate(d,2);
+     const mon=addDaysDate(d,4);
+
+     const friIso=isoLocalDate(fri);
+     const satIso=isoLocalDate(sat);
+     const monIso=isoLocalDate(mon);
+
+     if(!isFrenchPublicHoliday(friIso))continue;
+     if(isFrenchPublicHoliday(satIso) || seen.has(satIso))continue;
+
+     // Le lundi doit bien faire partie de la même période de congés.
+     if(!actual.some(x=>x.date===monIso))continue;
+
+     // Le samedi est un jour ouvrable de congé : on le décompte.
+     result.push({
+       id:`auto-holiday-bridge-sat-${empName}-${satIso}`,
+       employee:empName,
+       date:satIso,
+       type:'CGE',
+       comment:'Samedi décompté automatiquement après jour férié',
+       _autoSaturday:true,
+       _autoRebuilt:true
+     });
+     seen.add(satIso);
+   }
+
+   // Regrouper les jours CGE en périodes continues.
+   const spans=[];
+   let spanStart=actual[0].date;
+   let spanEnd=actual[0].date;
+
+   for(let i=1;i<actual.length;i++){
+     const prev=new Date(actual[i-1].date+'T12:00:00');
+     const cur=new Date(actual[i].date+'T12:00:00');
+     const diff=Math.round((cur-prev)/86400000);
+
+     // Deux journées CGE appartiennent à la même période si l'intervalle
+     // ne contient aucun jour ouvrable qui devrait rompre le congé.
+     // Cela couvre notamment : jeudi 24/12 + vendredi 25 férié +
+     // samedi 26 décompté + dimanche 27 + reprise des CGE le lundi 28.
+     let onlyNonWorkingGap=true;
+     for(let d=addDaysDate(prev,1);d<cur;d=addDaysDate(d,1)){
+       const iso=isoLocalDate(d);
+       const dow=d.getDay();
+       if(dow!==0 && !isFrenchPublicHoliday(iso)){
+         // Le samedi est un jour ouvrable de congé et peut être reconstitué.
+         // Il ne coupe donc pas la période. Les autres jours ouvrables, eux, la coupent.
+         if(dow!==6){
+           onlyNonWorkingGap=false;
+           break;
+         }
+       }
+     }
+
+     if(diff<=3 || onlyNonWorkingGap){
+       spanEnd=actual[i].date;
+     }else{
+       spans.push([spanStart,spanEnd]);
+       spanStart=actual[i].date;
+       spanEnd=actual[i].date;
+     }
+   }
+   spans.push([spanStart,spanEnd]);
+
+   for(const [a,b] of spans){
+     const da=new Date(a+'T12:00:00');
+     const db=new Date(b+'T12:00:00');
+
+     // Compléter tous les jours ouvrables lundi-samedi au milieu de la période.
+     for(let d=new Date(da);d<=db;d.setDate(d.getDate()+1)){
+       const iso=isoLocalDate(d);
+       const dow=d.getDay();
+       if(dow===0 || isFrenchPublicHoliday(iso) || seen.has(iso))continue;
+
+       const worked=state.entries.some(x=>
+         x.employee===empName &&
+         x.date===iso &&
+         x.type!=='CGE' &&
+         ['CONT','CLA','SAM','FORM'].includes(x.type)
+       );
+
+       if(!worked){
+         result.push({
+           id:`auto-cge-${empName}-${iso}`,
+           employee:empName,
+           date:iso,
+           type:'CGE',
+           comment:dow===6?'Samedi décompté automatiquement':'Jour de congé reconstitué automatiquement',
+           _autoSaturday:dow===6,
+           _autoRebuilt:true
+         });
+         seen.add(iso);
+       }
+     }
+
+     // Correction rétroactive des anciennes périodes :
+     // si la dernière journée CGE réellement enregistrée du bloc est un vendredi,
+     // ajouter le samedi suivant ; idem jeudi + vendredi férié.
+     // Cette règle ne s'applique qu'aux blocs d'au moins 2 jours CGE afin d'éviter
+     // les samedis fantômes après un congé isolé.
+     const spanActual=actual.filter(e=>e.date>=a && e.date<=b);
+     if(spanActual.length>=2){
+       const retroSaturday=paidLeaveFinalSaturday(a,b);
+       if(retroSaturday && retroSaturday<=end && !seen.has(retroSaturday)){
+         result.push({
+           id:`auto-last-sat-${empName}-${retroSaturday}`,
+           employee:empName,
+           date:retroSaturday,
+           type:'CGE',
+           comment:'Dernier samedi de congé décompté automatiquement',
+           _autoSaturday:true,
+           _autoRebuilt:true
+         });
+         seen.add(retroSaturday);
+       }
+     }
+   }
+ }
+
+ return result.sort((a,b)=>a.date.localeCompare(b.date)||a.employee.localeCompare(b.employee))
+}
+
+function initLeaveEmployee(){
+ const sel=el('leaveEmployee');
+ if(!sel)return;
+ const previous=sel.value;
+ sel.innerHTML=state.employees.map(emp=>`<option value="${esc(emp.name)}">${esc(emp.name)}</option>`).join('');
+ if(previous && state.employees.some(e=>e.name===previous))sel.value=previous;
+ else if(state.employees.length)sel.value=state.employees[0].name;
+}
+function updateLeaveSummaryForEmployee(){
+ const period=el('leavePeriod')?.value;
+ const employee=el('leaveEmployee')?.value;
+ if(!period||!employee)return;
+ const rights=leaveRights(period,employee);
+ const fraction=leaveFraction(period,employee);
+ const rows=leaveEntriesForPeriod(period,employee);
+ const today=todayIso();
+ const taken=rows.filter(e=>e.date<=today).length;
+ const planned=rows.filter(e=>e.date>today).length;
+ const available=rights+fraction-taken;
+ const after=available-planned;
+
+ el('leaveTotalRights').textContent=`${rights} j`;
+ if(el('leaveTotalFraction'))el('leaveTotalFraction').textContent=`${fraction} j`;
+ el('leaveTotalTaken').textContent=`${taken} j`;
+ el('leaveTotalPlanned').textContent=`${planned} j`;
+ if(el('leaveTotalAvailable')){
+   el('leaveTotalAvailable').textContent=`${available} j`;
+   el('leaveTotalAvailable').className=available<0?'leave-negative':available<=3?'leave-warning':'leave-positive';
+ }
+ if(el('leaveTotalBalance')){
+   el('leaveTotalBalance').textContent=`${after} j`;
+   el('leaveTotalBalance').className=after<0?'leave-negative':after<=3?'leave-warning':'leave-positive';
+ }
+}
+
+function leaveRightsSplit(period,employee){
+ const rights=Math.max(0,leaveRights(period,employee));
+ const rows=leaveEntriesForPeriod(period,employee).sort((a,b)=>a.date.localeCompare(b.date));
+ const today=todayIso();
+
+ const principalEntitlement=Math.min(24,rights);
+ const fifthEntitlement=Math.max(0,Math.min(6,rights-24));
+
+ // Les jours sont affectés chronologiquement : les 24 premiers au congé principal,
+ // puis les suivants à la 5e semaine.
+ const principalRows=rows.slice(0,Math.min(24,rows.length));
+ const fifthRows=rows.slice(24,30);
+
+ const principalTaken=principalRows.filter(e=>e.date<=today).length;
+ const principalPlanned=principalRows.filter(e=>e.date>today).length;
+ const fifthTaken=fifthRows.filter(e=>e.date<=today).length;
+ const fifthPlanned=fifthRows.filter(e=>e.date>today).length;
+
+ return {
+   rights,
+   principalEntitlement,
+   fifthEntitlement,
+   principalTaken,
+   principalPlanned,
+   principalRemaining:Math.max(0,principalEntitlement-principalTaken-principalPlanned),
+   fifthTaken,
+   fifthPlanned,
+   fifthRemaining:Math.max(0,fifthEntitlement-fifthTaken-fifthPlanned)
+ };
+}
+
+function renderLeaveRightsSplit(period){
+ const body=el('leaveRightsSplitBody');
+ if(!body)return;
+
+ body.innerHTML=state.employees.map(emp=>{
+   const s=leaveRightsSplit(period,emp.name);
+   const frac=leaveFractionInfo(period,emp.name);
+   const validated=frac.status==='validated' && frac.days>0;
+   const fracBadge=validated
+     ? `<span class="badge CGE">Validé : ${frac.days} j</span>`
+     : `<span class="badge" style="background:#f1f5f9;color:#475569">En attente</span>`;
+
+   return `<tr>
+    <td><b>${esc(emp.name)}</b></td>
+    <td>
+     <b>${s.principalRemaining} j restant${s.principalRemaining>1?'s':''}</b>
+     <div class="muted" style="font-size:11px;margin-top:3px">
+      Droit : ${s.principalEntitlement} j · Pris : ${s.principalTaken} j · Planifié : ${s.principalPlanned} j
+     </div>
+    </td>
+    <td>
+     <b>${s.fifthRemaining} j restant${s.fifthRemaining>1?'s':''}</b>
+     <div class="muted" style="font-size:11px;margin-top:3px">
+      Droit : ${s.fifthEntitlement} j · Pris : ${s.fifthTaken} j · Planifié : ${s.fifthPlanned} j
+     </div>
+    </td>
+    <td>
+     ${fracBadge}
+     <div class="muted" style="font-size:11px;margin-top:4px">${esc(frac.reason)}</div>
+    </td>
+   </tr>`;
+ }).join('');
+}
+
+function renderPaidLeave(){
+ initLeavePeriods();
+ initLeaveEmployee();
+ const period=el('leavePeriod')?.value;
+ if(!period)return;
+
+ const today=todayIso();
+ const autoRightsBox=el('paidLeaveAutoRights');
+ if(autoRightsBox){
+   autoRightsBox.checked=state.settings.paidLeaveAutoRights!==false;
+   autoRightsBox.onchange=async()=>{
+     state.settings.paidLeaveAutoRights=autoRightsBox.checked;
+     persist();
+     try{await pushSettings();setSyncStatus('Supabase synchronisé ✓')}catch(err){console.error(err);setSyncStatus('Paramètre sauvegardé localement',false)}
+     renderPaidLeave();
+   };
+ }
+
+ el('leaveBody').innerHTML=state.employees.map(emp=>{
+   const rights=leaveRights(period,emp.name);
+   const fraction=leaveFraction(period,emp.name);
+   const rows=leaveEntriesForPeriod(period,emp.name);
+   const taken=rows.filter(e=>e.date<=today).length;
+   const planned=rows.filter(e=>e.date>today).length;
+   const available=rights+fraction-taken;
+   const after=available-planned;
+   const cls=after<0?'leave-negative':after<=3?'leave-warning':'leave-positive';
+
+   return `<tr data-leave-row="${esc(emp.name)}">
+    <td><b>${esc(emp.name)}</b></td>
+    <td>${state.settings.paidLeaveAutoRights!==false
+ ? `<b data-leave-right-auto="${esc(emp.name)}">${rights} j</b><div class="muted" style="font-size:11px;margin-top:3px">${employeeHireDate(emp.name)?`Entrée : ${new Date(employeeHireDate(emp.name)+'T12:00:00').toLocaleDateString('fr-FR')}`:'Date d’entrée à renseigner'}</div>`
+ : `<input class="leave-right-input" type="number" min="0" step="0.5" data-leave-right="${esc(emp.name)}" value="${rights}"> j`
+}</td>
+    <td><b data-leave-fraction-auto="${esc(emp.name)}">${fraction} j</b><div class="muted" style="font-size:11px;margin-top:3px">${esc(leaveFractionInfo(period,emp.name).reason)}</div></td>
+    <td><b data-leave-taken>${taken} j</b></td>
+    <td data-leave-planned>${planned} j</td>
+    <td data-leave-available><b>${available} j</b></td>
+    <td data-leave-after class="${cls}">${after} j</td>
+   </tr>`
+ }).join('');
+
+ document.querySelectorAll('[data-leave-right]').forEach(inp=>{
+   inp.addEventListener('input',()=>{recalcPaidLeaveFromInputs();renderLeaveRightsSplit(period)});
+   inp.addEventListener('change',()=>{recalcPaidLeaveFromInputs();renderLeaveRightsSplit(period)});
+ });
+
+ recalcPaidLeaveFromInputs();
+ renderLeaveRightsSplit(period);
+
+ const details=leaveEntriesForPeriod(period);
+ el('leaveDetailBody').innerHTML=details.length?details.map(e=>`
+   <tr>
+    <td>${new Date(e.date+'T12:00:00').toLocaleDateString('fr-FR')}</td>
+    <td><b>${esc(e.employee)}</b></td>
+    <td><span class="badge CGE">${e.date>today?'Planifié':'Pris'}</span>${(e._autoSaturday||String(e.comment||'').includes('Dernier samedi de congé décompté'))?`<div class="muted" style="font-size:11px">Samedi décompté</div>`:''}</td>
+    <td>${esc(e.comment||'')}</td>
+   </tr>`).join(''):`<tr><td colspan="4" class="empty">Aucun congé CGE saisi sur cette période.</td></tr>`;
+}
+
+function recalcPaidLeaveFromInputs(){
+ document.querySelectorAll('#leaveBody tr[data-leave-row]').forEach(row=>{
+   const rightsInput=row.querySelector('[data-leave-right]');
+   const employee=row.dataset.leaveRow;
+   const period=el('leavePeriod')?.value;
+   const rights=state.settings.paidLeaveAutoRights!==false
+     ? leaveRights(period,employee)
+     : Math.max(0,Number(rightsInput?.value)||0);
+
+   let saved;
+   if(state.settings.paidLeaveAutoRights===false){
+     // Pour la saisie manuelle, le fractionnement réagit immédiatement au droit saisi.
+     saved=state.settings.paidLeaveRights?.[period]?.[employee];
+     state.settings.paidLeaveRights=state.settings.paidLeaveRights||{};
+     state.settings.paidLeaveRights[period]=state.settings.paidLeaveRights[period]||{};
+     state.settings.paidLeaveRights[period][employee]=rights;
+   }
+   const info=leaveFractionInfo(period,employee);
+   const fraction=info.days;
+   const auto=row.querySelector('[data-leave-fraction-auto]');
+   if(auto)auto.textContent=`${fraction} j`;
+   const infoNode=auto?.nextElementSibling;
+   if(infoNode)infoNode.textContent=info.reason;
+   if(state.settings.paidLeaveAutoRights===false){
+     if(saved===undefined)delete state.settings.paidLeaveRights[period][employee];
+     else state.settings.paidLeaveRights[period][employee]=saved;
+   }
+   const taken=parseFloat(row.querySelector('[data-leave-taken]')?.textContent)||0;
+   const planned=parseFloat(row.querySelector('[data-leave-planned]')?.textContent)||0;
+   const available=rights+fraction-taken;
+   const after=available-planned;
+   const av=row.querySelector('[data-leave-available]');
+   const af=row.querySelector('[data-leave-after]');
+   if(av)av.innerHTML=`<b>${available} j</b>`;
+   if(af){
+     af.textContent=`${after} j`;
+     af.className=after<0?'leave-negative':after<=3?'leave-warning':'leave-positive';
+   }
+ });
+ // Le résumé du haut correspond uniquement au salarié sélectionné.
+ // On lit les valeurs en cours de saisie de sa ligne pour un retour immédiat.
+ const employee=el('leaveEmployee')?.value;
+ const row=[...document.querySelectorAll('#leaveBody tr[data-leave-row]')].find(r=>r.dataset.leaveRow===employee);
+ if(row){
+   const rights=state.settings.paidLeaveAutoRights!==false
+     ? leaveRights(el('leavePeriod')?.value,employee)
+     : Math.max(0,Number(row.querySelector('[data-leave-right]')?.value)||0);
+   const fraction=Number(row.querySelector('[data-leave-fraction-auto]')?.textContent)||0;
+   const taken=parseFloat(row.querySelector('[data-leave-taken]')?.textContent)||0;
+   const planned=parseFloat(row.querySelector('[data-leave-planned]')?.textContent)||0;
+   const available=rights+fraction-taken,after=available-planned;
+   el('leaveTotalRights').textContent=`${rights} j`;
+   if(el('leaveTotalFraction'))el('leaveTotalFraction').textContent=`${fraction} j`;
+   el('leaveTotalTaken').textContent=`${taken} j`;
+   el('leaveTotalPlanned').textContent=`${planned} j`;
+   if(el('leaveTotalAvailable')){el('leaveTotalAvailable').textContent=`${available} j`;el('leaveTotalAvailable').className=available<0?'leave-negative':available<=3?'leave-warning':'leave-positive'}
+   if(el('leaveTotalBalance')){el('leaveTotalBalance').textContent=`${after} j`;el('leaveTotalBalance').className=after<0?'leave-negative':after<=3?'leave-warning':'leave-positive'}
+ }
+}
+
+async function saveLeaveRights(){
+ const period=el('leavePeriod')?.value;
+ if(!period)return alert('Choisis une période de congés.');
+
+ state.settings.paidLeaveAutoRights=!!el('paidLeaveAutoRights')?.checked;
+ recalcPaidLeaveFromInputs();
+
+ state.settings.paidLeaveRights=state.settings.paidLeaveRights||{};
+ state.settings.paidLeaveRights[period]=state.settings.paidLeaveRights[period]||{};
+ state.settings.paidLeaveFractionnement=state.settings.paidLeaveFractionnement||{};
+ state.settings.paidLeaveFractionnement[period]=state.settings.paidLeaveFractionnement[period]||{};
+
+ document.querySelectorAll('[data-leave-right]').forEach(inp=>{
+   state.settings.paidLeaveRights[period][inp.dataset.leaveRight]=Math.max(0,Number(inp.value)||0);
+ });
+
+
+ persist();
+
+ try{
+   await pushSettings();
+   setSyncStatus('Supabase synchronisé ✓');
+   renderPaidLeave();
+   alert(state.settings.paidLeaveAutoRights!==false
+     ? 'Calcul automatique CIBTP enregistré. Les droits sont recalculés à partir des dates d’entrée.'
+     : 'Droits acquis enregistrés. Le fractionnement est calculé automatiquement.');
+ }catch(err){
+   console.error(err);
+   setSyncStatus('Congés sauvegardés localement',false);
+   renderPaidLeave();
+   alert('Droits enregistrés sur cet appareil. Le fractionnement reste calculé automatiquement.');
+ }
+}
+
+function renderSettings(){el('contStart').value=state.settings.CONT.start;el('contEnd').value=state.settings.CONT.end;el('claStart').value=state.settings.CLA.start;el('claEnd').value=state.settings.CLA.end;el('pauseStart').value=state.settings.CLA.pauseStart;el('pauseEnd').value=state.settings.CLA.pauseEnd;el('samStart').value=state.settings.SAM.start;el('otRate1').value=state.settings.overtime.rate1;el('otRate2').value=state.settings.overtime.rate2;el('otThreshold').value=state.settings.overtime.thresholdHours;if(el('otGraceEnabled'))el('otGraceEnabled').checked=state.settings.overtime?.grace15Enabled!==false;renderEmployeeSettings();renderTeamSettings()}
+function renderEmployeeSettings(){el('employeeSettings').innerHTML=state.employees.map((e,i)=>`<div class="employee-row"><div><label>Nom</label><input data-n="${i}" value="${esc(e.name)}"></div><div><label>Taux horaire</label><input data-r="${i}" type="number" step="0.01" value="${e.rate||0}"></div><div><label>Date d’entrée</label><input data-hire="${i}" type="date" value="${esc(employeeHireDate(e.name))}"></div><button class="employee-delete-btn" type="button" onclick="removeEmployee(${i})">Supprimer</button></div>`).join('')}
+function removeEmployee(i){const name=state.employees[i]?.name;if(name&&state.settings.employeeHireDates)delete state.settings.employeeHireDates[name];state.employees.splice(i,1);renderEmployeeSettings()}
+function addEmployee(){state.employees.push({name:'NOUVEAU SALARIÉ',rate:0});renderEmployeeSettings()}
+async function saveEmployees(){
+ const oldNames=state.employees.map(e=>e.name);
+ const newHireDates={...(state.settings.employeeHireDates||{})};
+
+ document.querySelectorAll('[data-n]').forEach(x=>state.employees[+x.dataset.n].name=x.value.trim());
+ document.querySelectorAll('[data-r]').forEach(x=>state.employees[+x.dataset.r].rate=Number(x.value)||0);
+ document.querySelectorAll('[data-hire]').forEach(x=>{
+   const i=+x.dataset.hire;
+   const oldName=oldNames[i];
+   const newName=state.employees[i]?.name;
+   if(oldName && oldName!==newName)delete newHireDates[oldName];
+   if(newName){
+     if(x.value)newHireDates[newName]=x.value;
+     else delete newHireDates[newName];
+   }
+ });
+ state.settings.employeeHireDates=newHireDates;
+ state.employees=state.employees.filter(e=>e.name);
+ persist();options();renderTeamPicker();renderTeamSettings();renderMonth();renderRecap();renderPaidLeave();
+ try{
+   await pushEmployees();
+   await pushSettings();
+   setSyncStatus('Supabase synchronisé ✓');
+   alert('Salariés, taux horaires et dates d’entrée enregistrés et synchronisés.');
+ }catch(err){
+   console.error(err);setSyncStatus('Salariés sauvegardés localement',false);
+   alert('Salariés et dates d’entrée enregistrés localement.');
+ }
+}
+async function saveSettings(){state.settings.CONT={start:el('contStart').value,end:el('contEnd').value};state.settings.CLA={start:el('claStart').value,end:el('claEnd').value,pauseStart:el('pauseStart').value,pauseEnd:el('pauseEnd').value};state.settings.SAM={start:el('samStart').value,end:state.settings.SAM.end||'14:00'};state.settings.overtime={rate1:Number(el('otRate1').value)||0,rate2:Number(el('otRate2').value)||0,thresholdHours:Number(el('otThreshold').value)||0,grace15Enabled:!!el('otGraceEnabled')?.checked};persist();updateCalc();renderRecap();try{await pushSettings();setSyncStatus('Supabase synchronisé ✓');alert('Réglages enregistrés et synchronisés.')}catch(err){console.error(err);setSyncStatus('Réglages sauvegardés localement',false);alert('Réglages enregistrés localement.')}}
+
+function teamMode(on){
+ el('singleModeBtn')?.classList.toggle('active',!on);
+ el('teamModeBtn')?.classList.toggle('active',on);
+ el('teamPanel')?.classList.toggle('active',on);
+ const empField=el('employee')?.closest('.field');
+ if(empField) empField.style.opacity=on?'.45':'1';
+ updateTeamSummary();
+}
+function selectedTeamMembers(){return Array.from(document.querySelectorAll('.teamMemberCheck:checked')).map(x=>x.value)}
+function updateTeamSummary(){const n=selectedTeamMembers().length;if(el('teamSummary'))el('teamSummary').textContent=n+' salarié'+(n>1?'s':'')+' sélectionné'+(n>1?'s':'')}
+function renderTeamPicker(){
+ if(!el('teamMembers'))return;
+ el('teamMembers').innerHTML=state.employees.map(e=>`<label class="team-check"><input class="teamMemberCheck" type="checkbox" value="${esc(e.name)}"><span>${esc(e.name)}</span></label>`).join('');
+ document.querySelectorAll('.teamMemberCheck').forEach(x=>x.onchange=updateTeamSummary);
+ if(el('teamPreset'))el('teamPreset').innerHTML='<option value="">— Sélection libre —</option>'+(Array.isArray(state.settings.teams)?state.settings.teams:[]).map((t,i)=>`<option value="${i}">${esc(t.name||('Équipe '+(i+1)))}</option>`).join('');
+ updateTeamSummary();
+}
+function applyTeamPreset(){
+ const i=el('teamPreset').value;if(i==='')return;
+ const t=state.settings.teams[Number(i)];const members=new Set(t?.members||[]);
+ document.querySelectorAll('.teamMemberCheck').forEach(x=>x.checked=members.has(x.value));updateTeamSummary();
+}
+function renderTeamSettings(){
+ if(!el('teamSettingsList'))return;
+ el('teamSettingsList').innerHTML=(Array.isArray(state.settings.teams)?state.settings.teams:[]).map((t,i)=>`<div class="team-setting-row" data-team="${i}">
+  <div class="team-setting-head"><input class="teamName" value="${esc(t.name||'')}" placeholder="Nom de l’équipe"><button type="button" onclick="removeTeam(${i})">Supprimer</button></div>
+  <div class="team-setting-members">${state.employees.map(e=>`<label><input type="checkbox" class="teamCfgMember" value="${esc(e.name)}" ${(t.members||[]).includes(e.name)?'checked':''}> ${esc(e.name)}</label>`).join('')}</div>
+ </div>`).join('');
+}
+function addTeam(){state.settings.teams.push({name:'Nouvelle équipe',members:[]});renderTeamSettings()}
+function removeTeam(i){state.settings.teams.splice(i,1);renderTeamSettings();renderTeamPicker()}
+async function saveTeams(){
+ document.querySelectorAll('[data-team]').forEach(row=>{
+  const i=Number(row.dataset.team);
+  state.settings.teams[i]={name:row.querySelector('.teamName').value.trim()||('Équipe '+(i+1)),members:Array.from(row.querySelectorAll('.teamCfgMember:checked')).map(x=>x.value)}
+ });
+ persist();renderTeamPicker();
+ try{await pushSettings();setSyncStatus('Supabase synchronisé ✓');alert('Équipes enregistrées et synchronisées.')}
+ catch(err){console.error(err);setSyncStatus('Équipes sauvegardées localement',false);alert('Équipes enregistrées localement.')}
+}
+
+
+function buildFullBackup(){
+ return {
+  app:'RML_HEURES',
+  formatVersion:1,
+  exportedAt:new Date().toISOString(),
+  data:{
+   employees:state.employees||[],
+   entries:state.entries||[],
+   settings:state.settings||{}
+  }
+ }
+}
+
+function exportFullBackup(){
+ try{
+  const backup=buildFullBackup();
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const d=new Date();
+  const stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'_'+String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0');
+  a.href=url;
+  a.download='RML_HEURES_SAUVEGARDE_'+stamp+'.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+ }catch(err){
+  console.error(err);
+  alert('Impossible de créer la sauvegarde JSON.');
+ }
+}
+
+function validateBackup(obj){
+ if(!obj||typeof obj!=='object')return false;
+ if(obj.app!=='RML_HEURES')return false;
+ if(!obj.data||typeof obj.data!=='object')return false;
+ if(!Array.isArray(obj.data.employees))return false;
+ if(!Array.isArray(obj.data.entries))return false;
+ if(!obj.data.settings||typeof obj.data.settings!=='object')return false;
+ return true;
+}
+
+async function restoreFullBackup(file){
+ try{
+  const text=await file.text();
+  const backup=JSON.parse(text);
+
+  if(!validateBackup(backup)){
+   alert('Ce fichier ne correspond pas à une sauvegarde complète RML HEURES.');
+   return;
+  }
+
+  const ok=confirm(
+   'Restaurer cette sauvegarde complète ?\n\n'+
+   'Date de sauvegarde : '+(backup.exportedAt?new Date(backup.exportedAt).toLocaleString('fr-FR'):'inconnue')+
+   '\n\nLes données locales actuelles seront remplacées.'
+  );
+  if(!ok)return;
+
+  state.employees=backup.data.employees;
+  state.entries=backup.data.entries;
+  state.settings=normalizeSettings(backup.data.settings);
+
+  persist();
+  options();
+  renderSettings();
+  renderTeamPicker();
+  renderMonth();
+  renderRecap();
+  updateCalc();
+
+  try{
+   // Synchronise la restauration vers Supabase pour remettre tous les appareils au même état.
+   await pushSettings();
+
+   // Remplacement complet des salariés côté Supabase
+   await db.from('rml_heures_employees').delete().neq('id',0);
+   if(state.employees.length){
+    const empRows=state.employees.map(e=>({
+     name:e.name,
+     hourly_rate:Number(e.rate)||0,
+     active:true,
+     updated_at:new Date().toISOString()
+    }));
+    const er=await db.from('rml_heures_employees').insert(empRows);
+    if(er.error)throw er.error;
+   }
+
+   // Remplacement complet des journées côté Supabase
+   await db.from('rml_heures_entries').delete().neq('id',0);
+   for(const e of state.entries){
+    await pushEntry(e);
+   }
+
+   setSyncStatus('Sauvegarde restaurée et synchronisée ✓');
+   alert('Sauvegarde restaurée complètement et synchronisée avec Supabase.');
+  }catch(syncErr){
+   console.error(syncErr);
+   setSyncStatus('Sauvegarde restaurée localement — synchro incomplète',false);
+   alert('La sauvegarde a été restaurée sur cet appareil, mais la synchronisation Supabase n’a pas pu être terminée.');
+  }
+
+ }catch(err){
+  console.error(err);
+  alert('Impossible de lire ou restaurer ce fichier JSON.');
+ }
+}
+
+
+function ensureEmployeePlaceholder(){
+ const sel=el('employee');
+ if(!sel)return;
+ if(!sel.querySelector('option[value=""]')){
+   const opt=document.createElement('option');
+   opt.value='';
+   opt.textContent='Saisir un salarié dans la liste';
+   opt.disabled=true;
+   sel.insertBefore(opt,sel.firstChild);
+ }
+ if(!sel.value)sel.value='';
+}
+
+
+function analysisScheduledMinutesForEntry(e){
+ if(!e||!e.date)return 0;
+ const dow=new Date(e.date+'T12:00:00').getDay();
+
+ // Samedi/dimanche : aucune heure théorique d'absence.
+ if(dow===0||dow===6)return 0;
+
+ // Les absences sont valorisées sur l'horaire de journée continue,
+ // horaire de référence principal de l'entreprise.
+ const s=state.settings.CONT||{start:'07:15',end:'14:15'};
+ const a=mins(s.start),b=mins(s.end);
+ return (a!=null&&b!=null)?Math.max(0,b-a):0
+}
+
+function analysisWorkMinutes(e){
+ if(!e||!['CONT','CLA','SAM'].includes(e.type))return 0;
+ const s=state.settings[e.type]||state.settings.CONT;
+ const refStart=mins(s?.start),refEnd=mins(s?.end||s?.start);
+ const override=mins(e.startOverride);
+ const start=override!=null?override:refStart;
+ const arrivee=mins(e.arrivee);
+ const depart=mins(e.depart);
+
+ // Priorité à la présence réellement enregistrée.
+ if(start!=null && arrivee!=null)return Math.max(0,arrivee-start);
+ if(Number(e.presence)>0)return Number(e.presence);
+
+ // Pour les anciennes lignes incomplètes : fin chantier si connue, sinon horaire normal.
+ if(start!=null && depart!=null)return Math.max(0,depart-start);
+ if(refStart!=null&&refEnd!=null)return Math.max(0,refEnd-refStart);
+ return 0
+}
+
+function analysisFormationMinutes(e){
+ if(!e||e.type!=='FORM')return 0;
+ if(Number(e.presence)>0)return Number(e.presence);
+ return analysisScheduledMinutesForEntry(e)
+}
+
+function initAnalysisControls(){
+ const sel=el('analysisEmployee');
+ if(sel){
+   const keep=sel.value;
+   sel.innerHTML='<option value="">Tous les salariés</option>'+state.employees.map(e=>`<option value="${esc(e.name)}">${esc(e.name)}</option>`).join('');
+   if(keep && state.employees.some(e=>e.name===keep))sel.value=keep;
+ }
+ if(!el('analysisStart')?.value || !el('analysisEnd')?.value){
+   const y=new Date().getFullYear();
+   if(el('analysisStart'))el('analysisStart').value=`${y}-01-01`;
+   if(el('analysisEnd'))el('analysisEnd').value=`${y}-12-31`;
+ }
+}
+
+function analysisEmployeeStats(employee,start,end){
+ const rows=state.entries
+   .filter(e=>e.employee===employee&&e.date>=start&&e.date<=end)
+   .slice().sort((a,b)=>a.date.localeCompare(b.date));
+ const ledger=recoveryLedger(employee);
+
+ const stats={
+   employee,work:0,formation:0,mal:0,at:0,cge:0,abs:0,
+   route:0,overtime:0,paniers:0,
+   workDays:0,formationDays:0,malDays:0,atDays:0,cgeDays:0,absDays:0
+ };
+
+ for(const e of rows){
+   if(['CONT','CLA','SAM'].includes(e.type)){
+     stats.work+=analysisWorkMinutes(e);
+     stats.workDays++;
+   }else if(e.type==='FORM'){
+     stats.formation+=analysisFormationMinutes(e);
+     stats.formationDays++;
+   }else if(e.type==='MAL'){
+     stats.mal+=analysisScheduledMinutesForEntry(e);stats.malDays++;
+   }else if(e.type==='AT'){
+     stats.at+=analysisScheduledMinutesForEntry(e);stats.atDays++;
+   }else if(e.type==='CGE'){
+     stats.cge+=analysisScheduledMinutesForEntry(e);stats.cgeDays++;
+   }else if(e.type==='ABS'){
+     stats.abs+=analysisScheduledMinutesForEntry(e);stats.absDays++;
+   }
+
+   stats.route+=Number(e.route)||0;
+   stats.overtime+=ledger[e.id]?.netReal ?? (Number(e.real)||0);
+   stats.paniers+=panierForEntry(e);
+ }
+
+ // Ajouter les samedis de congés reconstruits automatiquement au nombre de jours,
+ // sans leur attribuer d'heures théoriques.
+ const leaveRows=leaveEntriesForRangeForAnalysis(start,end,employee);
+ const actualCgeDates=new Set(rows.filter(e=>e.type==='CGE').map(e=>e.date));
+ for(const e of leaveRows){
+   if(!actualCgeDates.has(e.date)){
+     stats.cgeDays++;
+     // 0 h si samedi ; si ancien jour ouvrable reconstitué, valoriser l'horaire théorique.
+     if(new Date(e.date+'T12:00:00').getDay()!==6)stats.cge+=analysisScheduledMinutesForEntry(e);
+   }
+ }
+ return stats
+}
+
+function leaveEntriesForRangeForAnalysis(start,end,employee){
+ if(!start||!end)return [];
+ const periodKeys=new Set();
+ let d=new Date(start+'T12:00:00');
+ const last=new Date(end+'T12:00:00');
+ while(d<=last){
+   periodKeys.add(leavePeriodKeyForDate(isoLocalDate(d)));
+   d.setMonth(d.getMonth()+1);
+ }
+ const seen=new Set(),rows=[];
+ for(const p of periodKeys){
+   for(const e of leaveEntriesForPeriod(p,employee)){
+     if(e.date<start||e.date>end)continue;
+     const k=e.employee+'|'+e.date;
+     if(seen.has(k))continue;
+     seen.add(k);rows.push(e);
+   }
+ }
+ return rows
+}
+
+function renderAnalysis(){
+ initAnalysisControls();
+ const start=el('analysisStart')?.value;
+ const end=el('analysisEnd')?.value;
+ const selected=el('analysisEmployee')?.value||'';
+ if(!start||!end)return;
+ if(end<start){
+   if(el('analysisBody'))el('analysisBody').innerHTML='<tr><td colspan="10" class="empty">La date de fin doit être postérieure à la date de début.</td></tr>';
+   return;
+ }
+
+ const employees=selected?[selected]:state.employees.map(e=>e.name);
+ const stats=employees.map(emp=>analysisEmployeeStats(emp,start,end));
+
+ const total=k=>stats.reduce((a,s)=>a+(Number(s[k])||0),0);
+ const totalWork=total('work');
+ const totalFormation=total('formation');
+ const totalAbsence=total('mal')+total('at')+total('cge')+total('abs');
+ const totalRoute=total('route');
+ const totalOT=total('overtime');
+
+ if(el('analysisPeriodLabel')){
+   el('analysisPeriodLabel').textContent=`Du ${new Date(start+'T12:00:00').toLocaleDateString('fr-FR')} au ${new Date(end+'T12:00:00').toLocaleDateString('fr-FR')}${selected?' — '+selected:''}`;
+ }
+
+ if(el('analysisKpis'))el('analysisKpis').innerHTML=`
+   <div class="kpi"><span>Temps de travail</span><b>${time(totalWork)}</b></div>
+   <div class="kpi"><span>Formation</span><b>${time(totalFormation)}</b><small>${total('formationDays')} j</small></div>
+   <div class="kpi"><span>Absences rémunérées / suivies</span><b>${time(totalAbsence)}</b><small>${total('malDays')+total('atDays')+total('cgeDays')+total('absDays')} j</small></div>
+   <div class="kpi route"><span>Heures de route</span><b>${time(totalRoute)}</b></div>
+   <div class="kpi real"><span>Heures sup nettes</span><b>${time(totalOT)}</b></div>
+   <div class="kpi"><span>Maladie</span><b>${time(total('mal'))}</b><small>${total('malDays')} j</small></div>
+   <div class="kpi"><span>Accident du travail</span><b>${time(total('at'))}</b><small>${total('atDays')} j</small></div>
+   <div class="kpi"><span>Congés</span><b>${time(total('cge'))}</b><small>${total('cgeDays')} j</small></div>
+   <div class="kpi"><span>Absence</span><b>${time(total('abs'))}</b><small>${total('absDays')} j</small></div>
+   <div class="kpi"><span>Paniers</span><b>${total('paniers')}</b></div>`;
+
+ if(el('analysisBody'))el('analysisBody').innerHTML=stats.length?stats.map(s=>`
+   <tr>
+    <td><b>${esc(s.employee)}</b></td>
+    <td><div class="analysis-main">${time(s.work)}</div><div class="analysis-sub">${s.workDays} j travaillés</div></td>
+    <td><div class="analysis-main">${time(s.formation)}</div><div class="analysis-sub">${s.formationDays} j</div></td>
+    <td><div class="analysis-main">${time(s.mal)}</div><div class="analysis-sub">${s.malDays} j</div></td>
+    <td><div class="analysis-main">${time(s.at)}</div><div class="analysis-sub">${s.atDays} j</div></td>
+    <td><div class="analysis-main">${time(s.cge)}</div><div class="analysis-sub">${s.cgeDays} j ouvrables</div></td>
+    <td><div class="analysis-main">${time(s.abs)}</div><div class="analysis-sub">${s.absDays} j</div></td>
+    <td><div class="analysis-main">${time(s.route)}</div></td>
+    <td><div class="analysis-main">${time(s.overtime)}</div></td>
+    <td><div class="analysis-main">${s.paniers}</div></td>
+   </tr>`).join(''):'<tr><td colspan="10" class="empty">Aucune donnée sur cette période.</td></tr>';
+}
+
+function setAnalysisCurrentYear(){
+ const y=new Date().getFullYear();
+ el('analysisStart').value=`${y}-01-01`;
+ el('analysisEnd').value=`${y}-12-31`;
+ renderAnalysis();
+}
+
+function printAnalysis(){
+ document.body.classList.add('analysis-print');
+ window.print();
+ setTimeout(()=>document.body.classList.remove('analysis-print'),500);
+}
+
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===id));if(id==='mois')renderMonth();if(id==='recap')renderRecap();if(id==='conges')renderPaidLeave();if(id==='analyse')renderAnalysis();if(id==='reglages')renderSettings()}
+function exportCsv(){const emp=el('monthEmployee').value,ym=el('monthPick').value;const rows=state.entries.filter(e=>e.employee===emp&&e.date.startsWith(ym)).sort((a,b)=>a.date.localeCompare(b.date));const data=[['Date','Salarié','Type','Embauche','Départ chantier ou atelier','Arrivée dépôt','H sup min','H route min','Déduction','H sup réelles min','Commentaire'],...rows.map(e=>[e.date,e.employee,e.type,e.startOverride||'',e.depart||'',e.arrivee||'',e.sup||0,e.route||0,e.deduction||'00:00',e.real||0,e.comment||''])];const csv=data.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download=`RML_HEURES_${emp}_${ym}.csv`;a.click();URL.revokeObjectURL(a.href)}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>show(b.dataset.view));['employee','date','startOverride','depart','arrivee','deduction','absenceEnd'].forEach(id=>el(id)?.addEventListener('input',updateCalc));
+el('type')?.addEventListener('input',updateCalc);
+el('type')?.addEventListener('change',updateCalc);el('saveBtn').onclick=saveEntry;
+el('singleModeBtn').onclick=()=>teamMode(false);
+el('teamModeBtn').onclick=()=>teamMode(true);
+el('teamPreset').onchange=applyTeamPreset;el('clearBtn').onclick=clearForm;el('monthEmployee').onchange=renderMonth;el('monthPick').onchange=renderMonth;el('recapMonth').onchange=()=>{if(el('globalReportDate'))el('globalReportDate').value='';renderRecap()};el('saveReports').onclick=saveReports;if(el('toggleMoneyColumns'))el('toggleMoneyColumns').onclick=toggleMoneyColumns;el('applyGlobalReportDate').onclick=applyGlobalReportDate;el('clearGlobalReportDate').onclick=clearGlobalReportDate;el('saveSettings').onclick=saveSettings;el('saveEmployees').onclick=saveEmployees;el('addEmployee').onclick=addEmployee;
+el('exportFullBackup').onclick=exportFullBackup;
+el('importFullBackup').onclick=()=>el('importBackupFile').click();
+el('importBackupFile').onchange=e=>{
+ const file=e.target.files?.[0];
+ if(file)restoreFullBackup(file);
+ e.target.value='';
+};el('addTeam').onclick=addTeam;el('saveTeams').onclick=saveTeams;
+if(el('toggleTeamSettings')){
+ el('toggleTeamSettings').onclick=()=>{
+  const p=el('teamSettingsPanel');
+  const collapsed=p.classList.toggle('collapsed');
+  el('toggleTeamSettings').textContent=collapsed?'Ouvrir':'Fermer';
+  localStorage.setItem('rml_team_settings_collapsed',collapsed?'1':'0');
+ };
+ const collapsed=localStorage.getItem('rml_team_settings_collapsed')==='1';
+ if(collapsed){el('teamSettingsPanel').classList.add('collapsed');el('toggleTeamSettings').textContent='Ouvrir'}
+}if(el('leavePeriod'))el('leavePeriod').onchange=renderPaidLeave;
+if(el('leaveEmployee'))el('leaveEmployee').onchange=recalcPaidLeaveFromInputs;
+if(el('saveLeaveRights'))el('saveLeaveRights').onclick=async()=>{
+ const b=el('saveLeaveRights'),old=b.textContent;
+ b.disabled=true;b.textContent='Enregistrement…';
+ try{await saveLeaveRights()}finally{b.disabled=false;b.textContent=old}
+};
+if(el('printLeave'))el('printLeave').onclick=()=>window.print();
+if(el('analysisRefresh'))el('analysisRefresh').onclick=renderAnalysis;
+if(el('analysisYear'))el('analysisYear').onclick=setAnalysisCurrentYear;
+if(el('analysisPrint'))el('analysisPrint').onclick=printAnalysis;
+if(el('analysisStart'))el('analysisStart').onchange=renderAnalysis;
+if(el('analysisEnd'))el('analysisEnd').onchange=renderAnalysis;
+if(el('analysisEmployee'))el('analysisEmployee').onchange=renderAnalysis;
+el('exportCsv').onclick=exportCsv;el('printRecap').onclick=()=>window.print();el('syncNow').onclick=syncFromCloud;window.addEventListener('online',syncFromCloud);window.addEventListener('offline',()=>setSyncStatus('Hors ligne — sauvegarde locale',false));
+options();ensureEmployeePlaceholder();setToday();if(el('employee'))el('employee').value='';renderSettings();renderTeamPicker();teamMode(false);updateCalc();renderMonth();renderRecap();renderPaidLeave();syncFromCloud();
+</script>
+
+
+
+
+<script id="v171-new-entry-fix">
+document.addEventListener('DOMContentLoaded',()=>{
+  const newBtn=Array.from(document.querySelectorAll('button'))
+    .find(b=>b.textContent.trim()==='Nouvelle saisie');
+  if(newBtn)newBtn.onclick=clearForm;
+});
+</script>
+
+</body>
+</html>
