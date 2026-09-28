@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V0.10.5 · Maintenance & planning</title>
+<title>RML ERP — V0.10.6 · Heures externe</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -178,7 +178,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.10.5</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.10.6</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -244,7 +244,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 </section>
 
 <section id="atelier" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Atelier / Pliage</h2><div class="muted">Application RML Pliage ALU complète intégrée à l’ERP DEV.</div></div></div><iframe class="full-module-frame" src="pliage.html?v=erp-v010-full" title="RML Pliage ALU"></iframe></div></section>
-<section id="heures" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Heures & Absences</h2><div class="muted">Application RML Heures complète intégrée à l’ERP DEV.</div></div></div><iframe class="full-module-frame" src="heures.html?v=erp-v010-full" title="RML Heures"></iframe></div></section>
+<section id="heures" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Heures & Absences</h2><div class="muted">Application RML Heures de référence ouverte directement dans l’ERP DEV.</div></div></div><iframe class="full-module-frame" src="https://micouleau-rml.github.io/RML_TABLEAU_HEURES/?app=rml-heures-v145" title="RML Heures" loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></section>
 <section id="planning" class="view"><div class="panel"><div class="planning-head"><div><h2>Planning équipes</h2><div class="muted">Équipes variables composées librement chaque jour. Les salariés sont lus depuis RML Heures en lecture seule ; la base Clients n’est jamais modifiée.</div></div><div class="planning-actions"><button class="btn secondary" type="button" onclick="planningPrevWeek()">← Semaine précédente</button><button class="btn secondary" type="button" onclick="planningToday()">Cette semaine</button><button class="btn secondary" type="button" onclick="planningNextWeek()">Semaine suivante →</button><button class="btn secondary" type="button" onclick="window.print()">Imprimer / PDF</button></div></div><div id="planningStatus" class="notice" style="margin:12px 0">Chargement du planning…</div><div class="planning-week-title" id="planningWeekTitle"></div><div id="planningGrid"></div></div></section>
 <section id="commandes" class="view">
   <div class="panel" style="padding:10px">
