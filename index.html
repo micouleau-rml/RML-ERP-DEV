@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V0.11.0 · Édition clients rapide</title>
+<title>RML ERP — V0.11.1 · Suppression clients en chaîne</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -213,7 +213,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.0</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.1</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -626,11 +626,32 @@ clientDeleteFromEditBtn.onclick=async()=>{
     return;
   }
   if(!confirm(`Voulez-vous vraiment supprimer le client « ${c.nom} » ?\n\nCette action est définitive.`))return;
+
+  // Mémoriser la position dans la liste filtrée avant suppression.
+  storeCurrentClientDraft();
+  const beforeRows=getVisibleClientRows();
+  const oldIndex=beforeRows.findIndex(x=>x.id===id);
+
   clientDrafts.delete(id);updateClientDraftStatus();
   const {error}=await sb.from('erp_clients').delete().eq('id',id);
   if(error){alert('Erreur Supabase : '+error.message);return}
-  closeModal('clientModal');
-  await refreshData();
+
+  // Mise à jour locale immédiate : ne pas fermer l'éditeur et ne pas revenir à la liste.
+  db.clients=db.clients.filter(x=>x.id!==id);
+  renderClients();
+  setSync(true,`Supabase : synchronisé · ${db.clients.length} clients`);
+
+  const afterRows=getVisibleClientRows();
+  if(afterRows.length){
+    // Le client qui prend la même position est l'ancien "suivant".
+    // Si on vient de supprimer le dernier, on prend le précédent.
+    const nextIndex=Math.min(Math.max(oldIndex,0),afterRows.length-1);
+    loadClientIntoEdit(afterRows[nextIndex]);
+    openModal('clientModal');
+  }else{
+    // Aucun client ne reste dans le filtre courant.
+    closeModal('clientModal');
+  }
 };
 clientPortalBtn.onclick=()=>{storeCurrentClientDraft();openCompanySearch(clientId.value,true)};
 clientForm.addEventListener('input',()=>{if(!clientFormLoading)storeCurrentClientDraft()});
