@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V0.10.9 · Navigation clients</title>
+<title>RML ERP — V0.11.0 · Édition clients rapide</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -23,7 +23,7 @@ header{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,var(--
 .header{max-width:1240px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand h1{margin:0;font-size:27px}.brand p{margin:4px 0 0;font-size:12px;opacity:.88}.badge{border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800;white-space:nowrap}
 main{max-width:1240px;margin:18px auto;padding:0 12px 40px}.statusbar{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:14px}.pill{background:white;border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:800}.pill.ok{color:var(--ok)}.pill.warn{color:var(--warn)}.pill.danger{color:var(--danger)}
 nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--line);padding:8px;border-radius:14px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)}nav button{border:0;background:transparent;color:var(--navy);font-weight:800;padding:10px 14px;border-radius:10px}nav button.active{background:var(--navy);color:white}
-/* V0.10.9 — navigation rapide entre clients en modification */
+/* V0.11.0 — édition clients rapide, navigation locale et enregistrement groupé */
 #mainNav button{border:2px solid transparent;background:#f4f7fa;box-shadow:0 1px 3px rgba(15,40,60,.05);transition:.15s ease}
 #mainNav button:nth-child(1){background:#eef4ff;border-color:#b8cef4}
 #mainNav button:nth-child(2){background:#eaf4ff;border-color:#8fbce8}
@@ -50,9 +50,9 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 #clientModal .modal-head h3{font-size:22px}
 #clientModal form .actions{position:sticky;bottom:-18px;background:white;padding:14px 0 4px;border-top:1px solid var(--line);z-index:2}
 #clientModal form .actions .btn[type=submit]{font-size:15px;padding:12px 22px}
-.client-edit-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto;margin-right:10px}.client-edit-nav .btn{padding:9px 13px}.client-edit-position{font-weight:850;color:var(--navy);min-width:90px;text-align:center}@media(max-width:700px){#clientModal .modal-head{align-items:flex-start}.client-edit-nav{order:3;width:100%;margin:8px 0 0;justify-content:space-between}.client-edit-position{flex:1}}
+.client-edit-nav{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto;margin-right:10px}.client-edit-nav .btn{padding:9px 13px}.client-edit-position{font-weight:850;color:var(--navy);min-width:90px;text-align:center}.client-edit-dirty{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#fff4d6;color:#8a5a00;font-weight:850;font-size:12px}.client-edit-dirty.clean{background:#e9f7ef;color:#1f6b43}.client-edit-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;margin:12px 0 2px;background:#f4f8fb;border:1px solid #d9e5ed;border-radius:14px}.client-edit-tools .portal-direct{background:#e9f1ff;color:#174f8a;border:2px solid #9fc1ea}.client-edit-tools .save-batch{background:#1f6b43;color:white}.client-edit-tools .save-batch:disabled{opacity:.5;cursor:not-allowed}@media(max-width:700px){#clientModal .modal-head{align-items:flex-start}.client-edit-nav{order:3;width:100%;margin:8px 0 0;justify-content:space-between}.client-edit-position{flex:1}}
 .company-search-highlight{background:#fff8df;border:2px solid #e1bd52;border-radius:14px;padding:12px;margin:0 0 14px;color:#664d00}
-#clientModal.open,#companySearchModal.open{z-index:1200!important}#clientFolderModal.open{z-index:100!important}
+#clientModal.open{z-index:1200!important}#companySearchModal.open{z-index:1300!important}#clientFolderModal.open{z-index:100!important}
 @media(max-width:720px){.client-folder-actions{grid-template-columns:1fr!important}#mainNav button{flex:1 1 auto}.client-folder-actions .client-primary-action{min-height:50px}}
 .view{display:none}.view.active{display:block}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 3px 14px rgba(0,0,0,.06);margin-bottom:15px}.panel h2,.panel h3{margin-top:0;color:var(--navy)}.muted{color:var(--muted)}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metric{background:white;border:1px solid var(--line);border-radius:15px;padding:15px}.metric strong{display:block;font-size:28px;color:var(--navy)}.metric span{font-size:13px;color:var(--muted)}
@@ -213,7 +213,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.10.9</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.0</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -316,7 +316,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 <div class="modal" id="hoursModal"><div class="modal-card"><div class="modal-head"><h3 id="hoursModalTitle">Saisie heures</h3><button class="close" data-close="hoursModal">Fermer</button></div><form id="hoursForm" class="entry-grid" style="margin-top:14px"><input type="hidden" id="hoursEntityId"><div class="field"><label>Date *</label><input id="hoursDate" type="date" required></div><div class="field wide"><label>Salarié *</label><input id="hoursEmployee" required></div><div class="field"><label>Type</label><select id="hoursType"><option>Chantier</option><option>Route</option><option>Atelier</option><option>Formation</option><option>Congés payés</option><option>Maladie</option><option>Accident du travail</option><option>Absence</option></select></div><div class="field wide"><label>Chantier</label><select id="hoursJob"></select></div><div class="field"><label>Heures</label><input id="hoursValue" type="number" min="0" step="0.25" value="7"></div><div class="field wide"><label>Notes</label><textarea id="hoursNotes" rows="3"></textarea></div><div class="wide actions"><button class="btn" type="submit">Enregistrer</button><button class="btn secondary" type="button" data-close="hoursModal">Annuler</button></div></form></div></div>
 <div class="modal" id="clientImportModal"><div class="modal-card"><div class="modal-head"><h3>Importer des clients depuis Excel</h3><button class="close" data-close="clientImportModal">Fermer</button></div><div id="clientImportSummary" class="notice" style="margin-top:14px"></div><div id="clientImportPreview" style="margin-top:12px"></div><div class="actions" style="margin-top:14px"><button class="btn ok" id="confirmClientImportBtn" type="button">Importer dans Supabase</button><button class="btn secondary" type="button" data-close="clientImportModal">Annuler</button></div></div></div>
 </div>
-<div class="modal" id="clientModal"><div class="modal-card"><div class="modal-head"><h3 id="clientModalTitle">Nouveau client</h3><div class="client-edit-nav" id="clientEditNav" style="display:none"><button class="btn secondary" type="button" id="clientPrevBtn">← Précédent</button><span class="client-edit-position" id="clientEditPosition"></span><button class="btn secondary" type="button" id="clientNextBtn">Suivant →</button></div><button class="close" data-close="clientModal">Fermer</button></div><form id="clientForm" class="grid2" style="margin-top:14px"><input type="hidden" id="clientId"><div class="field"><label>Nom du client *</label><input id="clientNom" required></div><div class="field"><label>Code client (automatique)</label><input id="clientCode" readonly placeholder="Attribué automatiquement"></div><div class="field"><label>Responsable / Contact principal</label><input id="clientResponsable"></div><div class="field"><label>Catégorie</label><select id="clientCategorie"><option value="">Non classé</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select></div><div class="field"><label>SIREN</label><input id="clientSiren" inputmode="numeric" maxlength="9" placeholder="Prévu pour le rapprochement Pennylane"></div><div class="field"><label>SIRET du siège</label><input id="clientSiret" inputmode="numeric" maxlength="14" placeholder="Renseigné automatiquement"></div><div class="field"><label>Téléphone</label><input id="clientTel" inputmode="tel"></div><div class="field"><label>E-mail</label><input id="clientEmail" type="email"></div><div class="field full"><label>Adresse</label><input id="clientAdresse"></div><div class="field full"><label>Notes</label><textarea id="clientNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer</button><button class="btn secondary" type="button" data-close="clientModal">Annuler</button></div></form></div></div>
+<div class="modal" id="clientModal"><div class="modal-card"><div class="modal-head"><h3 id="clientModalTitle">Nouveau client</h3><div class="client-edit-nav" id="clientEditNav" style="display:none"><button class="btn secondary" type="button" id="clientPrevBtn">← Précédent</button><span class="client-edit-position" id="clientEditPosition"></span><button class="btn secondary" type="button" id="clientNextBtn">Suivant →</button></div><button class="close" data-close="clientModal">Fermer</button></div><div class="client-edit-tools" id="clientEditTools" style="display:none"><button class="btn portal-direct" type="button" id="clientPortalBtn">⌕ Portail des entreprises</button><span class="client-edit-dirty clean" id="clientDraftStatus">Aucune modification en attente</span><button class="btn save-batch" type="button" id="clientSaveBatchBtn" disabled>Enregistrer les modifications</button></div><form id="clientForm" class="grid2" style="margin-top:14px"><input type="hidden" id="clientId"><div class="field"><label>Nom du client *</label><input id="clientNom" required></div><div class="field"><label>Code client (automatique)</label><input id="clientCode" readonly placeholder="Attribué automatiquement"></div><div class="field"><label>Responsable / Contact principal</label><input id="clientResponsable"></div><div class="field"><label>Catégorie</label><select id="clientCategorie"><option value="">Non classé</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select></div><div class="field"><label>SIREN</label><input id="clientSiren" inputmode="numeric" maxlength="9" placeholder="Prévu pour le rapprochement Pennylane"></div><div class="field"><label>SIRET du siège</label><input id="clientSiret" inputmode="numeric" maxlength="14" placeholder="Renseigné automatiquement"></div><div class="field"><label>Téléphone</label><input id="clientTel" inputmode="tel"></div><div class="field"><label>E-mail</label><input id="clientEmail" type="email"></div><div class="field full"><label>Adresse</label><input id="clientAdresse"></div><div class="field full"><label>Notes</label><textarea id="clientNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer et fermer</button><button class="btn secondary" type="button" data-close="clientModal">Fermer</button></div></form></div></div>
 <div class="modal" id="jobModal"><div class="modal-card"><div class="modal-head"><h3 id="jobModalTitle">Nouveau chantier</h3><button class="close" data-close="jobModal">Fermer</button></div><form id="jobForm" class="grid2" style="margin-top:14px"><input type="hidden" id="jobId"><div class="field"><label>Client *</label><select id="jobClient" required></select></div><div class="field"><label>Nom du chantier *</label><input id="jobNom" required></div><div class="field full"><label>Adresse du chantier</label><input id="jobAdresse"></div><div class="field"><label>Contact chantier</label><input id="jobContact"></div><div class="field"><label>Téléphone contact</label><input id="jobTel" inputmode="tel"></div><div class="field"><label>Responsable / chef d’équipe</label><input id="jobChef"></div><div class="field"><label>Statut</label><select id="jobStatut"><option value="actif">Actif</option><option value="attente">En attente</option><option value="termine">Terminé</option><option value="archive">Archivé</option></select></div><div class="field"><label>Date de début</label><input id="jobDebut" type="date"></div><div class="field"><label>Date de fin</label><input id="jobFin" type="date"></div><div class="field full"><label>Notes</label><textarea id="jobNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer</button><button class="btn secondary" type="button" data-close="jobModal">Annuler</button></div></form></div></div>
 <div class="modal" id="accessModal"><div class="modal-card"><div class="modal-head"><h3 id="accessModalTitle">Droits utilisateur</h3><button class="close" data-close="accessModal">Fermer</button></div><form id="accessForm" style="margin-top:14px"><input type="hidden" id="accessUserId"><div class="grid2"><div class="field"><label>Utilisateur</label><input id="accessEmail" disabled></div><div class="field"><label>Rôle</label><select id="accessRole"><option value="administrateur">Administrateur</option><option value="direction">Direction</option><option value="chef_equipe">Chef d’équipe</option><option value="ouvrier">Ouvrier</option><option value="atelier">Atelier</option><option value="lecture">Lecture seule</option></select></div><div class="field full"><label><input id="accessActive" type="checkbox" checked> Compte actif</label></div></div><h3 style="margin:16px 0 10px;color:var(--navy)">Modules autorisés</h3><div id="permissionGrid" class="perm-grid"></div><div class="actions" style="margin-top:16px"><button class="btn" type="submit">Enregistrer les droits</button><button class="btn secondary" type="button" data-close="accessModal">Annuler</button></div></form></div></div>
 
@@ -504,13 +504,22 @@ function applyAccessUI(){
 function go(view){if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='users')renderUsers();if(view==='security')renderResetStats();if(view==='page-forecast')renderMonthlyForecast()}
 mainNav.addEventListener('click',e=>{if(e.target.dataset.view)go(e.target.dataset.view)});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
+function requestCloseClientEditor(){
+  storeCurrentClientDraft();
+  if(clientDrafts.size&&!confirm(`${clientDrafts.size} fiche(s) client ont des modifications non enregistrées.\n\nFermer sans les enregistrer ?`))return false;
+  if(clientDrafts.size){clientDrafts.clear();updateClientDraftStatus()}
+  closeModal('clientModal');return true;
+}
+document.querySelectorAll('[data-close="clientModal"]').forEach(b=>{b.onclick=(e)=>{e.preventDefault();requestCloseClientEditor()}});
+document.getElementById('clientModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget){e.stopImmediatePropagation();requestCloseClientEditor()}},true);
+
 async function loadCurrentAccess(){const {data,error}=await sb.from('erp_user_access').select('*').eq('user_id',currentUser.id).single();if(error){console.error(error);return {error}}currentAccess=data;return {data}}
 async function fetchAllRows(table,orderCol,ascending=true){const pageSize=1000;let from=0,all=[];while(true){let q=sb.from(table).select('*').order(orderCol,{ascending}).range(from,from+pageSize-1);const {data,error}=await q;if(error)throw error;const rows=data||[];all.push(...rows);if(rows.length<pageSize)break;from+=pageSize}return all}
 async function refreshData(){setSync(false,'Supabase : synchronisation…');try{const promises=[fetchAllRows('erp_clients','nom',true),fetchAllRows('erp_chantiers','updated_at',false)];if(hasPerm('utilisateurs'))promises.push(fetchAllRows('erp_user_access','email',true));const results=await Promise.all(promises);db.clients=results[0]||[];db.chantiers=results[1]||[];db.users=results[2]||[];renderAll();applyAccessUI();setSync(true,`Supabase : synchronisé · ${db.clients.length} clients`);return true}catch(err){console.error(err);setSync(false,'Supabase : erreur de synchronisation');alert('Erreur Supabase : '+err.message);return false}}
 loginForm.onsubmit=async e=>{e.preventDefault();loginError.style.display='none';const {data,error}=await sb.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPassword.value});if(error){loginError.textContent=error.message;loginError.style.display='block';return}currentUser=data.user;await onSignedIn()}
 async function onSignedIn(){const access=await loadCurrentAccess();if(access.error||!currentAccess){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Aucun droit ERP n’est configuré pour ce compte. Exécute d’abord le SQL V0.5 dans Supabase.';loginError.style.display='block';return}if(!currentAccess.active){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Ce compte ERP est désactivé.';loginError.style.display='block';return}loginOverlay.classList.add('hidden');userPill.textContent='Utilisateur : '+(currentUser?.email||'connecté')+' · '+roleLabel(currentAccess.role);applyAccessUI();await refreshData()}
 logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
-async function resetClientForm(){clientForm.reset();clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)};if(window.clientEditNav)clientEditNav.style.display='none'}
+async function resetClientForm(){clientForm.reset();clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools)clientEditTools.style.display='none';updateClientDraftStatus()}
 newClientBtn.onclick=async()=>{if(!hasPerm('clients'))return;await resetClientForm();openModal('clientModal')}
 async function generateClientCodes(count=1){
   const {data,error}=await sb.from('erp_clients').select('code');
@@ -519,13 +528,99 @@ async function generateClientCodes(count=1){
   (data||[]).forEach(c=>{const m=String(c.code||'').trim().match(/^CLI(\d+)$/i);if(m)max=Math.max(max,Number(m[1])||0)});
   return Array.from({length:count},(_,i)=>'CLI'+String(max+i+1).padStart(4,'0'));
 }
-async function saveClientEdits({closeAfter=true}={}){const id=clientId.value;let code=clientCode.value.trim()||null;if(!code){try{[code]=await generateClientCodes(1)}catch(err){alert('Erreur Supabase lors de la création du code client : '+err.message);return false}}const item={nom:clientNom.value.trim(),code,responsable:clientResponsable.value.trim()||null,categorie:clientCategorie.value||null,telephone:clientTel.value.trim()||null,email:clientEmail.value.trim()||null,adresse:clientAdresse.value.trim()||null,notes:clientNotes.value.trim()||null,actif:true};const schemaReady=db.clients.length&&Object.prototype.hasOwnProperty.call(db.clients[0],'siren');if(schemaReady){item.siren=(window.clientSiren?.value||'').replace(/\D/g,'').slice(0,9)||null;item.siret=(window.clientSiret?.value||'').replace(/\D/g,'').slice(0,14)||null;}if(!item.nom)return false;let res;if(id)res=await sb.from('erp_clients').update(item).eq('id',id);else res=await sb.from('erp_clients').insert(item);if(res.error){alert('Erreur Supabase : '+res.error.message);return false}if(closeAfter)closeModal('clientModal');await refreshData();if(closeAfter&&id&&document.getElementById('clientFolderModal')?.classList.contains('open'))openClientFolder(id);return true}
+const clientDrafts=new Map();
+let clientFormLoading=false;
+
+function readClientForm(){
+  return {
+    nom:clientNom.value.trim(),
+    code:clientCode.value.trim()||null,
+    responsable:clientResponsable.value.trim()||null,
+    categorie:clientCategorie.value||null,
+    telephone:clientTel.value.trim()||null,
+    email:clientEmail.value.trim()||null,
+    adresse:clientAdresse.value.trim()||null,
+    notes:clientNotes.value.trim()||null,
+    siren:(window.clientSiren?.value||'').replace(/\D/g,'').slice(0,9)||null,
+    siret:(window.clientSiret?.value||'').replace(/\D/g,'').slice(0,14)||null
+  };
+}
+function clientComparable(c){
+  return {
+    nom:(c?.nom||'').trim(),code:(c?.code||null),responsable:c?.responsable||null,categorie:c?.categorie||null,
+    telephone:c?.telephone||null,email:c?.email||null,adresse:c?.adresse||null,notes:c?.notes||null,
+    siren:c?.siren||null,siret:c?.siret||null
+  };
+}
+function sameClientData(a,b){return JSON.stringify(clientComparable(a))===JSON.stringify(clientComparable(b))}
+function storeCurrentClientDraft(){
+  if(clientFormLoading)return;
+  const id=clientId.value;if(!id)return;
+  const base=db.clients.find(x=>x.id===id);if(!base)return;
+  const item=readClientForm();
+  if(sameClientData(item,base))clientDrafts.delete(id);else clientDrafts.set(id,item);
+  updateClientDraftStatus();
+}
+function updateClientDraftStatus(){
+  if(!window.clientDraftStatus)return;
+  const n=clientDrafts.size;
+  clientDraftStatus.textContent=n?`${n} fiche${n>1?'s':''} modifiée${n>1?'s':''} en attente`:'Aucune modification en attente';
+  clientDraftStatus.classList.toggle('clean',!n);
+  clientSaveBatchBtn.disabled=!n;
+}
+async function saveClientDrafts({closeAfter=false}={}){
+  storeCurrentClientDraft();
+  if(!clientDrafts.size){if(closeAfter)closeModal('clientModal');return true}
+  clientSaveBatchBtn.disabled=true;clientSaveBatchBtn.textContent='Enregistrement…';
+  try{
+    for(const [id,draft] of clientDrafts){
+      const item={...draft,actif:(db.clients.find(x=>x.id===id)?.actif??true)};
+      const schemaReady=db.clients.length&&Object.prototype.hasOwnProperty.call(db.clients[0],'siren');
+      if(!schemaReady){delete item.siren;delete item.siret}
+      const {error}=await sb.from('erp_clients').update(item).eq('id',id);
+      if(error)throw error;
+      const i=db.clients.findIndex(x=>x.id===id);if(i>=0)db.clients[i]={...db.clients[i],...draft};
+    }
+    clientDrafts.clear();
+    updateClientDraftStatus();
+    renderClients();
+    setSync(true,`Supabase : synchronisé · ${db.clients.length} clients`);
+    if(closeAfter)closeModal('clientModal');
+    return true;
+  }catch(err){
+    alert('Erreur Supabase : '+err.message);
+    return false;
+  }finally{
+    clientSaveBatchBtn.textContent='Enregistrer les modifications';
+    updateClientDraftStatus();
+  }
+}
+async function saveClientEdits({closeAfter=true}={}){
+  const id=clientId.value;
+  if(id)return saveClientDrafts({closeAfter});
+  let code=clientCode.value.trim()||null;
+  if(!code){try{[code]=await generateClientCodes(1)}catch(err){alert('Erreur Supabase lors de la création du code client : '+err.message);return false}}
+  const item={...readClientForm(),code,actif:true};if(!item.nom)return false;
+  const schemaReady=db.clients.length&&Object.prototype.hasOwnProperty.call(db.clients[0],'siren');if(!schemaReady){delete item.siren;delete item.siret}
+  const res=await sb.from('erp_clients').insert(item);if(res.error){alert('Erreur Supabase : '+res.error.message);return false}
+  if(closeAfter)closeModal('clientModal');await refreshData();return true
+}
 clientForm.onsubmit=async e=>{e.preventDefault();await saveClientEdits({closeAfter:true})};
 function getVisibleClientRows(){const q=clientSearch.value.trim().toLowerCase(),f=clientFilter.value,cat=clientCategoryFilter.value;return db.clients.filter(c=>{const hit=!q||[c.nom,c.code,c.responsable,c.categorie,c.telephone,c.email,c.adresse,c.siren,c.siret].join(' ').toLowerCase().includes(q);const stat=f==='tous'||(f==='actifs'&&c.actif)||(f==='archives'&&!c.actif);const catOk=!cat||c.categorie===cat;const alphaOk=clientAlpha==='TOUS'||clientInitial(c.nom)===clientAlpha;return hit&&stat&&catOk&&alphaOk}).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'))}
-function updateClientEditNav(){if(!window.clientEditNav)return;const id=clientId.value;if(!id){clientEditNav.style.display='none';return}const rows=getVisibleClientRows(),i=rows.findIndex(c=>c.id===id);clientEditNav.style.display='flex';clientEditPosition.textContent=i>=0?`${i+1} / ${rows.length}`:'Client';clientPrevBtn.disabled=i<=0;clientNextBtn.disabled=i<0||i>=rows.length-1}
-async function navigateClientEdit(delta){const rows=getVisibleClientRows(),i=rows.findIndex(c=>c.id===clientId.value),target=rows[i+delta];if(!target)return;const ok=await saveClientEdits({closeAfter:false});if(!ok)return;editClient(target.id)}
+function updateClientEditNav(){if(!window.clientEditNav)return;const id=clientId.value;if(!id){clientEditNav.style.display='none';clientEditTools.style.display='none';return}const rows=getVisibleClientRows(),i=rows.findIndex(c=>c.id===id);clientEditNav.style.display='flex';clientEditTools.style.display='flex';clientEditPosition.textContent=i>=0?`${i+1} / ${rows.length}`:'Client';clientPrevBtn.disabled=i<=0;clientNextBtn.disabled=i<0||i>=rows.length-1;updateClientDraftStatus()}
+function loadClientIntoEdit(c){
+  clientFormLoading=true;
+  const d=clientDrafts.get(c.id)||c;
+  clientId.value=c.id;clientNom.value=d.nom||'';clientCode.value=d.code||c.code||'';clientResponsable.value=d.responsable||'';clientCategorie.value=d.categorie||'';if(window.clientSiren)clientSiren.value=d.siren||'';if(window.clientSiret)clientSiret.value=d.siret||'';clientTel.value=d.telephone||'';clientEmail.value=d.email||'';clientAdresse.value=d.adresse||'';clientNotes.value=d.notes||'';clientModalTitle.textContent='Modifier le client';
+  clientFormLoading=false;updateClientEditNav();
+}
+function navigateClientEdit(delta){storeCurrentClientDraft();const rows=getVisibleClientRows(),i=rows.findIndex(c=>c.id===clientId.value),target=rows[i+delta];if(!target)return;loadClientIntoEdit(target)}
 clientPrevBtn.onclick=()=>navigateClientEdit(-1);clientNextBtn.onclick=()=>navigateClientEdit(1);
-function editClient(id){if(!hasPerm('clients'))return;const c=db.clients.find(x=>x.id===id);if(!c)return;closeModal('clientFolderModal');clientId.value=c.id;clientNom.value=c.nom||'';clientCode.value=c.code||'';clientResponsable.value=c.responsable||'';clientCategorie.value=c.categorie||'';if(window.clientSiren)clientSiren.value=c.siren||'';if(window.clientSiret)clientSiret.value=c.siret||'';clientTel.value=c.telephone||'';clientEmail.value=c.email||'';clientAdresse.value=c.adresse||'';clientNotes.value=c.notes||'';clientModalTitle.textContent='Modifier le client';openModal('clientModal');updateClientEditNav()}
+clientSaveBatchBtn.onclick=()=>saveClientDrafts({closeAfter:false});
+clientPortalBtn.onclick=()=>{storeCurrentClientDraft();openCompanySearch(clientId.value,true)};
+clientForm.addEventListener('input',()=>{if(!clientFormLoading)storeCurrentClientDraft()});
+clientForm.addEventListener('change',()=>{if(!clientFormLoading)storeCurrentClientDraft()});
+function editClient(id){if(!hasPerm('clients'))return;const c=db.clients.find(x=>x.id===id);if(!c)return;closeModal('clientFolderModal');loadClientIntoEdit(c);openModal('clientModal')}
 async function toggleClient(id){if(!hasPerm('clients'))return;const c=db.clients.find(x=>x.id===id);if(!c)return;const {error}=await sb.from('erp_clients').update({actif:!c.actif}).eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}await refreshData()}
 async function getJobDataCount(jobIds){if(!jobIds?.length)return 0;const {count,error}=await sb.from('erp_modules_data').select('id',{count:'exact',head:true}).in('chantier_id',jobIds).eq('deleted',false);if(error)throw error;return count||0}
 async function deleteJob(id){if(!hasPerm('chantiers'))return;const j=db.chantiers.find(x=>x.id===id);if(!j)return;try{const count=await getJobDataCount([id]);if(count>0){alert(`Suppression bloquée : le chantier « ${j.nom} » contient déjà des données enregistrées dans un module ERP.\n\nPour éviter une perte accidentelle, il ne peut pas être supprimé directement.`);return}if(!confirm(`Supprimer définitivement le chantier « ${j.nom} » ?\n\nAucune donnée métier n'est enregistrée sur ce chantier. Cette suppression est irréversible.`))return;const {error}=await sb.from('erp_chantiers').delete().eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}closeModal('jobCardModal');await refreshData()}catch(err){alert('Erreur Supabase : '+err.message)}}
@@ -833,10 +928,11 @@ async function deleteLastImport(){
 }
 deleteLastImportBtn.onclick=deleteLastImport;
 function pennylaneReady(){return !!(db.clients.length&&Object.prototype.hasOwnProperty.call(db.clients[0],'pennylane_customer_id'))}
-let companySearchClientId=null;
-function openCompanySearch(id){
+let companySearchClientId=null;let companySearchReturnToEdit=false;
+function openCompanySearch(id,returnToEdit=false){
   const c=db.clients.find(x=>x.id===id);if(!c)return;
   closeModal('clientFolderModal');
+  companySearchReturnToEdit=!!returnToEdit;
   companySearchClientId=id;
   companySearchInput.value=c.siret||c.siren||c.nom||'';
   companySearchResults.innerHTML='<div class="empty">Lance la recherche pour retrouver le SIREN, le SIRET du siège et l’adresse officielle.</div>';
@@ -859,6 +955,15 @@ async function applyCompanySearchResult(i){
   const x=(window._companySearchRows||[])[i], c=db.clients.find(z=>z.id===companySearchClientId);if(!x||!c)return;
   const sg=x.siege||{};const addr=sg.adresse||[sg.numero_voie,sg.type_voie,sg.libelle_voie,sg.code_postal,sg.libelle_commune].filter(Boolean).join(' ');
   const patch={siren:x.siren||null,siret:sg.siret||null,adresse:addr||c.adresse||null};
+  if(companySearchReturnToEdit&&clientId.value===c.id){
+    if(window.clientSiren)clientSiren.value=patch.siren||'';
+    if(window.clientSiret)clientSiret.value=patch.siret||'';
+    clientAdresse.value=patch.adresse||'';
+    storeCurrentClientDraft();
+    closeModal('companySearchModal');
+    openModal('clientModal');
+    return;
+  }
   const res=await sb.from('erp_clients').update(patch).eq('id',c.id);
   if(res.error){alert('Erreur Supabase : '+res.error.message+'\nVérifie que le SQL V0.10.1 a bien été exécuté.');return}
   closeModal('companySearchModal');await refreshData();openClientFolder(c.id);
