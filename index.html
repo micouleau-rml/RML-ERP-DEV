@@ -229,7 +229,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.5</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.6</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -262,28 +262,8 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 </section>
 
 <section id="preparation" class="view">
-  <div class="panel">
-    <div class="prep-top">
-      <div class="prep-title"><h2>Préparation chantier</h2><div id="prepSubtitle" class="muted">Sélectionne un chantier depuis la fiche chantier.</div></div>
-      <div class="prep-actions"><button class="btn secondary" onclick="closePreparation()">← Retour au chantier</button><button class="btn secondary" onclick="printPreparation()">Imprimer / PDF</button><button class="btn" onclick="savePreparation()">Enregistrer</button></div>
-    </div>
-    <div id="prepSaveStatus" class="prep-save-status">Aucun chantier ouvert.</div>
-    <div id="prepBody" style="display:none">
-      <div class="prep-info">
-        <div class="info-box"><strong>Client</strong><span id="prepClientLabel"></span></div>
-        <div class="info-box"><strong>Chantier</strong><span id="prepJobLabel"></span></div>
-        <div class="info-box"><strong>Adresse</strong><span id="prepAddressLabel"></span></div>
-      </div>
-      <div class="grid2" style="margin-top:12px">
-        <div class="field"><label>Date prévue</label><input id="prepDate" type="date"></div>
-        <div class="field"><label>Horaires d’intervention</label><input id="prepHoraires" placeholder="Ex. 8h00 – 17h00"></div>
-        <div class="field"><label>Code portail / Accès chantier</label><input id="prepAcces" placeholder="Code, consignes d'accès..."></div>
-        <div class="field"><label>Chef d’équipe</label><input id="prepChef"></div>
-      </div>
-      <div id="prepSections"></div>
-      <div class="field" style="margin-top:14px"><label>Remarques générales</label><textarea id="prepRemarques" rows="5"></textarea></div>
-    </div>
-  </div>
+<div class="panel"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Préparation chantier</h2><div class="muted">Application RML Préparation Chantier intégrée directement dans l’ERP.</div></div><button class="btn secondary" type="button" onclick="reloadPreparationApp()">Actualiser</button><button class="btn secondary" type="button" onclick="window.open(PREPARATION_APP_URL,'_blank')">Ouvrir séparément</button></div></div>
+<div style="height:calc(100vh - 190px);min-height:650px;margin-top:12px;border:1px solid #d9e0e8;border-radius:14px;overflow:hidden;background:#fff"><iframe id="preparationAppFrame" title="RML Préparation Chantier" style="width:100%;height:100%;border:0;background:#fff" allow="clipboard-read; clipboard-write"></iframe></div>
 </section>
 
 <section id="suivi" class="view">
@@ -387,6 +367,8 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 <div class="modal" id="maintenanceEventModal"><div class="modal-card"><div class="modal-head"><h3>Entretien / réparation</h3><button class="close" data-close="maintenanceEventModal">Fermer</button></div><form id="maintenanceEventForm" class="grid2" style="margin-top:14px"><input type="hidden" id="eventId"><input type="hidden" id="eventAssetId"><div class="field"><label>Type</label><select id="eventType"><option>Entretien</option><option>Réparation</option><option>Contrôle</option><option>Panne</option><option>Autre</option></select></div><div class="field"><label>Opération *</label><input id="eventTitle" required></div><div class="field"><label>Date réalisée</label><input id="eventDate" type="date"></div><div class="field"><label>Prochaine échéance</label><input id="eventDue" type="date"></div><div class="field"><label>Échéance km / heures</label><input id="eventDueCounter" type="number" min="0" step="1"></div><div class="field"><label>Coût HT (€)</label><input id="eventCost" type="number" min="0" step="0.01"></div><div class="field"><label>Fournisseur / réparateur</label><input id="eventSupplier"></div><div class="field"><label>Immobilisation (jours)</label><input id="eventDowntime" type="number" min="0" step="0.5"></div><div class="field full"><label>Observations / pièces remplacées</label><textarea id="eventNotes" rows="3"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer</button><button class="btn secondary" type="button" data-close="maintenanceEventModal">Annuler</button></div></form></div></div>
 <div class="modal" id="jobCardModal"><div class="modal-card"><div class="modal-head"><h3>Fiche chantier</h3><button class="close" data-close="jobCardModal">Fermer</button></div><div id="jobCardContent" style="margin-top:14px"></div></div></div>
 <script>
+const PREPARATION_APP_URL='https://micouleau-rml.github.io/RML-PR-PA-CHANTIER/';
+
 const SUPABASE_URL='https://jbtsncvuobptxyzcoqpf.supabase.co';
 const SUPABASE_KEY='sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
@@ -590,7 +572,8 @@ function applyAccessUI(){
   newJobBtn.style.display=hasPerm('chantiers')?'':'none';
   document.querySelectorAll('#modules [data-permission]').forEach(el=>el.style.display=hasPerm(el.dataset.permission)?'':'none');
 }
-function go(view){if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='users')renderUsers();if(view==='security')renderResetStats();if(view==='page-forecast')renderMonthlyForecast()}
+function go(view){
+if(view==='preparation')setTimeout(loadPreparationApp,0);if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='users')renderUsers();if(view==='security')renderResetStats();if(view==='page-forecast')renderMonthlyForecast()}
 mainNav.addEventListener('click',e=>{if(e.target.dataset.view)go(e.target.dataset.view)});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
 function requestCloseClientEditor(){
@@ -1478,6 +1461,9 @@ window.addEventListener('message',function(e){
   }
 });
 
+
+function loadPreparationApp(){const f=document.getElementById('preparationAppFrame');if(f&&!f.src)f.src=PREPARATION_APP_URL;}
+function reloadPreparationApp(){const f=document.getElementById('preparationAppFrame');if(f)f.src=PREPARATION_APP_URL+(PREPARATION_APP_URL.includes('?')?'&':'?')+'_rml='+Date.now();}
 </script>
 </body>
 </html>
