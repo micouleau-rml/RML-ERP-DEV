@@ -229,7 +229,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.8</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.9</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -292,12 +292,15 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 <section id="sous-traitants" class="view">
  <div class="panel">
   <div class="toolbar"><div style="flex:1"><h2 style="margin:0">Sous-traitants</h2><div class="muted">Affectation aux chantiers, contrats et signature manuscrite directement sur téléphone.</div></div><button class="btn secondary" onclick="loadSubcontractors()">Actualiser</button></div>
+  <div class="field" style="margin:12px 0"><label>Rechercher un sous-traitant</label><input id="subSearch" type="search" placeholder="Entreprise, contact, e-mail ou téléphone…" oninput="renderSubcontractors()"></div>
   <div class="sub-toolbar">
+   <input id="subEditId" type="hidden">
    <div class="field"><label>Entreprise</label><input id="subCompany" placeholder="Nom du sous-traitant"></div>
    <div class="field"><label>Contact</label><input id="subContact" placeholder="Nom du responsable"></div>
    <div class="field"><label>E-mail</label><input id="subEmail" type="email"></div>
    <div class="field"><label>Téléphone</label><input id="subPhone"></div>
-   <button class="btn" onclick="createSubcontractor()">+ Sous-traitant</button>
+   <button id="subSaveBtn" class="btn" onclick="saveSubcontractor()">Enregistrer</button>
+   <button id="subCancelEditBtn" class="btn secondary" style="display:none" onclick="cancelSubcontractorEdit()">Annuler modification</button>
   </div>
   <div id="subStatus" class="notice" style="margin-top:12px">Chargement…</div>
   <div id="subList" class="sub-grid"></div>
@@ -1379,18 +1382,34 @@ async function loadSubcontractors(focusJob=''){
 }
 function renderSubcontractors(focusJob=''){
  if(!window.subList)return;
- const rows=focusJob?erpSubcontractors.filter(x=>erpSubAssignments.some(a=>a.subcontractor_id===x.id&&a.chantier_id===focusJob)):erpSubcontractors;
+ let rows=focusJob?erpSubcontractors.filter(x=>erpSubAssignments.some(a=>a.subcontractor_id===x.id&&a.chantier_id===focusJob)):erpSubcontractors;
+ const q=(window.subSearch?.value||'').trim().toLowerCase();
+ if(q)rows=rows.filter(x=>[x.company,x.contact_name,x.email,x.phone].some(v=>String(v||'').toLowerCase().includes(q)));
  subList.innerHTML=rows.length?rows.map(x=>{
   const as=erpSubAssignments.filter(a=>a.subcontractor_id===x.id);
   const contracts=as.map(a=>{const j=db.chantiers.find(z=>z.id===a.chantier_id),c=db.clients.find(z=>z.id===j?.client_id);return `<div class="sub-contract"><strong>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}</strong><div class="sub-meta">${esc(a.work_description||'Travaux non précisés')}${a.amount_ht!=null?' · '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}</div><div style="margin-top:8px"><span class="sub-status ${esc(a.status||'brouillon')}">${esc(a.status||'brouillon')}</span> <button class="btn secondary" style="padding:6px 9px" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat signé':'Ouvrir / signer'}</button></div></div>`}).join('');
-  return `<div class="sub-card"><h3>${esc(x.company)}</h3><div class="sub-meta">${esc(x.contact_name||'')}${x.email?'<br>'+esc(x.email):''}${x.phone?'<br>'+esc(x.phone):''}</div><div class="actions"><button class="btn" onclick="openSubAssignment('${x.id}')">+ Affecter un chantier</button><button class="btn danger" onclick="deleteSubcontractor('${x.id}')">Supprimer</button></div>${contracts||'<div class="muted" style="margin-top:10px">Aucun chantier affecté.</div>'}</div>`;
+  return `<div class="sub-card"><h3>${esc(x.company)}</h3><div class="sub-meta">${esc(x.contact_name||'')}${x.email?'<br>'+esc(x.email):''}${x.phone?'<br>'+esc(x.phone):''}</div><div class="actions"><button class="btn secondary" onclick="editSubcontractor('${x.id}')">Modifier</button><button class="btn" onclick="openSubAssignment('${x.id}')">+ Affecter un chantier</button><button class="btn danger" onclick="deleteSubcontractor('${x.id}')">Supprimer</button></div>${contracts||'<div class="muted" style="margin-top:10px">Aucun chantier affecté.</div>'}</div>`;
  }).join(''):'<div class="empty">Aucun sous-traitant enregistré.</div>';
 }
-async function createSubcontractor(){
+function editSubcontractor(id){
+ const x=erpSubcontractors.find(v=>v.id===id);if(!x)return;
+ subEditId.value=x.id;subCompany.value=x.company||'';subContact.value=x.contact_name||'';subEmail.value=x.email||'';subPhone.value=x.phone||'';
+ subSaveBtn.textContent='Enregistrer les modifications';subCancelEditBtn.style.display='';
+ subCompany.scrollIntoView({behavior:'smooth',block:'center'});subCompany.focus();
+}
+function cancelSubcontractorEdit(){
+ subEditId.value='';subCompany.value=subContact.value=subEmail.value=subPhone.value='';
+ subSaveBtn.textContent='Enregistrer';subCancelEditBtn.style.display='none';
+}
+async function saveSubcontractor(){
  const company=subCompany.value.trim();if(!company){alert("Renseignez le nom de l'entreprise.");return}
- const {error}=await sb.from('erp_subcontractors').insert({company,contact_name:subContact.value.trim()||null,email:subEmail.value.trim()||null,phone:subPhone.value.trim()||null});
+ const row={company,contact_name:subContact.value.trim()||null,email:subEmail.value.trim()||null,phone:subPhone.value.trim()||null,updated_at:new Date().toISOString()};
+ const id=subEditId.value;
+ let error;
+ if(id)({error}=await sb.from('erp_subcontractors').update(row).eq('id',id));
+ else {delete row.updated_at;({error}=await sb.from('erp_subcontractors').insert(row))}
  if(error){alert('Erreur Supabase : '+error.message);return}
- subCompany.value=subContact.value=subEmail.value=subPhone.value='';await loadSubcontractors();
+ cancelSubcontractorEdit();await loadSubcontractors();
 }
 async function deleteSubcontractor(id){
  if(erpSubAssignments.some(a=>a.subcontractor_id===id)){alert("Suppression impossible : ce sous-traitant possède un ou plusieurs contrats/chantiers affectés.");return}
