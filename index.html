@@ -229,7 +229,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.9</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.10</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -334,12 +334,13 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 <div class="modal" id="professionModal"><div class="modal-card" style="max-width:620px"><div class="modal-head"><h3>Ajouter une profession</h3><button class="close" data-close="professionModal">Fermer</button></div><div class="field" style="margin-top:14px"><label>Nouvelle profession</label><input id="newProfessionName" placeholder="Ex. Façadier"></div><div class="actions"><button class="btn" type="button" id="saveProfessionBtn">Ajouter à la liste</button><button class="btn secondary" type="button" data-close="professionModal">Annuler</button></div><div class="muted" style="margin-top:12px">Cette profession sera enregistrée dans Supabase ERP DEV et disponible sur vos autres appareils.</div></div></div>
 <div class="modal" id="subAssignModal"><div class="modal-card" style="max-width:760px">
  <div class="modal-head"><h3>Affecter un chantier / créer le contrat</h3><button class="close" data-close="subAssignModal">Fermer</button></div>
- <input id="subAssignSubId" type="hidden">
- <div class="grid2" style="margin-top:12px"><div class="field"><label>Client</label><select id="subAssignClient"></select></div><div class="field"><label>Chantier</label><select id="subAssignJob"></select></div></div>
+ <input id="subAssignSubId" type="hidden"><input id="subAssignId" type="hidden">
+ <div class="field" style="margin-top:12px"><label>Rechercher un chantier</label><input id="subAssignJobSearch" type="search" placeholder="Nom du client, chantier ou adresse…" oninput="filterSubAssignJobs()"></div>
+ <div class="grid2"><div class="field"><label>Client</label><select id="subAssignClient"></select></div><div class="field"><label>Chantier</label><select id="subAssignJob"></select></div></div>
  <div class="grid2"><div class="field"><label>Date prévue</label><input id="subAssignDate" type="date"></div><div class="field"><label>Montant du contrat HT (€)</label><input id="subAssignAmount" type="number" step="0.01" min="0"></div></div>
  <div class="field"><label>Travaux confiés</label><textarea id="subAssignWork" rows="4" placeholder="Décrire précisément les travaux confiés au sous-traitant"></textarea></div>
  <div class="field"><label>Clauses du contrat</label><div class="muted" style="margin-bottom:8px">Toutes les clauses sont modifiables avant signature.</div><div id="subClauseEditor"></div><div class="actions"><button class="btn secondary" type="button" onclick="addSubClause()">+ Ajouter une clause</button><button class="btn secondary" type="button" onclick="resetSubClauses()">Réinitialiser le modèle</button></div></div>
- <div class="actions"><button class="btn" onclick="saveSubAssignment()">Créer le contrat</button><button class="btn secondary" data-close="subAssignModal">Annuler</button></div>
+ <div class="actions"><button id="subAssignSaveBtn" class="btn" onclick="saveSubAssignment()">Enregistrer le brouillon</button><button class="btn secondary" data-close="subAssignModal">Fermer</button></div>
 </div></div>
 
 <div class="modal" id="subClauseEditModal"><div class="modal-card" style="max-width:900px"><div class="modal-head"><h3>Modifier les clauses du contrat</h3><button class="close" data-close="subClauseEditModal">Fermer</button></div><input id="subClauseEditContractId" type="hidden"><div class="notice" style="margin-top:12px">Toutes les clauses sont modifiables tant que le contrat n’est pas signé.</div><div id="subExistingClauseEditor"></div><div class="actions"><button class="btn secondary" onclick="addExistingSubClause()">+ Ajouter une clause</button><button class="btn" onclick="saveExistingSubClauses()">Enregistrer les clauses</button></div></div></div><div class="modal" id="subContractModal"><div class="modal-card" style="max-width:820px">
@@ -1387,7 +1388,7 @@ function renderSubcontractors(focusJob=''){
  if(q)rows=rows.filter(x=>[x.company,x.contact_name,x.email,x.phone].some(v=>String(v||'').toLowerCase().includes(q)));
  subList.innerHTML=rows.length?rows.map(x=>{
   const as=erpSubAssignments.filter(a=>a.subcontractor_id===x.id);
-  const contracts=as.map(a=>{const j=db.chantiers.find(z=>z.id===a.chantier_id),c=db.clients.find(z=>z.id===j?.client_id);return `<div class="sub-contract"><strong>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}</strong><div class="sub-meta">${esc(a.work_description||'Travaux non précisés')}${a.amount_ht!=null?' · '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}</div><div style="margin-top:8px"><span class="sub-status ${esc(a.status||'brouillon')}">${esc(a.status||'brouillon')}</span> <button class="btn secondary" style="padding:6px 9px" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat signé':'Ouvrir / signer'}</button></div></div>`}).join('');
+  const contracts=as.map(a=>{const j=db.chantiers.find(z=>z.id===a.chantier_id),c=db.clients.find(z=>z.id===j?.client_id);return `<div class="sub-contract"><strong>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}</strong><div class="sub-meta">${esc(a.work_description||'Travaux non précisés')}${a.amount_ht!=null?' · '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}</div><div style="margin-top:8px"><span class="sub-status ${esc(a.status||'brouillon')}">${esc(a.status||'brouillon')}</span> ${a.status!=='signe'?`<button class="btn secondary" style="padding:6px 9px" onclick="editSubAssignment('${a.id}')">Modifier</button> `:''}<button class="btn secondary" style="padding:6px 9px" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat signé':'Ouvrir / signer'}</button></div></div>`}).join('');
   return `<div class="sub-card"><h3>${esc(x.company)}</h3><div class="sub-meta">${esc(x.contact_name||'')}${x.email?'<br>'+esc(x.email):''}${x.phone?'<br>'+esc(x.phone):''}</div><div class="actions"><button class="btn secondary" onclick="editSubcontractor('${x.id}')">Modifier</button><button class="btn" onclick="openSubAssignment('${x.id}')">+ Affecter un chantier</button><button class="btn danger" onclick="deleteSubcontractor('${x.id}')">Supprimer</button></div>${contracts||'<div class="muted" style="margin-top:10px">Aucun chantier affecté.</div>'}</div>`;
  }).join(''):'<div class="empty">Aucun sous-traitant enregistré.</div>';
 }
@@ -1416,14 +1417,65 @@ async function deleteSubcontractor(id){
  if(!confirm('Supprimer ce sous-traitant ?'))return;
  const {error}=await sb.from('erp_subcontractors').delete().eq('id',id);if(error){alert(error.message);return}await loadSubcontractors();
 }
+let subAssignAllJobs=[];
+function fillSubAssignJobOptions(selected=''){
+ const cid=subAssignClient.value;
+ const q=normalizeSearch(subAssignJobSearch.value);
+ let jobs=subAssignAllJobs.filter(j=>['actif','attente'].includes(j.statut));
+ if(cid)jobs=jobs.filter(j=>j.client_id===cid);
+ if(q)jobs=jobs.filter(j=>{const c=db.clients.find(x=>x.id===j.client_id);return normalizeSearch([c?.nom,j.nom,j.adresse].filter(Boolean).join(' ')).includes(q)});
+ fillSelect(subAssignJob,jobs,'Choisir un chantier','id',j=>{const c=db.clients.find(x=>x.id===j.client_id);return `${c?.nom||''} — ${j.nom||''}${j.adresse?' — '+j.adresse:''}`});
+ if(selected&&jobs.some(j=>j.id===selected))subAssignJob.value=selected;
+}
+function filterSubAssignJobs(){
+ const q=normalizeSearch(subAssignJobSearch.value);
+ if(q){
+  const hits=subAssignAllJobs.filter(j=>{const c=db.clients.find(x=>x.id===j.client_id);return ['actif','attente'].includes(j.statut)&&normalizeSearch([c?.nom,j.nom,j.adresse].filter(Boolean).join(' ')).includes(q)});
+  const clientIds=[...new Set(hits.map(j=>j.client_id))];
+  if(clientIds.length===1)subAssignClient.value=clientIds[0];
+  else if(clientIds.length>1)subAssignClient.value='';
+ }
+ fillSubAssignJobOptions();
+}
 function openSubAssignment(id){
- subAssignSubId.value=id;fillSelect(subAssignClient,clientSorted(),'Choisir un client');subAssignClient.onchange=()=>fillSelect(subAssignJob,jobsForClient(subAssignClient.value).filter(j=>['actif','attente'].includes(j.statut)),'Choisir un chantier');subAssignClient.onchange();subAssignDate.value='';subAssignAmount.value='';subAssignWork.value='';subClauseDraft=cloneDefaultSubClauses();renderSubClauseEditor();openModal('subAssignModal');
+ subAssignId.value='';subAssignSubId.value=id;subAssignAllJobs=[...db.chantiers];
+ fillSelect(subAssignClient,clientSorted(),'Tous les clients');
+ subAssignClient.onchange=()=>fillSubAssignJobOptions();
+ subAssignJobSearch.value='';subAssignClient.value='';fillSubAssignJobOptions();
+ subAssignDate.value='';subAssignAmount.value='';subAssignWork.value='';
+ subClauseDraft=cloneDefaultSubClauses();renderSubClauseEditor();
+ subAssignSaveBtn.textContent='Enregistrer le brouillon';
+ openModal('subAssignModal');
+}
+function editSubAssignment(id){
+ const a=erpSubAssignments.find(x=>x.id===id);if(!a)return;
+ if(a.status==='signe'){alert('Un contrat signé est verrouillé.');return}
+ subAssignId.value=a.id;subAssignSubId.value=a.subcontractor_id;subAssignAllJobs=[...db.chantiers];
+ fillSelect(subAssignClient,clientSorted(),'Tous les clients');
+ subAssignClient.onchange=()=>fillSubAssignJobOptions();
+ const j=db.chantiers.find(x=>x.id===a.chantier_id);
+ subAssignClient.value=j?.client_id||'';subAssignJobSearch.value='';
+ fillSubAssignJobOptions(a.chantier_id);
+ subAssignDate.value=a.planned_date||'';
+ subAssignAmount.value=a.amount_ht??'';
+ subAssignWork.value=a.work_description||'';
+ subClauseDraft=subClausesFromAssignment(a).map(x=>({...x}));renderSubClauseEditor();
+ subAssignSaveBtn.textContent='Enregistrer les modifications';
+ openModal('subAssignModal');
 }
 async function saveSubAssignment(){
- const sid=subAssignSubId.value,jid=subAssignJob.value;if(!sid||!jid){alert('Choisissez un client et un chantier.');return}
- const work=subAssignWork.value.trim();if(!work){alert('Décrivez les travaux confiés.');return}
- const row={subcontractor_id:sid,chantier_id:jid,planned_date:subAssignDate.value||null,amount_ht:subAssignAmount.value?Number(subAssignAmount.value):null,work_description:work,contract_terms:subClauseDraft.map(x=>`${x.title}\n${x.text}`).join('\n\n'),contract_clauses:subClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim()})).filter(x=>x.title||x.text),status:'brouillon'};
- const {error}=await sb.from('erp_subcontract_assignments').insert(row);if(error){alert('Erreur Supabase : '+error.message);return}
+ const sid=subAssignSubId.value,jid=subAssignJob.value;
+ if(!sid){alert('Sous-traitant introuvable.');return}
+ // Un brouillon peut être enregistré même si le chantier ou les travaux ne sont pas encore renseignés.
+ const clauses=subClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim()})).filter(x=>x.title||x.text);
+ const row={subcontractor_id:sid,planned_date:subAssignDate.value||null,amount_ht:subAssignAmount.value?Number(subAssignAmount.value):null,work_description:subAssignWork.value.trim()||'À compléter',contract_terms:clauses.map(x=>`${x.title}\n${x.text}`).join('\n\n'),contract_clauses:clauses,status:'brouillon',updated_at:new Date().toISOString()};
+ if(jid)row.chantier_id=jid;
+ const id=subAssignId.value;
+ if(!id&&!jid){alert('Pour créer le premier brouillon, choisissez au minimum un chantier. Vous pourrez compléter toutes les autres informations plus tard.');return}
+ let error;
+ if(id)({error}=await sb.from('erp_subcontract_assignments').update(row).eq('id',id).neq('status','signe'));
+ else {delete row.updated_at;({error}=await sb.from('erp_subcontract_assignments').insert(row))}
+ if(error){alert('Erreur Supabase : '+error.message);return}
  closeModal('subAssignModal');await loadSubcontractors();
 }
 let subExistingClauseDraft=[];
