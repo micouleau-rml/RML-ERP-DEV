@@ -229,7 +229,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.14</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.15</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -237,6 +237,13 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>7/9</strong><span>modules opérationnels</span></div></div>
   <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.10.3 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
   <div class="panel"><h2>Derniers chantiers</h2><div id="recentJobs"></div></div>
+</section>
+<section id="subPortal" class="view">
+  <div class="panel">
+    <div class="toolbar"><div style="flex:1"><h2 style="margin:0">Mon espace sous-traitant</h2><div class="muted">Uniquement les chantiers et contrats qui vous sont attribués.</div></div><button class="btn secondary" type="button" onclick="loadSubcontractorPortal()">Actualiser</button></div>
+    <div id="subPortalStatus" class="notice" style="margin-top:12px">Chargement…</div>
+    <div id="subPortalList" class="sub-grid" style="margin-top:12px"></div>
+  </div>
 </section>
 <section id="clients" class="view"><div class="panel client-panel">
 <div class="client-head"><div><h2>Clients</h2><div class="muted">Clique directement sur un client pour ouvrir son dossier.</div></div><button class="btn" id="newClientBtn">+ Nouveau client</button></div>
@@ -569,8 +576,15 @@ function suiviSetPose(i,p,v){const pr=suiviFindProduct(i,p);if(!pr)return;pr.pos
 function suiviSetTotal(i,p,v){if(suiviData.locked)return;const pr=suiviFindProduct(i,p);if(!pr)return;pr.total=Math.max(0,Number(v||0));suiviChanged()}
 function suiviToggleLock(){suiviData.locked=!suiviData.locked;suiviChanged()}
 
-function roleLabel(r){return ({administrateur:'Administrateur',direction:'Direction',chef_equipe:'Chef d’équipe',ouvrier:'Ouvrier',atelier:'Atelier',lecture:'Lecture seule'})[r]||r||'—'}
+function roleLabel(r){return ({administrateur:'Administrateur',direction:'Direction',chef_equipe:'Chef d’équipe',ouvrier:'Ouvrier',atelier:'Atelier',lecture:'Lecture seule',sous_traitant:'Sous-traitant'})[r]||r||'—'}
+function isSubcontractorUser(){return currentAccess?.role==='sous_traitant'}
 function applyAccessUI(){
+  if(isSubcontractorUser()){
+    document.querySelectorAll('#mainNav button').forEach(b=>b.style.display='none');
+    const homeBtn=document.querySelector('#mainNav [data-view="dashboard"]');if(homeBtn){homeBtn.style.display='';homeBtn.textContent='Mon espace'}
+    if(window.newClientBtn)newClientBtn.style.display='none';if(window.importClientsBtn)importClientsBtn.style.display='none';if(window.newJobBtn)newJobBtn.style.display='none';
+    return;
+  }
   const clientsBtn=document.querySelector('#mainNav [data-view="clients"]');
   const jobsBtn=document.querySelector('#mainNav [data-view="chantiers"]');
   if(clientsBtn)clientsBtn.style.display=hasPerm('clients')?'':'none';
@@ -584,7 +598,8 @@ function applyAccessUI(){
   document.querySelectorAll('#modules [data-permission]').forEach(el=>el.style.display=hasPerm(el.dataset.permission)?'':'none');
 }
 function go(view){
-if(view==='preparation')setTimeout(loadPreparationApp,0);if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='users')renderUsers();if(view==='security')renderResetStats();if(view==='page-forecast')renderMonthlyForecast()}
+if(isSubcontractorUser()){view='subPortal'}
+if(view==='preparation')setTimeout(loadPreparationApp,0);if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='users')renderUsers();if(view==='security')renderResetStats();if(view==='page-forecast')renderMonthlyForecast()}
 mainNav.addEventListener('click',e=>{if(e.target.dataset.view)go(e.target.dataset.view)});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
 function requestCloseClientEditor(){
@@ -596,9 +611,32 @@ function requestCloseClientEditor(){
 document.querySelectorAll('[data-close="clientModal"]').forEach(b=>{b.onclick=(e)=>{e.preventDefault();requestCloseClientEditor()}});
 document.getElementById('clientModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget){e.stopImmediatePropagation();requestCloseClientEditor()}},true);
 
+async function loadSubcontractorPortal(){
+ if(!isSubcontractorUser())return;
+ subPortalStatus.className='notice';subPortalStatus.textContent='Chargement de vos chantiers…';subPortalList.innerHTML='';
+ try{
+  const email=(currentUser?.email||'').toLowerCase();
+  const {data:subs,error:se}=await sb.from('erp_subcontractors').select('*').or(`auth_user_id.eq.${currentUser.id},email.ilike.${email}`);
+  if(se)throw se;
+  erpSubcontractors=subs||[];
+  if(!erpSubcontractors.length){subPortalStatus.className='notice warn';subPortalStatus.innerHTML='Votre compte est bien identifié comme sous-traitant, mais il n’est encore rattaché à aucune fiche sous-traitant. Aucun chantier n’est visible.';return}
+  const ids=erpSubcontractors.map(x=>x.id);
+  const {data:assign,error:ae}=await sb.from('erp_subcontract_assignments').select('*').in('subcontractor_id',ids).order('created_at',{ascending:false});if(ae)throw ae;
+  erpSubAssignments=assign||[];
+  const jobIds=[...new Set(erpSubAssignments.map(x=>x.chantier_id).filter(Boolean))];
+  let jobs=[];if(jobIds.length){const {data,error}=await sb.from('erp_chantiers').select('*').in('id',jobIds);if(error)throw error;jobs=data||[]}
+  const clientIds=[...new Set(jobs.map(x=>x.client_id).filter(Boolean))];
+  let clients=[];if(clientIds.length){const {data,error}=await sb.from('erp_clients').select('id,nom').in('id',clientIds);if(error)throw error;clients=data||[]}
+  db.chantiers=jobs;db.clients=clients;
+  subPortalStatus.className='notice';subPortalStatus.textContent=`${erpSubAssignments.length} contrat(s) / chantier(s) attribué(s)`;
+  if(!erpSubAssignments.length){subPortalList.innerHTML='<div class="empty">Aucun chantier ne vous est actuellement attribué.</div>';return}
+  subPortalList.innerHTML=erpSubAssignments.map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id);return `<div class="sub-card"><div class="row between"><div><h3>${esc(j?.nom||'Chantier')}</h3><div class="muted">${esc(c?.nom||'')}${j?.adresse?'<br>'+esc(j.adresse):''}</div></div><span class="status ${a.status==='signe'?'actif':'attente'}">${esc(a.status||'brouillon')}</span></div><div style="margin-top:10px"><strong>Travaux confiés</strong><div>${esc(a.work_description||'À compléter').replace(/\n/g,'<br>')}</div>${a.planned_date?'<div><strong>Date prévue :</strong> '+esc(a.planned_date)+'</div>':''}</div><div class="actions" style="margin-top:12px"><button class="btn" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat':'Voir / signer le contrat'}</button><button class="btn secondary" onclick="subContractId.value='${a.id}';printSubContract()">Imprimer / PDF</button></div></div>`}).join('');
+ }catch(err){console.error(err);subPortalStatus.className='notice danger';subPortalStatus.textContent='Erreur : '+err.message}
+}
+
 async function loadCurrentAccess(){const {data,error}=await sb.from('erp_user_access').select('*').eq('user_id',currentUser.id).single();if(error){console.error(error);return {error}}currentAccess=data;return {data}}
 async function fetchAllRows(table,orderCol,ascending=true){const pageSize=1000;let from=0,all=[];while(true){let q=sb.from(table).select('*').order(orderCol,{ascending}).range(from,from+pageSize-1);const {data,error}=await q;if(error)throw error;const rows=data||[];all.push(...rows);if(rows.length<pageSize)break;from+=pageSize}return all}
-async function refreshData(){setSync(false,'Supabase : synchronisation…');try{const promises=[fetchAllRows('erp_clients','nom',true),fetchAllRows('erp_chantiers','updated_at',false)];if(hasPerm('utilisateurs'))promises.push(fetchAllRows('erp_user_access','email',true));const results=await Promise.all(promises);db.clients=results[0]||[];db.chantiers=results[1]||[];db.users=results[2]||[];renderAll();applyAccessUI();setSync(true,`Supabase : synchronisé · ${db.clients.length} clients`);return true}catch(err){console.error(err);setSync(false,'Supabase : erreur de synchronisation');alert('Erreur Supabase : '+err.message);return false}}
+async function refreshData(){setSync(false,'Supabase : synchronisation…');try{if(isSubcontractorUser()){db={clients:[],chantiers:[],users:[]};renderAll();applyAccessUI();go('subPortal');await loadSubcontractorPortal();setSync(true,'Supabase : espace sous-traitant synchronisé');return true}const promises=[fetchAllRows('erp_clients','nom',true),fetchAllRows('erp_chantiers','updated_at',false)];if(hasPerm('utilisateurs'))promises.push(fetchAllRows('erp_user_access','email',true));const results=await Promise.all(promises);db.clients=results[0]||[];db.chantiers=results[1]||[];db.users=results[2]||[];renderAll();applyAccessUI();setSync(true,`Supabase : synchronisé · ${db.clients.length} clients`);return true}catch(err){console.error(err);setSync(false,'Supabase : erreur de synchronisation');alert('Erreur Supabase : '+err.message);return false}}
 loginForm.onsubmit=async e=>{e.preventDefault();loginError.style.display='none';const {data,error}=await sb.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPassword.value});if(error){loginError.textContent=error.message;loginError.style.display='block';return}currentUser=data.user;await onSignedIn()}
 async function onSignedIn(){const access=await loadCurrentAccess();if(access.error||!currentAccess){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Aucun droit ERP n’est configuré pour ce compte. Exécute d’abord le SQL V0.5 dans Supabase.';loginError.style.display='block';return}if(!currentAccess.active){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Ce compte ERP est désactivé.';loginError.style.display='block';return}loginOverlay.classList.add('hidden');userPill.textContent='Utilisateur : '+(currentUser?.email||'connecté')+' · '+roleLabel(currentAccess.role);applyAccessUI();await refreshData()}
 logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
@@ -1491,7 +1529,7 @@ function renderExistingSubClauseEditor(){subExistingClauseEditor.innerHTML=subEx
 function editExistingSubContract(){const a=erpSubAssignments.find(x=>x.id===subContractId.value);if(!a)return;if(a.status==='signe'){alert('Un contrat signé est verrouillé.');return}subClauseEditContractId.value=a.id;subExistingClauseDraft=subClausesFromAssignment(a).map(x=>({...x}));renderExistingSubClauseEditor();openModal('subClauseEditModal')}
 function addExistingSubClause(){subExistingClauseDraft.push({title:'Nouvelle clause',text:''});renderExistingSubClauseEditor()}
 function removeExistingSubClause(i){if(confirm('Supprimer cette clause ?')){subExistingClauseDraft.splice(i,1);renderExistingSubClauseEditor()}}
-async function saveExistingSubClauses(){const id=subClauseEditContractId.value,clauses=subExistingClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim()})).filter(x=>x.title||x.text);const {error}=await sb.from('erp_subcontract_assignments').update({contract_clauses:clauses,contract_terms:clauses.map(x=>`${x.title}\n${x.text}`).join('\n\n'),updated_at:new Date().toISOString()}).eq('id',id).neq('status','signe');if(error){alert(error.message);return}closeModal('subClauseEditModal');await loadSubcontractors();openSubContract(id)}
+async function saveExistingSubClauses(){const id=subClauseEditContractId.value,clauses=subExistingClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim()})).filter(x=>x.title||x.text);const {error}=await sb.from('erp_subcontract_assignments').update({contract_clauses:clauses,contract_terms:clauses.map(x=>`${x.title}\n${x.text}`).join('\n\n'),updated_at:new Date().toISOString()}).eq('id',id).neq('status','signe');if(error){alert(error.message);return}closeModal('subClauseEditModal');if(isSubcontractorUser()){await loadSubcontractorPortal();openSubContract(id)}else{await loadSubcontractors();openSubContract(id)}}
 
 async function saveSubContractDraft(){
  const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a)return;
@@ -1529,7 +1567,7 @@ function openSubContract(id){
  subContractId.value=id;subContractSummary.innerHTML=`<strong>${esc(sub?.company||'Sous-traitant')}</strong><br>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}${j?.adresse?'<br>'+esc(j.adresse):''}${a.planned_date?'<br>Date prévue : '+esc(a.planned_date):''}${a.amount_ht!=null?'<br>Montant : '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}`;
  const clauses=subClausesFromAssignment(a);subContractText.innerHTML=`<div class="sub-clause-display"><h4>Travaux confiés</h4><div>${esc(a.work_description||'').replace(/\\n/g,'<br>')}</div></div>`+clauses.map((x,i)=>`<div class="sub-clause-display"><h4>${i+1}. ${esc(x.title||'Clause')}</h4><div>${esc(x.text||'').replace(/\\n/g,'<br>')}</div></div>`).join('');
  subSignerName.value=a.signer_name||sub?.contact_name||'';subSignerRole.value=a.signer_role||'';
- openModal('subContractModal');setTimeout(()=>{setupSubSignaturePad();if(a.signature_data){drawSavedSignature(a.signature_data)}else clearSubSignature();const signed=a.status==='signe';subEditClausesActions.style.display=signed?'none':'flex';subSignBtn.disabled=signed;subSignBtn.textContent=signed?'Contrat signé':'Signer et valider le contrat';subSignaturePad.style.pointerEvents=signed?'none':'auto'},60);
+ openModal('subContractModal');setTimeout(()=>{setupSubSignaturePad();if(a.signature_data){drawSavedSignature(a.signature_data)}else clearSubSignature();const signed=a.status==='signe';subEditClausesActions.style.display=(signed||isSubcontractorUser())?'none':'flex';subSignBtn.disabled=signed;subSignBtn.textContent=signed?'Contrat signé':'Signer et valider le contrat';subSignaturePad.style.pointerEvents=signed?'none':'auto'},60);
 }
 function setupSubSignaturePad(){
  const c=subSignaturePad,dpr=Math.max(window.devicePixelRatio||1,1),r=c.getBoundingClientRect();c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111827';
@@ -1541,7 +1579,7 @@ function setupSubSignaturePad(){
 function clearSubSignature(){const c=subSignaturePad,ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);subSignatureDirty=false}
 function drawSavedSignature(data){const img=new Image();img.onload=()=>{const c=subSignaturePad,ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height)};img.src=data;subSignatureDirty=false}
 async function signSubContract(){
- const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a||a.status==='signe')return;
+ const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a||a.status==='signe')return;if(isSubcontractorUser()&&!erpSubcontractors.some(s=>s.id===a.subcontractor_id)){alert('Accès refusé.');return}
  const name=subSignerName.value.trim(),role=subSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire.');return}if(!subSignatureDirty){alert("Veuillez signer dans le cadre avant de valider.");return}
  if(!confirm('Valider définitivement la signature de ce contrat ?'))return;
  const signature_data=subSignaturePad.toDataURL('image/png');
