@@ -229,7 +229,17 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.16</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<div id="recoveryOverlay" class="login-overlay hidden" style="z-index:10001">
+  <form id="recoveryForm" class="login-card">
+    <h2>Nouveau mot de passe</h2>
+    <p>Définissez le nouveau mot de passe de votre compte RML ERP.</p>
+    <div class="field"><label>Nouveau mot de passe</label><input id="recoveryPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+    <div class="field"><label>Confirmer le mot de passe</label><input id="recoveryPassword2" type="password" autocomplete="new-password" minlength="8" required></div>
+    <button class="btn" type="submit">Enregistrer le nouveau mot de passe</button>
+    <div id="recoveryError" class="login-error"></div>
+  </form>
+</div>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.17</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -638,6 +648,34 @@ async function loadSubcontractorPortal(){
 async function loadCurrentAccess(){const {data,error}=await sb.from('erp_user_access').select('*').eq('user_id',currentUser.id).single();if(error){console.error(error);return {error}}currentAccess=data;return {data}}
 async function fetchAllRows(table,orderCol,ascending=true){const pageSize=1000;let from=0,all=[];while(true){let q=sb.from(table).select('*').order(orderCol,{ascending}).range(from,from+pageSize-1);const {data,error}=await q;if(error)throw error;const rows=data||[];all.push(...rows);if(rows.length<pageSize)break;from+=pageSize}return all}
 async function refreshData(){setSync(false,'Supabase : synchronisation…');try{if(isSubcontractorUser()){db={clients:[],chantiers:[],users:[]};renderAll();applyAccessUI();go('subPortal');await loadSubcontractorPortal();setSync(true,'Supabase : espace sous-traitant synchronisé');return true}const promises=[fetchAllRows('erp_clients','nom',true),fetchAllRows('erp_chantiers','updated_at',false)];if(hasPerm('utilisateurs'))promises.push(fetchAllRows('erp_user_access','email',true));const results=await Promise.all(promises);db.clients=results[0]||[];db.chantiers=results[1]||[];db.users=results[2]||[];renderAll();applyAccessUI();setSync(true,`Supabase : synchronisé · ${db.clients.length} clients`);return true}catch(err){console.error(err);setSync(false,'Supabase : erreur de synchronisation');alert('Erreur Supabase : '+err.message);return false}}
+let passwordRecoveryMode=false;
+function showPasswordRecovery(){
+  passwordRecoveryMode=true;
+  loginOverlay.classList.add('hidden');
+  recoveryOverlay.classList.remove('hidden');
+  recoveryError.style.display='none';
+  setTimeout(()=>recoveryPassword.focus(),50);
+}
+recoveryForm.onsubmit=async e=>{
+  e.preventDefault();
+  recoveryError.style.display='none';
+  const p1=recoveryPassword.value,p2=recoveryPassword2.value;
+  if(p1.length<8){recoveryError.textContent='Le mot de passe doit contenir au moins 8 caractères.';recoveryError.style.display='block';return}
+  if(p1!==p2){recoveryError.textContent='Les deux mots de passe ne correspondent pas.';recoveryError.style.display='block';return}
+  const {error}=await sb.auth.updateUser({password:p1});
+  if(error){recoveryError.textContent=error.message;recoveryError.style.display='block';return}
+  passwordRecoveryMode=false;
+  recoveryOverlay.classList.add('hidden');
+  history.replaceState({},document.title,location.pathname+location.search);
+  alert('Nouveau mot de passe enregistré.');
+  const {data:{session}}=await sb.auth.getSession();
+  if(session?.user){currentUser=session.user;await onSignedIn()}else{loginOverlay.classList.remove('hidden')}
+};
+sb.auth.onAuthStateChange((event,session)=>{
+  if(event==='PASSWORD_RECOVERY'){showPasswordRecovery()}
+});
+if(location.hash && /type=recovery/i.test(location.hash)){setTimeout(showPasswordRecovery,0)}
+
 loginForm.onsubmit=async e=>{e.preventDefault();loginError.style.display='none';const {data,error}=await sb.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPassword.value});if(error){loginError.textContent=error.message;loginError.style.display='block';return}currentUser=data.user;await onSignedIn()}
 async function onSignedIn(){const access=await loadCurrentAccess();if(access.error||!currentAccess){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Aucun droit ERP n’est configuré pour ce compte. Exécute d’abord le SQL V0.5 dans Supabase.';loginError.style.display='block';return}if(!currentAccess.active){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Ce compte ERP est désactivé.';loginError.style.display='block';return}loginOverlay.classList.add('hidden');userPill.textContent='Utilisateur : '+(currentUser?.email||'connecté')+' · '+roleLabel(currentAccess.role);applyAccessUI();await refreshData()}
 logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
