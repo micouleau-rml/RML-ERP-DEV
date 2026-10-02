@@ -229,7 +229,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="loginError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.10</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.13</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -343,11 +343,11 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
  <div class="actions"><button id="subAssignSaveBtn" class="btn" onclick="saveSubAssignment()">Enregistrer le brouillon</button><button class="btn secondary" data-close="subAssignModal">Fermer</button></div>
 </div></div>
 
-<div class="modal" id="subClauseEditModal"><div class="modal-card" style="max-width:900px"><div class="modal-head"><h3>Modifier les clauses du contrat</h3><button class="close" data-close="subClauseEditModal">Fermer</button></div><input id="subClauseEditContractId" type="hidden"><div class="notice" style="margin-top:12px">Toutes les clauses sont modifiables tant que le contrat n’est pas signé.</div><div id="subExistingClauseEditor"></div><div class="actions"><button class="btn secondary" onclick="addExistingSubClause()">+ Ajouter une clause</button><button class="btn" onclick="saveExistingSubClauses()">Enregistrer les clauses</button></div></div></div><div class="modal" id="subContractModal"><div class="modal-card" style="max-width:820px">
+<div class="modal" id="subClauseEditModal"><div class="modal-card" style="max-width:900px"><div class="modal-head"><h3>Modifier le contrat de sous-traitance</h3><button class="close" data-close="subClauseEditModal">Fermer</button></div><input id="subClauseEditContractId" type="hidden"><div class="notice" style="margin-top:12px">Le contrat reprend le modèle que vous avez fourni. Tous les articles restent modifiables tant que le contrat n’est pas signé.</div><div id="subExistingClauseEditor"></div><div class="actions"><button class="btn secondary" onclick="addExistingSubClause()">+ Ajouter une clause</button><button class="btn" onclick="saveExistingSubClauses()">Enregistrer le contrat</button></div></div></div><div class="modal" id="subContractModal"><div class="modal-card" style="max-width:820px">
  <div class="modal-head"><h3>Contrat de sous-traitance</h3><button class="close" data-close="subContractModal">Fermer</button></div>
  <input id="subContractId" type="hidden">
  <div id="subContractSummary" class="notice" style="margin-top:12px"></div>
- <div id="subContractText" class="sub-contract-text"></div><div class="actions" id="subEditClausesActions"><button class="btn secondary" type="button" onclick="editExistingSubContract()">Modifier toutes les clauses</button></div>
+ <div id="subContractText" class="sub-contract-text"></div><div class="actions" id="subEditClausesActions"><button class="btn secondary" type="button" onclick="editExistingSubContract()">Modifier le contrat</button><button class="btn" type="button" onclick="saveSubContractDraft()">Enregistrer</button><button class="btn secondary" type="button" onclick="printSubContract()">Imprimer / PDF</button></div>
  <div class="signature-wrap" style="margin-top:14px">
   <h3 style="margin-top:0">Signature du sous-traitant</h3>
   <div class="muted" style="margin-bottom:10px">Signez directement avec le doigt ou un stylet dans le cadre ci-dessous.</div>
@@ -1225,6 +1225,7 @@ function renderAll(){renderDashboard();renderClients();renderJobs();renderUsers(
 (async()=>{const {data:{session}}=await sb.auth.getSession();if(session?.user){currentUser=session.user;await onSignedIn()}else{setSync(false,'Supabase : déconnecté');renderAll()}})();
 
 function forecastMonthLabel(ym){
+  if(ym==='SANS_DATE')return 'Sans date';
   const [y,m]=ym.split('-').map(Number);
   return new Intl.DateTimeFormat('fr-FR',{month:'long',year:'numeric'}).format(new Date(y,m-1,1)).replace(/^./,c=>c.toUpperCase());
 }
@@ -1240,8 +1241,8 @@ async function renderMonthlyForecast(){
     let rows=[];
     for(let i=0;i<jobs.length;i+=100){
       const ids=jobs.slice(i,i+100).map(j=>j.id); if(!ids.length)continue;
-      const {data,error}=await sb.from('erp_modules_data').select('chantier_id,payload')
-        .eq('module','preparation').eq('entity_type','chantier').in('chantier_id',ids).eq('deleted',false);
+      const {data,error}=await sb.from('erp_modules_data').select('chantier_id,module,payload')
+        .in('module',['preparation','commandes_prevision']).eq('entity_type','chantier').in('chantier_id',ids).eq('deleted',false);
       if(error)throw error; rows.push(...(data||[]));
     }
     const famLabels={
@@ -1255,17 +1256,24 @@ async function renderMonthlyForecast(){
       sous_faces:'Sous-faces'
     };
     const months=new Map(); let sansDate=0;
+    // Une seule source par chantier : Préparation en priorité, sinon l'instantané Commandes prévision.
+    const byJob=new Map();
     rows.forEach(r=>{
+      const cur=byJob.get(r.chantier_id);
+      if(!cur || (r.module==='preparation' && cur.module!=='preparation'))byJob.set(r.chantier_id,r);
+    });
+    byJob.forEach(r=>{
       const j=jobById.get(r.chantier_id); if(!j)return;
       const date=String(j.date_debut||j.date_intervention||j.date_programmee||r.payload?.info?.date_intervention||r.payload?.info?.date||'').trim();
-      if(!date){sansDate++;return}
-      const ym=date.slice(0,7); if(!/^\d{4}-\d{2}$/.test(ym))return;
+      const ym=/^\d{4}-\d{2}/.test(date)?date.slice(0,7):'SANS_DATE';
+      if(ym==='SANS_DATE')sansDate++;
       if(!months.has(ym))months.set(ym,new Map());
       const group=months.get(ym);
 
-      // IMPORTANT : utilise exactement le même lecteur que la fenêtre "Prévision matériaux",
-      // qui affiche déjà correctement les produits de la Préparation chantier.
-      preparationNeeds(r.payload).forEach(n=>{
+      const needs=r.module==='commandes_prevision'
+        ? (Array.isArray(r.payload?.needs)?r.payload.needs:[])
+        : preparationNeeds(r.payload);
+      needs.forEach(n=>{
         const famille=famLabels[n.section]||n.section||'Autres';
         const couleur=String(n.color||'').trim()||'Sans couleur';
         const key=[famille,n.nom,couleur,n.unite].map(v=>String(v).toLowerCase()).join('|');
@@ -1276,9 +1284,9 @@ async function renderMonthlyForecast(){
       });
     });
 
-    const monthKeys=[...months.keys()].sort();
+    const monthKeys=[...months.keys()].sort((a,b)=>a==='SANS_DATE'?1:b==='SANS_DATE'?-1:a.localeCompare(b));
     let body='';
-    if(sansDate)body+=`<div class="notice" style="margin-bottom:12px">${sansDate} préparation(s) non comptées car leur chantier n'a pas de date programmée.</div>`;
+    if(sansDate)body+=`<div class="notice" style="margin-bottom:12px">${sansDate} chantier(s) sans date programmée sont affichés dans « Sans date » afin de ne perdre aucun produit à prévoir.</div>`;
     if(!monthKeys.length){
       body+=`<div class="notice"><b>Aucun mois à afficher.</b></div>`;
     }else{
@@ -1358,7 +1366,130 @@ async function openForecastPage(){
 // ===== V0.10.8 DOCUMENTS + ANALYSE =====
 const DOC_BUCKET='erp-documents';
 
-const DEFAULT_SUB_CLAUSES=[{"title": "Objet du contrat", "text": "Le présent contrat confie au Sous-traitant l'exécution des travaux décrits dans la fiche chantier et dans la rubrique « Travaux confiés », dans le cadre d'une opération de sous-traitance."}, {"title": "Chantier et documents contractuels", "text": "Le Sous-traitant reconnaît disposer des informations nécessaires à l'identification du chantier et à l'exécution de sa prestation. Les plans, devis, bordereaux, consignes, documents de prévention et documents techniques expressément remis ou joints complètent le présent contrat."}, {"title": "Prix du marché sous-traité", "text": "Le prix convenu est celui indiqué dans la fiche du contrat. Toute prestation supplémentaire ou modification du périmètre doit faire l'objet d'un accord écrit préalable de l'Entreprise principale."}, {"title": "Facturation et règlement", "text": "Le Sous-traitant établit ses factures conformément aux dispositions légales et au régime fiscal qui lui est applicable. Les modalités de règlement convenues s'appliquent sous réserve des dispositions impératives relatives à la sous-traitance."}, {"title": "Délais d'intervention", "text": "Le Sous-traitant s'engage à respecter les dates ou périodes convenues et à informer sans délai l'Entreprise principale de toute difficulté susceptible d'affecter l'avancement ou la date d'achèvement."}, {"title": "Exécution et qualité", "text": "Le Sous-traitant exécute les prestations conformément aux règles de l'art, aux prescriptions contractuelles et aux documents techniques applicables. Il demeure responsable de la bonne exécution des travaux qui lui sont confiés."}, {"title": "Matériaux et matériels", "text": "La répartition de la fourniture des matériaux, accessoires, moyens d'accès, engins, outillage et consommables est celle définie pour le chantier ou dans les documents contractuels."}, {"title": "Sécurité et prévention", "text": "Le Sous-traitant respecte les règles de santé et de sécurité applicables au chantier ainsi que les consignes et documents de prévention applicables. Il veille au respect de ces obligations par son personnel."}, {"title": "Indépendance du Sous-traitant", "text": "Le Sous-traitant exerce son activité en toute indépendance dans l'organisation de son entreprise, sous réserve de la coordination du chantier, des délais, de la sécurité et du résultat contractuellement attendu."}, {"title": "Personnel et obligations sociales", "text": "Le Sous-traitant certifie respecter les obligations déclaratives, sociales et fiscales qui lui sont applicables et remet à l'Entreprise principale les justificatifs légalement requis lorsqu'ils sont applicables."}, {"title": "Assurances", "text": "Le Sous-traitant déclare être assuré pour les activités exercées au titre du contrat et maintient les assurances nécessaires pendant son intervention. Lorsque la nature des travaux l'exige, il fournit une attestation décennale couvrant l'activité concernée."}, {"title": "Acceptation et conditions de paiement", "text": "Lorsque la réglementation l'exige, l'Entreprise principale accomplit les démarches nécessaires afin de faire accepter le Sous-traitant et agréer ses conditions de paiement par le maître de l'ouvrage."}, {"title": "Sous-traitance de second rang", "text": "Le Sous-traitant ne peut confier à un tiers tout ou partie des prestations sans accord écrit préalable de l'Entreprise principale et sans respecter les obligations légales applicables à ses propres sous-traitants."}, {"title": "Contrôle, réserves et reprises", "text": "Le Sous-traitant s'engage à remédier dans un délai approprié aux défauts, non-conformités ou réserves qui lui sont imputables et concernent ses prestations."}, {"title": "Responsabilité", "text": "Chaque partie répond des dommages qui lui sont imputables. Le Sous-traitant demeure responsable de ses prestations, de son personnel, de ses matériels et des dommages causés dans le cadre de son intervention."}, {"title": "Résiliation", "text": "En cas de manquement suffisamment grave à une obligation contractuelle, le contrat pourra être résilié dans les conditions applicables, sans préjudice des droits que les parties tiennent de la loi."}, {"title": "Droit applicable et différends", "text": "Le contrat est soumis au droit français. En cas de différend, les parties rechercheront d'abord une solution amiable, sous réserve des règles impératives applicables."}, {"title": "Acceptation et signature", "text": "Le Sous-traitant reconnaît avoir pris connaissance du contrat, des travaux confiés et des documents communiqués. La signature manuscrite apposée dans l'application matérialise son acceptation de la version affichée au moment de la signature."}];
+const DEFAULT_SUB_CLAUSES=[{"title": "ARTICLE 1 – OBJET DU CONTRAT – PIÈCES CONTRACTUELLES", "text": "Les travaux faisant l’objet du présent contrat sont définis comme suit :
+[À compléter]
+
+Ces travaux sont confiés au sous-traitant par l’entrepreneur dans le cadre du marché principal suivant :
+- Maître d’ouvrage : [À compléter]
+- Maître d’œuvre : [À compléter]
+- Type de travaux : [À compléter]
+- Lieu d’exécution : [À compléter]
+
+Les travaux sous-traités seront exécutés conformément aux conditions des pièces contractuelles fournies par l’entrepreneur, soit :
+- Pièces techniques : plans d’exécution
+
+Ces documents dûment signés par l’entrepreneur principal et le sous-traitant sont annexés au présent contrat."}, {"title": "ARTICLE 2 – APPLICATION DES DISPOSITIONS LÉGALES ET CONTRACTUELLES", "text": "1) Lutte contre le travail dissimulé
+Le sous-traitant souscrit les déclarations en matière de travail illégal selon le modèle proposé en annexe du présent contrat (attestation de régularité).
+
+2) Hygiène, sécurité, protection de la santé et des conditions de travail
+Le sous-traitant s’engage à respecter les règles de sécurité imposées par le chantier.
+Le chantier est soumis à un Plan Général de Coordination en matière de Sécurité et de Protection de la Santé (PGCSPS) : OUI / NON
+Si oui : remise d’un exemplaire du PGCSPS par l’entrepreneur principal avant le : [À compléter]
+Le sous-traitant, dans la mesure où il est concerné, doit participer au Collège Interentreprises de Sécurité, de Santé et des Conditions de Travail (CISSCT) lorsque cette instance existe sur le chantier.
+Existence du CISSCT : OUI / NON
+
+3) Évacuation et traitement des déchets
+Le sous-traitant est responsable de l’évacuation et du traitement des déchets de ses travaux.
+Il procède à l’évacuation et à l’élimination de ses déchets selon les préconisations de l’entrepreneur principal.
+
+4) Acceptation du sous-traitant et agrément des conditions de paiement
+Avant l’exécution des travaux objet du présent contrat, l’entrepreneur principal, conformément à l’article 3 de la loi du 31 décembre 1975, doit faire accepter le sous-traitant et faire agréer ses conditions de paiement par le maître de l’ouvrage. Il informe le sous-traitant de la décision prise par le maître de l’ouvrage.
+Le présent contrat est résilié de plein droit en cas de refus d’acceptation du sous-traitant ou d’agrément de ses conditions de paiement par le maître de l’ouvrage."}, {"title": "ARTICLE 3 – TRAVAUX SUPPLÉMENTAIRES, EN DIMINUTION OU MODIFICATIFS", "text": "Le sous-traitant accepte les augmentations et les diminutions résultant d’un changement de masse des travaux ou de la nature des ouvrages prévus au contrat de sous-traitance dans la limite des compétences faisant partie de son corps de métier.
+Les travaux supplémentaires ou en diminution et les travaux modificatifs feront l’objet d’un accord (prix et délais) constaté par un écrit formalisé par l’établissement d’un avenant."}, {"title": "ARTICLE 4 – OBLIGATION DES PARTIES", "text": "1) Obligation de l’entrepreneur principal
+L’entrepreneur principal s’engage à fournir au sous-traitant en temps utile tous les plans et documents nécessaires à la réalisation de sa prestation.
+L’entrepreneur principal ou la personne qu’il désigne établit, en accord avec le sous-traitant, un calendrier prévisionnel des travaux à l’aide des éléments fournis par ce dernier, en conformité avec le délai global d’exécution du marché principal.
+
+2) Obligation du sous-traitant
+Le sous-traitant doit mener à bonne fin l’exécution de ses travaux et, à cet effet, il doit notamment :
+- Fournir en temps utile à l’entrepreneur principal les pièces administratives demandées.
+- Faire toutes les observations qui lui paraissent opportunes au regard des règles de son art sur les études de conception ou d’exécution qui lui sont communiquées ; rendre compte de toutes les sujétions intéressant l’organisation du chantier et l’exécution des travaux.
+- Ne pas sous-traiter tout ou partie des travaux faisant l’objet du présent contrat sans l’autorisation préalable et écrite de l’entrepreneur principal. À défaut, l’entrepreneur principal peut exiger l’exécution complète des travaux par le sous-traitant ou, à défaut d’exécution, prononcer la résiliation du présent contrat."}, {"title": "ARTICLE 5 – PRIX", "text": "Le sous-traitant s’engage à exécuter les travaux objet du présent contrat pour la somme globale et forfaitaire de : [À compléter] € HT.
+
+Dans les cas relevant de l’article 283, 2 nonies du CGI, le sous-traitant facture sans TVA et mentionne « autoliquidation » sur sa facture ou sur les factures, à charge pour l’entrepreneur principal d’autoliquider la TVA, pour les entreprises soumises au régime de la TVA.
+
+Le prix du présent contrat est :
+☐ Ferme et actualisable
+☐ Révisable
+☐ Actualisable et révisable
+☐ Ferme
+
+Les prix fixés aux conditions particulières s’entendent pour l’exécution et la parfaite finition de tous les travaux faisant l’objet du sous-traité, tels qu’ils sont décrits et définis dans les pièces contractuelles annexées au présent contrat.
+Les travaux supplémentaires confiés au sous-traitant par l’entrepreneur principal font l’objet d’un ordre écrit ou d’un avenant au présent contrat préalablement aux travaux, y compris en cas de travaux à réaliser en urgence."}, {"title": "ARTICLE 6 – GARANTIE DE PAIEMENT ET MODALITÉ DE PAIEMENT", "text": "Les parties conviennent que les sommes dues seront réglées :
+- par l’entreprise principale, qui fournit au sous-traitant une caution bancaire en garantie de paiement (préciser OUI ou NON si une délégation de paiement est fournie : l’entrepreneur délègue le maître de l’ouvrage au sous-traitant) : [À compléter]
+Si oui, la caution est annexée au présent contrat sous le n° [À compléter] (ou indiquer « sans objet » si délégation de paiement).
+
+Le sous-traitant présente à l’entrepreneur principal ses demandes de paiement dans les conditions ci-après (délais notamment) : [À compléter]
+
+Le sous-traitant est payé soit :
+☐ Par virement (joindre RIB en annexe)
+☐ Par chèque
+☐ Autre : [À compléter]"}, {"title": "ARTICLE 7 – DÉLAIS ET CALENDRIERS D’EXÉCUTION", "text": "1) Période de préparation
+Une période de préparation est prévue : OUI / NON
+Si OUI :
+- La période de préparation est incluse dans le délai d’exécution : OUI / NON
+- Le point de départ et la durée de la période de préparation sont : [À compléter]
+
+2) Calendrier d’exécution
+Le calendrier prévisionnel des travaux établi par l’entrepreneur principal en accord avec le sous-traitant pendant la période de préparation, ou à défaut de celle-ci en temps utile, fixe, en conformité avec les délais prévus par le présent contrat, les dates, tâches et durées d’intervention qui deviendront contractuelles. Ensuite, le sous-traitant soumet à l’approbation de l’entrepreneur principal, à la date fixée par ce dernier, un calendrier d’exécution détaillé. Ce calendrier devient contractuel après accord de l’entrepreneur principal ; il est mis à jour dans les mêmes conditions.
+
+Les travaux faisant l’objet du présent contrat doivent être exécutés dans un délai de : [À compléter] à compter de l’ordre de service de commencer les travaux, donné par l’entrepreneur principal.
+Le ou les délais sont prolongés dans les cas suivants : travaux supplémentaires, travaux modificatifs, intempéries.
+Autre à préciser : [À compléter]
+
+Dès qu’il en a connaissance, l’entrepreneur principal doit informer le sous-traitant des retards non imputables à ce dernier, susceptibles d’affecter son délai d’exécution."}, {"title": "ARTICLE 8 – RÉCEPTION", "text": "Dès qu’il obtient le PV de réception, l’entrepreneur principal en transmet une copie au sous-traitant.
+Le sous-traitant procède aux travaux nécessaires à la levée des réserves éventuelles dans le délai prescrit par le PV de réception, à compter de sa remise au sous-traitant.
+À défaut, l’entrepreneur principal peut, après mise en demeure adressée par LRAR, restée infructueuse plus de 10 jours, faire exécuter les travaux par une autre entreprise aux frais du sous-traitant sans que celui-ci puisse s’y opposer.
+Le sous-traitant est déchargé de la garde de ses ouvrages antérieurement à la réception, après constat d’achèvement des travaux par l’entrepreneur principal : OUI / NON."}, {"title": "ARTICLE 9 – RETENUE DE GARANTIE", "text": "☐ Une retenue de garantie de [À compléter] % de la somme globale et forfaitaire du présent contrat sera appliquée.
+☐ Il n’y a pas de retenue de garantie."}, {"title": "ARTICLE 10 – RESPONSABILITÉS", "text": "Le sous-traitant est responsable des dommages causés à autrui à l’occasion de l’exécution des obligations résultant du présent contrat et garantit l’entrepreneur principal contre tous recours et actions exercés contre ce dernier de ce chef, et ce aussi longtemps que la responsabilité de l’entrepreneur principal peut être recherchée.
+Jusqu’à la réception, le sous-traitant doit assumer tous remplacements et réparations concernant ses travaux, matériaux et équipements, indépendamment de toutes assurances, quitte à exercer les recours qu’il juge utiles.
+Toutefois, en cas de constat d’achèvement des travaux sous-traités avant la réception du maître de l’ouvrage, la garde des travaux exécutés par le sous-traitant peut être transférée à l’entrepreneur principal comme indiqué à l’article 8.
+Durant la période de garantie de parfait achèvement d’un an à partir de la réception, le sous-traitant est tenu de procéder à la réparation des désordres visés à l’article 1792-6 du Code civil, dans les conditions et modalités stipulées audit article.
+Indépendamment des obligations visées ci-dessus, le sous-traitant est tenu de garantir l’entrepreneur principal pour ses travaux contre tout recours et actions exercés contre ce dernier en vertu des articles 1792 et suivants du Code civil."}, {"title": "ARTICLE 11 – ASSURANCES", "text": "Le sous-traitant est tenu de s’assurer avant le début des travaux.
+Il s’engage à fournir toutes les justifications utiles à l’entrepreneur principal sur simple demande de celui-ci.
+
+Assurance responsabilité civile
+Le sous-traitant justifie d’une assurance responsabilité civile pendant et après l’exécution des travaux par l’attestation jointe en annexe.
+
+Assurance responsabilité décennale
+Le sous-traitant doit justifier d’une assurance décennale (chantiers de construction relevant du domaine de l’assurance décennale obligatoire) : OUI / NON
+Si oui, l’attestation est jointe en annexe.
+Si dans un délai de [À compléter] jours comptés à partir de la date de son intervention sur le chantier, le sous-traitant ne peut pas justifier la souscription de la police précitée, il remboursera à l’entrepreneur principal toute surprime payée par ce dernier pour les travaux objet du présent contrat en application de sa propre police et compte tenu de la nature de celle du sous-traitant."}, {"title": "ARTICLE 12 – DÉPENSES COMMUNES", "text": "1) Dépenses communes à toutes les entreprises
+Choisir l’option applicable :
+☐ Le sous-traitant ne participe pas aux dépenses d’intérêt commun et de compte prorata éventuellement prévues au marché principal.
+☐ Le sous-traitant participe aux dépenses communes précisées par une convention de compte prorata à laquelle il adhère dans le cadre de l’exécution du chantier.
+☐ Le sous-traitant participe aux dépenses communes selon les modalités suivantes :
+- Les dépenses communes sont précisées conformément aux annexes A et B de la norme AFNOR NF P03-001.
+- Les dépenses communes sont définies ci-après : [À compléter]
+☐ Le sous-traitant participe aux dépenses communes :
+- Au prorata du montant de son contrat de sous-traitance rapporté au montant cumulé des situations des entreprises participant aux dépenses communes.
+- Au taux forfaitaire de : [À compléter] % du montant de son contrat de sous-traitance.
+
+2) Dépenses communes à l’entreprise principale et au sous-traitant
+Les parties décident d’un commun accord que certaines dépenses communes sont à la charge de l’entrepreneur principal ou du sous-traitant et sont énumérées ci-dessous :
+- Les dépenses engagées par l’entrepreneur principal : [À compléter]
+- Les dépenses engagées par le sous-traitant : [À compléter]"}, {"title": "ARTICLE 13 – PROPRIÉTÉ INTELLECTUELLE", "text": "Le sous-traitant s’engage à ne pas communiquer à des tiers étrangers aux travaux objet du présent contrat les plans, éléments de calcul, pièces écrites et, d’une manière générale, tous documents et informations qui lui sont remis pour lui permettre de réaliser son étude ou ses travaux.
+Il s’engage également à ne pas les utiliser pour d’autres opérations et à respecter la propriété intellectuelle des procédés dont la mise en œuvre lui est confiée.
+L’entrepreneur principal a les mêmes obligations envers le sous-traitant."}, {"title": "ARTICLE 14 – RÉSILIATION", "text": "1) Résiliation de plein droit
+Le présent contrat est résilié de plein droit et sans accomplissement d’aucune formalité judiciaire :
+- Lorsque le marché principal est lui-même résilié sans qu’il y ait faute de l’entrepreneur principal. Dans ce cas, aucune indemnité n’est due de part ni d’autre. Toutefois, dans le cas où une indemnité est versée par le maître de l’ouvrage à l’entrepreneur principal, celui-ci est tenu de répartir entre les sous-traitants concernés, en proportion du préjudice qu’ils ont subi, la part d’indemnité correspondant au préjudice retenu par le maître de l’ouvrage pour les travaux sous-traités.
+- Lorsque le marché principal est résilié aux torts de l’entrepreneur principal. Dans ce cas, l’entrepreneur principal doit réparer le préjudice éventuellement subi par le sous-traitant.
+- Lorsque le maître de l’ouvrage refuse d’accepter le sous-traitant et d’agréer ses conditions de paiement.
+
+2) Résiliation pour défaillance contractuelle du sous-traitant
+La défaillance contractuelle dûment établie du sous-traitant peut entraîner de plein droit la résiliation du contrat après mise en demeure adressée par LRAR.
+Lorsque la mise en demeure est restée infructueuse à l’expiration d’un délai de [À compléter] jours, l’entrepreneur principal peut résilier le contrat dans sa totalité ou pour les seules obligations dont la carence du sous-traitant est établie.
+L’entrepreneur principal notifie au sous-traitant la décision de résiliation et la date à laquelle il sera procédé à un constat contradictoire d’état des lieux et d’avancement des travaux.
+En l’absence d’un représentant du sous-traitant, le constat d’état des lieux et d’avancement des travaux est réputé contradictoire et opposable au sous-traitant.
+En cas de résiliation complète ou partielle du contrat, l’entrepreneur principal peut procéder au remplacement du sous-traitant."}, {"title": "ARTICLE 15 – RÉSERVE DE PROPRIÉTÉ", "text": "Le sous-traitant se réserve la propriété des fournitures non mises en œuvre jusqu’à leur complet paiement : OUI / NON."}, {"title": "ARTICLE 16 – RÈGLEMENT DES CONTESTATIONS", "text": "À tout moment, les entreprises ont la faculté de régler à l’amiable leurs litiges, notamment par la médiation.
+À défaut d’accord amiable, les tribunaux du lieu d’exécution de la prestation seront compétents pour connaître du différend.
+Le droit applicable au présent contrat est le droit français et les tribunaux compétents sont les tribunaux français."}, {"title": "ARTICLE 17 – ÉTAT RÉCAPITULATIF DES PIÈCES ANNEXÉES AUX PRÉSENTES CONDITIONS", "text": "Pièces annexées :
+[À compléter]
+
+Fait à : [À compléter]
+Le : [À compléter]
+
+Fait en deux exemplaires originaux.
+Signature précédée de la mention manuscrite « lu et approuvé »."}];
 let subClauseDraft=[];
 function cloneDefaultSubClauses(){return DEFAULT_SUB_CLAUSES.map(x=>({...x}))}
 function renderSubClauseEditor(){if(!window.subClauseEditor)return;subClauseEditor.innerHTML=subClauseDraft.map((x,i)=>`<div class="sub-clause-edit"><div class="sub-clause-head"><input value="${esc(x.title||'')}" oninput="subClauseDraft[${i}].title=this.value"><button class="btn danger" type="button" onclick="removeSubClause(${i})">Supprimer</button></div><textarea oninput="subClauseDraft[${i}].text=this.value">${esc(x.text||'')}</textarea></div>`).join('')}
@@ -1484,6 +1615,38 @@ function editExistingSubContract(){const a=erpSubAssignments.find(x=>x.id===subC
 function addExistingSubClause(){subExistingClauseDraft.push({title:'Nouvelle clause',text:''});renderExistingSubClauseEditor()}
 function removeExistingSubClause(i){if(confirm('Supprimer cette clause ?')){subExistingClauseDraft.splice(i,1);renderExistingSubClauseEditor()}}
 async function saveExistingSubClauses(){const id=subClauseEditContractId.value,clauses=subExistingClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim()})).filter(x=>x.title||x.text);const {error}=await sb.from('erp_subcontract_assignments').update({contract_clauses:clauses,contract_terms:clauses.map(x=>`${x.title}\n${x.text}`).join('\n\n'),updated_at:new Date().toISOString()}).eq('id',id).neq('status','signe');if(error){alert(error.message);return}closeModal('subClauseEditModal');await loadSubcontractors();openSubContract(id)}
+
+async function saveSubContractDraft(){
+ const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a)return;
+ if(a.status==='signe'){alert('Le contrat signé est verrouillé.');return}
+ const {error}=await sb.from('erp_subcontract_assignments').update({
+   signer_name:subSignerName.value.trim()||null,
+   signer_role:subSignerRole.value.trim()||null,
+   updated_at:new Date().toISOString()
+ }).eq('id',id).neq('status','signe');
+ if(error){alert('Enregistrement impossible : '+error.message);return}
+ alert('Contrat enregistré. Vous pourrez revenir le modifier plus tard.');
+ await loadSubcontractors();openSubContract(id);
+}
+function printSubContract(){
+ const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a)return;
+ const sub=erpSubcontractors.find(x=>x.id===a.subcontractor_id),j=db.chantiers.find(x=>x.id===a.chantier_id),c=db.clients.find(x=>x.id===j?.client_id);
+ const clauses=subClausesFromAssignment(a);
+ const sig=a.signature_data?`<img src="${a.signature_data}" style="max-width:260px;max-height:100px">`:'';
+ const w=window.open('','_blank');if(!w){alert("Autorisez les fenêtres surgissantes pour imprimer le contrat.");return}
+ w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Contrat de sous-traitance</title><style>
+ @page{size:A4;margin:16mm}body{font-family:Arial,sans-serif;color:#111;font-size:11pt;line-height:1.35}h1{text-align:center;font-size:20pt;margin:8px 0 24px}h2{font-size:12.5pt;margin:18px 0 7px;break-after:avoid}.head{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.head strong{font-size:16pt}.parties{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}.box{border:1px solid #bbb;padding:10px}.clause{break-inside:auto;white-space:pre-wrap}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px;break-inside:avoid}.muted{color:#555}.no-print{margin:0 0 15px}@media print{.no-print{display:none}}</style></head><body>
+ <button class="no-print" onclick="window.print()">Imprimer / Enregistrer en PDF</button>
+ <div class="head"><strong>SARL RML GOUTTIERE ALU</strong><div>14 ZA de Calens<br>33640 Beautiran<br>SIRET : 109 223 727 00016<br>Tél. : 05 56 67 33 89</div></div>
+ <h1>CONTRAT DE SOUS-TRAITANCE</h1>
+ <div class="parties"><div class="box"><strong>ENTREPRENEUR PRINCIPAL</strong><br>SARL RML GOUTTIERE ALU<br>14 ZA de Calens<br>33640 Beautiran<br>SIRET : 109 223 727 00016<br>Tél. : 05 56 67 33 89<br>Représenté par : M. MICOULEAU Jean-Christophe<br>Qualité : Gérant</div>
+ <div class="box"><strong>SOUS-TRAITANT</strong><br>${esc(sub?.company||'')}<br>${esc(sub?.contact_name||'')}<br>${esc(sub?.email||'')}<br>${esc(sub?.phone||'')}</div></div>
+ <div class="box"><strong>CHANTIER</strong><br>Client / maître d’ouvrage : ${esc(c?.nom||'')}<br>Chantier : ${esc(j?.nom||'')}<br>Adresse : ${esc(j?.adresse||'')}<br>Travaux confiés : ${esc(a.work_description||'À compléter')}<br>Montant : ${a.amount_ht!=null?Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2})+' € HT':'À compléter'}</div>
+ ${clauses.map(x=>`<section class="clause"><h2>${esc(x.title||'')}</h2><div>${esc(x.text||'').replace(/\n/g,'<br>')}</div></section>`).join('')}
+ <div class="signatures"><div><strong>L’entrepreneur principal</strong><br><br>Signature précédée de « lu et approuvé »</div><div><strong>Le sous-traitant</strong><br>${esc(a.signer_name||'')} ${esc(a.signer_role||'')}<br>${sig}<br>${a.signed_at?'Signé le '+new Date(a.signed_at).toLocaleString('fr-FR'):''}</div></div>
+ </body></html>`);w.document.close();setTimeout(()=>w.focus(),150);
+}
+
 function openSubContract(id){
  const a=erpSubAssignments.find(x=>x.id===id);if(!a)return;const sub=erpSubcontractors.find(x=>x.id===a.subcontractor_id),j=db.chantiers.find(x=>x.id===a.chantier_id),c=db.clients.find(x=>x.id===j?.client_id);
  subContractId.value=id;subContractSummary.innerHTML=`<strong>${esc(sub?.company||'Sous-traitant')}</strong><br>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}${j?.adresse?'<br>'+esc(j.adresse):''}${a.planned_date?'<br>Date prévue : '+esc(a.planned_date):''}${a.amount_ht!=null?'<br>Montant : '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}`;
