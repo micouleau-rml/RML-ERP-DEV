@@ -239,7 +239,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.17</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.18</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -1624,9 +1624,16 @@ async function signSubContract(){
  const name=subSignerName.value.trim(),role=subSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire.');return}if(!subSignatureDirty){alert("Veuillez signer dans le cadre avant de valider.");return}
  if(!confirm('Valider définitivement la signature de ce contrat ?'))return;
  const signature_data=subSignaturePad.toDataURL('image/png');
- const {error}=await sb.from('erp_subcontract_assignments').update({status:'signe',signer_name:name,signer_role:role||null,signature_data,signed_at:new Date().toISOString()}).eq('id',id);
+ const signed_at=new Date().toISOString();
+ const {data,error}=await sb.from('erp_subcontract_assignments')
+   .update({status:'signe',signer_name:name,signer_role:role||null,signature_data,signed_at})
+   .eq('id',id)
+   .select('id,status,signer_name,signer_role,signed_at,signature_data')
+   .maybeSingle();
  if(error){alert('Signature non enregistrée : '+error.message);return}
- closeModal('subContractModal');await loadSubcontractors();
+ if(!data||data.status!=='signe'||!data.signature_data){alert("La signature n'a pas été enregistrée dans Supabase. Vérifiez les droits d'accès du compte sous-traitant.");return}
+ closeModal('subContractModal');
+ if(isSubcontractorUser()) await loadSubcontractorPortal(); else await loadSubcontractors();
 }
 let erpDocuments=[];
 function clientSorted(){return [...db.clients].filter(c=>c.actif!==false).sort((a,b)=>(a.nom||'').localeCompare(b.nom||'','fr'))}
