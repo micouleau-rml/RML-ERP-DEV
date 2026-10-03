@@ -68,7 +68,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 @media(max-width:900px){.cards{grid-template-columns:1fr 1fr}.module-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.header{align-items:flex-start}.brand h1{font-size:23px}.badge{font-size:10px}.cards,.grid2,.module-grid{grid-template-columns:1fr}.toolbar input,.toolbar select{min-width:100%}main{margin-top:12px}.modal{padding:0}.modal-card{border-radius:18px 18px 0 0;max-height:94vh}.job-header{flex-direction:column}}
 
 /* ===== V0.6 — Préparation chantier intégrée ===== */
-.prep-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}.prep-title h2{margin:0;color:var(--navy)}.prep-title .muted{margin-top:4px}.prep-actions{display:flex;gap:8px;flex-wrap:wrap}.prep-info{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.prep-info .info-box{background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:10px}.prep-info strong{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}.prep-section{margin-top:14px}.prep-section h3{margin:0 0 8px;color:var(--navy)}.prep-tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.prep-table{width:100%;border-collapse:collapse;min-width:720px}.prep-table th,.prep-table td{border-bottom:1px solid var(--line);padding:7px;vertical-align:middle}.prep-table th{background:#edf4f9;color:var(--navy2);font-size:12px;text-align:left}.prep-table input,.prep-table select{width:100%;min-width:110px;border:1px solid var(--line);border-radius:8px;padding:8px;background:white}.prep-table tr:last-child td{border-bottom:0}.prep-delete{border:0;border-radius:8px;padding:7px 9px;background:#fdecec;color:var(--danger);font-weight:800}.prep-save-status{font-size:12px;font-weight:800;color:var(--muted);padding:8px 0}.prep-save-status.ok{color:var(--ok)}.prep-save-status.danger{color:var(--danger)}
+.prep-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}.prep-title h2{margin:0;color:var(--navy)}.prep-title .muted{margin-top:4px}.prep-actions{display:flex;gap:8px;flex-wrap:wrap}.prep-info{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.prep-info .info-box{background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:10px}.prep-info strong{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}.prep-section{margin-top:14px}.prep-section h3{margin:0 0 8px;color:var(--navy)}.prep-tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.prep-table{width:100%;border-collapse:collapse;min-width:720px}.prep-table th,.prep-table td{border-bottom:1px solid var(--line);padding:7px;vertical-align:middle}.prep-table th{background:#edf4f9;color:var(--navy2);font-size:12px;text-align:left}.prep-table input,.prep-table select{width:100%;min-width:110px;border:1px solid var(--line);border-radius:8px;padding:8px;background:white}.prep-table tr:last-child td{border-bottom:0}.prep-delete{border:0;border-radius:8px;padding:7px 9px;background:#fdecec;color:var(--danger);font-weight:800}.prep-save-status{font-size:12px;font-weight:800;color:var(--muted);padding:8px 0}.prep-save-status.ok{color:var(--ok)}.prep-save-status.danger{color:var(--danger)}.erp-save-toast{position:fixed;left:50%;top:22px;transform:translate(-50%,-140%);z-index:5000;width:min(650px,calc(100% - 30px));padding:16px 20px;border-radius:13px;background:#19733a;color:#fff;text-align:center;font-weight:900;box-shadow:0 8px 28px rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:.22s}.erp-save-toast.show{transform:translate(-50%,0);opacity:1}.erp-save-toast.danger{background:#b42318}.erp-save-toast small{display:block;margin-top:4px;font-weight:700}
 @media(max-width:760px){.prep-info{grid-template-columns:1fr}.prep-actions .btn{flex:1;min-width:145px}}
 
 /* ===== V0.7 — Suivi chantier intégré ===== */
@@ -77,7 +77,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 @media print{header,.statusbar,nav,.suivi-actions,.structure-action{display:none!important}main{max-width:none;margin:0;padding:0}.view{display:none!important}#suivi{display:block!important}.suivi-ilot,.suivi-progress{box-shadow:none;break-inside:avoid}}
 
 .sub-clause-edit{border:1px solid #d9e0e8;border-radius:12px;padding:10px;margin:10px 0;background:#fff}.sub-clause-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}.sub-clause-head input{font-weight:700;flex:1}.sub-clause-edit textarea{width:100%;min-height:110px}.sub-clause-display{margin:14px 0;padding-bottom:12px;border-bottom:1px solid #e4e7ec}.sub-clause-display h4{margin:0 0 6px;color:#243b53}
-/* V0.11.34 — Espace salarié */
+/* V0.11.35 — Espace salarié */
 .employee-hero{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.employee-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-top:12px}.employee-job{border:1px solid #dbe3ec;border-radius:14px;padding:14px;background:#fff}.employee-job.today{border-width:2px}.employee-date{font-weight:800;color:var(--navy);margin-bottom:6px}.employee-docs{display:grid;gap:8px}.employee-doc{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #e3e8ef;border-radius:10px;padding:10px}.employee-photo-box{border:1px dashed #b9c5d2;border-radius:12px;padding:12px;margin-top:12px;background:#fafcfe}.employee-link-field{display:none}.employee-link-field.show{display:block}
 </style>
 
@@ -222,6 +222,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 </style>
 </head>
 <body>
+<div id="erpSaveToast" class="erp-save-toast" role="status" aria-live="polite"></div>
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
@@ -242,7 +243,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.34</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.35</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -293,7 +294,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 </section>
 
 <section id="preparation" class="view">
-<div class="panel" style="padding:12px 16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2 style="margin:0">Préparation chantier</h2><div class="muted">Fiche du chantier sélectionné · enregistrement automatique dans RML ERP.</div></div><div id="externalPrepSyncStatus" class="muted" style="font-weight:700">Synchronisation ERP en attente…</div></div></div>
+<div class="panel" style="padding:12px 16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2 style="margin:0">Préparation chantier</h2><div class="muted">Fiche du chantier sélectionné.</div></div><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div id="externalPrepSyncStatus" class="muted" style="font-weight:700">Aucune modification enregistrée.</div><button class="btn ok" type="button" onclick="saveExternalPreparationManual()">✓ Enregistrer la préparation</button></div></div></div>
 <div style="height:calc(100vh - 190px);min-height:650px;margin-top:12px;border:1px solid #d9e0e8;border-radius:14px;overflow:hidden;background:#fff"><iframe id="preparationAppFrame" onload="bridgePreparationContext()" title="RML Préparation Chantier" style="width:100%;height:100%;border:0;background:#fff" allow="clipboard-read; clipboard-write"></iframe></div>
 </section>
 
@@ -753,7 +754,7 @@ if(location.hash && /type=recovery/i.test(location.hash)){setTimeout(showPasswor
 loginForm.onsubmit=async e=>{e.preventDefault();loginError.style.display='none';const {data,error}=await sb.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPassword.value});if(error){loginError.textContent=error.message;loginError.style.display='block';return}currentUser=data.user;await onSignedIn()}
 async function onSignedIn(){const access=await loadCurrentAccess();if(access.error||!currentAccess){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Aucun droit ERP n’est configuré pour ce compte. Exécute d’abord le SQL V0.5 dans Supabase.';loginError.style.display='block';return}if(!currentAccess.active){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Ce compte ERP est désactivé.';loginError.style.display='block';return}loginOverlay.classList.add('hidden');userPill.textContent='Utilisateur : '+(currentUser?.email||'connecté')+' · '+roleLabel(currentAccess.role);applyAccessUI();await refreshData()}
 logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
-async function resetClientForm(){clientForm.reset();clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools)clientEditTools.style.display='none';updateClientDraftStatus()}
+async function resetClientForm(){clientForm.reset();clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools){clientEditTools.style.display='flex';}if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='none';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='none';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Créer le client';updateClientDraftStatus()}
 newClientBtn.onclick=async()=>{if(!hasPerm('clients'))return;await resetClientForm();openModal('clientModal')}
 async function generateClientCodes(count=1){
   const {data,error}=await sb.from('erp_clients').select('code');
@@ -846,7 +847,7 @@ function loadClientIntoEdit(c){
   clientFormLoading=true;
   const d=clientDrafts.get(c.id)||c;
   clientId.value=c.id;clientNom.value=d.nom||'';clientCode.value=d.code||c.code||'';clientResponsable.value=d.responsable||'';clientCategorie.value=d.categorie||'';if(window.clientSiren)clientSiren.value=d.siren||'';if(window.clientSiret)clientSiret.value=d.siret||'';clientTel.value=d.telephone||'';clientEmail.value=d.email||'';clientAdresse.value=d.adresse||'';clientNotes.value=d.notes||'';clientModalTitle.textContent='Modifier le client';
-  clientFormLoading=false;updateClientEditNav();
+  clientFormLoading=false;if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Enregistrer et fermer';updateClientEditNav();
 }
 function navigateClientEdit(delta){storeCurrentClientDraft();const rows=getVisibleClientRows(),i=rows.findIndex(c=>c.id===clientId.value),target=rows[i+delta];if(!target)return;loadClientIntoEdit(target)}
 clientPrevBtn.onclick=()=>navigateClientEdit(-1);clientNextBtn.onclick=()=>navigateClientEdit(1);
@@ -1845,6 +1846,9 @@ function externalPrepStatus(text,kind=''){
  el.textContent=text;
  el.style.color=kind==='ok'?'var(--ok)':kind==='danger'?'var(--danger)':'';
 }
+let erpSaveToastTimer=null;
+function showErpSaveToast(message,detail='',danger=false){const el=document.getElementById('erpSaveToast');if(!el)return;el.className='erp-save-toast'+(danger?' danger':'');el.innerHTML=message+(detail?`<small>${esc(detail)}</small>`:'');el.classList.add('show');clearTimeout(erpSaveToastTimer);erpSaveToastTimer=setTimeout(()=>el.classList.remove('show'),6000)}
+async function saveExternalPreparationManual(){const ok=await syncExternalPreparationToERP(false);if(ok){const now=new Date();const time=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});externalPrepStatus('✓ Dernier enregistrement : '+time,'ok');showErpSaveToast('✓ PRÉPARATION ENREGISTRÉE','Toutes les quantités et informations du chantier ont bien été enregistrées dans l’ERP.');}else{showErpSaveToast('ÉCHEC DE L’ENREGISTREMENT','La préparation n’a pas pu être enregistrée. Réessayez.',true)}}
 async function syncExternalPreparationToERP(showAlert=false){
  const jobId=currentPrepSourceJobId||currentPrepJobId;
  if(!jobId||externalPrepSyncBusy)return false;
@@ -1875,7 +1879,7 @@ async function syncExternalPreparationToERP(showAlert=false){
 }
 function scheduleExternalPreparationSync(){
  clearTimeout(externalPrepSyncTimer);
- externalPrepSyncTimer=setTimeout(()=>syncExternalPreparationToERP(false),900);
+ externalPrepStatus('Modifications non enregistrées — cliquez sur « Enregistrer la préparation ».','');
 }
 function installExternalPreparationSync(){
  const f=document.getElementById('preparationAppFrame'); if(!f||!f.contentWindow)return;
@@ -1902,7 +1906,7 @@ function installExternalPreparationSync(){
     return result;
    };
   }
-  externalPrepStatus('Liaison ERP active · les quantités sont synchronisées automatiquement','ok');
+  externalPrepStatus('Préparation prête · utilisez « Enregistrer la préparation » après vos modifications.','');
  }catch(err){console.warn('Installation liaison Prépa → ERP',err)}
 }
 async function openSuiviFromPreparation(){
@@ -1947,7 +1951,6 @@ async function bridgePreparationContext(){
   const ss=w.document.getElementById('savedProjectsSelect'); if(ss)ss.value=entry.id;
   const target=w.document.getElementById('screenSheetTitle'); if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
   installExternalPreparationSync();
-  setTimeout(()=>syncExternalPreparationToERP(false),300);
 
  }catch(err){console.error('Liaison ERP → Prépa Chantier :',err)}
 }
