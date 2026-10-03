@@ -77,7 +77,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 @media print{header,.statusbar,nav,.suivi-actions,.structure-action{display:none!important}main{max-width:none;margin:0;padding:0}.view{display:none!important}#suivi{display:block!important}.suivi-ilot,.suivi-progress{box-shadow:none;break-inside:avoid}}
 
 .sub-clause-edit{border:1px solid #d9e0e8;border-radius:12px;padding:10px;margin:10px 0;background:#fff}.sub-clause-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}.sub-clause-head input{font-weight:700;flex:1}.sub-clause-edit textarea{width:100%;min-height:110px}.sub-clause-display{margin:14px 0;padding-bottom:12px;border-bottom:1px solid #e4e7ec}.sub-clause-display h4{margin:0 0 6px;color:#243b53}
-/* V0.11.37 — Espace salarié */
+/* V0.11.38 — Espace salarié */
 .employee-hero{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.employee-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-top:12px}.employee-job{border:1px solid #dbe3ec;border-radius:14px;padding:14px;background:#fff}.employee-job.today{border-width:2px}.employee-date{font-weight:800;color:var(--navy);margin-bottom:6px}.employee-docs{display:grid;gap:8px}.employee-doc{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #e3e8ef;border-radius:10px;padding:10px}.employee-photo-box{border:1px dashed #b9c5d2;border-radius:12px;padding:12px;margin-top:12px;background:#fafcfe}.employee-link-field{display:none}.employee-link-field.show{display:block}
 </style>
 
@@ -243,7 +243,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.37</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.38</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -1218,11 +1218,14 @@ deleteLastImportBtn.onclick=deleteLastImport;
 function pennylaneReady(){return !!(db.clients.length&&Object.prototype.hasOwnProperty.call(db.clients[0],'pennylane_customer_id'))}
 let companySearchClientId=null;let companySearchReturnToEdit=false;
 function openCompanySearch(id,returnToEdit=false){
-  const c=db.clients.find(x=>x.id===id);if(!c)return;
+  const c=id?db.clients.find(x=>x.id===id):null;
+  // Le portail doit aussi fonctionner pendant la création d'un client,
+  // avant que celui-ci possède un identifiant Supabase.
+  if(id&&!c)return;
   closeModal('clientFolderModal');
   companySearchReturnToEdit=!!returnToEdit;
-  companySearchClientId=id;
-  companySearchInput.value=c.siret||c.siren||c.nom||'';
+  companySearchClientId=id||null;
+  companySearchInput.value=(c?.siret||c?.siren||c?.nom||clientSiret?.value||clientSiren?.value||clientNom?.value||'');
   companySearchResults.innerHTML='<div class="empty">Lance la recherche pour retrouver le SIREN, le SIRET du siège et l’adresse officielle.</div>';
   openModal('companySearchModal');
   setTimeout(()=>companySearchInput.focus(),50);
@@ -1240,9 +1243,22 @@ async function runCompanySearch(){
   }catch(err){console.error(err);companySearchResults.innerHTML='<div class="empty">Impossible d’interroger l’Annuaire des Entreprises pour le moment.</div>'}
 }
 async function applyCompanySearchResult(i){
-  const x=(window._companySearchRows||[])[i], c=db.clients.find(z=>z.id===companySearchClientId);if(!x||!c)return;
+  const x=(window._companySearchRows||[])[i];if(!x)return;
+  const c=companySearchClientId?db.clients.find(z=>z.id===companySearchClientId):null;
   const sg=x.siege||{};const addr=sg.adresse||[sg.numero_voie,sg.type_voie,sg.libelle_voie,sg.code_postal,sg.libelle_commune].filter(Boolean).join(' ');
-  const patch={siren:x.siren||null,siret:sg.siret||null,adresse:addr||c.adresse||null};
+  const patch={siren:x.siren||null,siret:sg.siret||null,adresse:addr||(c?.adresse)||null};
+  // Création d'un nouveau client (y compris depuis Nouveau chantier) :
+  // on remplit directement la fiche sans écrire un client incomplet en base.
+  if(!companySearchClientId){
+    if(window.clientSiren)clientSiren.value=patch.siren||'';
+    if(window.clientSiret)clientSiret.value=patch.siret||'';
+    clientAdresse.value=patch.adresse||'';
+    if(!clientNom.value.trim())clientNom.value=x.nom_complet||x.nom_raison_sociale||'';
+    closeModal('companySearchModal');
+    openModal('clientModal');
+    return;
+  }
+  if(!c)return;
   if(companySearchReturnToEdit&&clientId.value===c.id){
     if(window.clientSiren)clientSiren.value=patch.siren||'';
     if(window.clientSiret)clientSiret.value=patch.siret||'';
