@@ -77,7 +77,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 @media print{header,.statusbar,nav,.suivi-actions,.structure-action{display:none!important}main{max-width:none;margin:0;padding:0}.view{display:none!important}#suivi{display:block!important}.suivi-ilot,.suivi-progress{box-shadow:none;break-inside:avoid}}
 
 .sub-clause-edit{border:1px solid #d9e0e8;border-radius:12px;padding:10px;margin:10px 0;background:#fff}.sub-clause-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}.sub-clause-head input{font-weight:700;flex:1}.sub-clause-edit textarea{width:100%;min-height:110px}.sub-clause-display{margin:14px 0;padding-bottom:12px;border-bottom:1px solid #e4e7ec}.sub-clause-display h4{margin:0 0 6px;color:#243b53}
-/* V0.11.31 — Espace salarié */
+/* V0.11.32 — Espace salarié */
 .employee-hero{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.employee-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-top:12px}.employee-job{border:1px solid #dbe3ec;border-radius:14px;padding:14px;background:#fff}.employee-job.today{border-width:2px}.employee-date{font-weight:800;color:var(--navy);margin-bottom:6px}.employee-docs{display:grid;gap:8px}.employee-doc{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #e3e8ef;border-radius:10px;padding:10px}.employee-photo-box{border:1px dashed #b9c5d2;border-radius:12px;padding:12px;margin-top:12px;background:#fafcfe}.employee-link-field{display:none}.employee-link-field.show{display:block}
 </style>
 
@@ -242,7 +242,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.31</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.32</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -293,7 +293,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 </section>
 
 <section id="preparation" class="view">
-<div class="panel"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Préparation chantier</h2><div class="muted">Application RML Préparation Chantier intégrée directement dans l’ERP.</div><div id="externalPrepSyncStatus" class="muted" style="margin-top:5px;font-weight:700">Synchronisation ERP en attente…</div></div><button class="btn ok" type="button" onclick="syncExternalPreparationToERP(true)">Enregistrer vers ERP</button><button class="btn secondary" type="button" onclick="openSuiviFromPreparation()">Suivi chantier</button><button class="btn secondary" type="button" onclick="openPrecommandeFromPreparation()">Pré-commande</button><button class="btn secondary" type="button" onclick="reloadPreparationApp()">Actualiser</button><button class="btn secondary" type="button" onclick="window.open(PREPARATION_APP_URL,'_blank')">Ouvrir séparément</button></div></div>
+<div class="panel"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Préparation chantier</h2><div class="muted">Application RML Préparation Chantier intégrée directement dans l’ERP.</div><div id="externalPrepSyncStatus" class="muted" style="margin-top:5px;font-weight:700">Synchronisation ERP en attente…</div></div><button class="btn secondary" type="button" onclick="openSuiviFromPreparation()">Suivi chantier</button><button class="btn secondary" type="button" onclick="openPrecommandeFromPreparation()">Pré-commande</button><button class="btn secondary" type="button" onclick="reloadPreparationApp()">Actualiser</button><button class="btn secondary" type="button" onclick="window.open(PREPARATION_APP_URL,'_blank')">Ouvrir séparément</button></div></div>
 <div style="height:calc(100vh - 190px);min-height:650px;margin-top:12px;border:1px solid #d9e0e8;border-radius:14px;overflow:hidden;background:#fff"><iframe id="preparationAppFrame" onload="bridgePreparationContext()" title="RML Préparation Chantier" style="width:100%;height:100%;border:0;background:#fff" allow="clipboard-read; clipboard-write"></iframe></div>
 </section>
 
@@ -1833,8 +1833,9 @@ window.addEventListener('message',function(e){
 });
 
 
-function loadPreparationApp(){const f=document.getElementById('preparationAppFrame');if(f&&!f.src)f.src=PREPARATION_APP_URL;else if(f)setTimeout(bridgePreparationContext,80);}
-function reloadPreparationApp(){const f=document.getElementById('preparationAppFrame');if(f)f.src=PREPARATION_APP_URL+(PREPARATION_APP_URL.includes('?')?'&':'?')+'_rml='+Date.now();}
+function preparationEmbeddedUrl(){return PREPARATION_APP_URL+(PREPARATION_APP_URL.includes('?')?'&':'?')+'erp=1'}
+function loadPreparationApp(){const f=document.getElementById('preparationAppFrame');if(f&&!f.src)f.src=preparationEmbeddedUrl();else if(f)setTimeout(bridgePreparationContext,80);}
+function reloadPreparationApp(){const f=document.getElementById('preparationAppFrame');if(f)f.src=preparationEmbeddedUrl()+'&_rml='+Date.now();}
 
 let externalPrepSyncTimer=null;
 let externalPrepSyncBusy=false;
@@ -1919,7 +1920,7 @@ async function bridgePreparationContext(){
   const clientName=cli?.nom||'';
   if(clientName){const existing=Object.values(folders||{}).find(x=>(x.name||'').trim().toLowerCase()===clientName.trim().toLowerCase());if(existing)folderId=existing.id;else if(w.saveProjectFolders){folderId=(crypto.randomUUID?crypto.randomUUID():Date.now()+'');folders[folderId]={id:folderId,name:clientName,createdAt:new Date().toISOString()};w.saveProjectFolders(folders);}}
   if(!entry){
-   const sections={gouttieres:[{}],accessoires_gouttieres:[{}],descentes:[{}],accessoires_descentes:[{}],couvertines:[{}],accessoires_couvertines:[{}],bandeaux:[{}],sous_faces:[{}]};
+   const sections={gouttieres:[{}],accessoires_gouttieres:[{}],descentes:[{}],accessoires_descentes:[{}],couvertines:[{}],accessoires_couvertines:[{}],bandeaux:[{}],sous_faces:[{}],pliage:[{}],zinguerie:[{}]};
    const data={version:'V13',savedAt:new Date().toISOString(),erp_chantier_id:jobId,info:{type_fiche:'preparation',client:clientName,chantier:job.nom||'',adresse:job.adresse||'',date:job.date_debut||'',contact_chantier:job.contact_nom||'',telephone_contact:job.contact_telephone||'',chef:job.chef_equipe||'',telephone:cli?.telephone||'',horaires:'',acces:'',remarques:job.notes||''},sections};
    const now=new Date().toISOString(); entry={id:jobId,name:[clientName,job.nom].filter(Boolean).join(' - '),savedAt:now,updatedAt:now,folderId,data}; lib[jobId]=entry;
    if(w.saveProjectLibrary)w.saveProjectLibrary(lib);
