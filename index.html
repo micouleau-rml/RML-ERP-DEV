@@ -77,7 +77,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 @media print{header,.statusbar,nav,.suivi-actions,.structure-action{display:none!important}main{max-width:none;margin:0;padding:0}.view{display:none!important}#suivi{display:block!important}.suivi-ilot,.suivi-progress{box-shadow:none;break-inside:avoid}}
 
 .sub-clause-edit{border:1px solid #d9e0e8;border-radius:12px;padding:10px;margin:10px 0;background:#fff}.sub-clause-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}.sub-clause-head input{font-weight:700;flex:1}.sub-clause-edit textarea{width:100%;min-height:110px}.sub-clause-display{margin:14px 0;padding-bottom:12px;border-bottom:1px solid #e4e7ec}.sub-clause-display h4{margin:0 0 6px;color:#243b53}
-/* V0.11.9 — Espace salarié */
+/* V0.11.10 — Espace salarié */
 .employee-hero{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.employee-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-top:12px}.employee-job{border:1px solid #dbe3ec;border-radius:14px;padding:14px;background:#fff}.employee-job.today{border-width:2px}.employee-date{font-weight:800;color:var(--navy);margin-bottom:6px}.employee-docs{display:grid;gap:8px}.employee-doc{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #e3e8ef;border-radius:10px;padding:10px}.employee-photo-box{border:1px dashed #b9c5d2;border-radius:12px;padding:12px;margin-top:12px;background:#fafcfe}.employee-link-field{display:none}.employee-link-field.show{display:block}
 </style>
 
@@ -243,7 +243,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.9</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.10</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -953,7 +953,64 @@ clientForm.addEventListener('change',()=>{if(!clientFormLoading)storeCurrentClie
 function editClient(id){if(!hasPerm('clients'))return;const c=db.clients.find(x=>x.id===id);if(!c)return;closeModal('clientFolderModal');loadClientIntoEdit(c);openModal('clientModal')}
 async function toggleClient(id){if(!hasPerm('clients'))return;const c=db.clients.find(x=>x.id===id);if(!c)return;const {error}=await sb.from('erp_clients').update({actif:!c.actif}).eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}await refreshData()}
 async function getJobDataCount(jobIds){if(!jobIds?.length)return 0;const {count,error}=await sb.from('erp_modules_data').select('id',{count:'exact',head:true}).in('chantier_id',jobIds).eq('deleted',false);if(error)throw error;return count||0}
-async function deleteJob(id){if(!hasPerm('chantiers'))return;const j=db.chantiers.find(x=>x.id===id);if(!j)return;try{const count=await getJobDataCount([id]);if(count>0){alert(`Suppression bloquée : le chantier « ${j.nom} » contient déjà des données enregistrées dans un module ERP.\n\nPour éviter une perte accidentelle, il ne peut pas être supprimé directement.`);return}if(!confirm(`Supprimer définitivement le chantier « ${j.nom} » ?\n\nAucune donnée métier n'est enregistrée sur ce chantier. Cette suppression est irréversible.`))return;const {error}=await sb.from('erp_chantiers').delete().eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}closeModal('jobCardModal');await refreshData()}catch(err){alert('Erreur Supabase : '+err.message)}}
+async function deleteJob(id){
+ if(!hasPerm('chantiers'))return;
+ const j=db.chantiers.find(x=>x.id===id);if(!j)return;
+ const client=db.clients.find(c=>c.id===j.client_id);
+ const warning=`ATTENTION — SUPPRESSION DÉFINITIVE
+
+Supprimer le chantier « ${j.nom} »${client?.nom?` du client « ${client.nom} »`:''} ?
+
+Toutes les données ERP rattachées à ce chantier seront supprimées :
+• préparation et suivi
+• planning / affectations enregistrées dans l’ERP
+• documents et photos
+• partages de documents
+• contrats / affectations de sous-traitance liés au chantier
+• autres données de modules liées au chantier
+
+Le CLIENT ne sera PAS supprimé.
+
+Cette opération est irréversible.`;
+ if(!confirm(warning))return;
+ try{
+   // 1) Documents : supprimer d'abord les liaisons de partage, puis les fichiers Storage et les fiches documents.
+   const {data:docs,error:docsReadErr}=await sb.from('erp_documents').select('id,storage_path').eq('chantier_id',id);
+   if(docsReadErr)throw docsReadErr;
+   const docRows=docs||[];
+   const docIds=docRows.map(d=>d.id).filter(Boolean);
+   if(docIds.length){
+     const {error:shareErr}=await sb.from('erp_document_subcontractors').delete().in('document_id',docIds);
+     if(shareErr)throw shareErr;
+     const paths=docRows.map(d=>d.storage_path).filter(Boolean);
+     if(paths.length){
+       const storageRes=await sb.storage.from(DOC_BUCKET).remove(paths);
+       if(storageRes.error)throw storageRes.error;
+     }
+     const {error:docErr}=await sb.from('erp_documents').delete().in('id',docIds);
+     if(docErr)throw docErr;
+   }
+
+   // 2) Affectations / contrats de sous-traitance du chantier.
+   const {error:subErr}=await sb.from('erp_subcontract_assignments').delete().eq('chantier_id',id);
+   if(subErr)throw subErr;
+
+   // 3) Toutes les données métier génériques : préparation, suivi, planning et autres modules ERP.
+   const {error:moduleErr}=await sb.from('erp_modules_data').delete().eq('chantier_id',id);
+   if(moduleErr)throw moduleErr;
+
+   // 4) Supprimer enfin la fiche chantier. Le client reste intact.
+   const {error:jobErr}=await sb.from('erp_chantiers').delete().eq('id',id);
+   if(jobErr)throw jobErr;
+
+   closeModal('jobCardModal');
+   await refreshData();
+   alert(`Le chantier « ${j.nom} » et ses données rattachées ont été supprimés.\n\nLe client a été conservé.`);
+ }catch(err){
+   console.error(err);
+   alert('Suppression incomplète : '+err.message+'\n\nAucune suppression supplémentaire ne sera effectuée. Recharge l’ERP avant de réessayer.');
+ }
+}
 async function deleteClient(id){if(!hasPerm('clients'))return;const c=db.clients.find(x=>x.id===id);if(!c)return;const linked=db.chantiers.filter(j=>j.client_id===id);if(linked.length){try{const count=await getJobDataCount(linked.map(j=>j.id));if(count>0){alert(`Suppression bloquée : ${c.nom} possède ${linked.length} chantier(s), dont au moins un contient déjà des données métier.\n\nTu peux archiver le client, mais la suppression complète est protégée.`);return}if(!confirm(`Supprimer définitivement le client « ${c.nom} » ET ses ${linked.length} chantier(s) vide(s) / test ?\n\nAucune donnée métier n'est enregistrée sur ces chantiers. Cette suppression est irréversible.`))return;const {error:jobErr}=await sb.from('erp_chantiers').delete().in('id',linked.map(j=>j.id));if(jobErr){alert('Erreur Supabase : '+jobErr.message);return}const {error}=await sb.from('erp_clients').delete().eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}await refreshData();return}catch(err){alert('Erreur Supabase : '+err.message);return}}if(!confirm(`Supprimer définitivement le client « ${c.nom} » ?\n\nCette suppression est irréversible.`))return;const {error}=await sb.from('erp_clients').delete().eq('id',id);if(error){alert('Erreur Supabase : '+error.message);return}await refreshData()}
 let pendingClientImport=[];
 function normHeader(v){return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ')}
