@@ -1767,11 +1767,49 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
   <!-- V63 : plis transversaux en bout gauche/droit, vue de dessus, comptage et longueur de débit -->
   <!-- V38 : calcul sur prépli 55°, affichage final avec retour strictement parallèle et petit rayon en 2D/3D -->
 <!-- V63 : repères d’angles rapprochés et cotes courtes placées à l’intérieur -->
+
+<style id="v106-material-fields-alignment">
+/* VERSION 106 — 6 champs matière : mêmes dimensions et alignement */
+#globalPriceDisplay,
+#selectedThickness,
+#materialMode,
+#sheetFormat,
+#materialWidth,
+#materialLength {
+  width: 100% !important;
+  height: 64px !important;
+  min-height: 64px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  font-size: 22px !important;
+  line-height: 1.2 !important;
+}
+
+#selectedThickness,
+#materialMode,
+#sheetFormat {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#globalPriceDisplay,
+#materialWidth,
+#materialLength {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+#globalPriceDisplay:disabled,
+#globalPriceDisplay[readonly] {
+  opacity: 1 !important;
+}
+</style>
+
 </head>
 <body>
 <div class="container">
   <div class="hero">
-    <div class="brand"><div class="app-version">VERSION 105</div></div>
+    <div class="brand"><div class="app-version">VERSION 106</div></div>
     <div class="install">
   <button class="btn-new" id="newProjectBtn">Nouveau devis</button>
   <button class="btn-primary" id="openSettingsBtn">Réglages</button>
