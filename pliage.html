@@ -1771,15 +1771,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
 <body>
 <div class="container">
   <div class="hero">
-    <div class="brand">
-      <img src="header-logo.png" alt="RML PLIAGE ALU" class="header-logo">
-      <div class="brand-text">
-        <h1>RML PLIAGE ALU</h1>
-        <div class="subline">by Micouleau &amp; Lhérisson</div>
-        <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
-        <div class="app-version">VERSION 101</div>
-      </div>
-    </div>
+    <div class="brand"><div class="app-version">VERSION 103</div></div>
     <div class="install">
   <button class="btn-new" id="newProjectBtn">Nouveau devis</button>
   <button class="btn-primary" id="openSettingsBtn">Réglages</button>
@@ -1926,16 +1918,12 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
           </div>
         </div>
       </div>
-
       <div class="sync-main-box">
         <div class="sync-main-head">
-          <div class="sync-main-title">Synchronisation Supabase</div>
-          <div class="sync-main-actions">
-            <button type="button" class="btn-primary" id="syncSupabaseMainBtn">Synchroniser</button>
-            <button type="button" class="btn-light" id="openSyncSettingsBtn">Réglages</button>
-          </div>
+          <div class="sync-main-title">Sauvegarde ERP</div>
+          <div class="sync-main-actions"><button type="button" class="btn-primary" id="syncSupabaseMainBtn">Enregistrer maintenant</button></div>
         </div>
-        <div id="supabaseSyncStatusMain" class="sync-main-status" aria-live="polite">Synchronisation non configurée.</div>
+        <div id="supabaseSyncStatusMain" class="sync-main-status" aria-live="polite">Connexion à ERP DEV…</div>
       </div>
 
       <div class="note" style="margin-top:18px">La gestion des clients et des tarifs se fait désormais dans <strong>Réglages</strong>.</div><div id="status"></div>
@@ -1975,41 +1963,6 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
       <button class="btn-light" id="newClientBtn">Nouveau client</button>
     </div>
     <div class="note">Les coûts de fabrication sont modulables par client : tarif pli, tarif coupe, taux horaire et chute par défaut.</div>
-    <div class="sync-lock-box" id="supabaseLockBox">
-      <h3>Administration et synchronisation</h3>
-      <div class="note">Les paramètres Supabase sont masqués. Saisissez le code administrateur pour ouvrir ce menu.</div>
-      <div class="sync-lock-row">
-        <div class="field">
-          <label for="supabaseAdminPassword">Code administrateur</label>
-          <input id="supabaseAdminPassword" type="password" inputmode="numeric" autocomplete="off" placeholder="Saisir le code" />
-        </div>
-        <button type="button" class="btn-primary" id="unlockSupabaseBtn">Déverrouiller</button>
-      </div>
-      <div id="supabaseUnlockStatus" class="note" aria-live="polite"></div>
-    </div>
-    <div id="supabaseProtectedArea" hidden style="margin-top:22px;padding-top:18px;border-top:1px solid #d8e0e8">
-      <div class="sync-protected-head">
-        <h3 style="margin:0">Synchronisation Supabase</h3>
-        <button type="button" class="btn-light" id="lockSupabaseBtn">🔒 Verrouiller</button>
-      </div>
-      <div class="note" style="margin-bottom:12px">Les données restent enregistrées sur cet appareil et fonctionnent hors ligne. Dès qu’Internet revient, les changements en attente sont envoyés.</div>
-      <div class="row">
-        <div class="field col-12"><label for="supabaseUrl">URL du projet Supabase</label><input id="supabaseUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://xxxxxxxx.supabase.co" /></div>
-        <div class="field col-12"><label for="supabaseKey">Clé anon / publishable</label><input id="supabaseKey" type="password" autocomplete="off" placeholder="eyJ... ou sb_publishable_..." /></div>
-        <div class="field col-12"><label for="supabaseWorkspace">Espace de synchronisation</label><input id="supabaseWorkspace" type="text" autocomplete="off" placeholder="RML-PLIAGE-ALU-01" value="RML-PLIAGE-ALU-01" /></div>
-      </div>
-      <div class="actions">
-        <button type="button" class="btn-primary" id="saveSupabaseConfigBtn">Enregistrer la configuration</button>
-        <button type="button" class="btn-secondary" id="syncSupabaseNowBtn">Synchroniser maintenant</button>
-        <button type="button" class="btn-light" id="showSupabaseSqlBtn">Afficher le SQL d’installation</button>
-      </div>
-      <div id="supabaseSyncStatus" class="note" style="margin-top:10px" aria-live="polite">Synchronisation non configurée.</div>
-      <div id="supabaseSqlBox" hidden style="margin-top:12px">
-        <div class="note">À exécuter une seule fois dans l’éditeur SQL de Supabase. Ces règles conviennent à une application privée utilisant la clé publishable ; choisissez un nom d’espace difficile à deviner.</div>
-        <textarea id="supabaseSqlText" readonly style="width:100%;min-height:250px;margin-top:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px"></textarea>
-        <button type="button" class="btn-light" id="copySupabaseSqlBtn" style="margin-top:8px">Copier le SQL</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -2167,7 +2120,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
 <script>
 /* V92 : détection sans rechargement imposé pendant le travail. */
 (() => {
-  const currentVersion = 101;
+  const currentVersion = 103;
   let registration = null, checking = false, applying = false, reloadTimer = 0;
   const pageUrl = new URL('./index.html', location.href).href;
   function offerUpdate() {
@@ -2952,6 +2905,156 @@ win.document.write(html);
 win.document.close();
 }
 
+function enableInteractiveCalepinage(win,data){
+  const doc=win.document, NS="http://www.w3.org/2000/svg";
+  const initial=JSON.parse(JSON.stringify(data.sheets));
+  let layouts=JSON.parse(JSON.stringify(initial)), selected=null, drag=null, history=[];
+  const key="rml_calepinage_interactif_v102:"+JSON.stringify([data.client,data.project,data.width,data.height,data.pieceIds,initial.map(parts=>parts.map(p=>[p.uid,p.sourceDev,p.sourceLong]))]);
+  const blocks=[...doc.querySelectorAll(".drawing-block")];
+  const style=doc.createElement("style");
+  style.textContent=".layout-tools{position:sticky;top:0;z-index:5;background:#eef6ff;border:1px solid #93b8ff;border-radius:10px;padding:10px;margin:12px 0;font-size:13px}.layout-tools button{font-size:13px;padding:8px 12px}.layout-tools button:disabled{opacity:.45}.layout-status{display:block;margin:6px;color:#17395c}.layout-piece{cursor:grab}.layout-piece text{pointer-events:none}.drawing-block svg{touch-action:none;user-select:none}@media print{.layout-tools{display:none!important}.layout-piece{cursor:default}}";
+  doc.head.appendChild(style);
+  const toolbar=doc.createElement("div"); toolbar.className="layout-tools";
+  toolbar.innerHTML='<strong>Calepinage interactif</strong><div>Glissez les pièces avec la souris. Les bords s’alignent automatiquement sur les pièces voisines.</div><button data-action="rotate">Tourner la pièce à 90°</button><button data-action="undo">Annuler</button><button data-action="save">Enregistrer la disposition</button><button data-action="reset">Revenir au placement automatique</button><span class="layout-status" role="status"></span>';
+  blocks[0].before(toolbar);
+  const status=toolbar.querySelector(".layout-status"), rotate=toolbar.querySelector('[data-action="rotate"]'), undo=toolbar.querySelector('[data-action="undo"]');
+  const destinationSelect=doc.createElement("select");
+  destinationSelect.setAttribute("aria-label","Support de destination");destinationSelect.style.cssText="font-size:14px;padding:8px;margin:4px";
+  blocks.forEach((block,i)=>{const option=doc.createElement("option");option.value=i;option.textContent="Vers le support "+(i+1);destinationSelect.append(option);});
+  const transfer=doc.createElement("button");transfer.dataset.action="transfer";transfer.textContent="Déplacer vers ce support";
+  status.before(destinationSelect,transfer);
+  toolbar.querySelector("div").textContent="Glissez les pièces sur cette feuille ou sur une autre. Pour une feuille éloignée, sélectionnez-la dans la liste puis cliquez sur Déplacer vers ce support.";
+  const say=message=>{status.textContent=message;};
+  const clone=value=>JSON.parse(JSON.stringify(value));
+  const overlaps=(a,b)=>a.x<b.x+b.w-.001&&a.x+a.w>b.x+.001&&a.y<b.y+b.h-.001&&a.y+a.h>b.y+.001;
+  const valid=(part,parts)=>[part.x,part.y,part.w,part.h].every(Number.isFinite)&&part.w>0&&part.h>0&&part.x>=-.001&&part.y>=-.001&&part.x+part.w<=data.width+.001&&part.y+part.h<=data.height+.001&&!parts.some(other=>other.uid!==part.uid&&overlaps(part,other));
+  const validSaved=value=>{
+    if(!Array.isArray(value)||value.length!==initial.length||!value.every(Array.isArray))return false;
+    const all=value.flat(),originals=initial.flat();
+    return all.length===originals.length&&new Set(all.map(p=>p.uid)).size===all.length&&value.every(parts=>parts.every(p=>{
+      const original=originals.find(a=>a.uid===p.uid);
+      return original&&((Math.abs(p.w-original.w)<.001&&Math.abs(p.h-original.h)<.001)||(Math.abs(p.w-original.h)<.001&&Math.abs(p.h-original.w)<.001))&&valid(p,parts);
+    }));
+  };
+  try{const saved=JSON.parse(win.localStorage.getItem(key));if(validSaved(saved)){layouts=saved;say("Disposition enregistrée restaurée.");}}catch(e){}
+  function freeZones(parts){
+    let zones=[{x:0,y:0,w:data.width,h:data.height}];
+    parts.forEach(p=>{
+      zones=zones.flatMap(z=>{
+        if(!overlaps(z,p))return [z];
+        const x=Math.max(z.x,p.x),y=Math.max(z.y,p.y),r=Math.min(z.x+z.w,p.x+p.w),b=Math.min(z.y+z.h,p.y+p.h);
+        return [{x:z.x,y:z.y,w:z.w,h:y-z.y},{x:z.x,y:b,w:z.w,h:z.y+z.h-b},{x:z.x,y,w:x-z.x,h:b-y},{x:r,y,w:z.x+z.w-r,h:b-y}].filter(a=>a.w>.001&&a.h>.001);
+      });
+    });
+    let merged=true;
+    while(merged){merged=false;outer:for(let i=0;i<zones.length;i++)for(let j=i+1;j<zones.length;j++){
+      const a=zones[i],b=zones[j],near=(x,y)=>Math.abs(x-y)<.001;
+      if(near(a.x,b.x)&&near(a.w,b.w)&&(near(a.y+a.h,b.y)||near(b.y+b.h,a.y))){zones[i]={x:a.x,y:Math.min(a.y,b.y),w:a.w,h:a.h+b.h};}
+      else if(near(a.y,b.y)&&near(a.h,b.h)&&(near(a.x+a.w,b.x)||near(b.x+b.w,a.x))){zones[i]={x:Math.min(a.x,b.x),y:a.y,w:a.w+b.w,h:a.h};}
+      else continue;
+      zones.splice(j,1);merged=true;break outer;
+    }}
+    return zones.sort((a,b)=>b.w*b.h-a.w*a.h);
+  }
+  const reusable=z=>Math.max(z.w,z.h)>=300-.001&&Math.min(z.w,z.h)>=150-.001;
+  const number=(n,d=1)=>n.toLocaleString("fr-FR",{maximumFractionDigits:d});
+  const area=n=>number(n/1000000,2)+" m²";
+  const pct=n=>number(100*n/(data.width*data.height))+" %";
+  const colors=["#f8c8dc","#fca5a5","#dbeafe","#fde68a","#e9d5ff","#fed7aa"];
+  function node(tag,attrs,text){const element=doc.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>element.setAttribute(k,v));if(text!=null)element.textContent=text;return element;}
+  function render(){
+    let totalUsed=0,totalReusable=0,totalLost=0;
+    layouts.forEach((parts,i)=>{
+      const block=blocks[i],svg=block.querySelector("svg"),zones=freeZones(parts);
+      svg.replaceChildren(node("rect",{x:0,y:0,width:data.width*data.scale,height:data.height*data.scale,fill:"white",stroke:"#111"}));
+      const used=parts.reduce((sum,p)=>sum+p.w*p.h,0),reuse=zones.filter(reusable).reduce((sum,z)=>sum+z.w*z.h,0),lost=Math.max(0,data.width*data.height-used-reuse);
+      totalUsed+=used;totalReusable+=reuse;totalLost+=lost;
+      const info=block.querySelector(".zones-line");info.replaceChildren();const strong=doc.createElement("strong");strong.textContent="Zones restantes : ";info.append(strong);
+      zones.forEach((z,index)=>{
+        const color=reusable(z)?colors[index%colors.length]:"#e5e7eb",cx=(z.x+z.w/2)*data.scale,cy=(z.y+z.h/2)*data.scale;
+        svg.append(node("rect",{x:z.x*data.scale,y:z.y*data.scale,width:z.w*data.scale,height:z.h*data.scale,fill:color,stroke:"#555","stroke-dasharray":"6,4"}));
+        if(z.w*data.scale>18&&z.h*data.scale>10)svg.append(node("text",{x:cx,y:cy,"font-size":8,"text-anchor":"middle","dominant-baseline":"middle"},"Z"+(index+1)));
+        const chip=doc.createElement("span");chip.className="zone-chip";chip.textContent=" Z"+(index+1)+" : "+number(z.w)+" × "+number(z.h)+" mm — "+(reusable(z)?"réutilisable":"non exploitable")+(index<zones.length-1?" / ":"");info.append(chip);
+      });
+      parts.forEach(p=>{
+        const active=selected&&selected.sheet===i&&selected.uid===p.uid,g=node("g",{class:"layout-piece","data-uid":p.uid});
+        const cx=(p.x+p.w/2)*data.scale,cy=(p.y+p.h/2)*data.scale;
+        g.append(node("rect",{x:p.x*data.scale,y:p.y*data.scale,width:p.w*data.scale,height:p.h*data.scale,fill:active?"#b9dcff":"#dff3df",stroke:active?"#0f62fe":"#111","stroke-width":active?2:1}));
+        const font=Math.max(6,Math.min(12,Math.min(p.w,p.h)*data.scale/2.8));
+        g.append(node("text",{x:cx,y:cy,"font-size":font,"text-anchor":"middle","dominant-baseline":"middle",...(p.w<p.h?{transform:"rotate(-90 "+cx+" "+cy+")"}:{})},"P"+p.pieceNo+" - "+number(p.sourceDev)+" × "+number(p.sourceLong)));
+        svg.append(g);
+      });
+      const kpis=block.querySelectorAll(".sheet-kpis span");[used,reuse,lost].forEach((n,j)=>kpis[j].textContent=area(n)+" — "+pct(n));
+      const groups=new Map();parts.forEach(p=>{if(!groups.has(p.pieceNo))groups.set(p.pieceNo,{part:p,count:0});groups.get(p.pieceNo).count++;});
+      const list=[...groups.entries()].sort((a,b)=>a[0]-b[0]);
+      const piecesLine=block.querySelector(".pieces-line");piecesLine.replaceChildren();const title=doc.createElement("strong");title.textContent="Pièces à couper : ";piecesLine.append(title);
+      list.forEach(([no,g])=>{const chip=doc.createElement("span");chip.className="piece-chip";chip.textContent="P"+no+" : "+g.count+" pièce"+(g.count>1?"s":"")+" — développé "+number(g.part.sourceDev)+" mm × longueur de débit "+number(g.part.sourceLong)+" mm";piecesLine.append(chip);});
+      if(!parts.length)piecesLine.append("Support vide — disponible pour recevoir des pièces.");
+      const row=doc.querySelectorAll(".sheet > table > tbody > tr")[i];if(row){row.cells[1].textContent=list.map(([no,g])=>"P"+no+" : "+g.count+" u").join(" / ")||"Vide";row.cells[2].textContent=parts.length;[used,reuse,lost].forEach((n,j)=>row.cells[j+3].textContent=pct(n));}
+    });
+    const totals=doc.querySelectorAll(".summary-grid strong"),all=data.width*data.height*layouts.length,waste=totalReusable+totalLost;
+    const globalPct=n=>number(100*n/all)+" %";
+    if(totals.length>=8){totals[3].textContent=area(totalUsed)+" — "+globalPct(totalUsed);totals[4].textContent=area(totalReusable)+" — "+globalPct(totalReusable);totals[5].textContent=area(totalLost)+" — "+globalPct(totalLost);totals[6].textContent=number(waste?100*totalReusable/waste:0)+" % des chutes";totals[7].textContent=number(waste?100*totalLost/waste:0)+" % des chutes";}
+    rotate.disabled=!selected;transfer.disabled=!selected||Number(destinationSelect.value)===selected.sheet;undo.disabled=!history.length;
+  }
+  function commit(before,message){history.push(before);if(history.length>40)history.shift();say(message+" Cliquez sur Enregistrer la disposition pour la conserver.");render();}
+  function coordinates(event,svg){const point=svg.createSVGPoint();point.x=event.clientX;point.y=event.clientY;const pos=point.matrixTransform(svg.getScreenCTM().inverse());return {x:pos.x/data.scale,y:pos.y/data.scale};}
+  blocks.forEach((block,i)=>{
+    const svg=block.querySelector("svg");
+    svg.addEventListener("pointerdown",event=>{
+      if(event.button!==0)return;const target=event.target.closest(".layout-piece");if(!target){selected=null;render();return;}
+      const part=layouts[i].find(p=>p.uid===target.dataset.uid),point=coordinates(event,svg);
+      selected={sheet:i,uid:part.uid};drag={part,sheet:i,start:clone(part),before:clone(layouts),dx:point.x-part.x,dy:point.y-part.y,id:event.pointerId,moved:false};
+      svg.setPointerCapture(event.pointerId);event.preventDefault();render();say("P"+part.pieceNo+" sélectionnée — glissez-la ou tournez-la à 90°.");
+    });
+    svg.addEventListener("pointermove",event=>{
+      if(!drag||drag.id!==event.pointerId)return;
+      const destination=blocks.findIndex(b=>{const r=b.querySelector("svg").getBoundingClientRect();return event.clientX>=r.left&&event.clientX<=r.right&&event.clientY>=r.top&&event.clientY<=r.bottom;});
+      if(destination<0){say("Amenez la souris sur la feuille cible. Vous pouvez faire défiler avec la molette en maintenant la pièce.");return;}
+      const targetSvg=blocks[destination].querySelector("svg");
+      const p=drag.part,point=coordinates(event,targetSvg),others=layouts[destination].filter(a=>a.uid!==p.uid),rect=targetSvg.getBoundingClientRect(),snap=8*data.width/rect.width;
+      let x=Math.max(0,Math.min(data.width-p.w,point.x-drag.dx)),y=Math.max(0,Math.min(data.height-p.h,point.y-drag.dy));
+      const xs=[0,data.width-p.w],ys=[0,data.height-p.h];others.forEach(a=>{xs.push(a.x,a.x+a.w,a.x-p.w,a.x+a.w-p.w);ys.push(a.y,a.y+a.h,a.y-p.h,a.y+a.h-p.h);});
+      const closest=(v,list)=>list.reduce((best,n)=>Math.abs(n-v)<Math.abs(best-v)?n:best,v+snap+1);
+      const sx=closest(x,xs),sy=closest(y,ys);if(Math.abs(sx-x)<=snap)x=sx;if(Math.abs(sy-y)<=snap)y=sy;
+      const candidate={...p,x:Math.round(x*10)/10,y:Math.round(y*10)/10};
+      if(valid(candidate,layouts[destination])){
+        if(destination!==drag.sheet){layouts[drag.sheet]=layouts[drag.sheet].filter(a=>a.uid!==p.uid);layouts[destination].push(p);drag.sheet=destination;selected.sheet=destination;}
+        Object.assign(p,candidate);drag.moved=true;render();say("P"+p.pieceNo+" — support "+(destination+1)+" — position "+number(p.x)+" × "+number(p.y)+" mm.");
+      }
+      else say("Placement bloqué : chevauchement ou dépassement. Déplacez la pièce dans une zone libre.");
+    });
+    svg.addEventListener("pointerup",event=>{if(!drag||drag.id!==event.pointerId)return;const current=drag;drag=null;if(svg.hasPointerCapture(event.pointerId))svg.releasePointerCapture(event.pointerId);if(current.moved)commit(current.before,"Pièce déplacée.");});
+    svg.addEventListener("pointercancel",()=>{if(drag){layouts=drag.before;drag=null;render();say("Déplacement annulé.");}});
+  });
+  toolbar.addEventListener("click",event=>{
+    const action=event.target.dataset.action;if(!action)return;
+    if(action==="transfer"&&selected){
+      const target=Number(destinationSelect.value),p=layouts[selected.sheet].find(a=>a.uid===selected.uid);
+      if(target===selected.sheet)return;
+      const xs=[0,data.width-p.w,p.x],ys=[0,data.height-p.h,p.y];layouts[target].forEach(a=>{xs.push(a.x,a.x+a.w,a.x-p.w);ys.push(a.y,a.y+a.h,a.y-p.h);});
+      let placement=null,distance=Infinity;xs.forEach(x=>ys.forEach(y=>{const candidate={...p,x,y},d=x*x+y*y;if(d<distance&&valid(candidate,layouts[target])){placement=candidate;distance=d;}}));
+      if(!placement){say("Ce support n’a pas de zone libre assez grande. Tournez la pièce ou déplacez les pièces voisines.");return;}
+      const before=clone(layouts);layouts[selected.sheet]=layouts[selected.sheet].filter(a=>a.uid!==p.uid);Object.assign(p,placement);layouts[target].push(p);selected.sheet=target;commit(before,"Pièce déplacée vers le support "+(target+1)+".");return;
+    }
+    if(action==="rotate"&&selected){const parts=layouts[selected.sheet],p=parts.find(a=>a.uid===selected.uid),before=clone(layouts),candidate={...p,w:p.h,h:p.w,rotated:!p.rotated};
+      let placement=valid(candidate,parts)?candidate:null;
+      if(!placement){
+        const xs=[p.x,0,data.width-candidate.w],ys=[p.y,0,data.height-candidate.h];
+        parts.filter(a=>a.uid!==p.uid).forEach(a=>{xs.push(a.x,a.x+a.w,a.x-candidate.w);ys.push(a.y,a.y+a.h,a.y-candidate.h);});
+        let distance=Infinity;
+        xs.forEach(x=>ys.forEach(y=>{const trial={...candidate,x,y},d=(x-p.x)**2+(y-p.y)**2;if(d<distance&&valid(trial,parts)){placement=trial;distance=d;}}));
+      }
+      if(placement){Object.assign(p,placement);commit(before,"Pièce tournée à 90° et placée dans une zone libre.");}else say("Rotation impossible : aucune zone libre ne peut accueillir la pièce tournée. Déplacez les pièces voisines.");
+    }else if(action==="undo"&&history.length){layouts=history.pop();selected=null;render();say("Dernière modification annulée.");}
+    else if(action==="reset"){commit(clone(layouts),"Placement automatique restauré.");layouts=clone(initial);selected=null;render();}
+    else if(action==="save"){try{win.localStorage.setItem(key,JSON.stringify(layouts));say("Disposition enregistrée. Elle sera restaurée pour ces mêmes pièces et ce format.");}catch(e){say("Enregistrement impossible : le stockage du navigateur est indisponible.");}}
+  });
+  destinationSelect.addEventListener("change",()=>{transfer.disabled=!selected||Number(destinationSelect.value)===selected.sheet;});
+  const note=doc.querySelector(".summary .note");note.textContent="Placement automatique modifiable à la souris. Les zones restantes sont recalculées après chaque déplacement. Vérifiez l’ordre des coupes à la cisaille avant fabrication.";
+  win.addEventListener("beforeprint",()=>{selected=null;render();});
+  render();if(!status.textContent)say("Sélectionnez une pièce pour la déplacer ou la tourner.");
+}
   function generateCalpinageDocument(){
   const client=getCurrentClient();
   const project=(projectName?.value || "Projet sans nom").trim();
@@ -3827,6 +3930,7 @@ button{padding:10px 18px;font-size:15px;border:none;border-radius:8px;background
   win.document.open();
   win.document.write(html);
   win.document.close();
+  enableInteractiveCalepinage(win,{width:sheetL,height:sheetW,scale,sheets:sheets.map(s=>s.parts),project,client:client?.id||client?.name||"",pieceIds:pieces.map(p=>p.id)});
 }
 document.getElementById("addPieceBtn").addEventListener("click",()=>addPiece());
 document.getElementById("duplicateLastBtn").addEventListener("click",duplicateLastPiece);
@@ -8608,394 +8712,135 @@ if(quotePdfBtn){
 })();
 </script>
 <script>
-/* ===== V83 : PROJETS COMPLETS SYNCHRONISÉS SANS FUSION DES PIÈCES COURANTES ===== */
+/* ===== ERP DEV : SAUVEGARDE PLIAGE EXCLUSIVE DANS SUPABASE ERP ===== */
 (()=>{
   "use strict";
-  const CONFIG_KEY="rml_pliage_supabase_config_v1";
-  const META_KEY="rml_pliage_sync_meta_v1";
-  const PENDING_KEY="rml_pliage_sync_pending_v1";
-  const TABLE="rml_pliage_sync";
-  const DEFAULT_SUPABASE_CONFIG={
-    url:"https://jbtsncvuobptxyzcoqpf.supabase.co",
-    key:"sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr",
-    workspace:"RML-PLIAGE-ALU-01"
-  };
-  const ADMIN_PASSWORD_HASH="55912b29b73aa9a8f6d5407fc032ba4ea5c1493517e92454249dd22e9c143739";
+  const ERP_URL="https://jbtsncvuobptxyzcoqpf.supabase.co";
+  const ERP_KEY="sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr";
+  const TABLE="erp_pliage_sync";
+  const WORKSPACE="RML-ERP-PLIAGE";
+  const META_KEY="rml_erp_pliage_sync_meta_v1";
+  const PENDING_KEY="rml_erp_pliage_sync_pending_v1";
+  const AUTH_STORAGE_KEY="sb-jbtsncvuobptxyzcoqpf-auth-token";
   const SYNC_KEYS={
     [STORAGE_KEY_CLIENTS]:"client",
-    // Les pièces ne sont plus synchronisées séparément. Elles appartiennent au
-    // projet complet ; une synchronisation pièce par pièce mélangeait les
-    // commandes ouvertes simultanément sur plusieurs appareils.
     [PROJECTS_KEY]:"project",
     [PROJECT_FOLDERS_KEY]:"folder",
     [STORAGE_KEY_BEND_LIBRARY]:"settings"
   };
-  const SINGLETON_TYPES=new Set();
-  let applyingRemote=false;
-  let syncing=false;
-  let syncTimer=0;
-  let snapshots={};
-
+  let applyingRemote=false, syncing=false, syncTimer=0;
   const $=id=>document.getElementById(id);
-  const clone=value=>JSON.parse(JSON.stringify(value));
+  const clone=v=>JSON.parse(JSON.stringify(v));
   const now=()=>new Date().toISOString();
   const parse=(raw,fallback)=>{try{return raw?JSON.parse(raw):fallback}catch{return fallback}};
-  const loadConfig=()=>{
-    const saved=parse(localStorage.getItem(CONFIG_KEY),{});
-    return {
-      ...DEFAULT_SUPABASE_CONFIG,
-      ...saved,
-      url:saved.url||DEFAULT_SUPABASE_CONFIG.url,
-      key:saved.key||DEFAULT_SUPABASE_CONFIG.key,
-      workspace:(!saved.workspace||saved.workspace==="rml-pliage")?DEFAULT_SUPABASE_CONFIG.workspace:saved.workspace
-    };
-  };
   const loadMeta=()=>parse(localStorage.getItem(META_KEY),{});
-  const saveMeta=value=>localStorage.setItem(META_KEY,JSON.stringify(value));
+  const saveMeta=v=>localStorage.setItem(META_KEY,JSON.stringify(v));
   const loadPending=()=>parse(localStorage.getItem(PENDING_KEY),[]);
-  const savePending=value=>localStorage.setItem(PENDING_KEY,JSON.stringify(value));
+  const savePending=v=>localStorage.setItem(PENDING_KEY,JSON.stringify(v));
   const rowKey=(type,id)=>`${type}:${id}`;
-  const normalizeUrl=value=>String(value||"").trim().replace(/\/+$/,"");
-  const validConfig=config=>/^https:\/\/.+/.test(config.url||"") && !!config.key && !!config.workspace;
-  async function sha256(value){
-    const bytes=new TextEncoder().encode(String(value||""));
-    const digest=await crypto.subtle.digest("SHA-256",bytes);
-    return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,"0")).join("");
-  }
-  function lockSupabaseSettings(){
-    const lockBox=$("supabaseLockBox");
-    const protectedArea=$("supabaseProtectedArea");
-    if(lockBox)lockBox.hidden=false;
-    if(protectedArea)protectedArea.hidden=true;
-    if($("supabaseAdminPassword"))$("supabaseAdminPassword").value="";
-    if($("supabaseUnlockStatus"))$("supabaseUnlockStatus").textContent="";
-  }
-  async function unlockSupabaseSettings(){
-    const input=$("supabaseAdminPassword");
-    const status=$("supabaseUnlockStatus");
-    const suppliedHash=await sha256(input?.value||"");
-    if(suppliedHash!==ADMIN_PASSWORD_HASH){
-      if(status){status.textContent="Code incorrect.";status.style.color="#b42318";status.style.fontWeight="800";}
-      input?.select();
-      return false;
+  const toMap=(raw)=>new Map((Array.isArray(parse(raw,[]))?parse(raw,[]):[]).filter(x=>x&&x.id).map(x=>[String(x.id),x]));
+  function accessToken(){
+    const direct=parse(localStorage.getItem(AUTH_STORAGE_KEY),null);
+    if(direct?.access_token)return direct.access_token;
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i)||"";
+      if(key.includes("jbtsncvuobptxyzcoqpf")&&key.includes("auth-token")){
+        const value=parse(localStorage.getItem(key),null);
+        if(value?.access_token)return value.access_token;
+      }
     }
-    if($("supabaseLockBox"))$("supabaseLockBox").hidden=true;
-    if($("supabaseProtectedArea"))$("supabaseProtectedArea").hidden=false;
-    if(status)status.textContent="";
-    setTimeout(()=>$("supabaseUrl")?.scrollIntoView({behavior:"smooth",block:"center"}),80);
-    return true;
+    return "";
   }
-  const entityId=(type,item)=>SINGLETON_TYPES.has(type)?"current":String(item?.id||"");
-  const toMap=(type,raw)=>{
-    const value=parse(raw,SINGLETON_TYPES.has(type)?{}:[]);
-    if(SINGLETON_TYPES.has(type))return new Map([["current",value||{}]]);
-    return new Map((Array.isArray(value)?value:[]).filter(item=>item&&item.id).map(item=>[String(item.id),item]));
-  };
-
-  function setSyncStatus(message,kind="neutral"){
-    const elements=[$("supabaseSyncStatus"),$("supabaseSyncStatusMain")].filter(Boolean);
-    if(!elements.length)return;
+  function setStatus(message,kind="neutral"){
+    const el=$("supabaseSyncStatusMain"); if(!el)return;
     const pending=loadPending().length;
-    elements.forEach(el=>{
-      el.textContent=message+(pending?` — ${pending} changement(s) en attente`:"");
-      el.style.color=kind==="error"?"#b42318":kind==="ok"?"#067647":"#475467";
-      el.style.fontWeight=kind==="neutral"?"600":"800";
-    });
+    el.textContent=message+(pending?` — ${pending} changement(s) en attente`:"");
+    el.style.color=kind==="error"?"#b42318":kind==="ok"?"#067647":"#475467";
+    el.style.fontWeight=kind==="neutral"?"600":"800";
   }
-
-  function queueRow(type,id,payload,deleted=false,updatedAt=now()){
+  async function request(path,options={}){
+    const token=accessToken();
+    if(!token)throw new Error("session ERP absente : reconnectez-vous à l’ERP");
+    const headers={apikey:ERP_KEY,Authorization:`Bearer ${token}`,"Content-Type":"application/json",...(options.headers||{})};
+    const response=await fetch(`${ERP_URL}/rest/v1/${path}`,{...options,headers});
+    if(!response.ok){const detail=await response.text().catch(()=>"");throw new Error(`ERP ${response.status}${detail?` : ${detail.slice(0,220)}`:""}`);}
+    if(response.status===204)return null;
+    const text=await response.text(); return text?JSON.parse(text):null;
+  }
+  function queue(type,id,payload,deleted=false,updatedAt=now()){
     if(!id)return;
-    const pending=loadPending();
-    const key=rowKey(type,id);
-    const row={
-      workspace_id:loadConfig().workspace||DEFAULT_SUPABASE_CONFIG.workspace,
-      entity_type:type,
-      entity_id:id,
-      payload:deleted?{}:clone(payload),
-      updated_at:updatedAt,
-      deleted:!!deleted
-    };
-    const index=pending.findIndex(item=>rowKey(item.entity_type,item.entity_id)===key);
+    const pending=loadPending(); const key=rowKey(type,id);
+    const row={workspace_id:WORKSPACE,entity_type:type,entity_id:String(id),payload:deleted?{}:clone(payload),updated_at:updatedAt,deleted:!!deleted};
+    const index=pending.findIndex(x=>rowKey(x.entity_type,x.entity_id)===key);
     if(index>=0)pending[index]=row;else pending.push(row);
     savePending(pending);
-    const meta=loadMeta();
-    meta[key]={updatedAt,deleted:!!deleted};
-    saveMeta(meta);
+    const meta=loadMeta();meta[key]={updatedAt,deleted:!!deleted};saveMeta(meta);
     scheduleSync();
   }
-
-  function captureLocalChange(storageKey,oldRaw,newRaw){
-    if(applyingRemote || !SYNC_KEYS[storageKey])return;
-    const type=SYNC_KEYS[storageKey];
-    const before=toMap(type,oldRaw);
-    const after=toMap(type,newRaw);
-    const stamp=now();
-    after.forEach((payload,id)=>{
-      if(JSON.stringify(before.get(id))!==JSON.stringify(payload))queueRow(type,id,payload,false,stamp);
-    });
-    before.forEach((payload,id)=>{
-      if(!after.has(id))queueRow(type,id,{},true,stamp);
-    });
-    snapshots[storageKey]=newRaw;
+  function capture(storageKey,oldRaw,newRaw){
+    if(applyingRemote||!SYNC_KEYS[storageKey])return;
+    const type=SYNC_KEYS[storageKey],before=toMap(oldRaw),after=toMap(newRaw),stamp=now();
+    after.forEach((payload,id)=>{if(JSON.stringify(before.get(id))!==JSON.stringify(payload))queue(type,id,payload,false,stamp)});
+    before.forEach((payload,id)=>{if(!after.has(id))queue(type,id,{},true,stamp)});
   }
-
-  const nativeSetItem=Storage.prototype.setItem;
-  const nativeRemoveItem=Storage.prototype.removeItem;
-  Storage.prototype.setItem=function(key,value){
-    const oldRaw=SYNC_KEYS[key]?this.getItem(key):null;
-    nativeSetItem.call(this,key,value);
-    if(this===localStorage && SYNC_KEYS[key])captureLocalChange(key,oldRaw,String(value));
-  };
-  Storage.prototype.removeItem=function(key){
-    const oldRaw=SYNC_KEYS[key]?this.getItem(key):null;
-    nativeRemoveItem.call(this,key);
-    if(this===localStorage && SYNC_KEYS[key])captureLocalChange(key,oldRaw,null);
-  };
-
-  function removeLegacyCurrentStateSyncQueue(){
-    // Les anciennes lignes distantes peuvent rester dans Supabase sans danger :
-    // la V83 les ignore. On retire seulement les envois locaux encore en attente.
-    savePending(loadPending().filter(row=>row?.entity_type!=="piece"));
-    const meta=loadMeta();
-    Object.keys(meta).forEach(key=>{if(key.startsWith("piece:"))delete meta[key];});
-    saveMeta(meta);
+  const nativeSetItem=Storage.prototype.setItem,nativeRemoveItem=Storage.prototype.removeItem;
+  Storage.prototype.setItem=function(key,value){const oldRaw=(this===localStorage&&SYNC_KEYS[key])?this.getItem(key):null;nativeSetItem.call(this,key,value);if(this===localStorage&&SYNC_KEYS[key])capture(key,oldRaw,String(value));};
+  Storage.prototype.removeItem=function(key){const oldRaw=(this===localStorage&&SYNC_KEYS[key])?this.getItem(key):null;nativeRemoveItem.call(this,key);if(this===localStorage&&SYNC_KEYS[key])capture(key,oldRaw,null);};
+  function localEntities(){return {client:toMap(localStorage.getItem(STORAGE_KEY_CLIENTS)),project:toMap(localStorage.getItem(PROJECTS_KEY)),folder:toMap(localStorage.getItem(PROJECT_FOLDERS_KEY)),settings:toMap(localStorage.getItem(STORAGE_KEY_BEND_LIBRARY))};}
+  function seedMissing(remoteRows){
+    const remoteKeys=new Set(remoteRows.filter(r=>!r.deleted).map(r=>rowKey(r.entity_type,r.entity_id))),locals=localEntities();
+    Object.entries(locals).forEach(([type,map])=>map.forEach((payload,id)=>{if(!remoteKeys.has(rowKey(type,id)))queue(type,id,payload,false,now())}));
   }
-
-  function savedActiveProject(projectMap=null,settingsValue=null){
-    const projects=projectMap||toMap("project",localStorage.getItem(PROJECTS_KEY));
-    const settings=settingsValue||parse(localStorage.getItem(STORAGE_KEY_CURRENT_PROJECT),{});
-    const runtimeId=typeof currentLoadedProjectId!=="undefined"?currentLoadedProjectId:"";
-    const projectId=String(settings?.projectId||runtimeId||"");
-    return projectId?projects.get(projectId)||null:null;
-  }
-
-  function restorePiecesFromSavedProject(projectMap=null,settingsValue=null){
-    const project=savedActiveProject(projectMap,settingsValue);
-    if(!project||!Array.isArray(project.pieces)||!project.pieces.length)return false;
-    // Remplacement intégral : aucune concaténation et aucune fusion avec la
-    // commande ouverte sur un autre Mac ou iPhone.
-    pieces=restoreBendProfiles(project.pieces,[]);
-    nativeSetItem.call(localStorage,STORAGE_KEY_PIECES,JSON.stringify(pieces));
-    return true;
-  }
-
-  async function headers(config,extra={}){
-    let bearer=config.key;
-    try{
-      const projectRef=new URL(config.url).hostname.split('.')[0];
-      const raw=localStorage.getItem(`sb-${projectRef}-auth-token`);
-      const auth=raw?JSON.parse(raw):null;
-      bearer=auth?.access_token||auth?.currentSession?.access_token||config.key;
-    }catch(_){}
-    return {apikey:config.key,Authorization:`Bearer ${bearer}`,"Content-Type":"application/json",...extra};
-  }
-  async function request(config,path,options={}){
-    const response=await fetch(`${config.url}/rest/v1/${path}`,{...options,headers:await headers(config,options.headers||{})});
-    if(!response.ok){
-      const detail=await response.text().catch(()=>"");
-      throw new Error(`Supabase ${response.status}${detail?` : ${detail.slice(0,240)}`:""}`);
-    }
-    if(response.status===204)return null;
-    const text=await response.text();
-    return text?JSON.parse(text):null;
-  }
-
-  function readLocalEntities(){
-    return {
-      client:toMap("client",localStorage.getItem(STORAGE_KEY_CLIENTS)),
-      project:toMap("project",localStorage.getItem(PROJECTS_KEY)),
-      folder:toMap("folder",localStorage.getItem(PROJECT_FOLDERS_KEY)),
-      settings:toMap("settings",localStorage.getItem(STORAGE_KEY_BEND_LIBRARY))
-    };
-  }
-
-  function seedRowsMissingRemotely(remoteRows){
-    const remoteKeys=new Set(remoteRows.map(row=>rowKey(row.entity_type,row.entity_id)));
-    const locals=readLocalEntities();
-    Object.entries(locals).forEach(([type,map])=>map.forEach((payload,id)=>{
-      const key=rowKey(type,id);
-      // Une ancienne métadonnée locale ne doit jamais empêcher l'envoi d'un
-      // projet réellement absent de l'espace Supabase courant.
-      if(!remoteKeys.has(key))queueRow(type,id,payload,false,now());
-    }));
-  }
-
-  function applyRemoteRows(rows){
-    const meta=loadMeta();
-    const locals=readLocalEntities();
-    let changed=false;
-    applyingRemote=true;
+  function applyRemote(rows){
+    const meta=loadMeta(),locals=localEntities(); let changed=false; applyingRemote=true;
     try{
       rows.forEach(row=>{
-        if(!locals[row.entity_type])return;
-        if(row.entity_type==="settings" && row.payload?.kind!=="bend_library_model")return;
-        const key=rowKey(row.entity_type,row.entity_id);
-        const map=locals[row.entity_type];
-        if(row.entity_type==="project" && !row.deleted){
-          const localProject=map.get(row.entity_id);
-          const localModified=Date.parse(localProject?.modifiedAt||localProject?.date||0)||0;
-          const remoteModified=Date.parse(row.payload?.modifiedAt||row.payload?.date||0)||0;
-          // Le contenu métier le plus récent prime sur l'heure technique de
-          // transfert Supabase. Cela protège les pièces d'un projet local plus
-          // complet contre une ancienne fiche distante vide ou incomplète.
-          if(localProject && localModified>remoteModified){
-            queueRow("project",row.entity_id,localProject,false,now());
-            return;
-          }
+        const map=locals[row.entity_type]; if(!map)return;
+        if(row.entity_type==="settings"&&row.payload?.kind!=="bend_library_model")return;
+        const key=rowKey(row.entity_type,row.entity_id),local=map.get(row.entity_id);
+        if(row.entity_type==="project"&&!row.deleted&&local){
+          const lt=Date.parse(local.modifiedAt||local.date||0)||0,rt=Date.parse(row.payload?.modifiedAt||row.payload?.date||0)||0;
+          if(lt>rt){queue("project",row.entity_id,local,false,now());return;}
         }
-        const localStamp=meta[key]?.updatedAt||"";
-        if(localStamp && localStamp>=row.updated_at)return;
+        const localStamp=meta[key]?.updatedAt||""; if(localStamp&&localStamp>=row.updated_at)return;
         if(row.deleted)map.delete(row.entity_id);else map.set(row.entity_id,row.payload||{});
-        meta[key]={updatedAt:row.updated_at,deleted:!!row.deleted};
-        changed=true;
+        meta[key]={updatedAt:row.updated_at,deleted:!!row.deleted};changed=true;
       });
       if(changed){
-        clients=[...locals.client.values()].map(normalizeClient);
-        if(!clients.length)clients=structuredClone(defaultClients);
+        clients=[...locals.client.values()].map(normalizeClient); if(!clients.length)clients=structuredClone(defaultClients);
         nativeSetItem.call(localStorage,STORAGE_KEY_CLIENTS,JSON.stringify(clients));
         nativeSetItem.call(localStorage,PROJECTS_KEY,JSON.stringify([...locals.project.values()]));
         nativeSetItem.call(localStorage,PROJECT_FOLDERS_KEY,JSON.stringify([...locals.folder.values()]));
-        nativeSetItem.call(localStorage,STORAGE_KEY_BEND_LIBRARY,JSON.stringify([...locals.settings.values()].filter(item=>item?.kind==="bend_library_model")));
-        // Le projet actuellement ouvert est propre à chaque appareil. Il ne doit
-        // jamais être imposé par le Mac ou l'iPhone qui a synchronisé en dernier.
-        const settings=parse(localStorage.getItem(STORAGE_KEY_CURRENT_PROJECT),{});
-        if(!restorePiecesFromSavedProject(locals.project,settings)){
-          pieces=restoreBendProfiles(parse(localStorage.getItem(STORAGE_KEY_PIECES),[]),pieces);
-          if(!pieces.length)pieces=[{id:crypto.randomUUID(),developed:"",length:"",qty:1,folds:0,cuts:0,time:0,waste:""}];
-          nativeSetItem.call(localStorage,STORAGE_KEY_PIECES,JSON.stringify(pieces));
-        }
-        saveMeta(meta);
-        renderClientSelect();
-        restoreCurrentProjectState();
-        renderClientForm();
-        renderPieces();
-        updatePriceDisplay();
-        document.getElementById("projectsModal")?.remove();
+        nativeSetItem.call(localStorage,STORAGE_KEY_BEND_LIBRARY,JSON.stringify([...locals.settings.values()].filter(x=>x?.kind==="bend_library_model")));
+        saveMeta(meta);renderClientSelect();restoreCurrentProjectState();renderClientForm();renderPieces();updatePriceDisplay();document.getElementById("projectsModal")?.remove();
       }
     }finally{applyingRemote=false;}
-    Object.keys(SYNC_KEYS).forEach(key=>snapshots[key]=localStorage.getItem(key));
   }
-
-  async function pushPending(config){
-    const pending=loadPending();
-    if(!pending.length)return 0;
-    const rows=pending.map(row=>({...row,workspace_id:config.workspace}));
-    await request(config,TABLE,{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(rows)});
-    const sentKeys=new Set(rows.map(row=>rowKey(row.entity_type,row.entity_id)+":"+row.updated_at));
-    savePending(loadPending().filter(row=>!sentKeys.has(rowKey(row.entity_type,row.entity_id)+":"+row.updated_at)));
-    return rows.length;
+  async function pushPending(){
+    const pending=loadPending(); if(!pending.length)return 0;
+    await request(TABLE,{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(pending)});
+    const sent=new Set(pending.map(r=>rowKey(r.entity_type,r.entity_id)+":"+r.updated_at));
+    savePending(loadPending().filter(r=>!sent.has(rowKey(r.entity_type,r.entity_id)+":"+r.updated_at))); return pending.length;
   }
-
-  async function syncNow({quiet=false}={}){
-    if(syncing)return;
-    const config=loadConfig();
-    if(!validConfig(config)){if(!quiet)setSyncStatus("Renseignez l’URL, la clé et l’espace de synchronisation.","error");return;}
-    if(!navigator.onLine){setSyncStatus("Hors ligne : les changements sont conservés sur cet appareil.");return;}
-    syncing=true;
-    setSyncStatus("Synchronisation en cours…");
+  async function syncNow(){
+    if(syncing)return;if(!navigator.onLine){setStatus("Hors ligne : les changements restent sur cet appareil.");return;}
+    syncing=true;setStatus("Sauvegarde ERP en cours…");
     try{
-      const workspace=encodeURIComponent(config.workspace);
-      let remote=await request(config,`${TABLE}?workspace_id=eq.${workspace}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`);
-      remote=Array.isArray(remote)?remote:[];
-      applyRemoteRows(remote);
-      seedRowsMissingRemotely(remote);
-      const sent=await pushPending(config);
-      if(sent){
-        const refreshed=await request(config,`${TABLE}?workspace_id=eq.${workspace}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`);
-        applyRemoteRows(Array.isArray(refreshed)?refreshed:[]);
-      }
-      localStorage.setItem(CONFIG_KEY,JSON.stringify({...config,lastSyncAt:now()}));
-      setSyncStatus(`À jour — dernière synchronisation ${new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}`,"ok");
-    }catch(error){
-      console.error("Synchronisation Supabase V83 :",error);
-      setSyncStatus(`Échec de synchronisation : ${error.message}`,"error");
-    }finally{syncing=false;}
+      let remote=await request(`${TABLE}?workspace_id=eq.${encodeURIComponent(WORKSPACE)}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`);remote=Array.isArray(remote)?remote:[];
+      applyRemote(remote);seedMissing(remote);const sent=await pushPending();
+      if(sent){remote=await request(`${TABLE}?workspace_id=eq.${encodeURIComponent(WORKSPACE)}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`);applyRemote(Array.isArray(remote)?remote:[]);}
+      setStatus(`Enregistré dans ERP DEV — ${new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}`,"ok");
+    }catch(error){console.error("Sauvegarde Pliage ERP :",error);setStatus(`Échec sauvegarde ERP : ${error.message}`,"error");}
+    finally{syncing=false;}
   }
-
-  function scheduleSync(){
-    clearTimeout(syncTimer);
-    setSyncStatus(navigator.onLine?"Modification locale enregistrée.":"Hors ligne : modification locale enregistrée.");
-    syncTimer=setTimeout(()=>syncNow({quiet:true}),1500);
-  }
-
-  const SQL=`create table if not exists public.${TABLE} (
-  workspace_id text not null,
-  entity_type text not null check (entity_type in ('client','piece','project','folder','settings')),
-  entity_id text not null,
-  payload jsonb not null default '{}'::jsonb,
-  updated_at timestamptz not null,
-  deleted boolean not null default false,
-  primary key (workspace_id, entity_type, entity_id)
-);
-
-create index if not exists ${TABLE}_updated_idx
-  on public.${TABLE} (workspace_id, updated_at);
-
-alter table public.${TABLE} enable row level security;
-
-drop policy if exists "RML Pliage lecture" on public.${TABLE};
-create policy "RML Pliage lecture" on public.${TABLE}
-  for select to anon using (true);
-
-drop policy if exists "RML Pliage ajout" on public.${TABLE};
-create policy "RML Pliage ajout" on public.${TABLE}
-  for insert to anon with check (true);
-
-drop policy if exists "RML Pliage modification" on public.${TABLE};
-create policy "RML Pliage modification" on public.${TABLE}
-  for update to anon using (true) with check (true);`;
-
-  function loadConfigForm(){
-    const config=loadConfig();
-    if($("supabaseUrl"))$("supabaseUrl").value=config.url||"";
-    if($("supabaseKey"))$("supabaseKey").value=config.key||"";
-    if($("supabaseWorkspace"))$("supabaseWorkspace").value=config.workspace||DEFAULT_SUPABASE_CONFIG.workspace;
-    if($("supabaseSqlText"))$("supabaseSqlText").value=SQL;
-    if(validConfig(config)){
-      const last=config.lastSyncAt?new Date(config.lastSyncAt).toLocaleString("fr-FR"):"jamais";
-      setSyncStatus(`Configuration enregistrée — dernière synchronisation : ${last}`);
-    }
-  }
-
-  $("saveSupabaseConfigBtn")?.addEventListener("click",()=>{
-    const config={url:normalizeUrl($("supabaseUrl").value),key:$("supabaseKey").value.trim(),workspace:$("supabaseWorkspace").value.trim()||DEFAULT_SUPABASE_CONFIG.workspace};
-    if(!validConfig(config)){setSyncStatus("Configuration incomplète ou URL invalide.","error");return;}
-    nativeSetItem.call(localStorage,CONFIG_KEY,JSON.stringify(config));
-    setSyncStatus("Configuration enregistrée. Premier rapprochement en cours…");
-    syncNow();
-  });
-  $("syncSupabaseNowBtn")?.addEventListener("click",()=>syncNow());
-  $("syncSupabaseMainBtn")?.addEventListener("click",()=>syncNow());
-  $("openSyncSettingsBtn")?.addEventListener("click",()=>{
-    $("openSettingsBtn")?.click();
-    lockSupabaseSettings();
-    setTimeout(()=>$("supabaseLockBox")?.scrollIntoView({behavior:"smooth",block:"center"}),120);
-  });
-  $("unlockSupabaseBtn")?.addEventListener("click",unlockSupabaseSettings);
-  $("supabaseAdminPassword")?.addEventListener("keydown",event=>{
-    if(event.key==="Enter"){event.preventDefault();unlockSupabaseSettings();}
-  });
-  $("lockSupabaseBtn")?.addEventListener("click",lockSupabaseSettings);
-  $("closeSettingsBtn")?.addEventListener("click",lockSupabaseSettings);
-  $("showSupabaseSqlBtn")?.addEventListener("click",()=>{
-    const box=$("supabaseSqlBox");box.hidden=!box.hidden;
-  });
-  $("copySupabaseSqlBtn")?.addEventListener("click",async()=>{
-    try{await navigator.clipboard.writeText(SQL);setSyncStatus("SQL copié.","ok");}
-    catch{$("supabaseSqlText").select();document.execCommand("copy");setSyncStatus("SQL copié.","ok");}
-  });
-  window.addEventListener("online",()=>syncNow({quiet:true}));
-  window.addEventListener("offline",()=>setSyncStatus("Hors ligne : les changements sont conservés sur cet appareil."));
-  window.addEventListener("storage",event=>{if(SYNC_KEYS[event.key]){captureLocalChange(event.key,event.oldValue,event.newValue);syncNow({quiet:true});}});
-  setInterval(()=>syncNow({quiet:true}),60000);
-  removeLegacyCurrentStateSyncQueue();
-  restorePiecesFromSavedProject();
-  renderPieces();
-  Object.keys(SYNC_KEYS).forEach(key=>snapshots[key]=localStorage.getItem(key));
-  lockSupabaseSettings();
-  loadConfigForm();
-  if(validConfig(loadConfig()))setTimeout(()=>syncNow({quiet:true}),600);
-  window.RML_SUPABASE_SYNC={syncNow,status:()=>({configured:validConfig(loadConfig()),pending:loadPending().length,config:{...loadConfig(),key:loadConfig().key?"••••••••":""}})};
+  function scheduleSync(){clearTimeout(syncTimer);setStatus(navigator.onLine?"Modification locale enregistrée.":"Hors ligne : modification locale enregistrée.");syncTimer=setTimeout(syncNow,1200);}
+  $("syncSupabaseMainBtn")?.addEventListener("click",syncNow);
+  window.addEventListener("online",syncNow);
+  window.addEventListener("offline",()=>setStatus("Hors ligne : les changements restent sur cet appareil."));
+  window.addEventListener("storage",event=>{if(SYNC_KEYS[event.key]){capture(event.key,event.oldValue,event.newValue);syncNow();}});
+  setInterval(syncNow,60000);
+  setTimeout(syncNow,700);
+  window.RML_ERP_PLIAGE_SYNC={syncNow,status:()=>({pending:loadPending().length,table:TABLE,workspace:WORKSPACE})};
 })();
 </script>
 <!-- V60 validée : grand dessinateur simplifié -->
