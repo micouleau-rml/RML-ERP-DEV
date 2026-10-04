@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V0.12.5 · Fiche chantier & terrain</title>
+<title>RML ERP — V0.12.6 · Fiche chantier & terrain</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -81,12 +81,22 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 .employee-hero{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.employee-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-top:12px}.employee-job{border:1px solid #dbe3ec;border-radius:14px;padding:14px;background:#fff}.employee-job.today{border-width:2px}.employee-date{font-weight:800;color:var(--navy);margin-bottom:6px}.employee-docs{display:grid;gap:8px}.employee-doc{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid #e3e8ef;border-radius:10px;padding:10px}.employee-photo-box{border:1px dashed #b9c5d2;border-radius:12px;padding:12px;margin-top:12px;background:#fafcfe}.employee-link-field{display:none}.employee-link-field.show{display:block}
 
 @media(max-width:700px){
-  .readonly-prep-table .prep-tablewrap{overflow:visible!important}
+  #employeeJobModal .modal-card,#subJobFolderModal .modal-card{width:100%!important;max-width:100%!important;margin:0!important;padding:12px!important;box-sizing:border-box!important;overflow-x:hidden!important}
+  #employeeJobModal .panel,#subJobFolderModal .panel{width:100%!important;max-width:100%!important;box-sizing:border-box!important;padding:11px!important}
+  .readonly-prep-table{min-width:0!important;max-width:100%!important;overflow:hidden!important}
+  .readonly-prep-table>strong{font-size:16px!important}
+  .readonly-prep-table .prep-tablewrap{overflow:visible!important;max-width:100%!important}
   .readonly-prep-table table,.readonly-prep-table thead,.readonly-prep-table tbody,.readonly-prep-table tr,.readonly-prep-table th,.readonly-prep-table td{display:block;width:100%!important}
   .readonly-prep-table thead{display:none}
-  .readonly-prep-table tr{border:1px solid #ccd8e2;border-radius:12px;margin:8px 0;padding:6px 10px;background:#fff}
-  .readonly-prep-table td{border:0!important;padding:5px 0!important;white-space:normal!important;overflow-wrap:anywhere}
-  .readonly-prep-table td:before{content:attr(data-label);display:block;font-size:12px;font-weight:700;color:#536779;margin-bottom:2px}
+  .readonly-prep-table tr{border:1px solid #ccd8e2;border-radius:10px;margin:7px 0;padding:7px 9px;background:#fff;max-width:100%!important;box-sizing:border-box!important;overflow:hidden!important}
+  .readonly-prep-table td{border:0!important;padding:4px 0!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;max-width:100%!important;font-size:15px!important;line-height:1.25!important}
+  .readonly-prep-table td:before{content:attr(data-label);display:block;font-size:11px;font-weight:800;color:#536779;margin-bottom:1px}
+  .employee-doc{align-items:flex-start!important;flex-direction:column!important;max-width:100%!important;box-sizing:border-box!important}
+  .employee-doc .btn{width:100%!important}
+  .employee-doc strong,.doc-name{overflow-wrap:anywhere!important;word-break:break-word!important}
+  #employeeJobBody,#subJobFolderContent{font-size:15px!important;overflow-x:hidden!important}
+  #employeeJobBody h3,#subJobFolderContent h3{font-size:18px!important}
+  #employeeJobBody .muted,#subJobFolderContent .muted{font-size:13px!important}
 }
 </style>
 
@@ -235,7 +245,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée au nouvel environnement de développement V0.12.5.</p>
+    <p>Connexion sécurisée au nouvel environnement de développement V0.12.6.</p>
     <div class="field"><label>Adresse e-mail</label><input id="loginEmail" type="email" autocomplete="username" required></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -252,13 +262,13 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.12.5</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.12.6</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>7/9</strong><span>modules opérationnels</span></div></div>
-  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.12.5 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
+  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.12.6 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
   </div>
 </section>
 <section id="subPortal" class="view">
@@ -774,22 +784,33 @@ async function openEmployeeJobFolder(jobId,date){
  const modalId='employeeJobModal';let m=document.getElementById(modalId);if(!m){m=document.createElement('div');m.className='modal';m.id=modalId;m.innerHTML='<div class="modal-card" style="max-width:900px"><div class="modal-head"><h3 id="employeeJobTitle">Feuille chantier</h3><button class="close" onclick="closeModal(\'employeeJobModal\')">Fermer</button></div><div id="employeeJobBody" style="margin-top:12px"></div></div>';document.body.appendChild(m)}
  employeeJobTitle.textContent='Feuille chantier — '+j.nom;employeeJobBody.innerHTML='<div class="notice">Chargement du chantier…</div>';openModal(modalId);
  const folder=await sb.rpc('erp_get_my_job_folder',{p_chantier_id:String(jobId)});
- if(folder.error){employeeJobBody.innerHTML='<div class="notice danger"><strong>Données chantier indisponibles.</strong><br>'+esc(folder.error.message)+'<br><span class="muted">La fonction Supabase V0.12.5 doit être installée.</span></div>';return}
+ if(folder.error){employeeJobBody.innerHTML='<div class="notice danger"><strong>Données chantier indisponibles.</strong><br>'+esc(folder.error.message)+'<br><span class="muted">La fonction Supabase V0.12.6 doit être installée.</span></div>';return}
  const fd=Array.isArray(folder.data)?folder.data[0]:folder.data;
  if(!fd||fd.authorized===false){employeeJobBody.innerHTML='<div class="notice danger">Ce chantier n’est pas autorisé pour votre équipe.</div>';return}
  employeeDocs=Array.isArray(fd.documents)?fd.documents:[];
- const dh=employeeDocs.length?`<div class="employee-docs">${employeeDocs.map(d=>`<div class="employee-doc"><div><strong>${esc(d.file_name)}</strong><div class="muted">${esc(d.category||'Document')}${d.note?' · '+esc(d.note):''}</div></div><button class="btn secondary" onclick="openEmployeeDocument('${d.id}','${jobId}')">${d.category==='Photo'?'Voir la photo':'Ouvrir / imprimer'}</button></div>`).join('')}</div>`:'<div class="empty">Aucun document mis à disposition pour le moment.</div>';
+ const dh=employeeDocs.length?`<div class="employee-docs">${employeeDocs.map(d=>`<div class="employee-doc"><div><strong>${d.category==='Photo'?'Photo — ':''}${esc(d.file_name)}</strong><div class="muted">${esc(d.category||'Document')}${d.note?' · '+esc(d.note):''}</div></div><button class="btn secondary" onclick="openEmployeeDocument('${d.id}','${jobId}')">${d.category==='Photo'?'Voir la photo':'Ouvrir / imprimer'}</button></div>`).join('')}</div>`:'<div class="empty">Aucun document ou photo visible pour les salariés.</div>';
  const qh=employeePreparationReadOnlyHtml(fd.preparation);
  employeeJobBody.innerHTML=`<div class="panel" style="padding:14px"><h3 style="margin-top:0">Informations chantier</h3><div><strong>Date :</strong> ${new Date(date+'T12:00:00').toLocaleDateString('fr-FR')}</div><div><strong>Client :</strong> ${esc(c?.nom||'')}</div><div><strong>Chantier :</strong> ${esc(j.nom)}</div>${j.adresse?`<div><strong>Adresse :</strong> ${esc(j.adresse)}</div>`:''}${j.contact_nom?`<div><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j.notes?`<div style="margin-top:8px"><strong>Consignes :</strong><br>${esc(j.notes).replace(/\n/g,'<br>')}</div>`:''}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Quantitatifs / travaux à réaliser</h3><div class="muted">Consultation uniquement — les quantités ne peuvent pas être modifiées depuis l’espace salarié.</div>${qh}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Plans, photos et documents</h3>${dh}</div><div class="employee-photo-box"><h3 style="margin-top:0">Photos du chantier</h3><div class="muted">Les photos sont envoyées directement dans le dossier du chantier.</div><div class="actions" style="margin-top:10px"><button class="btn" type="button" onclick="document.getElementById('employeeCameraInput').click()">Prendre une photo</button><button class="btn secondary" type="button" onclick="document.getElementById('employeePhotoInput').click()">Choisir dans la photothèque</button></div><input id="employeeCameraInput" type="file" accept="image/*" capture="environment" hidden onchange="uploadEmployeePhotos('${jobId}','${date}','employeeCameraInput')"><input id="employeePhotoInput" type="file" accept="image/*" multiple hidden onchange="uploadEmployeePhotos('${jobId}','${date}','employeePhotoInput')"></div>`;
+}
+async function resolveEmployeeStoragePath(d,jobId){
+ const candidates=[d?.storage_path].filter(Boolean);
+ const safe=String(d?.file_name||'').replace(/[^a-zA-Z0-9._-]+/g,'_');
+ const dirs=[String(jobId),`${jobId}/admin`,`${jobId}/employee`];
+ for(const dir of dirs){
+  const lr=await sb.storage.from(DOC_BUCKET).list(dir,{limit:100,sortBy:{column:'created_at',order:'desc'},search:safe||undefined});
+  if(!lr.error){for(const o of (lr.data||[])){if(o?.name&&!o.id)continue;const path=`${dir}/${o.name}`;if(!candidates.includes(path))candidates.push(path)}}
+ }
+ for(const path of candidates){const signed=await sb.storage.from(DOC_BUCKET).createSignedUrl(path,300);if(!signed.error&&signed.data?.signedUrl)return {path,url:signed.data.signedUrl}}
+ return null;
 }
 async function openEmployeeDocument(docId,jobId){
  const allowed=employeeAssignments.some(a=>String(a.chantier_id)===String(jobId));
  if(!allowed){alert('Chantier non attribué à votre équipe.');return}
  const d=(employeeDocs||[]).find(x=>String(x.id)===String(docId)&&String(x.chantier_id)===String(jobId));
- if(!d||!d.storage_path){alert('Document inaccessible : fichier introuvable dans le dossier chantier.');return}
- const signed=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,300);
- if(signed.error){alert('Ouverture impossible : '+signed.error.message);return}
- window.open(signed.data.signedUrl,'_blank','noopener');
+ if(!d){alert('Document inaccessible.');return}
+ const found=await resolveEmployeeStoragePath(d,jobId);
+ if(!found){alert('Ouverture impossible : le fichier est référencé dans le chantier mais aucun fichier correspondant n’a été retrouvé dans le stockage.');return}
+ window.open(found.url,'_blank','noopener');
 }
 async function uploadEmployeePhotos(jobId,date,inputId='employeePhotoInput'){const input=document.getElementById(inputId);if(!input?.files?.length){alert('Choisissez au moins une photo.');return}const j=db.chantiers.find(x=>x.id===jobId);let ok=0;for(const f of [...input.files]){if(!String(f.type||'').startsWith('image/'))continue;const safe=f.name.replace(/[^a-zA-Z0-9._-]+/g,'_'),path=`${jobId}/employee/${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${safe}`;const up=await sb.storage.from(DOC_BUCKET).upload(path,f,{upsert:false,contentType:f.type||undefined});if(up.error){alert('Envoi impossible : '+up.error.message);return}const row={client_id:j?.client_id||null,chantier_id:jobId,category:'Photo',file_name:f.name,storage_path:path,mime_type:f.type||null,file_size:f.size,note:'Photo terrain ajoutée par '+(employeeAccount?.employee_name||'un salarié'),employee_visible:true,subcontractor_visible:false,uploaded_by_employee:currentUser.id};const ins=await sb.from('erp_documents').insert(row);if(ins.error){await sb.storage.from(DOC_BUCKET).remove([path]);alert('Enregistrement impossible : '+ins.error.message);return}ok++}input.value='';alert(ok+' photo(s) ajoutée(s) au chantier.');await openEmployeeJobFolder(jobId,date)}
 
