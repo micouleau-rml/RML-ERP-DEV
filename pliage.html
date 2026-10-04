@@ -1771,7 +1771,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
 <body>
 <div class="container">
   <div class="hero">
-    <div class="brand"><div class="app-version">VERSION 103</div></div>
+    <div class="brand"><div class="app-version">VERSION 104</div></div>
     <div class="install">
   <button class="btn-new" id="newProjectBtn">Nouveau devis</button>
   <button class="btn-primary" id="openSettingsBtn">Réglages</button>
@@ -3980,7 +3980,13 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
       clients=data.clients.map(normalizeClient);
       saveClients();
       if(Array.isArray(data.projectFolders))saveProjectFolders(data.projectFolders);
-      if(Array.isArray(data.bendLibrary))localStorage.setItem(STORAGE_KEY_BEND_LIBRARY,JSON.stringify(data.bendLibrary));
+      if(Array.isArray(data.bendLibrary)){
+        localStorage.setItem(STORAGE_KEY_BEND_LIBRARY,JSON.stringify(data.bendLibrary));
+        // La sauvegarde importée est prioritaire : on marque explicitement chaque
+        // modèle restauré comme une modification locale récente avant la synchro ERP.
+        // Cela empêche une ancienne version distante de vider/remplacer la bibliothèque.
+        setTimeout(()=>window.RML_ERP_PLIAGE_SYNC?.protectRestoredLibrary?.(data.bendLibrary),0);
+      }
 
       if(hasProjects){
         const restoredProjects=data.projects.map(project=>({
@@ -8834,13 +8840,20 @@ if(quotePdfBtn){
     finally{syncing=false;}
   }
   function scheduleSync(){clearTimeout(syncTimer);setStatus(navigator.onLine?"Modification locale enregistrée.":"Hors ligne : modification locale enregistrée.");syncTimer=setTimeout(syncNow,1200);}
+  function protectRestoredLibrary(models){
+    if(!Array.isArray(models))return;
+    const stamp=now();
+    models.filter(model=>model&&model.id).forEach(model=>queue("settings",String(model.id),model,false,stamp));
+    setStatus(`${models.length} modèle(s) de bibliothèque restauré(s) — sauvegarde ERP en cours…`);
+    setTimeout(syncNow,50);
+  }
   $("syncSupabaseMainBtn")?.addEventListener("click",syncNow);
   window.addEventListener("online",syncNow);
   window.addEventListener("offline",()=>setStatus("Hors ligne : les changements restent sur cet appareil."));
   window.addEventListener("storage",event=>{if(SYNC_KEYS[event.key]){capture(event.key,event.oldValue,event.newValue);syncNow();}});
   setInterval(syncNow,60000);
   setTimeout(syncNow,700);
-  window.RML_ERP_PLIAGE_SYNC={syncNow,status:()=>({pending:loadPending().length,table:TABLE,workspace:WORKSPACE})};
+  window.RML_ERP_PLIAGE_SYNC={syncNow,protectRestoredLibrary,status:()=>({pending:loadPending().length,table:TABLE,workspace:WORKSPACE})};
 })();
 </script>
 <!-- V60 validée : grand dessinateur simplifié -->
