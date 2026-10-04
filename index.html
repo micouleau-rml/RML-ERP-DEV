@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V0.12.3 · Fiche chantier & terrain</title>
+<title>RML ERP — V0.12.4 · Fiche chantier & terrain</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -226,7 +226,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée au nouvel environnement de développement V0.12.3.</p>
+    <p>Connexion sécurisée au nouvel environnement de développement V0.12.4.</p>
     <div class="field"><label>Adresse e-mail</label><input id="loginEmail" type="email" autocomplete="username" required></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -243,13 +243,13 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.12.3</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.12.4</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>7/9</strong><span>modules opérationnels</span></div></div>
-  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.12.3 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
+  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.12.4 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
   </div>
 </section>
 <section id="subPortal" class="view">
@@ -765,7 +765,7 @@ async function openEmployeeJobFolder(jobId,date){
  const modalId='employeeJobModal';let m=document.getElementById(modalId);if(!m){m=document.createElement('div');m.className='modal';m.id=modalId;m.innerHTML='<div class="modal-card" style="max-width:900px"><div class="modal-head"><h3 id="employeeJobTitle">Feuille chantier</h3><button class="close" onclick="closeModal(\'employeeJobModal\')">Fermer</button></div><div id="employeeJobBody" style="margin-top:12px"></div></div>';document.body.appendChild(m)}
  employeeJobTitle.textContent='Feuille chantier — '+j.nom;employeeJobBody.innerHTML='<div class="notice">Chargement du chantier…</div>';openModal(modalId);
  const folder=await sb.rpc('erp_get_my_job_folder',{p_chantier_id:String(jobId)});
- if(folder.error){employeeJobBody.innerHTML='<div class="notice danger"><strong>Données chantier indisponibles.</strong><br>'+esc(folder.error.message)+'<br><span class="muted">La fonction Supabase V0.12.3 doit être installée.</span></div>';return}
+ if(folder.error){employeeJobBody.innerHTML='<div class="notice danger"><strong>Données chantier indisponibles.</strong><br>'+esc(folder.error.message)+'<br><span class="muted">La fonction Supabase V0.12.4 doit être installée.</span></div>';return}
  const fd=Array.isArray(folder.data)?folder.data[0]:folder.data;
  if(!fd||fd.authorized===false){employeeJobBody.innerHTML='<div class="notice danger">Ce chantier n’est pas autorisé pour votre équipe.</div>';return}
  employeeDocs=Array.isArray(fd.documents)?fd.documents:[];
@@ -773,7 +773,17 @@ async function openEmployeeJobFolder(jobId,date){
  const qh=employeePreparationReadOnlyHtml(fd.preparation);
  employeeJobBody.innerHTML=`<div class="panel" style="padding:14px"><h3 style="margin-top:0">Informations chantier</h3><div><strong>Date :</strong> ${new Date(date+'T12:00:00').toLocaleDateString('fr-FR')}</div><div><strong>Client :</strong> ${esc(c?.nom||'')}</div><div><strong>Chantier :</strong> ${esc(j.nom)}</div>${j.adresse?`<div><strong>Adresse :</strong> ${esc(j.adresse)}</div>`:''}${j.contact_nom?`<div><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j.notes?`<div style="margin-top:8px"><strong>Consignes :</strong><br>${esc(j.notes).replace(/\n/g,'<br>')}</div>`:''}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Quantitatifs / travaux à réaliser</h3><div class="muted">Consultation uniquement — les quantités ne peuvent pas être modifiées depuis l’espace salarié.</div>${qh}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Plans, photos et documents</h3>${dh}</div><div class="employee-photo-box"><h3 style="margin-top:0">Photos du chantier</h3><div class="muted">Les photos sont envoyées directement dans le dossier du chantier.</div><div class="actions" style="margin-top:10px"><button class="btn" type="button" onclick="document.getElementById('employeeCameraInput').click()">Prendre une photo</button><button class="btn secondary" type="button" onclick="document.getElementById('employeePhotoInput').click()">Choisir dans la photothèque</button></div><input id="employeeCameraInput" type="file" accept="image/*" capture="environment" hidden onchange="uploadEmployeePhotos('${jobId}','${date}','employeeCameraInput')"><input id="employeePhotoInput" type="file" accept="image/*" multiple hidden onchange="uploadEmployeePhotos('${jobId}','${date}','employeePhotoInput')"></div>`;
 }
-async function openEmployeeDocument(docId,jobId){const d=employeeDocs.find(x=>x.id===docId);if(!d||d.chantier_id!==jobId||!d.employee_visible){alert('Document non autorisé.');return}const r=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,300);if(r.error){alert('Ouverture impossible : '+r.error.message);return}window.open(r.data.signedUrl,'_blank','noopener')}
+async function openEmployeeDocument(docId,jobId){
+ // V0.12.4 : même principe que l'espace sous-traitant : on revalide d'abord
+ // le document côté base, puis seulement ensuite on demande l'URL Storage.
+ const allowed=employeeAssignments.some(a=>String(a.chantier_id)===String(jobId));
+ if(!allowed){alert('Chantier non attribué à votre équipe.');return}
+ const {data:d,error}=await sb.from('erp_documents').select('*').eq('id',docId).eq('chantier_id',jobId).eq('employee_visible',true).single();
+ if(error||!d){alert('Document inaccessible : '+(error?.message||'document non autorisé'));return}
+ const signed=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,300);
+ if(signed.error){alert('Ouverture impossible : '+signed.error.message);return}
+ window.open(signed.data.signedUrl,'_blank','noopener');
+}
 async function uploadEmployeePhotos(jobId,date,inputId='employeePhotoInput'){const input=document.getElementById(inputId);if(!input?.files?.length){alert('Choisissez au moins une photo.');return}const j=db.chantiers.find(x=>x.id===jobId);let ok=0;for(const f of [...input.files]){if(!String(f.type||'').startsWith('image/'))continue;const safe=f.name.replace(/[^a-zA-Z0-9._-]+/g,'_'),path=`${jobId}/employee/${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${safe}`;const up=await sb.storage.from(DOC_BUCKET).upload(path,f,{upsert:false,contentType:f.type||undefined});if(up.error){alert('Envoi impossible : '+up.error.message);return}const row={client_id:j?.client_id||null,chantier_id:jobId,category:'Photo',file_name:f.name,storage_path:path,mime_type:f.type||null,file_size:f.size,note:'Photo terrain ajoutée par '+(employeeAccount?.employee_name||'un salarié'),employee_visible:true,subcontractor_visible:false,uploaded_by_employee:currentUser.id};const ins=await sb.from('erp_documents').insert(row);if(ins.error){await sb.storage.from(DOC_BUCKET).remove([path]);alert('Enregistrement impossible : '+ins.error.message);return}ok++}input.value='';alert(ok+' photo(s) ajoutée(s) au chantier.');await openEmployeeJobFolder(jobId,date)}
 
 async function loadCurrentAccess(){const {data,error}=await sb.from('erp_user_access').select('*').eq('user_id',currentUser.id).single();if(error){console.error(error);return {error}}currentAccess=data;return {data}}
