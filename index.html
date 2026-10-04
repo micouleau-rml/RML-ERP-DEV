@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V0.11.2 · Professions clients</title>
+<title>RML ERP — V0.11.12 · Gestion des équipes</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -243,10 +243,10 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.11</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V0.11.12</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
-<nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
+<nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>7/9</strong><span>modules opérationnels</span></div></div>
   <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette V0.10.3 utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
@@ -321,6 +321,14 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 </section>
 <section id="documents" class="view"><div class="panel"><div class="docs-head"><div><h2>Documents</h2><div class="muted">Documents classés par client et chantier. Fichiers stockés dans Supabase Storage ERP DEV.</div></div><button class="btn secondary" onclick="loadDocuments()">Actualiser</button></div><div class="upload-box"><strong>Ajouter un document</strong><div class="field" style="margin-top:10px"><label>Rechercher un client ou un chantier</label><input id="docAddContextSearch" type="search" placeholder="Nom du client, chantier ou adresse…" oninput="searchAddDocumentContext()"></div><div class="upload-grid" style="margin-top:10px"><div class="field"><label>Client</label><select id="docClient"></select></div><div class="field"><label>Chantier</label><select id="docJob"></select></div><div class="field"><label>Catégorie</label><select id="docCategory"><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div></div><div class="field"><label>Fichier</label><input id="docFile" type="file"></div><div class="field"><label>Note</label><input id="docNote" placeholder="Description facultative"></div><div class="field"><label><input id="docEmployeeVisible" type="checkbox"> Mettre également ce document à disposition des salariés affectés au chantier</label></div><div class="field"><label>Mettre ce document à disposition de</label><div id="docSubRecipients" class="sub-contract" style="padding:10px;margin-top:4px"><span class="muted">Sélectionnez d’abord un chantier.</span></div></div><button class="btn" onclick="uploadDocument()">Ajouter le document</button></div><div class="docs-filters" style="margin-top:16px"><select id="docFilterClient" onchange="docFilterClientChanged()"></select><select id="docFilterJob" onchange="renderDocuments()"></select><select id="docFilterCategory" onchange="renderDocuments()"><option value="">Toutes les catégories</option><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div><div id="documentsStatus" class="notice">Chargement…</div><div id="documentsList" class="doc-list" style="margin-top:12px"></div></div></section>
 
+<section id="equipes" class="view">
+ <div class="panel">
+  <div class="toolbar"><div style="flex:1"><h2 style="margin:0">Équipes</h2><div class="muted">Gestion des comptes permanents Équipe 1, Équipe 2, etc. La composition des salariés reste définie chaque jour dans le Planning.</div></div><button class="btn secondary" type="button" onclick="loadTeamsAdmin()">Actualiser</button></div>
+  <div class="notice" style="margin:12px 0">Un compte d’accès peut être rattaché à une seule équipe permanente. Le compte suit ensuite automatiquement les chantiers affectés à ce numéro d’équipe dans le Planning.</div>
+  <div id="teamsStatus" class="notice">Chargement…</div>
+  <div id="teamsList" class="sub-grid" style="margin-top:12px"></div>
+ </div>
+</section>
 <section id="sous-traitants" class="view">
  <div class="panel">
   <div class="toolbar"><div style="flex:1"><h2 style="margin:0">Sous-traitants</h2><div class="muted">Affectation aux chantiers, contrats et signature manuscrite directement sur téléphone.</div></div><button class="btn secondary" onclick="loadSubcontractors()">Actualiser</button></div>
@@ -676,7 +684,7 @@ function applyAccessUI(){
   if(clientsBtn)clientsBtn.style.display=hasPerm('clients')?'':'none';
   if(jobsBtn)jobsBtn.style.display=hasPerm('chantiers')?'':'none';
   document.querySelectorAll('#mainNav [data-perm-nav]').forEach(b=>b.style.display=hasPerm(b.dataset.permNav)?'':'none');
-  usersNavBtn.style.display=hasPerm('utilisateurs')?'':'none';
+  usersNavBtn.style.display=hasPerm('utilisateurs')?'':'none';if(window.teamsNavBtn)teamsNavBtn.style.display=hasPerm('utilisateurs')?'':'none';
   if(window.securityNavBtn)securityNavBtn.style.display=currentAccess?.role==='administrateur'?'':'none';
   newClientBtn.style.display=hasPerm('clients')?'':'none';
   importClientsBtn.style.display=hasPerm('clients')?'':'none';if(window.importChantierBackupBtn)importChantierBackupBtn.style.display=(hasPerm('clients')&&hasPerm('chantiers')&&hasPerm('preparation'))?'':'none';if(window.deleteLastImportBtn)deleteLastImportBtn.style.display=hasPerm('clients')?'':'none';
@@ -685,7 +693,7 @@ function applyAccessUI(){
 }
 function go(view){
 if(isSubcontractorUser()){view='subPortal'}else if(isEmployeeUser() && !(currentAccess?.role==='chef_equipe'&&view==='suivi')){view='employeePortal'}
-if(view==='preparation')setTimeout(loadPreparationApp,0);if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security')renderResetStats();if(view==='page-forecast')renderMonthlyForecast()}
+if(view==='preparation')setTimeout(loadPreparationApp,0);if(view==='equipes'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='equipes')loadTeamsAdmin();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security')renderResetStats();if(view==='page-forecast')renderMonthlyForecast()}
 mainNav.addEventListener('click',e=>{if(e.target.dataset.view)go(e.target.dataset.view)});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
 function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
 document.querySelectorAll('[data-close="jobModal"]').forEach(b=>{b.onclick=(e)=>{e.preventDefault();requestCloseJobEditor()}});
@@ -1498,6 +1506,55 @@ function editMaintenanceEvent(id){const e=maintenanceEvents.find(x=>x.id===id);i
 maintenanceEventForm.onsubmit=async e=>{e.preventDefault();const row={asset_id:eventAssetId.value,event_type:eventType.value,title:eventTitle.value.trim(),event_date:eventDate.value||null,next_due_date:eventDue.value||null,next_due_counter:eventDueCounter.value?Number(eventDueCounter.value):null,cost:eventCost.value?Number(eventCost.value):0,supplier:eventSupplier.value.trim()||null,downtime_days:eventDowntime.value?Number(eventDowntime.value):0,notes:eventNotes.value.trim()||null,updated_at:new Date().toISOString()};let r=eventId.value?await sb.from('erp_maintenance_events').update(row).eq('id',eventId.value):await sb.from('erp_maintenance_events').insert(row);if(r.error){alert(r.error.message);return}closeModal('maintenanceEventModal');await loadMaintenance()}
 async function deleteMaintenanceEvent(id){if(!confirm('Supprimer cette intervention ?'))return;const r=await sb.from('erp_maintenance_events').delete().eq('id',id);if(r.error){alert(r.error.message);return}await loadMaintenance()}
 
+let erpTeamLinks=[];
+async function loadTeamsAdmin(){
+ if(!hasPerm('utilisateurs'))return;
+ if(!window.teamsStatus||!window.teamsList)return;
+ teamsStatus.className='notice';teamsStatus.textContent='Chargement des équipes…';teamsList.innerHTML='';
+ const users=(db.users||[]).filter(u=>['ouvrier','chef_equipe'].includes(u.role)&&u.active);
+ try{
+  const links=[];
+  for(const u of users){
+   const r=await sb.rpc('erp_get_team_account',{p_auth_user_id:u.user_id});
+   if(r.error)throw r.error;
+   const row=Array.isArray(r.data)?r.data[0]:r.data;
+   if(row?.team_number)links.push({...row,auth_user_id:u.user_id});
+  }
+  erpTeamLinks=links;
+  teamsStatus.className='notice';teamsStatus.textContent=`8 équipes permanentes · ${links.length} compte(s) rattaché(s)`;
+  renderTeamsAdmin();
+ }catch(err){console.error(err);teamsStatus.className='notice danger';teamsStatus.textContent='Gestion des équipes indisponible : '+err.message}
+}
+function renderTeamsAdmin(){
+ if(!window.teamsList)return;
+ const users=(db.users||[]).filter(u=>['ouvrier','chef_equipe'].includes(u.role)&&u.active);
+ teamsList.innerHTML=Array.from({length:8},(_,i)=>i+1).map(n=>{
+  const link=erpTeamLinks.find(x=>Number(x.team_number)===n);
+  const linkedUser=link?users.find(u=>u.user_id===link.auth_user_id):null;
+  const usedIds=new Set(erpTeamLinks.filter(x=>Number(x.team_number)!==n).map(x=>x.auth_user_id));
+  const options=users.filter(u=>!usedIds.has(u.user_id)||u.user_id===link?.auth_user_id).map(u=>`<option value="${esc(u.user_id)}" ${u.user_id===link?.auth_user_id?'selected':''}>${esc(u.nom||u.email||'Utilisateur')} — ${esc(u.email||'')} (${esc(roleLabel(u.role))})</option>`).join('');
+  return `<div class="sub-card"><div class="row between"><div><h3 style="margin-bottom:4px">Équipe ${n}</h3><div class="sub-meta">Compte permanent de l’équipe</div></div>${linkedUser?'<span class="status actif">Compte actif</span>':'<span class="status attente">Non rattaché</span>'}</div><div class="field" style="margin-top:12px"><label>Compte d’accès ERP</label><select id="teamAccount_${n}"><option value="">Aucun compte rattaché</option>${options}</select></div>${linkedUser?`<div class="sub-meta" style="margin-top:8px"><strong>${esc(linkedUser.nom||linkedUser.email||'Utilisateur')}</strong><br>${esc(linkedUser.email||'')} · ${esc(roleLabel(linkedUser.role))}</div>`:''}<div class="actions" style="margin-top:12px"><button class="btn" type="button" onclick="saveTeamAccount(${n})">Enregistrer</button>${linkedUser?`<button class="btn secondary" type="button" onclick="editAccess('${linkedUser.user_id}')">Modifier les droits</button><button class="btn danger" type="button" onclick="unlinkTeamAccount(${n},'${linkedUser.user_id}')">Détacher</button>`:''}</div></div>`;
+ }).join('');
+}
+async function saveTeamAccount(teamNumber){
+ if(!hasPerm('utilisateurs'))return;
+ const sel=document.getElementById('teamAccount_'+teamNumber),userId=sel?.value||'';
+ const current=erpTeamLinks.find(x=>Number(x.team_number)===Number(teamNumber));
+ if(!userId){if(current)return unlinkTeamAccount(teamNumber,current.auth_user_id);alert('Choisissez un compte d’accès ERP.');return}
+ const other=erpTeamLinks.find(x=>x.auth_user_id===userId&&Number(x.team_number)!==Number(teamNumber));
+ if(other&&!confirm(`Ce compte est actuellement rattaché à l’Équipe ${other.team_number}. Le déplacer vers l’Équipe ${teamNumber} ?`))return;
+ teamsStatus.className='notice';teamsStatus.textContent='Enregistrement de l’Équipe '+teamNumber+'…';
+ const r=await sb.rpc('erp_set_team_account',{p_auth_user_id:userId,p_team_number:Number(teamNumber),p_active:true});
+ if(r.error){teamsStatus.className='notice danger';teamsStatus.textContent='Enregistrement impossible : '+r.error.message;return}
+ await loadTeamsAdmin();
+}
+async function unlinkTeamAccount(teamNumber,userId){
+ if(!hasPerm('utilisateurs')||!userId)return;
+ if(!confirm(`Détacher le compte de l’Équipe ${teamNumber} ?\n\nLe compte utilisateur n’est pas supprimé.`))return;
+ const {error}=await sb.from('erp_employee_accounts').delete().eq('auth_user_id',userId);
+ if(error){teamsStatus.className='notice danger';teamsStatus.textContent='Détachement impossible : '+error.message;return}
+ await loadTeamsAdmin();
+}
 function renderUsers(){if(!hasPerm('utilisateurs')){usersTable.innerHTML='<div class="empty">Accès non autorisé.</div>';return}const rows=db.users||[];if(!rows.length){usersTable.innerHTML='<div class="empty">Aucun utilisateur trouvé.</div>';return}usersTable.innerHTML='<div class="tablewrap"><table class="table access-table"><thead><tr><th>Utilisateur</th><th>Rôle</th><th>État</th><th>Modules autorisés</th><th>Actions</th></tr></thead><tbody>'+rows.map(u=>{const count=permissionList.filter(([k])=>u.permissions?.[k]).length;return `<tr><td><div class="access-user"><strong>${esc(u.nom||u.email||'Utilisateur')}</strong><small>${esc(u.email||'')}</small></div></td><td><span class="role-badge">${esc(roleLabel(u.role))}</span></td><td>${u.active?'<span class="status actif">Actif</span>':'<span class="status archive">Désactivé</span>'}</td><td>${count}/${permissionList.length}</td><td><div class="actions"><button onclick="editAccess('${u.user_id}')">Modifier les droits</button></div></td></tr>`}).join('')+'</tbody></table></div>'}
 function buildPermissionGrid(values={}){permissionGrid.innerHTML=permissionList.map(([k,label])=>`<label class="perm-item"><input type="checkbox" data-perm="${k}" ${values?.[k]?'checked':''}><span>${esc(label)}</span></label>`).join('')}
 async function loadEmployeeLinkOptions(selected=''){if(window.accessEmployeeLink)accessEmployeeLink.value=selected||''}
