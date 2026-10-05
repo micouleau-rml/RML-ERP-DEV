@@ -262,7 +262,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V13.7</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V13.8</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -313,7 +313,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
 </section>
 
 <section id="preparation" class="view">
-<div class="panel" style="padding:12px 16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2 style="margin:0">Préparation chantier</h2><div class="muted">Fiche du chantier sélectionné.</div></div><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div id="externalPrepSyncStatus" class="muted" style="font-weight:700">Aucune modification enregistrée.</div><button class="btn secondary" type="button" onclick="printExternalPreparation()">Imprimer / PDF</button><button class="btn ok" type="button" onclick="saveExternalPreparationManual()">✓ Enregistrer la préparation</button></div></div></div>
+<div class="panel" style="padding:12px 16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2 style="margin:0">Préparation chantier</h2><div class="muted">Fiche du chantier sélectionné.</div></div><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div id="externalPrepSyncStatus" class="muted" style="font-weight:700">Aucune modification enregistrée.</div><button class="btn secondary" type="button" onclick="previewExternalPreparation()">Aperçu / Imprimer</button><button class="btn ok" type="button" onclick="saveExternalPreparationManual()">✓ Enregistrer la préparation</button></div></div></div>
 <div style="height:calc(100vh - 190px);min-height:650px;margin-top:12px;border:1px solid #d9e0e8;border-radius:14px;overflow:hidden;background:#fff"><iframe id="preparationAppFrame" onload="bridgePreparationContext()" title="RML Préparation Chantier" style="width:100%;height:100%;border:0;background:#fff" allow="clipboard-read; clipboard-write"></iframe></div>
 </section>
 
@@ -2145,15 +2145,63 @@ function externalPrepStatus(text,kind=''){
 }
 let erpSaveToastTimer=null;
 function showErpSaveToast(message,detail='',danger=false){const el=document.getElementById('erpSaveToast');if(!el)return;el.className='erp-save-toast'+(danger?' danger':'');el.innerHTML=message+(detail?`<small>${esc(detail)}</small>`:'');el.classList.add('show');clearTimeout(erpSaveToastTimer);erpSaveToastTimer=setTimeout(()=>el.classList.remove('show'),6000)}
-function printExternalPreparation(){
+function previewExternalPreparation(){
  const f=document.getElementById('preparationAppFrame');
  if(!f||!f.contentWindow){alert('La fiche de préparation n’est pas encore chargée.');return}
  try{
-  f.contentWindow.focus();
-  f.contentWindow.print();
+  const d=f.contentWindow.document;
+  if(!d||!d.documentElement){alert('La fiche de préparation n’est pas encore disponible.');return}
+
+  // Recopie les valeurs actuellement saisies dans les champs avant de créer l'aperçu.
+  const clone=d.documentElement.cloneNode(true);
+  const srcFields=d.querySelectorAll('input,textarea,select');
+  const dstFields=clone.querySelectorAll('input,textarea,select');
+  srcFields.forEach((el,i)=>{
+   const c=dstFields[i]; if(!c)return;
+   if(el.tagName==='TEXTAREA') c.textContent=el.value;
+   else if(el.tagName==='SELECT'){
+    [...c.options].forEach((o,j)=>o.selected=!!el.options[j]?.selected);
+   }else{
+    c.setAttribute('value',el.value||'');
+    if(el.checked)c.setAttribute('checked','checked');else c.removeAttribute('checked');
+   }
+  });
+
+  // L'aperçu est autonome : on retire les scripts et les commandes de l'application.
+  clone.querySelectorAll('script').forEach(x=>x.remove());
+  const head=clone.querySelector('head');
+  if(head){
+   const base=d.createElement('base'); base.href=PREPARATION_APP_URL; head.prepend(base);
+   const st=d.createElement('style');
+   st.textContent=`
+    body{padding-top:70px!important;background:#fff!important}
+    body>header,.toolbar,.project-save-panel{display:none!important}
+    #rmlPrintPreviewBar{display:flex!important}
+    @media print{
+      body{padding-top:0!important}
+      #rmlPrintPreviewBar{display:none!important}
+      @page{size:A4 portrait;margin:10mm}
+    }`;
+   head.appendChild(st);
+  }
+  const body=clone.querySelector('body');
+  if(body){
+   const bar=d.createElement('div');
+   bar.id='rmlPrintPreviewBar';
+   bar.setAttribute('style','position:fixed;z-index:999999;left:0;right:0;top:0;background:#0b3555;color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.2)');
+   bar.innerHTML='<strong>Aperçu avant impression — Fiche de préparation chantier</strong><button type="button" onclick="window.print()" style="border:0;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer">Imprimer / Enregistrer en PDF</button>';
+   body.prepend(bar);
+  }
+
+  const w=window.open('','_blank');
+  if(!w){alert("Safari a bloqué l’aperçu. Autorisez les fenêtres surgissantes pour ce site.");return}
+  w.document.open();
+  w.document.write('<!doctype html>'+clone.outerHTML);
+  w.document.close();
+  w.focus();
  }catch(err){
-  console.error('Impression préparation :',err);
-  alert('Impossible d’ouvrir l’impression de la fiche.');
+  console.error('Aperçu préparation :',err);
+  alert("Impossible de générer l’aperçu de la fiche.");
  }
 }
 async function saveExternalPreparationManual(){const ok=await syncExternalPreparationToERP(false);if(ok){const now=new Date();const time=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});externalPrepStatus('✓ Dernier enregistrement : '+time,'ok');showErpSaveToast('✓ PRÉPARATION ENREGISTRÉE','Toutes les quantités et informations du chantier ont bien été enregistrées dans l’ERP.');}else{showErpSaveToast('ÉCHEC DE L’ENREGISTREMENT','La préparation n’a pas pu être enregistrée. Réessayez.',true)}}
