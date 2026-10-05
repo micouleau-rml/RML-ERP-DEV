@@ -262,7 +262,7 @@ body.commandes-mode #commandesFrame{flex:1 1 auto!important;height:100%!importan
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V13.8</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V13.9</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse">Analyse chantier</button><button onclick="openForecastPage()">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none">Sécurité / Réinitialisation</button></nav>
@@ -2147,62 +2147,60 @@ let erpSaveToastTimer=null;
 function showErpSaveToast(message,detail='',danger=false){const el=document.getElementById('erpSaveToast');if(!el)return;el.className='erp-save-toast'+(danger?' danger':'');el.innerHTML=message+(detail?`<small>${esc(detail)}</small>`:'');el.classList.add('show');clearTimeout(erpSaveToastTimer);erpSaveToastTimer=setTimeout(()=>el.classList.remove('show'),6000)}
 function previewExternalPreparation(){
  const f=document.getElementById('preparationAppFrame');
- if(!f||!f.contentWindow){alert('La fiche de préparation n’est pas encore chargée.');return}
- try{
-  const d=f.contentWindow.document;
-  if(!d||!d.documentElement){alert('La fiche de préparation n’est pas encore disponible.');return}
+ if(!f){alert('La fiche de préparation n’est pas encore chargée.');return}
+ const old=document.getElementById('rmlPreparationPrintOverlay');
+ if(old)old.remove();
 
-  // Recopie les valeurs actuellement saisies dans les champs avant de créer l'aperçu.
-  const clone=d.documentElement.cloneNode(true);
-  const srcFields=d.querySelectorAll('input,textarea,select');
-  const dstFields=clone.querySelectorAll('input,textarea,select');
-  srcFields.forEach((el,i)=>{
-   const c=dstFields[i]; if(!c)return;
-   if(el.tagName==='TEXTAREA') c.textContent=el.value;
-   else if(el.tagName==='SELECT'){
-    [...c.options].forEach((o,j)=>o.selected=!!el.options[j]?.selected);
-   }else{
-    c.setAttribute('value',el.value||'');
-    if(el.checked)c.setAttribute('checked','checked');else c.removeAttribute('checked');
-   }
-  });
+ const ov=document.createElement('div');
+ ov.id='rmlPreparationPrintOverlay';
+ ov.innerHTML=`
+  <div class="rml-print-head">
+   <strong>Aperçu avant impression — Fiche de préparation chantier</strong>
+   <div class="rml-print-actions">
+    <button type="button" class="btn secondary" id="rmlClosePrintPreview">Fermer</button>
+    <button type="button" class="btn ok" id="rmlDoPrint">Imprimer / PDF</button>
+   </div>
+  </div>
+  <div class="rml-print-sheet"><iframe id="rmlPreparationPrintFrame" title="Aperçu fiche de préparation"></iframe></div>`;
+ document.body.appendChild(ov);
 
-  // L'aperçu est autonome : on retire les scripts et les commandes de l'application.
-  clone.querySelectorAll('script').forEach(x=>x.remove());
-  const head=clone.querySelector('head');
-  if(head){
-   const base=d.createElement('base'); base.href=PREPARATION_APP_URL; head.prepend(base);
-   const st=d.createElement('style');
-   st.textContent=`
-    body{padding-top:70px!important;background:#fff!important}
-    body>header,.toolbar,.project-save-panel{display:none!important}
-    #rmlPrintPreviewBar{display:flex!important}
-    @media print{
-      body{padding-top:0!important}
-      #rmlPrintPreviewBar{display:none!important}
-      @page{size:A4 portrait;margin:10mm}
-    }`;
-   head.appendChild(st);
-  }
-  const body=clone.querySelector('body');
-  if(body){
-   const bar=d.createElement('div');
-   bar.id='rmlPrintPreviewBar';
-   bar.setAttribute('style','position:fixed;z-index:999999;left:0;right:0;top:0;background:#0b3555;color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:Arial,sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.2)');
-   bar.innerHTML='<strong>Aperçu avant impression — Fiche de préparation chantier</strong><button type="button" onclick="window.print()" style="border:0;border-radius:9px;padding:10px 16px;font-weight:700;cursor:pointer">Imprimer / Enregistrer en PDF</button>';
-   body.prepend(bar);
-  }
-
-  const w=window.open('','_blank');
-  if(!w){alert("Safari a bloqué l’aperçu. Autorisez les fenêtres surgissantes pour ce site.");return}
-  w.document.open();
-  w.document.write('<!doctype html>'+clone.outerHTML);
-  w.document.close();
-  w.focus();
- }catch(err){
-  console.error('Aperçu préparation :',err);
-  alert("Impossible de générer l’aperçu de la fiche.");
+ let st=document.getElementById('rmlPreparationPrintStyle');
+ if(!st){
+  st=document.createElement('style');st.id='rmlPreparationPrintStyle';
+  st.textContent=`
+   #rmlPreparationPrintOverlay{position:fixed;inset:0;z-index:999999;background:#e9eef3;overflow:auto;padding:18px}
+   #rmlPreparationPrintOverlay .rml-print-head{max-width:1100px;margin:0 auto 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+   #rmlPreparationPrintOverlay .rml-print-actions{display:flex;gap:8px;flex-wrap:wrap}
+   #rmlPreparationPrintOverlay .rml-print-sheet{max-width:1100px;margin:auto;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.16)}
+   #rmlPreparationPrintFrame{display:block;width:100%;height:calc(100vh - 115px);min-height:720px;border:0;background:#fff}
+   @media print{
+    body>*:not(#rmlPreparationPrintOverlay){display:none!important}
+    #rmlPreparationPrintOverlay{position:static!important;inset:auto!important;padding:0!important;background:#fff!important;overflow:visible!important}
+    #rmlPreparationPrintOverlay .rml-print-head{display:none!important}
+    #rmlPreparationPrintOverlay .rml-print-sheet{max-width:none!important;box-shadow:none!important}
+    #rmlPreparationPrintFrame{width:100%!important;height:280mm!important;min-height:0!important}
+    @page{size:A4 portrait;margin:8mm}
+   }`;
+  document.head.appendChild(st);
  }
+
+ const pf=document.getElementById('rmlPreparationPrintFrame');
+ pf.src=f.src;
+ pf.onload=()=>{
+  try{
+   const sd=f.contentWindow.document, td=pf.contentWindow.document;
+   const a=sd.querySelectorAll('input,textarea,select');
+   const b=td.querySelectorAll('input,textarea,select');
+   a.forEach((el,i)=>{
+    if(!b[i])return;
+    if(el.type==='checkbox'||el.type==='radio')b[i].checked=el.checked;
+    else b[i].value=el.value;
+   });
+   td.querySelectorAll('button').forEach(x=>x.style.display='none');
+  }catch(e){console.warn('Aperçu: copie des champs impossible',e)}
+ };
+ document.getElementById('rmlClosePrintPreview').onclick=()=>ov.remove();
+ document.getElementById('rmlDoPrint').onclick=()=>window.print();
 }
 async function saveExternalPreparationManual(){const ok=await syncExternalPreparationToERP(false);if(ok){const now=new Date();const time=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});externalPrepStatus('✓ Dernier enregistrement : '+time,'ok');showErpSaveToast('✓ PRÉPARATION ENREGISTRÉE','Toutes les quantités et informations du chantier ont bien été enregistrées dans l’ERP.');}else{showErpSaveToast('ÉCHEC DE L’ENREGISTREMENT','La préparation n’a pas pu être enregistrée. Réessayez.',true)}}
 async function syncExternalPreparationToERP(showAlert=false){
