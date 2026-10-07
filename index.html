@@ -283,37 +283,19 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 }
 </style>
 
-<style id="v150-commandes-integration">
-/* Commandes : l'iframe occupe toute la hauteur disponible.
-   Le défilement reste DANS l'application Commandes afin que son bandeau
-   Accueil / Produits / Récap reste visible comme dans l'application autonome. */
-body.commandes-mode{overflow:hidden!important}
-body.commandes-mode #commandes{
-  height:calc(100dvh - 175px)!important;
-  min-height:560px!important;
-  overflow:hidden!important;
-}
-body.commandes-mode #commandes>.panel{
-  height:100%!important;
-  min-height:0!important;
-  box-sizing:border-box!important;
-  display:flex!important;
-  flex-direction:column!important;
-  overflow:hidden!important;
-}
-body.commandes-mode #commandesFrame{
+
+
+<style id="v151-commandes-integration">
+/* V15.1 : Commandes garde sa propre mise en page.
+   L'ERP ne fabrique plus un grand bandeau artificiel autour de l'iframe. */
+#commandes>.panel{padding:10px!important;overflow:visible!important}
+#commandesFrame{
   display:block!important;
   width:100%!important;
-  flex:1 1 auto!important;
-  height:auto!important;
-  min-height:0!important;
+  min-height:520px!important;
   border:1px solid #d9e0e8!important;
   border-radius:12px!important;
-  overflow:hidden!important;
   background:#fff!important;
-}
-@media(max-width:800px){
- body.commandes-mode #commandes{height:calc(100dvh - 145px)!important;min-height:500px!important}
 }
 </style>
 </head>
@@ -339,7 +321,7 @@ body.commandes-mode #commandesFrame{
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V15.0</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V15.1</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav>
@@ -694,6 +676,30 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
   </div>
 </div>
 
+
+<script id="v151-commandes-resize">
+(function(){
+  function sizeCommandesFrame(){
+    const frame=document.getElementById('commandesFrame');
+    const view=document.getElementById('commandes');
+    if(!frame || !view || !view.classList.contains('active')) return;
+    const top=frame.getBoundingClientRect().top;
+    const available=Math.max(520, window.innerHeight-top-18);
+    frame.style.height=available+'px';
+  }
+  window.addEventListener('resize',sizeCommandesFrame);
+  document.addEventListener('click',function(){
+    setTimeout(sizeCommandesFrame,60);
+    setTimeout(sizeCommandesFrame,300);
+  });
+  const frame=document.getElementById('commandesFrame');
+  if(frame) frame.addEventListener('load',function(){
+    sizeCommandesFrame();
+    setTimeout(sizeCommandesFrame,250);
+  });
+  window.sizeCommandesFrame=sizeCommandesFrame;
+})();
+</script>
 </body></html>`);win.document.close()}
 
 
@@ -1673,6 +1679,8 @@ async function openCommandes(jobId=null){
   if(ctx)ctx.textContent=job?`${client?.nom||''} — ${job.nom||''} · prévision matériaux issue de Préparation`:'Application Commandes V18 intégrée dans RML ERP DEV.';
   try{closeModal('jobCardModal')}catch(e){}
   go('commandes');
+  setTimeout(()=>window.sizeCommandesFrame?.(),0);
+  setTimeout(()=>window.sizeCommandesFrame?.(),200);
   const frame=document.getElementById('commandesFrame');
   let prep=null,needs=[];
   if(job){
