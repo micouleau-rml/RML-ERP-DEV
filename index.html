@@ -282,6 +282,40 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
   color:#fff !important;
 }
 </style>
+
+<style id="v150-commandes-integration">
+/* Commandes : l'iframe occupe toute la hauteur disponible.
+   Le défilement reste DANS l'application Commandes afin que son bandeau
+   Accueil / Produits / Récap reste visible comme dans l'application autonome. */
+body.commandes-mode{overflow:hidden!important}
+body.commandes-mode #commandes{
+  height:calc(100dvh - 175px)!important;
+  min-height:560px!important;
+  overflow:hidden!important;
+}
+body.commandes-mode #commandes>.panel{
+  height:100%!important;
+  min-height:0!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+}
+body.commandes-mode #commandesFrame{
+  display:block!important;
+  width:100%!important;
+  flex:1 1 auto!important;
+  height:auto!important;
+  min-height:0!important;
+  border:1px solid #d9e0e8!important;
+  border-radius:12px!important;
+  overflow:hidden!important;
+  background:#fff!important;
+}
+@media(max-width:800px){
+ body.commandes-mode #commandes{height:calc(100dvh - 145px)!important;min-height:500px!important}
+}
+</style>
 </head>
 <body>
 <div id="erpSaveToast" class="erp-save-toast" role="status" aria-live="polite"></div>
@@ -305,7 +339,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V14.9</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V15.0</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav>
@@ -391,8 +425,8 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
       <div style="flex:1"><h2 style="margin:0">Commandes fournisseurs</h2><div id="commandesContext" class="muted" style="margin-top:4px">Application Commandes V18 intégrée dans RML ERP DEV.</div></div>
       <button class="btn secondary" type="button" onclick="closeCommandes()">← Retour</button>
     </div>
-    <div class="notice" style="margin-bottom:10px">Version de développement : l’application Commandes V18 est intégrée sans modifier l’application actuellement en production.</div>
-    <iframe id="commandesFrame" title="RML Commandes fournisseurs" src="commandes.html?v=0.10.1" style="width:100%;height:calc(100vh - 245px);min-height:680px;border:1px solid #d9e0e8;border-radius:12px;background:#fff"></iframe>
+    
+    <iframe id="commandesFrame" title="RML Commandes fournisseurs" src="commandes.html?v=0.10.1"></iframe>
   </div>
 </section>
 <section id="documents" class="view"><div class="panel"><div class="docs-head"><div><h2>Documents</h2><div class="muted">Documents classés par client et chantier. Fichiers stockés dans Supabase Storage ERP DEV.</div></div><button class="btn secondary" onclick="loadDocuments()">Actualiser</button></div><div class="upload-box"><strong>Ajouter un document</strong><div class="field" style="margin-top:10px"><label>Rechercher un client ou un chantier</label><input id="docAddContextSearch" type="search" placeholder="Nom du client, chantier ou adresse…" oninput="searchAddDocumentContext()"></div><div class="upload-grid" style="margin-top:10px"><div class="field"><label>Client</label><select id="docClient"></select></div><div class="field"><label>Chantier</label><select id="docJob"></select></div><div class="field"><label>Catégorie</label><select id="docCategory"><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div></div><div class="field"><label>Fichier</label><input id="docFile" type="file"></div><div class="field"><label>Note</label><input id="docNote" placeholder="Description facultative"></div><div class="field"><label><input id="docEmployeeVisible" type="checkbox"> Mettre également ce document à disposition des salariés affectés au chantier</label></div><div class="field"><label>Mettre ce document à disposition de</label><div id="docSubRecipients" class="sub-contract" style="padding:10px;margin-top:4px"><span class="muted">Sélectionnez d’abord un chantier.</span></div></div><button class="btn" onclick="uploadDocument()">Ajouter le document</button></div><div class="docs-filters" style="margin-top:16px"><select id="docFilterClient" onchange="docFilterClientChanged()"></select><select id="docFilterJob" onchange="renderDocuments()"></select><select id="docFilterCategory" onchange="renderDocuments()"><option value="">Toutes les catégories</option><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div><div id="documentsStatus" class="notice">Chargement…</div><div id="documentsList" class="doc-list" style="margin-top:12px"></div></div></section>
@@ -2593,10 +2627,3 @@ async function bridgePreparationContext(){
 </script>
 </body>
 </html>
-<style id="v081-commandes-fix">
-body.commandes-mode{overflow:auto!important}
-#commandes{height:auto!important;min-height:0!important;overflow:visible!important}
-#commandes>.card{height:auto!important;overflow:visible!important}
-#commandesFrame{display:block!important;width:100%!important;height:calc(100vh - 300px)!important;min-height:650px!important;border:0!important;overflow:auto!important}
-@media(max-width:800px){#commandesFrame{height:calc(100vh - 250px)!important;min-height:560px!important}}
-</style>
