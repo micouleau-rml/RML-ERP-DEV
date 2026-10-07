@@ -285,7 +285,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V14.7</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V14.8</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav>
@@ -327,7 +327,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 
 <section id="stock" class="view">
  <div class="panel">
-  <div class="toolbar"><div style="flex:1"><h2 style="margin:0">Stock fournisseurs</h2><div class="muted">GutterFrance · Gutti · Sodifab · Gutterkel</div></div><button class="btn" onclick="openStockProduct()">+ Produit</button><button class="btn secondary" onclick="loadStock()">Actualiser</button></div>
+  <div class="toolbar"><div style="flex:1"><h2 style="margin:0">Stock fournisseurs</h2><div class="muted">GutterFrance · Gutti · Sodifab · Gutterkel</div></div><button class="btn" onclick="openStockProduct()">+ Produit</button><button class="btn secondary" onclick="chooseStockExcel()">Importer Excel</button><button class="btn secondary" onclick="loadStock()">Actualiser</button><input id="stockExcelFile" type="file" accept=".xlsx,.xls" hidden onchange="importStockExcelFile(this.files?.[0])"></div>
   <div class="cards" style="margin-top:14px"><div class="metric"><strong id="stockRefs">0</strong><span>références</span></div><div class="metric"><strong id="stockLow">0</strong><span>stock faible / rupture</span></div><div class="metric"><strong id="stockValue">0 €</strong><span>valeur indicative</span></div></div>
   <div class="toolbar" style="margin-top:14px"><input id="stockSearch" placeholder="Rechercher une référence ou désignation…" oninput="renderStock()"><select id="stockSupplierFilter" onchange="renderStock()"><option value="">Tous les fournisseurs</option><option>GutterFrance</option><option>Gutti</option><option>Sodifab</option><option>Gutterkel</option></select><select id="stockStateFilter" onchange="renderStock()"><option value="">Tous les stocks</option><option value="low">Stock faible / rupture</option><option value="ok">Stock suffisant</option></select></div>
   <div id="stockStatus" class="notice" style="margin-top:12px">Chargement…</div><div id="stockTable" style="margin-top:10px"></div>
@@ -441,6 +441,12 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div class="modal" id="clientImportModal"><div class="modal-card"><div class="modal-head"><h3>Importer des clients depuis Excel</h3><button class="close" data-close="clientImportModal">Fermer</button></div><div id="clientImportSummary" class="notice" style="margin-top:14px"></div><div id="clientImportPreview" style="margin-top:12px"></div><div class="actions" style="margin-top:14px"><button class="btn ok" id="confirmClientImportBtn" type="button">Importer dans Supabase</button><button class="btn secondary" type="button" data-close="clientImportModal">Annuler</button></div></div></div>
 </div>
 
+
+<div class="modal" id="stockImportModal"><div class="modal-card" style="max-width:980px"><div class="modal-head"><h2>Importer un catalogue fournisseur</h2><button class="btn secondary" data-close="stockImportModal">Fermer</button></div>
+<div class="notice"><strong>Protection du stock :</strong> cet import peut créer des références et actualiser leur désignation, unité et prix. <strong>Il ne modifie jamais les quantités en stock.</strong></div>
+<div class="grid2" style="margin-top:12px"><div class="field"><label>Fournisseur *</label><select id="stockImportSupplier"><option>GutterFrance</option><option>Gutti</option><option>Sodifab</option><option>Gutterkel</option></select></div><div class="field"><label>Fichier</label><input id="stockImportFilename" readonly></div></div>
+<div id="stockImportSummary" class="notice" style="margin-top:12px"></div><div id="stockImportPreview" style="max-height:420px;overflow:auto;margin-top:10px"></div>
+<div class="actions"><button class="btn" type="button" onclick="confirmStockImport()">Importer / mettre à jour</button><button class="btn secondary" type="button" data-close="stockImportModal">Annuler</button></div></div></div>
 <div class="modal" id="stockProductModal"><div class="modal-card"><div class="modal-head"><h2 id="stockProductTitle">Produit stock</h2><button class="btn secondary" data-close="stockProductModal">Fermer</button></div>
 <form id="stockProductForm"><input id="stockProductId" type="hidden"><div class="grid2">
 <div class="field"><label>Fournisseur *</label><select id="stockSupplier" required><option>GutterFrance</option><option>Gutti</option><option>Sodifab</option><option>Gutterkel</option></select></div>
@@ -751,6 +757,51 @@ function suiviToggleLock(){suiviData.locked=!suiviData.locked;suiviChanged()}
 
 
 let stockProducts=[],stockMovements=[];
+let stockImportRows=[];
+function chooseStockExcel(){stockExcelFile.value='';stockExcelFile.click()}
+function stockNorm(v){return String(v??'').trim()}
+function stockHeader(v){return stockNorm(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
+function stockPick(obj,aliases){for(const a of aliases){const k=Object.keys(obj).find(x=>stockHeader(x)===a);if(k&&stockNorm(obj[k]))return obj[k]}return ''}
+function stockNumber(v){if(v===null||v===undefined||v==='')return null;let x=String(v).replace(/\s/g,'').replace('€','').replace(',','.').replace(/[^\d.-]/g,'');let n=Number(x);return Number.isFinite(n)?n:null}
+async function importStockExcelFile(file){
+ if(!file)return;
+ try{
+  const data=await file.arrayBuffer(),wb=XLSX.read(data,{type:'array'});let rows=[];
+  for(const sn of wb.SheetNames){const arr=XLSX.utils.sheet_to_json(wb.Sheets[sn],{defval:'',raw:false});if(arr.length){rows=arr;break}}
+  if(!rows.length)throw new Error('Aucune ligne trouvée.');
+  const parsed=rows.map(r=>({sku:stockNorm(stockPick(r,['reference','ref','code','codearticle','article','referencearticle','refarticle'])),name:stockNorm(stockPick(r,['designation','libelle','produit','nom','description','designationarticle'])),unit:stockNorm(stockPick(r,['unite','unit','u']))||'u',unit_price:stockNumber(stockPick(r,['prix','prixht','prixachat','prixunitaire','pu','puht','tarif','prixnet']))})).filter(r=>r.sku||r.name);
+  if(!parsed.length)throw new Error("Colonnes produit non reconnues. Il faut au minimum une référence/code ou une désignation/libellé.");
+  stockImportRows=parsed;stockImportFilename.value=file.name;
+  const f=(file.name.match(/gutterfrance/i)?'GutterFrance':file.name.match(/gutterkel/i)?'Gutterkel':file.name.match(/sodifab/i)?'Sodifab':file.name.match(/gutti/i)?'Gutti':null);if(f)stockImportSupplier.value=f;
+  stockImportSummary.innerHTML=`${parsed.length} produit(s) détecté(s). Les quantités actuelles seront conservées.`;
+  stockImportPreview.innerHTML='<div class="tablewrap"><table class="table"><thead><tr><th>Référence</th><th>Désignation</th><th>Unité</th><th>Prix HT</th></tr></thead><tbody>'+parsed.slice(0,100).map(r=>`<tr><td>${esc(r.sku||'—')}</td><td>${esc(r.name||'—')}</td><td>${esc(r.unit)}</td><td>${r.unit_price==null?'—':r.unit_price.toLocaleString('fr-FR',{style:'currency',currency:'EUR'})}</td></tr>`).join('')+'</tbody></table></div>'+(parsed.length>100?`<div class="muted">Aperçu limité aux 100 premières lignes.</div>`:'');
+  openModal('stockImportModal');
+ }catch(err){alert('Impossible de lire le fichier Excel : '+err.message)}
+}
+async function confirmStockImport(){
+ if(!stockImportRows.length)return;
+ const supplier=stockImportSupplier.value;
+ const {data:existing,error}=await sb.from('erp_stock_products').select('id,sku,name,quantity,min_quantity,location,unit_price,unit').eq('supplier',supplier);
+ if(error){alert(error.message);return}
+ const bySku=new Map((existing||[]).filter(x=>x.sku).map(x=>[stockHeader(x.sku),x])),byName=new Map((existing||[]).map(x=>[stockHeader(x.name),x]));
+ let created=0,updated=0,failed=0;
+ for(const r of stockImportRows){
+  const ex=(r.sku&&bySku.get(stockHeader(r.sku)))||byName.get(stockHeader(r.name));
+  if(ex){
+   // IMPORTANT: quantity, min_quantity and location are deliberately omitted.
+   const patch={sku:r.sku||ex.sku,name:r.name||ex.name,unit:r.unit||ex.unit||'u',updated_at:new Date().toISOString()};
+   if(r.unit_price!=null)patch.unit_price=r.unit_price;
+   const q=await sb.from('erp_stock_products').update(patch).eq('id',ex.id);q.error?failed++:updated++;
+  }else{
+   const row={supplier,sku:r.sku||null,name:r.name||r.sku,unit:r.unit||'u',quantity:0,min_quantity:0};
+   if(r.unit_price!=null)row.unit_price=r.unit_price;
+   const q=await sb.from('erp_stock_products').insert(row);q.error?failed++:created++;
+  }
+ }
+ closeModal('stockImportModal');stockImportRows=[];await loadStock();
+ alert(`Import terminé.\n\n${created} produit(s) créé(s)\n${updated} produit(s) mis à jour\n${failed} erreur(s)\n\nLes quantités en stock ont été conservées.`);
+}
+
 function openStock(){if(!hasPerm('stock')){alert('Accès non autorisé au stock.');return}go('stock')}
 async function loadStock(){
  if(!hasPerm('stock'))return;
