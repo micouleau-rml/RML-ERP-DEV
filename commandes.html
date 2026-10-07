@@ -2847,8 +2847,7 @@ function openFamily(index){
   const fam = getFamilies()[index];
   document.getElementById("family").innerHTML = `
     <div class="toolbar">
-
-<div style="height:60px;"></div>
+      <button class="btn" style="background:#0a8454;color:#fff;border-color:#0a8454" onclick="validateFamilyEntry()">Valider la saisie</button>
       <button class="btn" style="background:#0a8454;color:#fff;border-color:#0a8454" onclick="goRecap()">Récapitulatif</button>
     </div>
     <div class="badge" style="background:${fam.family_color}">${esc(fam.family_label)} • ${esc(fam.name)}</div>
@@ -2857,6 +2856,23 @@ function openFamily(index){
     <div style="height:40px"></div>`;
   renderItems();
   updateFloatingSaveBar();
+}
+
+function validateFamilyEntry(){
+  try{
+    if(typeof syncVisibleInputs === "function") syncVisibleInputs();
+    else if(typeof syncInputs === "function") syncInputs();
+    save();
+
+    const supplierName = String(currentSupplierName || "").trim();
+    const supplierIndex = getSuppliers().findIndex(s => String(s.name || "").trim() === supplierName);
+    if(supplierIndex >= 0){
+      openSupplier(supplierIndex);
+    }
+  }catch(e){
+    console.error("Validation de la saisie", e);
+    alert("Impossible de valider la saisie.");
+  }
 }
 
 function renderItems(){
