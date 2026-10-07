@@ -1026,16 +1026,8 @@ save();
   orders[supplierName] = validatedOrder;
   saveValidatedSupplierOrders(orders);
 
-  // V66.6 : la validation alimente immédiatement l’historique avec exactement
-  // les mêmes lignes que le récapitulatif. Les deux clés sont ensuite envoyées
-  // ensemble par la file de synchronisation V66.
-  try{
-    withPreviewGroups(groups, function(){
-      saveCurrentOrderToHistory(validatedOrder.validatedAt);
-    }, supplierName);
-  }catch(e){
-    console.error("V66.6 historique validation", e);
-  }
+  // La validation met uniquement à jour le récapitulatif.
+  // L’historique reste une action manuelle depuis le récapitulatif.
 
   // V66.14 : affichage LOCAL immédiat. Le récapitulatif ne doit jamais attendre Supabase.
   try{ goRecap(); }catch(e){ console.error("V66.14 affichage récapitulatif", e); }
@@ -2846,9 +2838,9 @@ function openFamily(index){
   document.getElementById("family").classList.remove("hidden");
   const fam = getFamilies()[index];
   document.getElementById("family").innerHTML = `
-    <div class="toolbar">
-      <button class="btn" style="background:#0a8454;color:#fff;border-color:#0a8454" onclick="validateFamilyEntry()">Valider la saisie</button>
-      <button class="btn" style="background:#0a8454;color:#fff;border-color:#0a8454" onclick="goRecap()">Récapitulatif</button>
+    <div class="toolbar" style="display:flex;gap:10px;flex-wrap:nowrap">
+      <button class="btn" style="background:#c62828;color:#fff;border-color:#c62828;flex:1 1 50%" onclick="validateFamilyEntry()">Valider la saisie</button>
+      <button class="btn" style="background:#0a8454;color:#fff;border-color:#0a8454;flex:1 1 50%" onclick="goRecap()">Récapitulatif</button>
     </div>
     <div class="badge" style="background:${fam.family_color}">${esc(fam.family_label)} • ${esc(fam.name)}</div>
     <div style="margin-top:10px"><input id="search" class="search" placeholder="Rechercher un produit ou une couleur…" oninput="renderItems()"></div>
@@ -8006,7 +7998,13 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
   function escRml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
   function renderRmlForecast(msg){
     let box=document.getElementById('rmlErpForecast');
-    if(!box){box=document.createElement('div');box.id='rmlErpForecast';box.style.cssText='position:fixed;right:12px;bottom:12px;z-index:999999;width:min(430px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;background:#fff;border:2px solid #0f766e;border-radius:14px;box-shadow:0 12px 35px #0003;font-family:Arial,sans-serif';document.body.appendChild(box)}
+    if(!box){
+      box=document.createElement('div');
+      box.id='rmlErpForecast';
+      box.style.cssText='position:static;z-index:121;max-width:430px;max-height:70px;overflow:auto;background:#fff;border:2px solid #0f766e;border-radius:10px;box-shadow:none;font-family:Arial,sans-serif;font-weight:400;margin-left:auto';
+      const bar=document.getElementById('erpCompactCommandesBar');
+      (bar||document.body).appendChild(box);
+    }
     const j=msg.chantier,needs=Array.isArray(msg.needs)?msg.needs:[];
     if(!j){box.innerHTML='<div style="padding:12px"><b>Prévision ERP</b><div style="font-size:12px;margin-top:5px">Ouvre Commandes depuis un dossier chantier pour recevoir les besoins.</div></div>';return}
     const rows=needs.map(n=>`<tr><td style="padding:5px;border-bottom:1px solid #ddd">${escRml(n.nom)}${n.color?`<div style="font-size:11px;color:#666">${escRml(n.color)}</div>`:''}</td><td style="padding:5px;border-bottom:1px solid #ddd;text-align:right"><b>${escRml(n.total)} ${escRml(n.unite)}</b></td></tr>`).join('');
