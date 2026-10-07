@@ -321,7 +321,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V15.1</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V15.2</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav>
@@ -677,29 +677,6 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
 </div>
 
 
-<script id="v151-commandes-resize">
-(function(){
-  function sizeCommandesFrame(){
-    const frame=document.getElementById('commandesFrame');
-    const view=document.getElementById('commandes');
-    if(!frame || !view || !view.classList.contains('active')) return;
-    const top=frame.getBoundingClientRect().top;
-    const available=Math.max(520, window.innerHeight-top-18);
-    frame.style.height=available+'px';
-  }
-  window.addEventListener('resize',sizeCommandesFrame);
-  document.addEventListener('click',function(){
-    setTimeout(sizeCommandesFrame,60);
-    setTimeout(sizeCommandesFrame,300);
-  });
-  const frame=document.getElementById('commandesFrame');
-  if(frame) frame.addEventListener('load',function(){
-    sizeCommandesFrame();
-    setTimeout(sizeCommandesFrame,250);
-  });
-  window.sizeCommandesFrame=sizeCommandesFrame;
-})();
-</script>
 </body></html>`);win.document.close()}
 
 
@@ -2632,6 +2609,25 @@ async function bridgePreparationContext(){
 
  }catch(err){console.error('Liaison ERP → Prépa Chantier :',err)}
 }
+</script>
+
+<script id="v152-commandes-resize">
+(function(){
+  function sizeCommandesFrame(){
+    const frame=document.getElementById('commandesFrame');
+    const view=document.getElementById('commandes');
+    if(!frame || !view || !view.classList.contains('active')) return;
+    const top=frame.getBoundingClientRect().top;
+    frame.style.height=Math.max(520,window.innerHeight-top-18)+'px';
+  }
+  window.sizeCommandesFrame=sizeCommandesFrame;
+  window.addEventListener('resize',sizeCommandesFrame);
+  document.addEventListener('click',()=>setTimeout(sizeCommandesFrame,80));
+  window.addEventListener('load',()=>{
+    const frame=document.getElementById('commandesFrame');
+    if(frame) frame.addEventListener('load',sizeCommandesFrame);
+  });
+})();
 </script>
 </body>
 </html>
