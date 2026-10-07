@@ -387,6 +387,16 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 
 <section id="preparation" class="view">
 <div class="panel" style="padding:12px 16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2 style="margin:0">Préparation chantier</h2><div class="muted">Fiche du chantier sélectionné.</div></div><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div id="externalPrepSyncStatus" class="muted" style="font-weight:700">Aucune modification enregistrée.</div><button class="btn secondary" type="button" onclick="callPreparationAction('showPreview')">Visualiser la fiche</button><button class="btn secondary" type="button" onclick="callPreparationAction('printProject')">Imprimer / PDF A4</button><button class="btn ok" type="button" onclick="saveExternalPreparationManual()">✓ Enregistrer la préparation</button></div></div></div>
+<div class="panel" id="prepJobDocumentsPanel" style="margin-top:12px">
+<div class="docs-head"><div><h3 style="margin:0">Photos et documents du chantier</h3><div class="muted">Ajoutez ici les plans, PDF, photos et autres documents liés directement à ce chantier.</div></div><button class="btn secondary" type="button" onclick="currentPrepJobId&&loadJobDocumentsPanel(currentPrepJobId)">Actualiser</button></div>
+<div class="upload-box" style="margin-top:12px">
+<div class="upload-grid"><div class="field"><label>Catégorie</label><select id="jobDocCategory" onchange="updateJobDocumentSourceUI()"><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div>
+<div class="field"><label>Source</label><div id="jobDocStandardSource"><input id="jobDocFile" type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"></div><div id="jobDocPhotoSource" style="display:none"><div class="actions"><button class="btn secondary" type="button" onclick="chooseJobPhotoFile()">Choisir un fichier photo</button><button class="btn secondary" type="button" onclick="chooseJobPhotoLibrary()">Photothèque</button></div><div id="jobDocPhotoSelected" class="muted" style="margin-top:6px">Aucune photo sélectionnée.</div><input id="jobDocPhotoFile" type="file" accept="image/*" hidden onchange="jobPhotoSelected('jobDocPhotoFile')"><input id="jobDocPhotoLibrary" type="file" accept="image/*,.heic,.heif" hidden onchange="jobPhotoSelected('jobDocPhotoLibrary')"></div></div></div>
+<div class="field"><label>Note</label><input id="jobDocNote" placeholder="Description facultative"></div>
+<div class="grid2"><div class="field"><label><input id="jobDocEmployee" type="checkbox"> Salarié — visible par les salariés affectés au chantier</label></div><div class="field"><label><input id="jobDocSub" type="checkbox"> Sous-traitant — visible par les sous-traitants affectés au chantier</label></div></div>
+<div class="actions"><button class="btn" type="button" onclick="currentPrepJobId&&uploadJobDocument(currentPrepJobId)">Ajouter le document</button></div></div>
+<div id="jobDocumentsStatus" class="notice" style="margin-top:12px">Chargement…</div><div id="jobDocumentsList" class="doc-list" style="margin-top:10px"></div>
+</div>
 <div style="height:calc(100vh - 190px);min-height:650px;margin-top:12px;border:1px solid #d9e0e8;border-radius:14px;overflow:hidden;background:#fff"><iframe id="preparationAppFrame" onload="bridgePreparationContext()" title="RML Préparation Chantier" style="width:100%;height:100%;border:0;background:#fff" allow="clipboard-read; clipboard-write"></iframe></div>
 </section>
 
@@ -645,7 +655,7 @@ async function openPreparation(jobId){
  currentPrepJobId=jobId; currentPrepSourceJobId=jobId;
  closeModal('jobCardModal'); closeModal('prepSelectModal');
  go('preparation');
- setTimeout(bridgePreparationContext,150);
+ setTimeout(()=>{bridgePreparationContext();loadJobDocumentsPanel(jobId);updateJobDocumentSourceUI();},150);
 }
 function closePreparation(){const id=currentPrepSourceJobId;go('chantiers');if(id)setTimeout(()=>openJob(id),0)}
 function buildPrepPayload(){return {version:'ERP-V0.6',saved_at:new Date().toISOString(),info:{date:prepDate.value,horaires:prepHoraires.value,acces:prepAcces.value,chef:prepChef.value,remarques:prepRemarques.value},sections:collectPrepSections()}}
