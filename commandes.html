@@ -330,7 +330,14 @@ body.erp-embedded #erpMonthlyNeeds{display:block}
  .floating-save-bar{bottom:calc(78px + env(safe-area-inset-bottom))!important}
  .floating-save-bar .btn{min-width:0!important}
 }
-</style></head>
+</style><style id="rml-v18-bottom-buttons-height-fix">
+/* Taille stable dans l’iframe ERP, y compris sur Safari iPhone. */
+#bottomBar.bottom{height:auto!important;min-height:0!important;max-height:90px!important;box-sizing:border-box!important;padding:7px 8px calc(7px + env(safe-area-inset-bottom))!important}
+#bottomBar .bottominner{display:grid!important;grid-template-columns:minmax(0,.85fr) minmax(0,1fr) minmax(0,1.15fr)!important;grid-template-rows:48px!important;align-items:center!important;gap:6px!important;width:100%!important;max-width:1080px!important;height:48px!important;min-height:0!important;max-height:48px!important}
+#bottomBar .bottominner>button.btn{display:flex!important;align-items:center!important;justify-content:center!important;align-self:center!important;justify-self:stretch!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;height:48px!important;min-height:48px!important;max-height:48px!important;margin:0!important;padding:3px 5px!important;border-radius:11px!important;font-size:13px!important;line-height:1.12!important;text-align:center!important;white-space:normal!important;overflow-wrap:normal!important}
+@media(max-width:400px){#bottomBar .bottominner>button.btn{font-size:12px!important}}
+</style>
+</head>
 <body>
 <div id="erpCompactCommandesBar">
   <span>COMMANDES FOURNISSEURS</span>
