@@ -2628,6 +2628,15 @@ async function bridgePreparationContext(){
 }
 </script>
 
+<style id="v153-commandes-mobile-height-fix">
+/* L'ancien conteneur limitait la hauteur et coupait l'iframe sur iPhone. */
+@media (max-width:800px){
+  body.commandes-mode{overflow-y:auto!important}
+  #commandes.view.active{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+  #commandes>.panel{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+  #commandesFrame{display:block!important;flex:none!important;min-height:520px!important;max-height:none!important;box-sizing:border-box!important}
+}
+</style>
 <script id="v152-commandes-resize">
 (function(){
   function sizeCommandesFrame(){
@@ -2635,7 +2644,7 @@ async function bridgePreparationContext(){
     const view=document.getElementById('commandes');
     if(!frame || !view || !view.classList.contains('active')) return;
     const top=frame.getBoundingClientRect().top;
-    frame.style.height=Math.max(520,(window.visualViewport?.height || window.innerHeight)-top-2)+'px';
+    frame.style.height=Math.max(520,Math.round((window.visualViewport?.height || window.innerHeight)-top-12))+'px';
   }
   window.sizeCommandesFrame=sizeCommandesFrame;
   window.addEventListener('resize',sizeCommandesFrame);
