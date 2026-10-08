@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V13 · Fiche chantier & terrain</title>
+<title>RML ERP — V16 · Fiche chantier & terrain</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -313,7 +313,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée au nouvel environnement de développement V13.</p>
+    <p>Connexion sécurisée à RML ERP DEV — V16.</p>
     <div class="field"><label>Identifiant</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex. Equipe1, Dupont ou adresse e-mail" required><div class="muted" style="margin-top:5px">Ouvriers / équipes / sous-traitants : utilisez votre identifiant. Les comptes existants peuvent toujours utiliser leur adresse e-mail.</div></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -698,46 +698,7 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
 </div>
 
 
-<script>
-// RML ERP V16 — rapport journalier salarié, écriture atomique via RPC Supabase.
-let v16CurrentReport=null;
-async function v16LoadReport(jobId,date){
- const host=document.getElementById('employeeJobBody');if(!host)return;
- const section=document.createElement('div');section.id='v16ReportSection';section.className='v16-report';
- section.innerHTML='<h3>Rapport journalier et quantités posées</h3><div class="muted">Chargement du suivi chantier…</div>';
- const hours=host.querySelector('#employeeTeamHours')?.closest('.panel');
- if(hours)hours.insertAdjacentElement('afterend',section);else host.prepend(section);
- const {data,error}=await sb.rpc('erp_v16_get_daily_report',{p_chantier_id:String(jobId),p_date:date});
- if(error){section.innerHTML='<h3>Rapport journalier</h3><div class="notice danger">'+esc(error.message)+' — Vérifier que le SQL V16 a été exécuté dans Supabase.</div>';return}
- const ilots=data?.suivi?.ilots||[],old=data?.report?.quantities||{};
- v16CurrentReport={jobId:String(jobId),date,old};
- let html='<h3>Rapport journalier — '+esc(new Date(date+'T12:00:00').toLocaleDateString('fr-FR'))+'</h3><p class="muted">Saisissez uniquement les quantités réellement posées ce jour. Vérifiez puis validez : le reste à poser sera mis à jour automatiquement.</p>';
- let count=0;
- for(const il of ilots){if(!(il.produits||[]).length)continue;
- html+='<div class="v16-family">'+esc(il.nom||'Produits')+'</div>';
- for(const pr of il.produits||[]){const prev=Number(old[pr.id]||0),pose=Number(pr.pose||0),total=Number(pr.total||0),available=Math.max(0,total-pose+prev);
- html+='<label class="v16-line"><span><strong>'+esc(pr.nom||'Produit')+'</strong><small>Prévu : '+suiviFmt(total)+' '+esc(pr.unite||'')+' · Reste disponible : '+suiviFmt(available)+' '+esc(pr.unite||'')+'</small></span><input class="v16-qty" data-product="'+esc(pr.id)+'" type="number" min="0" max="'+available+'" step="any" inputmode="decimal" value="'+prev+'" aria-label="Quantité posée '+esc(pr.nom||'')+'"></label>';count++;
- }}
- if(!count)html+='<div class="notice warn">Aucun produit dans le suivi chantier. Un responsable doit ouvrir et enregistrer le suivi de ce chantier.</div>';
- html+='<label style="display:block;margin-top:18px;font-weight:700">Compte rendu de la journée</label><textarea id="v16ReportText" placeholder="Travaux réalisés, difficultés, reste à faire…">'+esc(data?.report?.report_text||'')+'</textarea>';
- html+='<div class="actions" style="margin-top:12px"><button id="v16ReportSubmit" class="btn ok" type="button" '+(!count?'disabled':'')+' onclick="v16SubmitReport()">Valider les quantités et le compte rendu</button></div><div id="v16ReportStatus" class="muted" style="margin-top:10px"></div>';
- section.innerHTML=html;
-}
-async function v16SubmitReport(){
- const ctx=v16CurrentReport,section=document.getElementById('v16ReportSection');if(!ctx||!section)return;
- const quantities={};let invalid=false;
- section.querySelectorAll('.v16-qty').forEach(el=>{const raw=el.value.trim().replace(',','.');const n=raw===''?0:Number(raw);if(!Number.isFinite(n)||n<0||n>Number(el.max)){invalid=true;el.style.borderColor='#dc2626'}else{el.style.borderColor='';if(n!==0)quantities[el.dataset.product]=n}});
- if(invalid){alert('Vérifiez les quantités : elles doivent être positives et ne pas dépasser le reste disponible.');return}
- if(!confirm('Confirmez-vous les quantités posées et le compte rendu ?\n\nLe suivi chantier sera mis à jour immédiatement, sans validation supplémentaire.'))return;
- const btn=document.getElementById('v16ReportSubmit'),status=document.getElementById('v16ReportStatus');btn.disabled=true;status.textContent='Enregistrement dans Supabase…';
- const {data,error}=await sb.rpc('erp_v16_save_daily_report',{p_chantier_id:ctx.jobId,p_date:ctx.date,p_quantities:quantities,p_text:document.getElementById('v16ReportText').value});
- btn.disabled=false;
- if(error){status.textContent='Erreur : '+error.message;status.style.color='#b91c1c';return}
- status.textContent='✓ Rapport validé et quantités déduites du suivi chantier.';status.style.color='#15803d';
- await v16LoadReport(ctx.jobId,ctx.date);
- const fresh=document.getElementById('v16ReportStatus');if(fresh){fresh.textContent='✓ Rapport enregistré. Vous pouvez corriger cette saisie : seul l’écart sera recalculé.';fresh.style.color='#15803d'}
-}
-</script></body></html>`);win.document.close()}
+</body></html>`);win.document.close()}
 
 
 function prepNumber(v){const n=Number(String(v??'').replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:0}
@@ -1107,12 +1068,33 @@ function rmlLoginEmail(value){
  return id?id+'@login.rml.local':'';
 }
 loginForm.onsubmit=async e=>{
- e.preventDefault();loginError.style.display='none';
+ e.preventDefault();
+ loginError.style.display='none';
+ const submitBtn=loginForm.querySelector('button[type="submit"]');
  const entered=loginEmail.value.trim(),email=rmlLoginEmail(entered);
  if(!email){loginError.textContent='Renseignez votre identifiant.';loginError.style.display='block';return}
- const {data,error}=await sb.auth.signInWithPassword({email,password:loginPassword.value});
- if(error){loginError.textContent='Identifiant ou mot de passe incorrect.';loginError.style.display='block';return}
- currentUser=data.user;await onSignedIn()
+ try{
+   if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='Connexion…'}
+   const {data,error}=await sb.auth.signInWithPassword({email,password:loginPassword.value});
+   if(error){
+     loginError.textContent='Connexion refusée : '+(error.message||'identifiant ou mot de passe incorrect.');
+     loginError.style.display='block';
+     return
+   }
+   if(!data?.user){
+     loginError.textContent='Connexion Supabase reçue sans utilisateur. Actualisez la page et réessayez.';
+     loginError.style.display='block';
+     return
+   }
+   currentUser=data.user;
+   await onSignedIn()
+ }catch(err){
+   console.error('Erreur connexion RML ERP V16',err);
+   loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
+   loginError.style.display='block'
+ }finally{
+   if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='Se connecter'}
+ }
 }
 async function onSignedIn(){const access=await loadCurrentAccess();if(access.error||!currentAccess){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Aucun droit ERP n’est configuré pour ce compte. Exécute d’abord le SQL V0.5 dans Supabase.';loginError.style.display='block';return}if(!currentAccess.active){await sb.auth.signOut();currentUser=null;loginOverlay.classList.remove('hidden');loginError.textContent='Ce compte ERP est désactivé.';loginError.style.display='block';return}loginOverlay.classList.add('hidden');userPill.textContent='Utilisateur : '+(currentUser?.email||'connecté')+' · '+roleLabel(currentAccess.role);applyAccessUI();await refreshData()}
 logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
@@ -2745,5 +2727,44 @@ async function bridgePreparationContext(){
   });
 })();
 </script>
-</body>
+<script>
+// RML ERP V16 — rapport journalier salarié, écriture atomique via RPC Supabase.
+let v16CurrentReport=null;
+async function v16LoadReport(jobId,date){
+ const host=document.getElementById('employeeJobBody');if(!host)return;
+ const section=document.createElement('div');section.id='v16ReportSection';section.className='v16-report';
+ section.innerHTML='<h3>Rapport journalier et quantités posées</h3><div class="muted">Chargement du suivi chantier…</div>';
+ const hours=host.querySelector('#employeeTeamHours')?.closest('.panel');
+ if(hours)hours.insertAdjacentElement('afterend',section);else host.prepend(section);
+ const {data,error}=await sb.rpc('erp_v16_get_daily_report',{p_chantier_id:String(jobId),p_date:date});
+ if(error){section.innerHTML='<h3>Rapport journalier</h3><div class="notice danger">'+esc(error.message)+' — Vérifier que le SQL V16 a été exécuté dans Supabase.</div>';return}
+ const ilots=data?.suivi?.ilots||[],old=data?.report?.quantities||{};
+ v16CurrentReport={jobId:String(jobId),date,old};
+ let html='<h3>Rapport journalier — '+esc(new Date(date+'T12:00:00').toLocaleDateString('fr-FR'))+'</h3><p class="muted">Saisissez uniquement les quantités réellement posées ce jour. Vérifiez puis validez : le reste à poser sera mis à jour automatiquement.</p>';
+ let count=0;
+ for(const il of ilots){if(!(il.produits||[]).length)continue;
+ html+='<div class="v16-family">'+esc(il.nom||'Produits')+'</div>';
+ for(const pr of il.produits||[]){const prev=Number(old[pr.id]||0),pose=Number(pr.pose||0),total=Number(pr.total||0),available=Math.max(0,total-pose+prev);
+ html+='<label class="v16-line"><span><strong>'+esc(pr.nom||'Produit')+'</strong><small>Prévu : '+suiviFmt(total)+' '+esc(pr.unite||'')+' · Reste disponible : '+suiviFmt(available)+' '+esc(pr.unite||'')+'</small></span><input class="v16-qty" data-product="'+esc(pr.id)+'" type="number" min="0" max="'+available+'" step="any" inputmode="decimal" value="'+prev+'" aria-label="Quantité posée '+esc(pr.nom||'')+'"></label>';count++;
+ }}
+ if(!count)html+='<div class="notice warn">Aucun produit dans le suivi chantier. Un responsable doit ouvrir et enregistrer le suivi de ce chantier.</div>';
+ html+='<label style="display:block;margin-top:18px;font-weight:700">Compte rendu de la journée</label><textarea id="v16ReportText" placeholder="Travaux réalisés, difficultés, reste à faire…">'+esc(data?.report?.report_text||'')+'</textarea>';
+ html+='<div class="actions" style="margin-top:12px"><button id="v16ReportSubmit" class="btn ok" type="button" '+(!count?'disabled':'')+' onclick="v16SubmitReport()">Valider les quantités et le compte rendu</button></div><div id="v16ReportStatus" class="muted" style="margin-top:10px"></div>';
+ section.innerHTML=html;
+}
+async function v16SubmitReport(){
+ const ctx=v16CurrentReport,section=document.getElementById('v16ReportSection');if(!ctx||!section)return;
+ const quantities={};let invalid=false;
+ section.querySelectorAll('.v16-qty').forEach(el=>{const raw=el.value.trim().replace(',','.');const n=raw===''?0:Number(raw);if(!Number.isFinite(n)||n<0||n>Number(el.max)){invalid=true;el.style.borderColor='#dc2626'}else{el.style.borderColor='';if(n!==0)quantities[el.dataset.product]=n}});
+ if(invalid){alert('Vérifiez les quantités : elles doivent être positives et ne pas dépasser le reste disponible.');return}
+ if(!confirm('Confirmez-vous les quantités posées et le compte rendu ?\n\nLe suivi chantier sera mis à jour immédiatement, sans validation supplémentaire.'))return;
+ const btn=document.getElementById('v16ReportSubmit'),status=document.getElementById('v16ReportStatus');btn.disabled=true;status.textContent='Enregistrement dans Supabase…';
+ const {data,error}=await sb.rpc('erp_v16_save_daily_report',{p_chantier_id:ctx.jobId,p_date:ctx.date,p_quantities:quantities,p_text:document.getElementById('v16ReportText').value});
+ btn.disabled=false;
+ if(error){status.textContent='Erreur : '+error.message;status.style.color='#b91c1c';return}
+ status.textContent='✓ Rapport validé et quantités déduites du suivi chantier.';status.style.color='#15803d';
+ await v16LoadReport(ctx.jobId,ctx.date);
+ const fresh=document.getElementById('v16ReportStatus');if(fresh){fresh.textContent='✓ Rapport enregistré. Vous pouvez corriger cette saisie : seul l’écart sera recalculé.';fresh.style.color='#15803d'}
+}
+</script></body>
 </html>
