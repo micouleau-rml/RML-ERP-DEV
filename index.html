@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V16 · Fiche chantier & terrain</title>
+<title>RML ERP — V17 · Atelier de pliage</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -332,7 +332,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V16</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V17</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Atelier</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button">Fabrication pliage · Équipe 8</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav>
