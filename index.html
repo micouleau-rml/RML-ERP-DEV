@@ -2886,7 +2886,7 @@ function apply(order){const map=new Map(buttons().map(b=>[b.dataset.rmlNavKey,b]
 try{const order=JSON.parse(localStorage.getItem(KEY)||'null');if(Array.isArray(order))apply(order)}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(buttons().map(b=>b.dataset.rmlNavKey)))}catch(e){}}
 function setEdit(on){editing=on;nav.classList.toggle('rml-reorder',on);buttons().forEach(b=>b.draggable=on);editBtn.textContent=on?'Terminer et enregistrer':'Réorganiser les modules';resetBtn.style.display=on?'inline-block':'none';hint.style.display=on?'inline':'none';if(!on)save()}
-window.rmlRefreshNavEditor=function(){const admin=window.currentAccess?.role==='administrateur';editor.style.display=admin?'block':'none';if(!admin&&editing)setEdit(false)};
+window.rmlRefreshNavEditor=function(){const admin=(typeof currentAccess!=='undefined' && currentAccess?.role==='administrateur');editor.style.display=admin?'block':'none';if(!admin&&editing)setEdit(false)};
 editBtn.addEventListener('click',()=>setEdit(!editing));
 resetBtn.addEventListener('click',()=>{apply(initial);save()});
 nav.addEventListener('dragstart',e=>{if(!editing)return;const b=e.target.closest('button');if(!b)return;dragged=b;b.classList.add('rml-dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',b.dataset.rmlNavKey)});
