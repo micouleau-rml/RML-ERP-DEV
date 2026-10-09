@@ -1767,49 +1767,19 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
   <!-- V63 : plis transversaux en bout gauche/droit, vue de dessus, comptage et longueur de débit -->
   <!-- V38 : calcul sur prépli 55°, affichage final avec retour strictement parallèle et petit rayon en 2D/3D -->
 <!-- V63 : repères d’angles rapprochés et cotes courtes placées à l’intérieur -->
-
-<style id="v106-material-fields-alignment">
-/* VERSION 107 — 6 champs matière : mêmes dimensions et alignement */
-#globalPriceDisplay,
-#selectedThickness,
-#materialMode,
-#sheetFormat,
-#materialWidth,
-#materialLength {
-  width: 100% !important;
-  height: 46px !important;
-  min-height: 46px !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  font-size: 16px !important;
-  line-height: 1.2 !important;
-}
-
-#selectedThickness,
-#materialMode,
-#sheetFormat {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-#globalPriceDisplay,
-#materialWidth,
-#materialLength {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-#globalPriceDisplay:disabled,
-#globalPriceDisplay[readonly] {
-  opacity: 1 !important;
-}
-</style>
-
 </head>
 <body>
 <div class="container">
   <div class="hero">
-    <div class="brand"><div class="app-version">VERSION 107</div></div>
+    <div class="brand">
+      <img src="header-logo.png" alt="RML PLIAGE ALU" class="header-logo">
+      <div class="brand-text">
+        <h1>RML PLIAGE ALU</h1>
+        <div class="subline">by Micouleau &amp; Lhérisson</div>
+        <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
+        <div class="app-version">VERSION 103</div>
+      </div>
+    </div>
     <div class="install">
   <button class="btn-new" id="newProjectBtn">Nouveau devis</button>
   <button class="btn-primary" id="openSettingsBtn">Réglages</button>
@@ -1844,11 +1814,12 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
       </div>
     </div>
 
-        <div class="row">
+        <div class="row">       
         <div class="field col-4">
           <label for="globalPriceDisplay">Tarif matière €/m²</label>
           <input id="globalPriceDisplay" type="text" readonly />
         </div>
+        
         <div class="field col-4">
           <label for="selectedThickness">Épaisseur métal</label>
           <select id="selectedThickness">
@@ -1857,38 +1828,33 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
             <option value="15/10">Alu 15/10</option>
           </select>
         </div>
-        <div class="field col-4">
-          <label for="materialMode">Support de calepinage</label>
-          <select id="materialMode">
-            <option value="sheet">Feuille</option>
-            <option value="roll">Rouleau</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="field col-4" id="sheetPresetField">
-          <label for="sheetFormat">Format prédéfini</label>
-          <select id="sheetFormat">
-            <option value="1500x3000">3000 x 1500 mm — longueur × hauteur</option>
-            <option value="1250x3000">3000 x 1250 mm — longueur × hauteur</option>
-            <option value="1000x2000">2000 x 1000 mm — longueur × hauteur</option>
-            <option value="custom">Dimensions personnalisées</option>
-          </select>
-        </div>
-        <div class="field col-4">
-          <label for="materialWidth">Largeur utile (mm)</label>
-          <input id="materialWidth" type="number" min="100" step="10" value="1500">
-        </div>
-        <div class="field col-4">
-          <label for="materialLength" id="materialLengthLabel">Longueur feuille (mm)</label>
-          <input id="materialLength" type="number" min="100" step="100" value="3000">
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="field col-12"><div class="note" id="materialFormatSummary">Feuille personnalisable : 3 000 × 1 500 mm.</div></div>
-      </div>
+       
+        <div class="field col-3">
+  <label for="materialMode">Support de calepinage</label>
+  <select id="materialMode">
+    <option value="sheet">Feuille</option>
+    <option value="roll">Rouleau</option>
+  </select>
+</div>
+<div class="field col-3" id="sheetPresetField">
+  <label for="sheetFormat">Format prédéfini</label>
+  <select id="sheetFormat">
+    <option value="1500x3000">3000 x 1500 mm — longueur × hauteur</option>
+    <option value="1250x3000">3000 x 1250 mm — longueur × hauteur</option>
+    <option value="1000x2000">2000 x 1000 mm — longueur × hauteur</option>
+    <option value="custom">Dimensions personnalisées</option>
+  </select>
+</div>
+<div class="field col-3">
+  <label for="materialWidth">Largeur utile (mm)</label>
+  <input id="materialWidth" type="number" min="100" step="10" value="1500">
+</div>
+<div class="field col-3">
+  <label for="materialLength" id="materialLengthLabel">Longueur feuille (mm)</label>
+  <input id="materialLength" type="number" min="100" step="100" value="3000">
+</div>
+<div class="field col-12"><div class="note" id="materialFormatSummary">Feuille personnalisable : 3 000 × 1 500 mm.</div></div>
+</div>
       <div class="actions">
         <button class="btn-primary" id="addPieceBtn">+ Ajouter une pièce</button>
         <button class="btn-light" id="duplicateLastBtn">Dupliquer la dernière</button>
@@ -1940,6 +1906,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <button class="btn-danger" id="quotePdfBtn">Visualiser PDF</button>  
         <div class="project-action-grid">
           <button class="btn-primary" id="saveProjectBtn">Enregistrer projet</button>
+          <button type="button" class="btn-primary" id="rmlSendAtelierBtn" style="background:#176b48">Envoyer à l’atelier (équipe 8)</button>
           <button class="btn-secondary" id="loadProjectBtn">Mes projets</button>
         </div>
         <div class="manual-backup-wrap">
@@ -1960,12 +1927,16 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
           </div>
         </div>
       </div>
+
       <div class="sync-main-box">
         <div class="sync-main-head">
-          <div class="sync-main-title">Sauvegarde ERP</div>
-          <div class="sync-main-actions"><button type="button" class="btn-primary" id="syncSupabaseMainBtn">Enregistrer maintenant</button></div>
+          <div class="sync-main-title">Synchronisation Supabase</div>
+          <div class="sync-main-actions">
+            <button type="button" class="btn-primary" id="syncSupabaseMainBtn">Synchroniser</button>
+            <button type="button" class="btn-light" id="openSyncSettingsBtn">Réglages</button>
+          </div>
         </div>
-        <div id="supabaseSyncStatusMain" class="sync-main-status" aria-live="polite">Connexion à ERP DEV…</div>
+        <div id="supabaseSyncStatusMain" class="sync-main-status" aria-live="polite">Synchronisation non configurée.</div>
       </div>
 
       <div class="note" style="margin-top:18px">La gestion des clients et des tarifs se fait désormais dans <strong>Réglages</strong>.</div><div id="status"></div>
@@ -2005,6 +1976,41 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
       <button class="btn-light" id="newClientBtn">Nouveau client</button>
     </div>
     <div class="note">Les coûts de fabrication sont modulables par client : tarif pli, tarif coupe, taux horaire et chute par défaut.</div>
+    <div class="sync-lock-box" id="supabaseLockBox">
+      <h3>Administration et synchronisation</h3>
+      <div class="note">Les paramètres Supabase sont masqués. Saisissez le code administrateur pour ouvrir ce menu.</div>
+      <div class="sync-lock-row">
+        <div class="field">
+          <label for="supabaseAdminPassword">Code administrateur</label>
+          <input id="supabaseAdminPassword" type="password" inputmode="numeric" autocomplete="off" placeholder="Saisir le code" />
+        </div>
+        <button type="button" class="btn-primary" id="unlockSupabaseBtn">Déverrouiller</button>
+      </div>
+      <div id="supabaseUnlockStatus" class="note" aria-live="polite"></div>
+    </div>
+    <div id="supabaseProtectedArea" hidden style="margin-top:22px;padding-top:18px;border-top:1px solid #d8e0e8">
+      <div class="sync-protected-head">
+        <h3 style="margin:0">Synchronisation Supabase</h3>
+        <button type="button" class="btn-light" id="lockSupabaseBtn">🔒 Verrouiller</button>
+      </div>
+      <div class="note" style="margin-bottom:12px">Les données restent enregistrées sur cet appareil et fonctionnent hors ligne. Dès qu’Internet revient, les changements en attente sont envoyés.</div>
+      <div class="row">
+        <div class="field col-12"><label for="supabaseUrl">URL du projet Supabase</label><input id="supabaseUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://xxxxxxxx.supabase.co" /></div>
+        <div class="field col-12"><label for="supabaseKey">Clé anon / publishable</label><input id="supabaseKey" type="password" autocomplete="off" placeholder="eyJ... ou sb_publishable_..." /></div>
+        <div class="field col-12"><label for="supabaseWorkspace">Espace de synchronisation</label><input id="supabaseWorkspace" type="text" autocomplete="off" placeholder="RML-PLIAGE-ALU-01" value="RML-PLIAGE-ALU-01" /></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn-primary" id="saveSupabaseConfigBtn">Enregistrer la configuration</button>
+        <button type="button" class="btn-secondary" id="syncSupabaseNowBtn">Synchroniser maintenant</button>
+        <button type="button" class="btn-light" id="showSupabaseSqlBtn">Afficher le SQL d’installation</button>
+      </div>
+      <div id="supabaseSyncStatus" class="note" style="margin-top:10px" aria-live="polite">Synchronisation non configurée.</div>
+      <div id="supabaseSqlBox" hidden style="margin-top:12px">
+        <div class="note">À exécuter une seule fois dans l’éditeur SQL de Supabase. Ces règles conviennent à une application privée utilisant la clé publishable ; choisissez un nom d’espace difficile à deviner.</div>
+        <textarea id="supabaseSqlText" readonly style="width:100%;min-height:250px;margin-top:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px"></textarea>
+        <button type="button" class="btn-light" id="copySupabaseSqlBtn" style="margin-top:8px">Copier le SQL</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4022,13 +4028,7 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
       clients=data.clients.map(normalizeClient);
       saveClients();
       if(Array.isArray(data.projectFolders))saveProjectFolders(data.projectFolders);
-      if(Array.isArray(data.bendLibrary)){
-        localStorage.setItem(STORAGE_KEY_BEND_LIBRARY,JSON.stringify(data.bendLibrary));
-        // La sauvegarde importée est prioritaire : on marque explicitement chaque
-        // modèle restauré comme une modification locale récente avant la synchro ERP.
-        // Cela empêche une ancienne version distante de vider/remplacer la bibliothèque.
-        setTimeout(()=>window.RML_ERP_PLIAGE_SYNC?.protectRestoredLibrary?.(data.bendLibrary),0);
-      }
+      if(Array.isArray(data.bendLibrary))localStorage.setItem(STORAGE_KEY_BEND_LIBRARY,JSON.stringify(data.bendLibrary));
 
       if(hasProjects){
         const restoredProjects=data.projects.map(project=>({
@@ -8760,144 +8760,421 @@ if(quotePdfBtn){
 })();
 </script>
 <script>
-/* ===== ERP DEV : SAUVEGARDE PLIAGE EXCLUSIVE DANS SUPABASE ERP ===== */
+/* ===== V83 : PROJETS COMPLETS SYNCHRONISÉS SANS FUSION DES PIÈCES COURANTES ===== */
 (()=>{
   "use strict";
-  const ERP_URL="https://jbtsncvuobptxyzcoqpf.supabase.co";
-  const ERP_KEY="sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr";
-  const TABLE="erp_pliage_sync";
-  const WORKSPACE="RML-ERP-PLIAGE";
-  const META_KEY="rml_erp_pliage_sync_meta_v1";
-  const PENDING_KEY="rml_erp_pliage_sync_pending_v1";
-  const AUTH_STORAGE_KEY="sb-jbtsncvuobptxyzcoqpf-auth-token";
+  const CONFIG_KEY="rml_pliage_supabase_config_v1";
+  const META_KEY="rml_pliage_sync_meta_v1";
+  const PENDING_KEY="rml_pliage_sync_pending_v1";
+  const TABLE="rml_pliage_sync";
+  const DEFAULT_SUPABASE_CONFIG={
+    url:"https://dbsibzcqhtecknpkkuxa.supabase.co",
+    key:"sb_publishable_WE_zFh9O23cF7zEDie4L3w_JUsSb9ao",
+    workspace:"RML-PLIAGE-ALU-01"
+  };
+  const ADMIN_PASSWORD_HASH="55912b29b73aa9a8f6d5407fc032ba4ea5c1493517e92454249dd22e9c143739";
   const SYNC_KEYS={
     [STORAGE_KEY_CLIENTS]:"client",
+    // Les pièces ne sont plus synchronisées séparément. Elles appartiennent au
+    // projet complet ; une synchronisation pièce par pièce mélangeait les
+    // commandes ouvertes simultanément sur plusieurs appareils.
     [PROJECTS_KEY]:"project",
     [PROJECT_FOLDERS_KEY]:"folder",
     [STORAGE_KEY_BEND_LIBRARY]:"settings"
   };
-  let applyingRemote=false, syncing=false, syncTimer=0;
+  const SINGLETON_TYPES=new Set();
+  let applyingRemote=false;
+  let syncing=false;
+  let syncTimer=0;
+  let snapshots={};
+
   const $=id=>document.getElementById(id);
-  const clone=v=>JSON.parse(JSON.stringify(v));
+  const clone=value=>JSON.parse(JSON.stringify(value));
   const now=()=>new Date().toISOString();
   const parse=(raw,fallback)=>{try{return raw?JSON.parse(raw):fallback}catch{return fallback}};
+  const loadConfig=()=>{
+    const saved=parse(localStorage.getItem(CONFIG_KEY),{});
+    return {
+      ...DEFAULT_SUPABASE_CONFIG,
+      ...saved,
+      url:saved.url||DEFAULT_SUPABASE_CONFIG.url,
+      key:saved.key||DEFAULT_SUPABASE_CONFIG.key,
+      workspace:(!saved.workspace||saved.workspace==="rml-pliage")?DEFAULT_SUPABASE_CONFIG.workspace:saved.workspace
+    };
+  };
   const loadMeta=()=>parse(localStorage.getItem(META_KEY),{});
-  const saveMeta=v=>localStorage.setItem(META_KEY,JSON.stringify(v));
+  const saveMeta=value=>localStorage.setItem(META_KEY,JSON.stringify(value));
   const loadPending=()=>parse(localStorage.getItem(PENDING_KEY),[]);
-  const savePending=v=>localStorage.setItem(PENDING_KEY,JSON.stringify(v));
+  const savePending=value=>localStorage.setItem(PENDING_KEY,JSON.stringify(value));
   const rowKey=(type,id)=>`${type}:${id}`;
-  const toMap=(raw)=>new Map((Array.isArray(parse(raw,[]))?parse(raw,[]):[]).filter(x=>x&&x.id).map(x=>[String(x.id),x]));
-  function accessToken(){
-    const direct=parse(localStorage.getItem(AUTH_STORAGE_KEY),null);
-    if(direct?.access_token)return direct.access_token;
-    for(let i=0;i<localStorage.length;i++){
-      const key=localStorage.key(i)||"";
-      if(key.includes("jbtsncvuobptxyzcoqpf")&&key.includes("auth-token")){
-        const value=parse(localStorage.getItem(key),null);
-        if(value?.access_token)return value.access_token;
-      }
+  const normalizeUrl=value=>String(value||"").trim().replace(/\/+$/,"");
+  const validConfig=config=>/^https:\/\/.+/.test(config.url||"") && !!config.key && !!config.workspace;
+  async function sha256(value){
+    const bytes=new TextEncoder().encode(String(value||""));
+    const digest=await crypto.subtle.digest("SHA-256",bytes);
+    return [...new Uint8Array(digest)].map(byte=>byte.toString(16).padStart(2,"0")).join("");
+  }
+  function lockSupabaseSettings(){
+    const lockBox=$("supabaseLockBox");
+    const protectedArea=$("supabaseProtectedArea");
+    if(lockBox)lockBox.hidden=false;
+    if(protectedArea)protectedArea.hidden=true;
+    if($("supabaseAdminPassword"))$("supabaseAdminPassword").value="";
+    if($("supabaseUnlockStatus"))$("supabaseUnlockStatus").textContent="";
+  }
+  async function unlockSupabaseSettings(){
+    const input=$("supabaseAdminPassword");
+    const status=$("supabaseUnlockStatus");
+    const suppliedHash=await sha256(input?.value||"");
+    if(suppliedHash!==ADMIN_PASSWORD_HASH){
+      if(status){status.textContent="Code incorrect.";status.style.color="#b42318";status.style.fontWeight="800";}
+      input?.select();
+      return false;
     }
-    return "";
+    if($("supabaseLockBox"))$("supabaseLockBox").hidden=true;
+    if($("supabaseProtectedArea"))$("supabaseProtectedArea").hidden=false;
+    if(status)status.textContent="";
+    setTimeout(()=>$("supabaseUrl")?.scrollIntoView({behavior:"smooth",block:"center"}),80);
+    return true;
   }
-  function setStatus(message,kind="neutral"){
-    const el=$("supabaseSyncStatusMain"); if(!el)return;
+  const entityId=(type,item)=>SINGLETON_TYPES.has(type)?"current":String(item?.id||"");
+  const toMap=(type,raw)=>{
+    const value=parse(raw,SINGLETON_TYPES.has(type)?{}:[]);
+    if(SINGLETON_TYPES.has(type))return new Map([["current",value||{}]]);
+    return new Map((Array.isArray(value)?value:[]).filter(item=>item&&item.id).map(item=>[String(item.id),item]));
+  };
+
+  function setSyncStatus(message,kind="neutral"){
+    const elements=[$("supabaseSyncStatus"),$("supabaseSyncStatusMain")].filter(Boolean);
+    if(!elements.length)return;
     const pending=loadPending().length;
-    el.textContent=message+(pending?` — ${pending} changement(s) en attente`:"");
-    el.style.color=kind==="error"?"#b42318":kind==="ok"?"#067647":"#475467";
-    el.style.fontWeight=kind==="neutral"?"600":"800";
+    elements.forEach(el=>{
+      el.textContent=message+(pending?` — ${pending} changement(s) en attente`:"");
+      el.style.color=kind==="error"?"#b42318":kind==="ok"?"#067647":"#475467";
+      el.style.fontWeight=kind==="neutral"?"600":"800";
+    });
   }
-  async function request(path,options={}){
-    const token=accessToken();
-    if(!token)throw new Error("session ERP absente : reconnectez-vous à l’ERP");
-    const headers={apikey:ERP_KEY,Authorization:`Bearer ${token}`,"Content-Type":"application/json",...(options.headers||{})};
-    const response=await fetch(`${ERP_URL}/rest/v1/${path}`,{...options,headers});
-    if(!response.ok){const detail=await response.text().catch(()=>"");throw new Error(`ERP ${response.status}${detail?` : ${detail.slice(0,220)}`:""}`);}
-    if(response.status===204)return null;
-    const text=await response.text(); return text?JSON.parse(text):null;
-  }
-  function queue(type,id,payload,deleted=false,updatedAt=now()){
+
+  function queueRow(type,id,payload,deleted=false,updatedAt=now()){
     if(!id)return;
-    const pending=loadPending(); const key=rowKey(type,id);
-    const row={workspace_id:WORKSPACE,entity_type:type,entity_id:String(id),payload:deleted?{}:clone(payload),updated_at:updatedAt,deleted:!!deleted};
-    const index=pending.findIndex(x=>rowKey(x.entity_type,x.entity_id)===key);
+    const pending=loadPending();
+    const key=rowKey(type,id);
+    const row={
+      workspace_id:loadConfig().workspace||DEFAULT_SUPABASE_CONFIG.workspace,
+      entity_type:type,
+      entity_id:id,
+      payload:deleted?{}:clone(payload),
+      updated_at:updatedAt,
+      deleted:!!deleted
+    };
+    const index=pending.findIndex(item=>rowKey(item.entity_type,item.entity_id)===key);
     if(index>=0)pending[index]=row;else pending.push(row);
     savePending(pending);
-    const meta=loadMeta();meta[key]={updatedAt,deleted:!!deleted};saveMeta(meta);
+    const meta=loadMeta();
+    meta[key]={updatedAt,deleted:!!deleted};
+    saveMeta(meta);
     scheduleSync();
   }
-  function capture(storageKey,oldRaw,newRaw){
-    if(applyingRemote||!SYNC_KEYS[storageKey])return;
-    const type=SYNC_KEYS[storageKey],before=toMap(oldRaw),after=toMap(newRaw),stamp=now();
-    after.forEach((payload,id)=>{if(JSON.stringify(before.get(id))!==JSON.stringify(payload))queue(type,id,payload,false,stamp)});
-    before.forEach((payload,id)=>{if(!after.has(id))queue(type,id,{},true,stamp)});
+
+  function captureLocalChange(storageKey,oldRaw,newRaw){
+    if(applyingRemote || !SYNC_KEYS[storageKey])return;
+    const type=SYNC_KEYS[storageKey];
+    const before=toMap(type,oldRaw);
+    const after=toMap(type,newRaw);
+    const stamp=now();
+    after.forEach((payload,id)=>{
+      if(JSON.stringify(before.get(id))!==JSON.stringify(payload))queueRow(type,id,payload,false,stamp);
+    });
+    before.forEach((payload,id)=>{
+      if(!after.has(id))queueRow(type,id,{},true,stamp);
+    });
+    snapshots[storageKey]=newRaw;
   }
-  const nativeSetItem=Storage.prototype.setItem,nativeRemoveItem=Storage.prototype.removeItem;
-  Storage.prototype.setItem=function(key,value){const oldRaw=(this===localStorage&&SYNC_KEYS[key])?this.getItem(key):null;nativeSetItem.call(this,key,value);if(this===localStorage&&SYNC_KEYS[key])capture(key,oldRaw,String(value));};
-  Storage.prototype.removeItem=function(key){const oldRaw=(this===localStorage&&SYNC_KEYS[key])?this.getItem(key):null;nativeRemoveItem.call(this,key);if(this===localStorage&&SYNC_KEYS[key])capture(key,oldRaw,null);};
-  function localEntities(){return {client:toMap(localStorage.getItem(STORAGE_KEY_CLIENTS)),project:toMap(localStorage.getItem(PROJECTS_KEY)),folder:toMap(localStorage.getItem(PROJECT_FOLDERS_KEY)),settings:toMap(localStorage.getItem(STORAGE_KEY_BEND_LIBRARY))};}
-  function seedMissing(remoteRows){
-    const remoteKeys=new Set(remoteRows.filter(r=>!r.deleted).map(r=>rowKey(r.entity_type,r.entity_id))),locals=localEntities();
-    Object.entries(locals).forEach(([type,map])=>map.forEach((payload,id)=>{if(!remoteKeys.has(rowKey(type,id)))queue(type,id,payload,false,now())}));
+
+  const nativeSetItem=Storage.prototype.setItem;
+  const nativeRemoveItem=Storage.prototype.removeItem;
+  Storage.prototype.setItem=function(key,value){
+    const oldRaw=SYNC_KEYS[key]?this.getItem(key):null;
+    nativeSetItem.call(this,key,value);
+    if(this===localStorage && SYNC_KEYS[key])captureLocalChange(key,oldRaw,String(value));
+  };
+  Storage.prototype.removeItem=function(key){
+    const oldRaw=SYNC_KEYS[key]?this.getItem(key):null;
+    nativeRemoveItem.call(this,key);
+    if(this===localStorage && SYNC_KEYS[key])captureLocalChange(key,oldRaw,null);
+  };
+
+  function removeLegacyCurrentStateSyncQueue(){
+    // Les anciennes lignes distantes peuvent rester dans Supabase sans danger :
+    // la V83 les ignore. On retire seulement les envois locaux encore en attente.
+    savePending(loadPending().filter(row=>row?.entity_type!=="piece"));
+    const meta=loadMeta();
+    Object.keys(meta).forEach(key=>{if(key.startsWith("piece:"))delete meta[key];});
+    saveMeta(meta);
   }
-  function applyRemote(rows){
-    const meta=loadMeta(),locals=localEntities(); let changed=false; applyingRemote=true;
+
+  function savedActiveProject(projectMap=null,settingsValue=null){
+    const projects=projectMap||toMap("project",localStorage.getItem(PROJECTS_KEY));
+    const settings=settingsValue||parse(localStorage.getItem(STORAGE_KEY_CURRENT_PROJECT),{});
+    const runtimeId=typeof currentLoadedProjectId!=="undefined"?currentLoadedProjectId:"";
+    const projectId=String(settings?.projectId||runtimeId||"");
+    return projectId?projects.get(projectId)||null:null;
+  }
+
+  function restorePiecesFromSavedProject(projectMap=null,settingsValue=null){
+    const project=savedActiveProject(projectMap,settingsValue);
+    if(!project||!Array.isArray(project.pieces)||!project.pieces.length)return false;
+    // Remplacement intégral : aucune concaténation et aucune fusion avec la
+    // commande ouverte sur un autre Mac ou iPhone.
+    pieces=restoreBendProfiles(project.pieces,[]);
+    nativeSetItem.call(localStorage,STORAGE_KEY_PIECES,JSON.stringify(pieces));
+    return true;
+  }
+
+  function headers(config,extra={}){
+    return {apikey:config.key,Authorization:`Bearer ${config.key}`,"Content-Type":"application/json",...extra};
+  }
+  async function request(config,path,options={}){
+    const response=await fetch(`${config.url}/rest/v1/${path}`,{...options,headers:headers(config,options.headers||{})});
+    if(!response.ok){
+      const detail=await response.text().catch(()=>"");
+      throw new Error(`Supabase ${response.status}${detail?` : ${detail.slice(0,240)}`:""}`);
+    }
+    if(response.status===204)return null;
+    const text=await response.text();
+    return text?JSON.parse(text):null;
+  }
+
+  function readLocalEntities(){
+    return {
+      client:toMap("client",localStorage.getItem(STORAGE_KEY_CLIENTS)),
+      project:toMap("project",localStorage.getItem(PROJECTS_KEY)),
+      folder:toMap("folder",localStorage.getItem(PROJECT_FOLDERS_KEY)),
+      settings:toMap("settings",localStorage.getItem(STORAGE_KEY_BEND_LIBRARY))
+    };
+  }
+
+  function seedRowsMissingRemotely(remoteRows){
+    const remoteKeys=new Set(remoteRows.map(row=>rowKey(row.entity_type,row.entity_id)));
+    const locals=readLocalEntities();
+    Object.entries(locals).forEach(([type,map])=>map.forEach((payload,id)=>{
+      const key=rowKey(type,id);
+      // Une ancienne métadonnée locale ne doit jamais empêcher l'envoi d'un
+      // projet réellement absent de l'espace Supabase courant.
+      if(!remoteKeys.has(key))queueRow(type,id,payload,false,now());
+    }));
+  }
+
+  function applyRemoteRows(rows){
+    const meta=loadMeta();
+    const locals=readLocalEntities();
+    let changed=false;
+    applyingRemote=true;
     try{
       rows.forEach(row=>{
-        const map=locals[row.entity_type]; if(!map)return;
-        if(row.entity_type==="settings"&&row.payload?.kind!=="bend_library_model")return;
-        const key=rowKey(row.entity_type,row.entity_id),local=map.get(row.entity_id);
-        if(row.entity_type==="project"&&!row.deleted&&local){
-          const lt=Date.parse(local.modifiedAt||local.date||0)||0,rt=Date.parse(row.payload?.modifiedAt||row.payload?.date||0)||0;
-          if(lt>rt){queue("project",row.entity_id,local,false,now());return;}
+        if(!locals[row.entity_type])return;
+        if(row.entity_type==="settings" && row.payload?.kind!=="bend_library_model")return;
+        const key=rowKey(row.entity_type,row.entity_id);
+        const map=locals[row.entity_type];
+        if(row.entity_type==="project" && !row.deleted){
+          const localProject=map.get(row.entity_id);
+          const localModified=Date.parse(localProject?.modifiedAt||localProject?.date||0)||0;
+          const remoteModified=Date.parse(row.payload?.modifiedAt||row.payload?.date||0)||0;
+          // Le contenu métier le plus récent prime sur l'heure technique de
+          // transfert Supabase. Cela protège les pièces d'un projet local plus
+          // complet contre une ancienne fiche distante vide ou incomplète.
+          if(localProject && localModified>remoteModified){
+            queueRow("project",row.entity_id,localProject,false,now());
+            return;
+          }
         }
-        const localStamp=meta[key]?.updatedAt||""; if(localStamp&&localStamp>=row.updated_at)return;
+        const localStamp=meta[key]?.updatedAt||"";
+        if(localStamp && localStamp>=row.updated_at)return;
         if(row.deleted)map.delete(row.entity_id);else map.set(row.entity_id,row.payload||{});
-        meta[key]={updatedAt:row.updated_at,deleted:!!row.deleted};changed=true;
+        meta[key]={updatedAt:row.updated_at,deleted:!!row.deleted};
+        changed=true;
       });
       if(changed){
-        clients=[...locals.client.values()].map(normalizeClient); if(!clients.length)clients=structuredClone(defaultClients);
+        clients=[...locals.client.values()].map(normalizeClient);
+        if(!clients.length)clients=structuredClone(defaultClients);
         nativeSetItem.call(localStorage,STORAGE_KEY_CLIENTS,JSON.stringify(clients));
         nativeSetItem.call(localStorage,PROJECTS_KEY,JSON.stringify([...locals.project.values()]));
         nativeSetItem.call(localStorage,PROJECT_FOLDERS_KEY,JSON.stringify([...locals.folder.values()]));
-        nativeSetItem.call(localStorage,STORAGE_KEY_BEND_LIBRARY,JSON.stringify([...locals.settings.values()].filter(x=>x?.kind==="bend_library_model")));
-        saveMeta(meta);renderClientSelect();restoreCurrentProjectState();renderClientForm();renderPieces();updatePriceDisplay();document.getElementById("projectsModal")?.remove();
+        nativeSetItem.call(localStorage,STORAGE_KEY_BEND_LIBRARY,JSON.stringify([...locals.settings.values()].filter(item=>item?.kind==="bend_library_model")));
+        // Le projet actuellement ouvert est propre à chaque appareil. Il ne doit
+        // jamais être imposé par le Mac ou l'iPhone qui a synchronisé en dernier.
+        const settings=parse(localStorage.getItem(STORAGE_KEY_CURRENT_PROJECT),{});
+        if(!restorePiecesFromSavedProject(locals.project,settings)){
+          pieces=restoreBendProfiles(parse(localStorage.getItem(STORAGE_KEY_PIECES),[]),pieces);
+          if(!pieces.length)pieces=[{id:crypto.randomUUID(),developed:"",length:"",qty:1,folds:0,cuts:0,time:0,waste:""}];
+          nativeSetItem.call(localStorage,STORAGE_KEY_PIECES,JSON.stringify(pieces));
+        }
+        saveMeta(meta);
+        renderClientSelect();
+        restoreCurrentProjectState();
+        renderClientForm();
+        renderPieces();
+        updatePriceDisplay();
+        document.getElementById("projectsModal")?.remove();
       }
     }finally{applyingRemote=false;}
+    Object.keys(SYNC_KEYS).forEach(key=>snapshots[key]=localStorage.getItem(key));
   }
-  async function pushPending(){
-    const pending=loadPending(); if(!pending.length)return 0;
-    await request(TABLE,{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(pending)});
-    const sent=new Set(pending.map(r=>rowKey(r.entity_type,r.entity_id)+":"+r.updated_at));
-    savePending(loadPending().filter(r=>!sent.has(rowKey(r.entity_type,r.entity_id)+":"+r.updated_at))); return pending.length;
+
+  async function pushPending(config){
+    const pending=loadPending();
+    if(!pending.length)return 0;
+    const rows=pending.map(row=>({...row,workspace_id:config.workspace}));
+    await request(config,TABLE,{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(rows)});
+    const sentKeys=new Set(rows.map(row=>rowKey(row.entity_type,row.entity_id)+":"+row.updated_at));
+    savePending(loadPending().filter(row=>!sentKeys.has(rowKey(row.entity_type,row.entity_id)+":"+row.updated_at)));
+    return rows.length;
   }
-  async function syncNow(){
-    if(syncing)return;if(!navigator.onLine){setStatus("Hors ligne : les changements restent sur cet appareil.");return;}
-    syncing=true;setStatus("Sauvegarde ERP en cours…");
+
+  async function syncNow({quiet=false}={}){
+    if(syncing)return;
+    const config=loadConfig();
+    if(!validConfig(config)){if(!quiet)setSyncStatus("Renseignez l’URL, la clé et l’espace de synchronisation.","error");return;}
+    if(!navigator.onLine){setSyncStatus("Hors ligne : les changements sont conservés sur cet appareil.");return;}
+    syncing=true;
+    setSyncStatus("Synchronisation en cours…");
     try{
-      let remote=await request(`${TABLE}?workspace_id=eq.${encodeURIComponent(WORKSPACE)}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`);remote=Array.isArray(remote)?remote:[];
-      applyRemote(remote);seedMissing(remote);const sent=await pushPending();
-      if(sent){remote=await request(`${TABLE}?workspace_id=eq.${encodeURIComponent(WORKSPACE)}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`);applyRemote(Array.isArray(remote)?remote:[]);}
-      setStatus(`Enregistré dans ERP DEV — ${new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}`,"ok");
-    }catch(error){console.error("Sauvegarde Pliage ERP :",error);setStatus(`Échec sauvegarde ERP : ${error.message}`,"error");}
-    finally{syncing=false;}
+      const workspace=encodeURIComponent(config.workspace);
+      let remote=await request(config,`${TABLE}?workspace_id=eq.${workspace}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`);
+      remote=Array.isArray(remote)?remote:[];
+      applyRemoteRows(remote);
+      seedRowsMissingRemotely(remote);
+      const sent=await pushPending(config);
+      if(sent){
+        const refreshed=await request(config,`${TABLE}?workspace_id=eq.${workspace}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`);
+        applyRemoteRows(Array.isArray(refreshed)?refreshed:[]);
+      }
+      localStorage.setItem(CONFIG_KEY,JSON.stringify({...config,lastSyncAt:now()}));
+      setSyncStatus(`À jour — dernière synchronisation ${new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}`,"ok");
+    }catch(error){
+      console.error("Synchronisation Supabase V83 :",error);
+      setSyncStatus(`Échec de synchronisation : ${error.message}`,"error");
+    }finally{syncing=false;}
   }
-  function scheduleSync(){clearTimeout(syncTimer);setStatus(navigator.onLine?"Modification locale enregistrée.":"Hors ligne : modification locale enregistrée.");syncTimer=setTimeout(syncNow,1200);}
-  function protectRestoredLibrary(models){
-    if(!Array.isArray(models))return;
-    const stamp=now();
-    models.filter(model=>model&&model.id).forEach(model=>queue("settings",String(model.id),model,false,stamp));
-    setStatus(`${models.length} modèle(s) de bibliothèque restauré(s) — sauvegarde ERP en cours…`);
-    setTimeout(syncNow,50);
+
+  function scheduleSync(){
+    clearTimeout(syncTimer);
+    setSyncStatus(navigator.onLine?"Modification locale enregistrée.":"Hors ligne : modification locale enregistrée.");
+    syncTimer=setTimeout(()=>syncNow({quiet:true}),1500);
   }
-  $("syncSupabaseMainBtn")?.addEventListener("click",syncNow);
-  window.addEventListener("online",syncNow);
-  window.addEventListener("offline",()=>setStatus("Hors ligne : les changements restent sur cet appareil."));
-  window.addEventListener("storage",event=>{if(SYNC_KEYS[event.key]){capture(event.key,event.oldValue,event.newValue);syncNow();}});
-  setInterval(syncNow,60000);
-  setTimeout(syncNow,700);
-  window.RML_ERP_PLIAGE_SYNC={syncNow,protectRestoredLibrary,status:()=>({pending:loadPending().length,table:TABLE,workspace:WORKSPACE})};
+
+  const SQL=`create table if not exists public.${TABLE} (
+  workspace_id text not null,
+  entity_type text not null check (entity_type in ('client','piece','project','folder','settings')),
+  entity_id text not null,
+  payload jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null,
+  deleted boolean not null default false,
+  primary key (workspace_id, entity_type, entity_id)
+);
+
+create index if not exists ${TABLE}_updated_idx
+  on public.${TABLE} (workspace_id, updated_at);
+
+alter table public.${TABLE} enable row level security;
+
+drop policy if exists "RML Pliage lecture" on public.${TABLE};
+create policy "RML Pliage lecture" on public.${TABLE}
+  for select to anon using (true);
+
+drop policy if exists "RML Pliage ajout" on public.${TABLE};
+create policy "RML Pliage ajout" on public.${TABLE}
+  for insert to anon with check (true);
+
+drop policy if exists "RML Pliage modification" on public.${TABLE};
+create policy "RML Pliage modification" on public.${TABLE}
+  for update to anon using (true) with check (true);`;
+
+  function loadConfigForm(){
+    const config=loadConfig();
+    if($("supabaseUrl"))$("supabaseUrl").value=config.url||"";
+    if($("supabaseKey"))$("supabaseKey").value=config.key||"";
+    if($("supabaseWorkspace"))$("supabaseWorkspace").value=config.workspace||DEFAULT_SUPABASE_CONFIG.workspace;
+    if($("supabaseSqlText"))$("supabaseSqlText").value=SQL;
+    if(validConfig(config)){
+      const last=config.lastSyncAt?new Date(config.lastSyncAt).toLocaleString("fr-FR"):"jamais";
+      setSyncStatus(`Configuration enregistrée — dernière synchronisation : ${last}`);
+    }
+  }
+
+  $("saveSupabaseConfigBtn")?.addEventListener("click",()=>{
+    const config={url:normalizeUrl($("supabaseUrl").value),key:$("supabaseKey").value.trim(),workspace:$("supabaseWorkspace").value.trim()||DEFAULT_SUPABASE_CONFIG.workspace};
+    if(!validConfig(config)){setSyncStatus("Configuration incomplète ou URL invalide.","error");return;}
+    nativeSetItem.call(localStorage,CONFIG_KEY,JSON.stringify(config));
+    setSyncStatus("Configuration enregistrée. Premier rapprochement en cours…");
+    syncNow();
+  });
+  $("syncSupabaseNowBtn")?.addEventListener("click",()=>syncNow());
+  $("syncSupabaseMainBtn")?.addEventListener("click",()=>syncNow());
+  $("openSyncSettingsBtn")?.addEventListener("click",()=>{
+    $("openSettingsBtn")?.click();
+    lockSupabaseSettings();
+    setTimeout(()=>$("supabaseLockBox")?.scrollIntoView({behavior:"smooth",block:"center"}),120);
+  });
+  $("unlockSupabaseBtn")?.addEventListener("click",unlockSupabaseSettings);
+  $("supabaseAdminPassword")?.addEventListener("keydown",event=>{
+    if(event.key==="Enter"){event.preventDefault();unlockSupabaseSettings();}
+  });
+  $("lockSupabaseBtn")?.addEventListener("click",lockSupabaseSettings);
+  $("closeSettingsBtn")?.addEventListener("click",lockSupabaseSettings);
+  $("showSupabaseSqlBtn")?.addEventListener("click",()=>{
+    const box=$("supabaseSqlBox");box.hidden=!box.hidden;
+  });
+  $("copySupabaseSqlBtn")?.addEventListener("click",async()=>{
+    try{await navigator.clipboard.writeText(SQL);setSyncStatus("SQL copié.","ok");}
+    catch{$("supabaseSqlText").select();document.execCommand("copy");setSyncStatus("SQL copié.","ok");}
+  });
+  window.addEventListener("online",()=>syncNow({quiet:true}));
+  window.addEventListener("offline",()=>setSyncStatus("Hors ligne : les changements sont conservés sur cet appareil."));
+  window.addEventListener("storage",event=>{if(SYNC_KEYS[event.key]){captureLocalChange(event.key,event.oldValue,event.newValue);syncNow({quiet:true});}});
+  setInterval(()=>syncNow({quiet:true}),60000);
+  removeLegacyCurrentStateSyncQueue();
+  restorePiecesFromSavedProject();
+  renderPieces();
+  Object.keys(SYNC_KEYS).forEach(key=>snapshots[key]=localStorage.getItem(key));
+  lockSupabaseSettings();
+  loadConfigForm();
+  if(validConfig(loadConfig()))setTimeout(()=>syncNow({quiet:true}),600);
+  window.RML_SUPABASE_SYNC={syncNow,status:()=>({configured:validConfig(loadConfig()),pending:loadPending().length,config:{...loadConfig(),key:loadConfig().key?"••••••••":""}})};
 })();
 </script>
 <!-- V60 validée : grand dessinateur simplifié -->
+<script>
+/* RML Atelier V17 — Envoi à l’ERP, projet complet ou sélection de pièces. */
+(function(){
+ const ERP_URL='https://jbtsncvuobptxyzcoqpf.supabase.co';
+ const ERP_KEY='sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr';
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function getPieces(){return Array.isArray(window.pieces)?window.pieces:typeof pieces!=='undefined'?pieces:[]}
+ function project(){return typeof persistCurrentProjectRecord==='function'?persistCurrentProjectRecord({createIfMissing:true}):null}
+ function modal(){
+  const proj=project();if(!proj){alert('Enregistrez le projet avant de l’envoyer.');return}
+  const rows=Array.isArray(proj.pieces)?proj.pieces:[];if(!rows.length){alert('Ce projet ne contient aucune pièce.');return}
+  const client=typeof clients!=='undefined'?clients.find(c=>String(c.id)===String(proj.clientId)):null;
+  const overlay=document.createElement('div');overlay.id='rmlAtelierOverlay';overlay.style='position:fixed;inset:0;background:#0009;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.innerHTML=`<div style="background:white;color:#182333;border-radius:14px;padding:20px;max-width:750px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 10px 50px #0004"><h2 style="margin-top:0">Envoyer à l’atelier — Équipe 8</h2><div><b>${esc(proj.name)}</b> · ${esc(client?.name||'Client non renseigné')}</div><p><label><input type="radio" name="rmlMode" value="all" checked> Projet complet</label> &nbsp; <label><input type="radio" name="rmlMode" value="selected"> Pièces sélectionnées</label></p><div id="rmlPieceChoices" style="max-height:40vh;overflow:auto;border:1px solid #ddd;border-radius:8px">${rows.map((x,i)=>`<label style="display:flex;align-items:center;gap:12px;padding:9px;border-bottom:1px solid #eee"><input type="checkbox" data-piece="${i}" checked><span style="flex:1">Pièce ${i+1} — ${esc(x.name||x.nom||x.label||x.designation||'')}</span><span>Qté</span><input type="number" min="1" step="1" data-qty="${i}" value="${Math.max(1,Math.round(Number(x.quantity??x.qty??x.quantite??1)||1))}" style="width:75px;padding:5px"></label>`).join('')}</div><p><label>Priorité <select id="rmlAtelierPriority"><option value="normale">Normale</option><option value="urgente">Urgente</option></select></label> &nbsp; <label>Date souhaitée <input type="date" id="rmlAtelierDue"></label></p><div id="rmlAtelierMsg" style="color:#b42318;min-height:22px"></div><div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" id="rmlAtelierCancel">Annuler</button><button type="button" id="rmlAtelierConfirm" style="background:#176b48;color:white;border:0;border-radius:8px;padding:10px 16px">Confirmer l’envoi</button></div></div>`;
+  document.body.appendChild(overlay);const q=s=>overlay.querySelector(s);q('#rmlAtelierCancel').onclick=()=>overlay.remove();
+  overlay.querySelectorAll('[name=rmlMode]').forEach(el=>el.onchange=()=>{const all=q('[name=rmlMode]:checked').value==='all';overlay.querySelectorAll('[data-piece]').forEach(c=>{c.checked=all;c.disabled=all})});
+  q('#rmlAtelierConfirm').onclick=async()=>{
+   const chosen=rows.map((x,i)=>({x,i,check:q(`[data-piece="${i}"]`),qty:q(`[data-qty="${i}"]`)})).filter(o=>o.check.checked);
+   if(!chosen.length){q('#rmlAtelierMsg').textContent='Sélectionnez au moins une pièce.';return}
+   if(chosen.some(o=>!Number.isInteger(Number(o.qty.value))||Number(o.qty.value)<1)){q('#rmlAtelierMsg').textContent='Quantités invalides.';return}
+   const btn=q('#rmlAtelierConfirm');btn.disabled=true;q('#rmlAtelierMsg').textContent='Transmission en cours…';
+   const payload={source_project_id:String(proj.id),source_app:'RML_PLIAGE_V95',project_name:proj.name,client_name:client?.name||'',mode:q('[name=rmlMode]:checked').value,priority:q('#rmlAtelierPriority').value,due_date:q('#rmlAtelierDue').value||null,team_number:8,material:{thickness:proj.thickness,color:proj.color,sheetFormat:proj.sheetFormat,materialMode:proj.materialMode},items:chosen.map(o=>({source_index:o.i,quantity:Number(o.qty.value),piece:o.x}))};
+   try{
+    const response=await fetch(ERP_URL+'/rest/v1/erp_bending_orders',{method:'POST',headers:{apikey:ERP_KEY,Authorization:'Bearer '+ERP_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({source_project_id:payload.source_project_id,source_app:payload.source_app,project_name:payload.project_name,client_name:payload.client_name,mode:payload.mode,priority:payload.priority,due_date:payload.due_date,team_number:8,payload,status:'a_fabriquer'})});
+    if(!response.ok){const t=await response.text();throw Error(response.status+' '+t.slice(0,300))}
+    alert('Commande envoyée à l’atelier de pliage — Équipe 8.');overlay.remove();
+   }catch(err){q('#rmlAtelierMsg').textContent='Envoi impossible : '+err.message+' — Vérifiez que le SQL Atelier V17 a été exécuté.';btn.disabled=false}
+  };
+ }
+ document.getElementById('rmlSendAtelierBtn')?.addEventListener('click',modal);
+})();
+</script>
 </body>
 </html>
