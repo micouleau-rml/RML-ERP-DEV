@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V19.10 · Atelier et fabrication</title>
+<title>RML ERP — V19.12 · Atelier et fabrication</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -336,7 +336,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V19.10</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — V19.12</p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -2807,6 +2807,11 @@ function rmlV19PrintPlan(orderId,index){const o=rmlV19Orders.find(x=>String(x.id
 function rmlAtelier8PrintHtml(html,title){
  if(!html)return alert('Document indisponible pour cette commande. Renvoyez-la depuis la nouvelle version de RML Pliage.');
  const win=window.open('','_blank');if(!win)return alert('Autorisez les fenêtres surgissantes pour afficher le document.');
+ // Les anciens calpinages stockés conservent leur CSS initial : corriger à l'affichage.
+ if(/zones-line|zone-chip/.test(html)){
+   const fix='<style id="rml-zones-wrap-fix">.zones-line{max-width:100%!important;overflow-wrap:anywhere!important;word-break:normal!important;line-height:1.55!important}.zone-chip{display:inline-block!important;white-space:normal!important;overflow-wrap:break-word!important;vertical-align:top!important;margin:2px 5px 2px 0!important;padding:2px 4px!important;max-width:100%!important}.drawing-block{max-width:100%!important;box-sizing:border-box!important}</style>';
+   html=html.replace(/<\/head>/i,fix+'</head>');
+ }
  win.document.open();win.document.write(html);win.document.close();win.focus();
 }
 function rmlAtelier8PlanDocument(o,index){
@@ -2862,7 +2867,7 @@ async function rmlSubmitDocumentOrder(e){
   const now=new Date().toISOString();const payload={type:'document',reference:String(f.get('reference')||''),instructions:String(f.get('instructions')||''),documents:paths,items:[{quantity:qty,piece:{name:String(f.get('reference')||'Fabrication sur document')}}]};
   const {error}=await sb.from('erp_bending_orders').insert({source_project_id:uid,source_app:'RML_ERP_DOCUMENT',project_name:String(f.get('project')).trim(),client_name:String(f.get('client')).trim(),mode:'all',priority:f.get('priority'),due_date:f.get('due')||null,team_number:8,payload,status:'a_fabriquer'});if(error)throw error;
   msg.textContent='Commande publiée.';document.getElementById('rmlDocumentOrderDialog')?.close();await rmlLoadAtelier8();
- }catch(err){msg.textContent='Envoi impossible : '+(err.message||err)+'. Vérifiez que le SQL V19.10 a été exécuté.';}
+ }catch(err){msg.textContent='Envoi impossible : '+(err.message||err)+'. Vérifiez que le SQL V19.12 a été exécuté.';}
  finally{btn.disabled=false}
 }
 async function rmlOpenAtelierDocument(orderId,index){const o=rmlAtelier8Rows.find(x=>String(x.id)===String(orderId)),doc=o?.payload?.documents?.[index];if(!doc)return alert('Document introuvable.');const {data,error}=await sb.storage.from('rml-atelier-documents').createSignedUrl(doc.path,120);if(error||!data?.signedUrl)return alert('Impossible d’ouvrir le document : '+(error?.message||'Accès refusé'));window.open(data.signedUrl,'_blank','noopener,noreferrer')}
