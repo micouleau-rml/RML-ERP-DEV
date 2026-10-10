@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V19.14 · Atelier et fabrication</title>
+<title>RML ERP — V19.15 · Atelier et fabrication</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -926,7 +926,7 @@ if(isSubcontractorUser()){view='subPortal'}else if(isEmployeeUser() && view!=='a
 if(view==='atelierPliage8'&&!rmlCanAtelier8())view=isEmployeeUser()?'employeePortal':'dashboard';
 if(view==='atelierPliage8')setTimeout(rmlLoadAtelier8,0);if(view==='preparation')setTimeout(loadPreparationApp,0);if(view==='stock'&&!hasPerm('stock'))view='dashboard';if(view==='equipes'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='stock')loadStock();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='equipes')loadTeamsAdmin();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security')renderResetStats();if(view==='page-forecast')renderMonthlyForecast()}
 mainNav.addEventListener('click',e=>{if(e.target.dataset.view)go(e.target.dataset.view)});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
-function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open')}document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
+function openModal(id){$(id).classList.add('open')}function closeModal(id){$(id).classList.remove('open');if(id==='clientModal'&&window.rmlDocClientReturnDialog){const dlg=window.rmlDocClientReturnDialog;window.rmlDocClientReturnDialog=null;if(dlg.isConnected&&!dlg.open){rmlDocumentRefreshClients(dlg);dlg.showModal();}}}document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
 document.querySelectorAll('[data-close="jobModal"]').forEach(b=>{b.onclick=(e)=>{e.preventDefault();requestCloseJobEditor()}});
 document.getElementById('jobModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget){e.stopImmediatePropagation();requestCloseJobEditor()}},true);
 document.getElementById('jobUnsavedSave')?.addEventListener('click',()=>{closeModal('jobUnsavedModal');jobForm.requestSubmit()});
@@ -1201,6 +1201,16 @@ clientForm.onsubmit=async e=>{
   e.preventDefault();
   const wasNew=!clientId.value;
   const created=await saveClientEdits({closeAfter:true});
+  if(created&&wasNew&&window.rmlDocClientPendingDialog){
+    const dlg=window.rmlDocClientPendingDialog;
+    window.rmlDocClientReturnDialog=null;window.rmlDocClientPendingDialog=null;
+    if(dlg.isConnected){
+      rmlDocumentRefreshClients(dlg);
+      dlg.querySelector('#rmlDocClientInput').value=created.nom||clientNom.value||'';
+      rmlDocumentClientStatus(dlg);
+      dlg.showModal();
+    }
+  }
   if(created&&wasNew&&clientCreationFromJob){
     clientCreationFromJob=false;
     const newId=created.id||'';
@@ -2865,8 +2875,18 @@ function rmlShowDocumentOrder(){
  document.body.appendChild(d);d.showModal();d.querySelector('#rmlDocumentCancel').onclick=()=>d.close();d.addEventListener('close',()=>d.remove());d.querySelector('form').onsubmit=rmlSubmitDocumentOrder;
  rmlDocumentRefreshClients(d);
  d.querySelector('#rmlDocClientInput').addEventListener('input',()=>rmlDocumentClientStatus(d));
- d.querySelector('#rmlDocCreateClient').onclick=()=>{const box=d.querySelector('#rmlDocNewClient');box.hidden=!box.hidden;if(!box.hidden)d.querySelector('#rmlDocNewClientName').value=d.querySelector('#rmlDocClientInput').value;};
- d.querySelector('#rmlDocSaveClient').onclick=()=>rmlDocumentCreateClient(d);
+ d.querySelector('#rmlDocCreateClient').onclick=async()=>{
+  if(!hasPerm('clients')){alert('Vous ne disposez pas des droits pour créer un client.');return;}
+  // Réutiliser exactement la fiche Clients de l'ERP, sans formulaire parallèle.
+  const name=d.querySelector('#rmlDocClientInput').value.trim();
+  d.close();
+  window.rmlDocClientReturnDialog=d;window.rmlDocClientPendingDialog=d;
+  await resetClientForm();
+  if(name&&!rmlDocumentClientMatch(name))clientNom.value=name;
+  openModal('clientModal');
+  setTimeout(()=>clientNom.focus(),50);
+ };
+
 }
 function rmlDocumentClients(){return (db.clients||[]).filter(c=>c&&c.nom).slice().sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));}
 function rmlDocumentClientMatch(value){return rmlDocumentClients().find(c=>c.nom.trim().toLocaleLowerCase('fr')===String(value||'').trim().toLocaleLowerCase('fr'));}
