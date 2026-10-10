@@ -320,7 +320,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée à RML ERP DEV — V19.20.2.</p>
+    <p>Connexion sécurisée à RML ERP DEV — V19.20.3.</p>
     <div class="field"><label>Identifiant</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex. Equipe1, Dupont ou adresse e-mail" required><div class="muted" style="margin-top:5px">Ouvriers / équipes / collaborateurs / sous-traitants : utilisez votre identifiant. Les comptes existants peuvent toujours utiliser leur adresse e-mail.</div></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -337,7 +337,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V19.20.2</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V19.20.3</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3066,7 +3066,7 @@ if(window.rmlRefreshNavEditor)rmlRefreshNavEditor();
 
 #rmlV19PlanModal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:8000;display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}#rmlV19PlanModal.open{display:flex}#rmlV19PlanModal .modal-card{background:white;border-radius:12px;padding:20px;max-height:95vh;overflow:auto}#rmlV19PlanModal .modal-head{display:flex;justify-content:space-between;align-items:center}#rmlV19PlanModal .close{cursor:pointer;padding:8px 12px} @media print{body.rml-printing-plan > *:not(#rmlPrintArea){display:none!important}}
 </style><script>
-/* RML ERP : version unique, visible et actualisation anti-cache (V19.20.2). */
+/* RML ERP : version unique, visible et actualisation anti-cache (V19.20.3). */
 (function(){
   const version=document.querySelector('meta[name="rml-app-version"]')?.content||'19.20.2';
   const label='V'+version;
@@ -3123,7 +3123,7 @@ async function openJobHistory(jobId){
    isEmployeeUser()?Promise.resolve({data:[],error:null}):sb.rpc('erp_admin_get_job_team_time',{p_chantier_id:String(jobId)}),
    sb.from('erp_modules_data').select('payload').eq('chantier_id',jobId).eq('module','suivi').eq('entity_type','chantier').eq('entity_id',jobId).maybeSingle()
  ]);
- if(rep.error){host.innerHTML='<div class="notice danger">Lecture des rapports indisponible : '+esc(rep.error.message)+'<br>Installez le fichier SQL HISTORIQUE_INTERVENTIONS dans Supabase.</div>';return;}
+ if(rep.error){host.innerHTML='<div class="notice danger">Lecture des rapports indisponible : '+esc(rep.error.message)+'<br>Exécutez le correctif SQL V19.20.3 dans Supabase si cette erreur persiste.</div>';return;}
  const reports=Array.isArray(rep.data)?rep.data:[],times=Array.isArray(time.data)?time.data:[];
  const products=new Map();for(const il of (suivi.data?.payload?.ilots||[]))for(const p of (il.produits||[]))products.set(String(p.id),{name:p.nom||'Produit',unit:p.unite||''});
  const membersByDate=new Map();
