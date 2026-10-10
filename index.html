@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V20</title>
+<title>RML ERP — V21</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -337,7 +337,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V20</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V21</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3139,6 +3139,21 @@ async function openJobHistory(jobId){
  scanProducts(suivi.data?.payload);
  // Référentiel de préparation également consulté pour résoudre les identifiants techniques.
  try{const {data:prep}=await sb.from('erp_modules_data').select('payload').eq('chantier_id',jobId).eq('module','preparation').eq('entity_type','chantier').eq('deleted',false);for(const row of prep||[])scanProducts(row.payload);}catch(e){console.warn('Désignations de préparation indisponibles',e)}
+ // V21 : le référentiel exact est celui du suivi renvoyé à la fiche salarié.
+ // Les identifiants des produits sont propres aux îlots : ne pas afficher une référence technique si le libellé existe.
+ try {
+   const dates=[...new Set(reports.map(r=>String(r.intervention_date||'').slice(0,10)).filter(Boolean))];
+   if(dates.length){
+     const {data:daily,error:dailyError}=await sb.rpc('erp_v16_get_daily_report',{p_chantier_id:String(jobId),p_date:dates[0]});
+     if(!dailyError){
+       for(const il of daily?.suivi?.ilots||[]){
+         for(const pr of il.produits||[]){
+           if(pr.id!=null&&pr.nom)products.set(String(pr.id),{name:String(pr.nom),unit:String(pr.unite||'')});
+         }
+       }
+     }
+   }
+ }catch(e){console.warn('Libellés du suivi indisponibles',e)}
  const membersByDate=new Map();
  try{
   const {data:plans,error:planError}=await sb.from('erp_modules_data').select('payload').eq('chantier_id',jobId).eq('module','planning').eq('entity_type','chantier').eq('deleted',false);
