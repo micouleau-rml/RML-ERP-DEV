@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V19.20 · Atelier et fabrication</title>
+<title>RML ERP — V19.20.1 · Atelier et fabrication</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -337,7 +337,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V19.20</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V19.20.1</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -707,27 +707,7 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
 </div>
 
 
-<script id="rml-v1920-finished-script">
-async function rmlV1920LoadFinished(){
- const panel=document.getElementById('rmlV1920FinishedPanel'),box=document.getElementById('rmlV1920FinishedList');if(!panel||!box)return;
- if(!currentUser||!currentAccess?.active||!['administrateur','collaborateur'].includes(currentAccess.role)){panel.style.display='none';return}
- panel.style.display='block';box.textContent='Chargement des travaux terminés…';
- try{
- const [{data:orders,error:oe},{data:reads,error:re}]=await Promise.all([sb.from('erp_bending_orders').select('id,project_name,client_name,status,updated_at,created_at').eq('status','terminee').order('updated_at',{ascending:false}).limit(100),sb.from('erp_completion_ack').select('alert_key').eq('user_id',currentUser.id)]);
- if(oe)throw oe;if(re)throw re;
- const acknowledged=new Set((reads||[]).map(x=>x.alert_key));
- const entries=[];
- (orders||[]).forEach(o=>{const key='pliage:'+o.id+':'+(o.updated_at||o.created_at||'');if(!acknowledged.has(key))entries.push({key,type:'pliage',title:'Fabrication terminée',label:[o.project_name,o.client_name].filter(Boolean).join(' — '),date:o.updated_at||o.created_at,id:o.id})});
- (db?.chantiers||[]).filter(j=>j.statut==='termine').forEach(j=>{const key='chantier:'+j.id+':'+(j.updated_at||j.created_at||'');if(!acknowledged.has(key))entries.push({key,type:'chantier',title:'Chantier terminé',label:[clientName(j.client_id),j.nom].filter(Boolean).join(' — '),date:j.updated_at||j.created_at,id:j.id})});
- entries.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
- box.innerHTML=entries.length?entries.map((e,i)=>`<div class="rml-v1920-alert"><div><strong>${esc(e.title)}</strong><div>${esc(e.label)}</div><small>${e.date?new Date(e.date).toLocaleString('fr-FR'):''}</small></div><div><button class="btn secondary" type="button" data-finish-view="${i}">Voir</button><button class="btn" type="button" data-finish-ack="${i}">Marquer comme lu</button></div></div>`).join(''):'Aucun travail terminé en attente de validation.';
- box.querySelectorAll('[data-finish-view]').forEach(b=>b.onclick=()=>{const e=entries[Number(b.dataset.finishView)];if(e.type==='chantier')openJob(e.id);else{go('atelierPliage8');const cb=document.getElementById('rmlAtelier8Archives');if(cb){cb.checked=true;rmlLoadAtelier8()}}});
- box.querySelectorAll('[data-finish-ack]').forEach(b=>b.onclick=async()=>{const e=entries[Number(b.dataset.finishAck)];b.disabled=true;const {error}=await sb.from('erp_completion_ack').upsert({user_id:currentUser.id,alert_key:e.key},{onConflict:'user_id,alert_key'});if(error){alert('Validation impossible : '+error.message);b.disabled=false;return}await rmlV1920LoadFinished()});
- }catch(e){box.textContent='Notifications indisponibles : '+e.message+' — exécutez le SQL V19.20 dans Supabase.'}
-}
-const rmlV1920OldLoadHome=window.loadHomeAlerts;
-if(typeof rmlV1920OldLoadHome==='function')window.loadHomeAlerts=async function(...args){const r=await rmlV1920OldLoadHome.apply(this,args);await rmlV1920LoadFinished();return r};
-</script></body></html>`);win.document.close()}
+</body></html>`);win.document.close()}
 
 
 function prepNumber(v){const n=Number(String(v??'').replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:0}
@@ -2954,7 +2934,7 @@ async function rmlSubmitDocumentOrder(e){
  }catch(err){msg.textContent='Envoi impossible : '+(err.message||err)+'. Vérifiez que le SQL V19.12 a été exécuté.';}
  finally{btn.disabled=false}
 }
-/* V19.20 — Aperçu intégré : aucun window.open asynchrone (Safari iPad / PWA). */
+/* V19.20.1 — Aperçu intégré : aucun window.open asynchrone (Safari iPad / PWA). */
 function rmlCloseAtelierDocument(){
  const panel=document.getElementById('rmlAtelierDocumentViewer');
  if(!panel)return;
@@ -3084,7 +3064,7 @@ if(window.rmlRefreshNavEditor)rmlRefreshNavEditor();
 
 #rmlV19PlanModal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:8000;display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}#rmlV19PlanModal.open{display:flex}#rmlV19PlanModal .modal-card{background:white;border-radius:12px;padding:20px;max-height:95vh;overflow:auto}#rmlV19PlanModal .modal-head{display:flex;justify-content:space-between;align-items:center}#rmlV19PlanModal .close{cursor:pointer;padding:8px 12px} @media print{body.rml-printing-plan > *:not(#rmlPrintArea){display:none!important}}
 </style><script>
-/* RML ERP : version unique, visible et actualisation anti-cache (V19.20). */
+/* RML ERP : version unique, visible et actualisation anti-cache (V19.20.1). */
 (function(){
   const version=document.querySelector('meta[name="rml-app-version"]')?.content||'19.19';
   const label='V'+version;
@@ -3103,5 +3083,26 @@ if(window.rmlRefreshNavEditor)rmlRefreshNavEditor();
   badge.append(versionText,refresh);document.body.appendChild(badge);
   window.RML_ERP_VERSION=version;
 })();
-</script><div id="rmlV19PlanModal"></div><div id="rmlPrintArea" class="rml-print-area"></div><style>.rml-atelier-doc-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:10px;border:1px solid #cbd5e1;background:#f0f7ff;border-radius:10px}</style></body>
+</script><div id="rmlV19PlanModal"></div><div id="rmlPrintArea" class="rml-print-area"></div><style>.rml-atelier-doc-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:10px;border:1px solid #cbd5e1;background:#f0f7ff;border-radius:10px}</style><script id="rml-v1920-finished-script">
+async function rmlV1920LoadFinished(){
+ const panel=document.getElementById('rmlV1920FinishedPanel'),box=document.getElementById('rmlV1920FinishedList');if(!panel||!box)return;
+ if(!currentUser||!currentAccess?.active||!['administrateur','collaborateur'].includes(currentAccess.role)){panel.style.display='none';return}
+ panel.style.display='block';box.textContent='Chargement des travaux terminés…';
+ try{
+ const [{data:orders,error:oe},{data:reads,error:re}]=await Promise.all([sb.from('erp_bending_orders').select('id,project_name,client_name,status,updated_at,created_at').eq('status','terminee').order('updated_at',{ascending:false}).limit(100),sb.from('erp_completion_ack').select('alert_key').eq('user_id',currentUser.id)]);
+ if(oe)throw oe;if(re)throw re;
+ const acknowledged=new Set((reads||[]).map(x=>x.alert_key));
+ const entries=[];
+ (orders||[]).forEach(o=>{const key='pliage:'+o.id+':'+(o.updated_at||o.created_at||'');if(!acknowledged.has(key))entries.push({key,type:'pliage',title:'Fabrication terminée',label:[o.project_name,o.client_name].filter(Boolean).join(' — '),date:o.updated_at||o.created_at,id:o.id})});
+ (db?.chantiers||[]).filter(j=>j.statut==='termine').forEach(j=>{const key='chantier:'+j.id+':'+(j.updated_at||j.created_at||'');if(!acknowledged.has(key))entries.push({key,type:'chantier',title:'Chantier terminé',label:[clientName(j.client_id),j.nom].filter(Boolean).join(' — '),date:j.updated_at||j.created_at,id:j.id})});
+ entries.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+ box.innerHTML=entries.length?entries.map((e,i)=>`<div class="rml-v1920-alert"><div><strong>${esc(e.title)}</strong><div>${esc(e.label)}</div><small>${e.date?new Date(e.date).toLocaleString('fr-FR'):''}</small></div><div><button class="btn secondary" type="button" data-finish-view="${i}">Voir</button><button class="btn" type="button" data-finish-ack="${i}">Marquer comme lu</button></div></div>`).join(''):'Aucun travail terminé en attente de validation.';
+ box.querySelectorAll('[data-finish-view]').forEach(b=>b.onclick=()=>{const e=entries[Number(b.dataset.finishView)];if(e.type==='chantier')openJob(e.id);else{go('atelierPliage8');const cb=document.getElementById('rmlAtelier8Archives');if(cb){cb.checked=true;rmlLoadAtelier8()}}});
+ box.querySelectorAll('[data-finish-ack]').forEach(b=>b.onclick=async()=>{const e=entries[Number(b.dataset.finishAck)];b.disabled=true;const {error}=await sb.from('erp_completion_ack').upsert({user_id:currentUser.id,alert_key:e.key},{onConflict:'user_id,alert_key'});if(error){alert('Validation impossible : '+error.message);b.disabled=false;return}await rmlV1920LoadFinished()});
+ }catch(e){box.textContent='Notifications indisponibles : '+e.message+' — exécutez le SQL V19.20.1 dans Supabase.'}
+}
+const rmlV1920OldLoadHome=window.loadHomeAlerts;
+if(typeof rmlV1920OldLoadHome==='function')window.loadHomeAlerts=async function(...args){const r=await rmlV1920OldLoadHome.apply(this,args);await rmlV1920LoadFinished();return r};
+</script>
+</body>
 </html>
