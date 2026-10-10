@@ -740,7 +740,7 @@ async function openJobHistory(jobId){
  const totals=[...sums].filter(([id,n])=>n!==0).map(([id,n])=>{const p=products.get(id);return '<tr><td>'+esc(p?.name||('Référence '+id))+'</td><td>'+n.toLocaleString('fr-FR')+' '+esc(p?.unit||'')+'</td></tr>'}).join('');
  host.innerHTML='<div class="notice"><strong>'+days.size+' date(s) d’intervention · '+hours.toLocaleString('fr-FR')+' heures déclarées par les équipes</strong><br><span class="muted">Les heures disponibles dans cette version sont saisies par équipe et non par salarié. Les quantités sont additionnées une fois par rapport enregistré.</span></div>'+(time.error?'<div class="notice warn">Temps indisponible : '+esc(time.error.message)+'</div>':'')+(totals?'<h3>Quantités cumulées</h3><div class="tablewrap"><table class="table"><thead><tr><th>Produit</th><th>Total posé</th></tr></thead><tbody>'+totals+'</tbody></table></div>':'')+(sections.join('')||'<div class="empty">Aucune intervention enregistrée pour ce chantier.</div>');
 }
-</script>
+<\/script>
 </body></html>`);win.document.close()}
 
 
