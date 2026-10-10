@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V19.13 · Atelier et fabrication</title>
+<title>RML ERP — V19.14 · Atelier et fabrication</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -2861,19 +2861,50 @@ function rmlShowDocumentOrder(){
  if(!rmlCanAtelier8()||currentAccess?.role==='ouvrier'||currentAccess?.role==='chef_equipe')return alert('Création réservée au bureau.');
  const existing=document.getElementById('rmlDocumentOrderDialog');if(existing)existing.remove();
  const d=document.createElement('dialog');d.id='rmlDocumentOrderDialog';d.style.cssText='border:1px solid #cbd5e1;border-radius:14px;padding:24px;max-width:660px;width:calc(100% - 36px);max-height:90vh;overflow:auto';
- d.innerHTML=`<form id="rmlDocumentOrderForm" style="display:grid;gap:12px"><h2>Nouvelle commande atelier sur document</h2><label>Client *<input name="client" required maxlength="300" style="width:100%;padding:9px"></label><label>Projet / chantier *<input name="project" required maxlength="300" style="width:100%;padding:9px"></label><label>Référence<input name="reference" maxlength="150" style="width:100%;padding:9px"></label><label>Quantité à fabriquer *<input name="quantity" type="number" min="1" max="100000" value="1" required style="width:100%;padding:9px"></label><label>Date de mise à disposition<input name="due" type="date" style="width:100%;padding:9px"></label><label>Priorité<select name="priority"><option value="normale">Normale</option><option value="urgente">Urgente</option></select></label><label>Instructions atelier<textarea name="instructions" rows="3" maxlength="4000" style="width:100%"></textarea></label><label>Documents (PDF, images, Word, Excel…) *<input name="documents" type="file" multiple required accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt" style="width:100%"></label><small>Maximum 15 Mo par fichier, 10 fichiers. Les documents sont stockés dans Supabase.</small><div id="rmlDocumentOrderMessage" role="status"></div><div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" class="btn secondary" id="rmlDocumentCancel">Annuler</button><button class="btn" type="submit">Envoyer à ATELIER RML</button></div></form>`;
+ d.innerHTML=`<form id="rmlDocumentOrderForm" style="display:grid;gap:12px"><h2>Nouvelle commande atelier sur document</h2><label>Client existant *<input name="client" id="rmlDocClientInput" list="rmlDocClientChoices" autocomplete="off" required maxlength="300" placeholder="Rechercher un client…" style="width:100%;padding:9px"><datalist id="rmlDocClientChoices"></datalist></label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button type="button" class="btn secondary" id="rmlDocCreateClient">+ Créer un client</button><span id="rmlDocClientInfo" class="muted">Sélectionnez un client existant ou créez-le.</span></div><div id="rmlDocNewClient" hidden style="padding:12px;border:1px solid #cbd5e1;border-radius:9px;background:#f8fafc"><label>Nom du nouveau client *<input id="rmlDocNewClientName" maxlength="300" style="width:100%;padding:9px"></label><label>Téléphone (facultatif)<input id="rmlDocNewClientPhone" style="width:100%;padding:9px"></label><label>E-mail (facultatif)<input id="rmlDocNewClientEmail" type="email" style="width:100%;padding:9px"></label><label>Adresse (facultatif)<input id="rmlDocNewClientAddress" style="width:100%;padding:9px"></label><button type="button" class="btn" id="rmlDocSaveClient" style="margin-top:8px">Enregistrer ce client</button><span id="rmlDocNewClientMessage" role="status"></span></div><label>Projet / chantier *<input name="project" required maxlength="300" style="width:100%;padding:9px"></label><label>Référence<input name="reference" maxlength="150" style="width:100%;padding:9px"></label><label>Quantité à fabriquer *<input name="quantity" type="number" min="1" max="100000" value="1" required style="width:100%;padding:9px"></label><label>Date de mise à disposition<input name="due" type="date" style="width:100%;padding:9px"></label><label>Priorité<select name="priority"><option value="normale">Normale</option><option value="urgente">Urgente</option></select></label><label>Instructions atelier<textarea name="instructions" rows="3" maxlength="4000" style="width:100%"></textarea></label><label>Documents (PDF, images, Word, Excel…) *<input name="documents" type="file" multiple required accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt" style="width:100%"></label><small>Maximum 15 Mo par fichier, 10 fichiers. Les documents sont stockés dans Supabase.</small><div id="rmlDocumentOrderMessage" role="status"></div><div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" class="btn secondary" id="rmlDocumentCancel">Annuler</button><button class="btn" type="submit">Envoyer à ATELIER RML</button></div></form>`;
  document.body.appendChild(d);d.showModal();d.querySelector('#rmlDocumentCancel').onclick=()=>d.close();d.addEventListener('close',()=>d.remove());d.querySelector('form').onsubmit=rmlSubmitDocumentOrder;
+ rmlDocumentRefreshClients(d);
+ d.querySelector('#rmlDocClientInput').addEventListener('input',()=>rmlDocumentClientStatus(d));
+ d.querySelector('#rmlDocCreateClient').onclick=()=>{const box=d.querySelector('#rmlDocNewClient');box.hidden=!box.hidden;if(!box.hidden)d.querySelector('#rmlDocNewClientName').value=d.querySelector('#rmlDocClientInput').value;};
+ d.querySelector('#rmlDocSaveClient').onclick=()=>rmlDocumentCreateClient(d);
+}
+function rmlDocumentClients(){return (db.clients||[]).filter(c=>c&&c.nom).slice().sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));}
+function rmlDocumentClientMatch(value){return rmlDocumentClients().find(c=>c.nom.trim().toLocaleLowerCase('fr')===String(value||'').trim().toLocaleLowerCase('fr'));}
+function rmlDocumentRefreshClients(dialog){
+ const list=dialog.querySelector('#rmlDocClientChoices');list.replaceChildren();
+ for(const c of rmlDocumentClients()){const option=document.createElement('option');option.value=c.nom;list.appendChild(option);}
+ rmlDocumentClientStatus(dialog);
+}
+function rmlDocumentClientStatus(dialog){
+ const value=dialog.querySelector('#rmlDocClientInput').value;
+ const match=rmlDocumentClientMatch(value);
+ dialog.querySelector('#rmlDocClientInfo').textContent=match?'Client existant sélectionné : '+match.nom:'Sélectionnez un client dans la liste ou créez un nouveau client.';
+ return match;
+}
+async function rmlDocumentCreateClient(dialog){
+ const message=dialog.querySelector('#rmlDocNewClientMessage'),name=dialog.querySelector('#rmlDocNewClientName').value.trim();
+ if(!hasPerm('clients')){message.textContent='Vous ne disposez pas des droits pour créer un client.';return;}
+ if(!name){message.textContent='Indiquez le nom du client.';return;}
+ const existing=rmlDocumentClientMatch(name);
+ if(existing){dialog.querySelector('#rmlDocClientInput').value=existing.nom;dialog.querySelector('#rmlDocNewClient').hidden=true;rmlDocumentClientStatus(dialog);return;}
+ const btn=dialog.querySelector('#rmlDocSaveClient');btn.disabled=true;message.textContent='Enregistrement…';
+ try{
+  const row={nom:name,actif:true,telephone:dialog.querySelector('#rmlDocNewClientPhone').value.trim()||null,email:dialog.querySelector('#rmlDocNewClientEmail').value.trim()||null,adresse:dialog.querySelector('#rmlDocNewClientAddress').value.trim()||null};
+  const {data,error}=await sb.from('erp_clients').insert(row).select('*').single();if(error)throw error;
+  db.clients.push(data);dialog.querySelector('#rmlDocClientInput').value=data.nom;dialog.querySelector('#rmlDocNewClient').hidden=true;rmlDocumentRefreshClients(dialog);renderClients();
+ }catch(err){message.textContent='Création impossible : '+(err.message||err)}finally{btn.disabled=false;}
 }
 async function rmlSubmitDocumentOrder(e){
  e.preventDefault();const form=e.currentTarget,msg=form.querySelector('#rmlDocumentOrderMessage'),btn=form.querySelector('[type=submit]'),f=new FormData(form),files=[...form.querySelector('[name=documents]').files],qty=Number(f.get('quantity'));
+ const selectedClient=rmlDocumentClientMatch(f.get('client'));if(!selectedClient){msg.textContent='Sélectionnez un client existant ou créez-le avec le bouton « + Créer un client ».';return;}
  if(!files.length||files.length>10||files.some(x=>x.size>15*1024*1024)||!Number.isInteger(qty)||qty<1){msg.textContent='Vérifiez la quantité et les fichiers (10 maximum, 15 Mo chacun).';return}
  btn.disabled=true;msg.textContent='Envoi des documents…';const paths=[];const uid=crypto.randomUUID();
  try{
   for(const file of files){const ext=(file.name.split('.').pop()||'bin').toLowerCase();const allowed=['pdf','png','jpg','jpeg','webp','doc','docx','xls','xlsx','odt','ods','txt'];if(!allowed.includes(ext))throw Error('Format de fichier non accepté : '+file.name);
    const path=uid+'/'+crypto.randomUUID()+'.'+ext;const {error}=await sb.storage.from('rml-atelier-documents').upload(path,file,{upsert:false,contentType:file.type||'application/octet-stream'});if(error)throw error;paths.push({path,name:file.name,size:file.size});
   }
-  const now=new Date().toISOString();const payload={type:'document',reference:String(f.get('reference')||''),instructions:String(f.get('instructions')||''),documents:paths,items:[{quantity:qty,piece:{name:String(f.get('reference')||'Fabrication sur document')}}]};
-  const {error}=await sb.from('erp_bending_orders').insert({source_project_id:uid,source_app:'RML_ERP_DOCUMENT',project_name:String(f.get('project')).trim(),client_name:String(f.get('client')).trim(),mode:'all',priority:f.get('priority'),due_date:f.get('due')||null,team_number:8,payload,status:'a_fabriquer'});if(error)throw error;
+  const now=new Date().toISOString();const payload={type:'document',client_id:selectedClient.id,reference:String(f.get('reference')||''),instructions:String(f.get('instructions')||''),documents:paths,items:[{quantity:qty,piece:{name:String(f.get('reference')||'Fabrication sur document')}}]};
+  const {error}=await sb.from('erp_bending_orders').insert({source_project_id:uid,source_app:'RML_ERP_DOCUMENT',project_name:String(f.get('project')).trim(),client_name:selectedClient.nom,mode:'all',priority:f.get('priority'),due_date:f.get('due')||null,team_number:8,payload,status:'a_fabriquer'});if(error)throw error;
   msg.textContent='Commande publiée.';document.getElementById('rmlDocumentOrderDialog')?.close();await rmlLoadAtelier8();
  }catch(err){msg.textContent='Envoi impossible : '+(err.message||err)+'. Vérifiez que le SQL V19.12 a été exécuté.';}
  finally{btn.disabled=false}
