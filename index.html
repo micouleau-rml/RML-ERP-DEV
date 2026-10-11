@@ -366,7 +366,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <section id="employeePortal" class="view">
   <div class="panel">
     <div class="employee-hero"><div><h2 style="margin:0">Mon espace salarié</h2><div class="muted">Vos chantiers, feuilles chantier, documents et photos terrain.</div></div><button class="btn secondary" type="button" onclick="loadEmployeePortal()">Actualiser</button></div>
-    <div id="employeePortalStatus" class="notice" style="margin-top:12px">Chargement…</div>
+    <div class="panel" id="employeeMileagePanel" style="margin:12px 0;padding:15px"><h3 style="margin:0 0 8px">Kilométrage du fourgon — fin de journée</h3><div class="muted">Saisissez le kilométrage total affiché au compteur, et non les kilomètres parcourus aujourd’hui. La valeur sera transmise à Maintenance.</div><div class="grid2" style="margin-top:12px"><div class="field"><label>Fourgon (nom et immatriculation)</label><select id="employeeMileageVehicle"><option value="">Chargement des fourgons…</option></select></div><div class="field"><label>Kilométrage total au compteur</label><input id="employeeMileageTotal" type="number" min="0" step="1" inputmode="numeric" placeholder="Ex. 125430"></div></div><div class="actions" style="margin-top:10px"><button class="btn ok" type="button" onclick="saveEmployeeMileage()">Enregistrer le kilométrage</button></div><div id="employeeMileageStatus" class="muted" style="margin-top:8px"></div></div><div id="employeePortalStatus" class="notice" style="margin-top:12px">Chargement…</div>
     <div id="employeePortalList" class="employee-grid"></div>
   </div>
 </section>
@@ -974,9 +974,25 @@ async function loadSubcontractorPortal(){
 let employeeAccount=null,employeeAssignments=[],employeeDocs=[];
 function employeeTodayISO(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
 function employeePlusDaysISO(n){const d=new Date();d.setDate(d.getDate()+n);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+async function loadEmployeeMileageVehicles(){
+ const sel=document.getElementById('employeeMileageVehicle'),status=document.getElementById('employeeMileageStatus');if(!sel)return;
+ try{const {data,error}=await sb.rpc('erp_employee_mileage_vehicles');if(error)throw error;
+  sel.innerHTML='<option value="">Choisir un fourgon…</option>'+(data||[]).map(v=>`<option value="${esc(v.id)}">${esc(v.name)} — ${esc(v.registration)}${v.current_counter==null?'':' · '+Number(v.current_counter).toLocaleString('fr-FR')+' km'}</option>`).join('');
+  if(!data?.length)status.textContent='Aucun fourgon immatriculé dans Maintenance.';else status.textContent='';
+ }catch(e){sel.innerHTML='<option value="">Fourgons indisponibles</option>';status.textContent='Chargement impossible : '+e.message}
+}
+async function saveEmployeeMileage(){
+ const sel=document.getElementById('employeeMileageVehicle'),input=document.getElementById('employeeMileageTotal'),status=document.getElementById('employeeMileageStatus');
+ const value=input.value.trim();if(!sel.value){status.textContent='Sélectionnez un fourgon.';return}
+ if(!/^\d+$/.test(value)||!Number.isSafeInteger(Number(value))){status.textContent='Saisissez le kilométrage total en nombre entier.';return}
+ const km=Number(value);status.textContent='Enregistrement…';
+ try{const {data,error}=await sb.rpc('erp_employee_record_mileage',{p_asset_id:sel.value,p_counter:km});if(error)throw error;
+ status.textContent='Kilométrage total enregistré dans Maintenance : '+km.toLocaleString('fr-FR')+' km.';input.value='';await loadEmployeeMileageVehicles();
+ }catch(e){status.textContent='Enregistrement impossible : '+e.message}
+}
 async function loadEmployeePortal(){
  if(!isEmployeeUser())return;
- employeePortalStatus.className='notice';employeePortalStatus.textContent='Chargement de votre planning…';employeePortalList.innerHTML='';
+ employeePortalStatus.className='notice';employeePortalStatus.textContent='Chargement de votre planning…';employeePortalList.innerHTML='';loadEmployeeMileageVehicles();
  try{
   const {data:link,error:le}=await sb.from('erp_employee_accounts').select('*').eq('auth_user_id',currentUser.id).eq('active',true).maybeSingle();if(le)throw le;
   employeeAccount=link||null;if(Number(employeeAccount?.team_number)===8){const a8=document.getElementById('rmlAtelier8Nav');if(a8)a8.style.display='inline-flex';}
@@ -3195,8 +3211,8 @@ async function openJobHistory(jobId){
 </script>
 <script>
 
-/* RML ERP V24 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V24';
+/* RML ERP V25 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
+const RML_ERP_VERSION='V25';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
