@@ -8814,6 +8814,9 @@ if(quotePdfBtn){
 /* ===== V83 : PROJETS COMPLETS SYNCHRONISÉS SANS FUSION DES PIÈCES COURANTES ===== */
 (()=>{
   "use strict";
+  // MODE PROTECTION : aucune lecture/ecriture distante tant que la base
+  // contient des suppressions historiques et des payloads vides.
+  const RML_SYNC_SUSPENDED = true;
   const CONFIG_KEY="rml_pliage_supabase_config_v1";
   const META_KEY="rml_pliage_sync_meta_v1";
   const PENDING_KEY="rml_pliage_sync_pending_v1";
@@ -8907,6 +8910,9 @@ if(quotePdfBtn){
   }
 
   function queueRow(type,id,payload,deleted=false,updatedAt=now()){
+    // Ne pas constituer de nouvelles tombstones pendant la suspension.
+    // Les changements restent dans les donnees locales de l'application.
+    if(RML_SYNC_SUSPENDED)return;
     if(!id)return;
     const pending=loadPending();
     const key=rowKey(type,id);
@@ -9083,6 +9089,10 @@ if(quotePdfBtn){
   }
 
   async function syncNow({quiet=false}={}){
+    if(RML_SYNC_SUSPENDED){
+      setSyncStatus("Synchronisation suspendue pour protéger les projets. Données locales conservées.");
+      return {suspended:true};
+    }
     if(syncing)return;
     const config=loadConfig();
     if(!validConfig(config)){if(!quiet)setSyncStatus("Renseignez l’URL, la clé et l’espace de synchronisation.","error");return;}
@@ -9109,6 +9119,7 @@ if(quotePdfBtn){
   }
 
   function scheduleSync(){
+    if(RML_SYNC_SUSPENDED)return;
     clearTimeout(syncTimer);
     setSyncStatus(navigator.onLine?"Modification locale enregistrée.":"Hors ligne : modification locale enregistrée.");
     syncTimer=setTimeout(()=>syncNow({quiet:true}),1500);
@@ -9157,8 +9168,7 @@ create policy "RML Pliage modification" on public.${TABLE}
     const config={url:normalizeUrl($("supabaseUrl").value),key:$("supabaseKey").value.trim(),workspace:$("supabaseWorkspace").value.trim()||DEFAULT_SUPABASE_CONFIG.workspace};
     if(!validConfig(config)){setSyncStatus("Configuration incomplète ou URL invalide.","error");return;}
     nativeSetItem.call(localStorage,CONFIG_KEY,JSON.stringify(config));
-    setSyncStatus("Configuration enregistrée. Premier rapprochement en cours…");
-    syncNow();
+    setSyncStatus("Configuration enregistrée. Synchronisation suspendue pour protéger les données.");
   });
   $("syncSupabaseNowBtn")?.addEventListener("click",()=>syncNow());
   $("syncSupabaseMainBtn")?.addEventListener("click",()=>syncNow());
@@ -9184,14 +9194,21 @@ create policy "RML Pliage modification" on public.${TABLE}
   window.addEventListener("offline",()=>setSyncStatus("Hors ligne : les changements sont conservés sur cet appareil."));
   window.addEventListener("storage",event=>{if(SYNC_KEYS[event.key]){captureLocalChange(event.key,event.oldValue,event.newValue);syncNow({quiet:true});}});
   setInterval(()=>syncNow({quiet:true}),60000);
-  removeLegacyCurrentStateSyncQueue();
+  if(!RML_SYNC_SUSPENDED)removeLegacyCurrentStateSyncQueue();
   restorePiecesFromSavedProject();
   renderPieces();
   Object.keys(SYNC_KEYS).forEach(key=>snapshots[key]=localStorage.getItem(key));
   lockSupabaseSettings();
   loadConfigForm();
-  if(validConfig(loadConfig()))setTimeout(()=>syncNow({quiet:true}),600);
-  window.RML_SUPABASE_SYNC={syncNow,status:()=>({configured:validConfig(loadConfig()),pending:loadPending().length,config:{...loadConfig(),key:loadConfig().key?"••••••••":""}})};
+  if(!RML_SYNC_SUSPENDED && validConfig(loadConfig()))setTimeout(()=>syncNow({quiet:true}),600);
+  if(RML_SYNC_SUSPENDED){
+    ["syncSupabaseNowBtn","syncSupabaseMainBtn"].forEach(id=>{
+      const button=$(id);
+      if(button){button.disabled=true;button.textContent="Synchronisation suspendue";button.title="Protection des données : synchronisation Supabase désactivée";}
+    });
+    setSyncStatus("Synchronisation suspendue pour protéger les projets. Conservez votre sauvegarde.");
+  }
+  window.RML_SUPABASE_SYNC={syncNow,status:()=>({configured:validConfig(loadConfig()),suspended:RML_SYNC_SUSPENDED,pending:loadPending().length,config:{...loadConfig(),key:loadConfig().key?"••••••••":""}})};
 })();
 </script>
 <!-- V60 validée : grand dessinateur simplifié -->
