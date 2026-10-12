@@ -3277,8 +3277,9 @@ const RML_FULL_BACKUP_TABLES=[
  'erp_finance_settings','erp_maintenance_documents','erp_maintenance_events',
  'erp_modules_data','erp_planning_day_locks','erp_stock_movements',
  'erp_stock_products','erp_subcontract_assignments','erp_subcontract_documents',
- 'erp_subcontractors','erp_user_access','rml_heures_employees','erp_pliage_sync'
+ 'erp_subcontractors','erp_user_access','erp_pliage_sync'
 ];
+// rml_heures_employees appartient à une autre connexion Supabase (heuresSb) : ne pas la lire via sb.
 // PostgREST ne permet pas de découvrir toutes les tables du schéma avec la clé publique.
 // Une table absente est signalée et ignorée; une erreur d'accès ou de réseau interrompt l'export.
 function rmlBackupMissingTable(error){
