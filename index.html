@@ -17,6 +17,7 @@
 <title>RML ERP — V21</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
 :root{--navy:#113a5d;--navy2:#0a2840;--bg:#edf2f6;--card:#fff;--line:#d8e0e7;--text:#1b2730;--muted:#687480;--ok:#177245;--warn:#a55d00;--danger:#b42318;--soft:#f5f8fa}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text)}body{padding-bottom:env(safe-area-inset-bottom)}button,input,select,textarea{font:inherit}button{cursor:pointer}
@@ -483,7 +484,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 </div></div>
 <section id="analyse" class="view"><div class="panel"><div class="analyse-head"><div><h2>Analyse chantier</h2><div class="muted">Synthèse des données déjà reliées au chantier dans ERP DEV.</div></div><button class="btn secondary" onclick="loadAnalysis()">Actualiser</button></div><div class="field" style="margin-top:12px"><label>Rechercher</label><input id="analysisSearch" placeholder="Rechercher un client ou un chantier…" oninput="searchAnalysisContext()"></div><div class="grid2" style="margin-top:12px"><div class="field"><label>Client</label><select id="analysisClient"></select></div><div class="field"><label>Chantier</label><select id="analysisJob"></select></div></div><div id="analysisStatus" class="notice">Sélectionnez un chantier.</div><div id="analysisContent"></div><div id="financePanel" style="margin-top:16px"></div></div></section>
 <section id="users" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Utilisateurs & droits d’accès</h2><div class="muted" style="margin-top:4px">Choisis les modules visibles pour chaque utilisateur.</div></div><button class="btn secondary" id="refreshUsersBtn">Actualiser</button></div><div class="notice" style="margin-bottom:12px">Pour créer un nouveau compte, ajoute d’abord l’utilisateur dans <strong>Supabase → Authentication → Users</strong>. Il apparaîtra ici dès que son accès est enregistré dans Supabase. Tu peux lui attribuer le rôle Collaborateur et définir ses droits module par module.</div><div id="usersTable"></div></div></section>
-<section id="security" class="view"><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
+<section id="security" class="view"><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte les données des tables ERP et PLIAGE accessibles à votre compte Supabase, sans modifier la base. Les fichiers physiques de Supabase Storage, les comptes Authentication et les tables non répertoriées ne sont pas inclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Inclut les tables ERP et PLIAGE accessibles ainsi que les fichiers des espaces de stockage accessibles. Le téléchargement peut être volumineux. Une sauvegarde signalée incomplète ne doit pas servir à une restauration.</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
 
 <section id="page-forecast" class="view">
   <div class="card" id="forecastDedicatedCard">
@@ -3266,6 +3267,134 @@ async function rmlFinSave(){if(!hasPerm('analyse')||!rmlFinData)return;const d=r
 async function rmlFinSaveSettings(){if(currentAccess?.role!=='administrateur')return;const row={id:1,overhead_pct:rmlFinNum(document.getElementById('rmlGlobalOverhead').value),km_rate:rmlFinNum(document.getElementById('rmlGlobalKm').value)};const {error}=await sb.from('erp_finance_settings').upsert(row,{onConflict:'id'});if(error){alert('Paramètres non enregistrés : '+error.message);return}rmlFinSettings=row;rmlFinRecalc();alert('Paramètres enregistrés.');}
 /* Numéro affiché cohérent sur les éléments de version existants. */
 window.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('body *').forEach(el=>{if(el.children.length||['SCRIPT','STYLE','TEXTAREA'].includes(el.tagName))return;const t=el.textContent||'';if(/\bV(?:19\.\d+(?:\.\d+)?|2[012])\b/.test(t)&&t.length<130)el.textContent=t.replace(/\bV(?:19\.\d+(?:\.\d+)?|2[012])\b/g,RML_ERP_VERSION);});});
+
+
+/* Export lecture seule : ne lance aucun upsert, update ou delete. */
+const RML_FULL_BACKUP_TABLES=[
+ 'erp_alert_ack','erp_assets','erp_bending_orders','erp_chantier_finances',
+ 'erp_chantiers','erp_client_professions','erp_clients','erp_completion_ack',
+ 'erp_document_subcontractors','erp_documents','erp_employee_accounts',
+ 'erp_finance_settings','erp_maintenance_documents','erp_maintenance_events',
+ 'erp_modules_data','erp_planning_day_locks','erp_stock_movements',
+ 'erp_stock_products','erp_subcontract_assignments','erp_subcontract_documents',
+ 'erp_subcontractors','erp_user_access','rml_heures_employees','erp_pliage_sync'
+];
+async function rmlExportFullERP(){
+ const button=document.getElementById('rmlFullBackupBtn');
+ const status=document.getElementById('rmlFullBackupStatus');
+ if(!currentUser || !currentAccess || !['administrateur','direction'].includes(currentAccess.role)){
+  alert('Sauvegarde réservée à la direction / administration.');return;
+ }
+ if(!confirm('Exporter les données ERP et PLIAGE accessibles dans un fichier JSON ? Ce fichier peut contenir des informations confidentielles.'))return;
+ button.disabled=true;
+ const tables={};const counts={};
+ try{
+  for(let i=0;i<RML_FULL_BACKUP_TABLES.length;i++){
+   const name=RML_FULL_BACKUP_TABLES[i];const rows=[];let start=0;
+   status.textContent='Lecture '+(i+1)+'/'+RML_FULL_BACKUP_TABLES.length+' : '+name+'…';
+   while(true){
+    const pageSize=500;
+    const {data,error}=await sb.from(name).select('*').range(start,start+pageSize-1);
+    if(error)throw new Error(name+' : '+error.message);
+    if(!Array.isArray(data))throw new Error('Réponse invalide pour '+name);
+    rows.push(...data);
+    if(data.length<pageSize)break;
+    start+=pageSize;
+    if(start>1000000)throw new Error('Limite de sécurité dépassée : '+name);
+   }
+   tables[name]=rows;counts[name]=rows.length;
+  }
+  const backup={format:'RML_ERP_BACKUP_JSON_V1',created_at:new Date().toISOString(),
+   source:'RML ERP DEV / Supabase, lecture par compte connecté',
+   scope:'Tables listées et lignes visibles selon les droits Supabase (RLS)',
+   excluded:['Supabase Storage : contenu binaire des fichiers','Supabase Auth : comptes et mots de passe','Tables absentes de la liste','Données non visibles selon les politiques RLS'],
+   table_counts:counts,tables};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+  a.href=url;a.download='sauvegarde-rml-erp-pliage-'+stamp+'.json';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),30000);
+  const total=Object.values(counts).reduce((a,b)=>a+b,0);
+  status.textContent='Export JSON généré : '+RML_FULL_BACKUP_TABLES.length+' tables, '+total+' lignes visibles. Conservez le fichier en lieu sûr. Les fichiers Storage et Auth ne sont pas inclus.';
+ }catch(err){status.textContent='ÉCHEC — aucune sauvegarde complète créée : '+err.message;alert('Sauvegarde interrompue : '+err.message+'\nAucun fichier incomplet n’a été téléchargé.');}
+ finally{button.disabled=false;}
+}
+
+
+/* Sauvegarde ZIP en lecture seule. Pas de clés privilégiées dans le navigateur. */
+async function rmlExportERPZip(){
+ const btn=document.getElementById('rmlZipBackupBtn'), status=document.getElementById('rmlFullBackupStatus');
+ if(!currentUser||!currentAccess||!['administrateur','direction'].includes(currentAccess.role)){alert('Accès réservé à la direction / administration.');return;}
+ if(typeof JSZip==='undefined'){alert('Bibliothèque ZIP indisponible. Vérifiez votre connexion Internet.');return;}
+ if(!confirm('Télécharger les données et fichiers ERP accessibles ? Le ZIP contient des informations confidentielles et peut être volumineux.'))return;
+ btn.disabled=true;
+ const zip=new JSZip(), tables={}, counts={}, errors=[], bucketInventory={}, seen=new Set();
+ const expectedBuckets=['erp-documents','erp-subcontractor-documents','rml-atelier-documents'];
+ let totalBytes=0, fileCount=0;
+ try{
+  for(let i=0;i<RML_FULL_BACKUP_TABLES.length;i++){
+   const name=RML_FULL_BACKUP_TABLES[i], rows=[];let start=0;
+   status.textContent='Tables '+(i+1)+'/'+RML_FULL_BACKUP_TABLES.length+' : '+name;
+   while(true){
+    const {data,error}=await sb.from(name).select('*').range(start,start+499);
+    if(error)throw new Error('Lecture de '+name+' impossible : '+error.message);
+    if(!Array.isArray(data))throw new Error('Réponse invalide : '+name);
+    rows.push(...data);if(data.length<500)break;
+    start+=500;if(start>1000000)throw new Error('Limite dépassée : '+name);
+   }
+   tables[name]=rows;counts[name]=rows.length;
+   zip.file('donnees/'+name+'.json',JSON.stringify(rows));
+  }
+  // L'énumération globale peut être refusée par les règles Storage : les buckets connus restent inspectés.
+  const bucketNames=new Set(expectedBuckets);
+  const found=await sb.storage.listBuckets();
+  if(found.error){errors.push('Liste globale des buckets inaccessible : '+found.error.message+' (buckets connus vérifiés uniquement)');}
+  else for(const b of found.data||[])if(b?.name)bucketNames.add(b.name);
+  async function walk(bucket,prefix){
+   let offset=0;
+   while(true){
+    const {data,error}=await sb.storage.from(bucket).list(prefix,{limit:100,offset,sortBy:{column:'name',order:'asc'}});
+    if(error){errors.push('Liste '+bucket+'/'+prefix+' : '+error.message);return;}
+    const entries=data||[];
+    for(const item of entries){
+     if(!item?.name)continue;
+     const path=prefix?prefix+'/'+item.name:item.name;
+     if(item.id==null){await walk(bucket,path);continue;}
+     const key=bucket+'/'+path;if(seen.has(key))continue;seen.add(key);
+     status.textContent='Fichiers : '+(fileCount+1)+' — '+key;
+     const {data:blob,error:downloadError}=await sb.storage.from(bucket).download(path);
+     if(downloadError||!blob){errors.push('Fichier inaccessible : '+key+' : '+(downloadError?.message||'sans contenu'));continue;}
+     totalBytes+=blob.size||0;
+     // Eviter une archive impossible à construire dans un navigateur.
+     if(totalBytes>1500*1024*1024)throw new Error('Plus de 1,5 Go de fichiers : utilisez une sauvegarde serveur pour éviter un plantage du navigateur.');
+     zip.file('fichiers/'+bucket+'/'+path,blob,{binary:true,compression:'STORE'});
+     fileCount++;
+     bucketInventory[bucket]=(bucketInventory[bucket]||0)+1;
+    }
+    if(entries.length<100)break;
+    offset+=100;if(offset>1000000){errors.push('Pagination trop importante : '+bucket+'/'+prefix);break;}
+   }
+  }
+  for(const bucket of bucketNames){status.textContent='Inventaire Storage : '+bucket;await walk(bucket,'');}
+  const manifest={format:'RML_ERP_ZIP_V1',created_at:new Date().toISOString(),source:'RML ERP DEV',
+   scope:'Données et fichiers visibles par le compte connecté selon RLS et permissions Storage',
+   tables:counts,storage_files:bucketInventory,total_files:fileCount,total_file_bytes:totalBytes,
+   inspected_buckets:[...bucketNames],expected_buckets:expectedBuckets,
+   errors,complete:errors.length===0,
+   exclusions:['Supabase Auth et mots de passe','Schéma SQL, politiques RLS, fonctions et secrets','Données invisibles au compte connecté']};
+  zip.file('manifeste.json',JSON.stringify(manifest,null,2));
+  zip.file('donnees/toutes_les_tables.json',JSON.stringify({format:'RML_ERP_BACKUP_JSON_V1',created_at:manifest.created_at,tables,table_counts:counts}));
+  status.textContent='Création de l’archive ZIP…';
+  const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:2}},meta=>{status.textContent='Compression ZIP : '+Math.round(meta.percent)+' %';});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='RML_ERP_SAUVEGARDE_'+new Date().toISOString().replace(/[:.]/g,'-')+(errors.length?'_INCOMPLETE':'')+'.zip';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  status.textContent=(errors.length?'ATTENTION : sauvegarde partielle':'Sauvegarde ZIP générée')+' — '+Object.keys(counts).length+' tables, '+fileCount+' fichiers, '+errors.length+' erreur(s). Consultez manifeste.json.';
+  if(errors.length)alert('Archive INCOMPLÈTE : '+errors.length+' problème(s). Consultez manifeste.json. Ne pas utiliser pour restaurer intégralement.');
+ }catch(e){status.textContent='ÉCHEC : '+e.message;alert('Sauvegarde ZIP interrompue : '+e.message);}
+ finally{btn.disabled=false;}
+}
 
 </script>
 </body>
