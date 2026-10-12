@@ -484,7 +484,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 </div></div>
 <section id="analyse" class="view"><div class="panel"><div class="analyse-head"><div><h2>Analyse chantier</h2><div class="muted">Synthèse des données déjà reliées au chantier dans ERP DEV.</div></div><button class="btn secondary" onclick="loadAnalysis()">Actualiser</button></div><div class="field" style="margin-top:12px"><label>Rechercher</label><input id="analysisSearch" placeholder="Rechercher un client ou un chantier…" oninput="searchAnalysisContext()"></div><div class="grid2" style="margin-top:12px"><div class="field"><label>Client</label><select id="analysisClient"></select></div><div class="field"><label>Chantier</label><select id="analysisJob"></select></div></div><div id="analysisStatus" class="notice">Sélectionnez un chantier.</div><div id="analysisContent"></div><div id="financePanel" style="margin-top:16px"></div></div></section>
 <section id="users" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Utilisateurs & droits d’accès</h2><div class="muted" style="margin-top:4px">Choisis les modules visibles pour chaque utilisateur.</div></div><button class="btn secondary" id="refreshUsersBtn">Actualiser</button></div><div class="notice" style="margin-bottom:12px">Pour créer un nouveau compte, ajoute d’abord l’utilisateur dans <strong>Supabase → Authentication → Users</strong>. Il apparaîtra ici dès que son accès est enregistré dans Supabase. Tu peux lui attribuer le rôle Collaborateur et définir ses droits module par module.</div><div id="usersTable"></div></div></section>
-<section id="security" class="view"><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte les données des tables ERP et PLIAGE accessibles à votre compte Supabase, sans modifier la base. Les fichiers physiques de Supabase Storage, les comptes Authentication et les tables non répertoriées ne sont pas inclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Inclut les tables ERP et PLIAGE accessibles ainsi que les fichiers des espaces de stockage accessibles. Le téléchargement peut être volumineux. Une sauvegarde signalée incomplète ne doit pas servir à une restauration.</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
+<section id="security" class="view"><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte en lecture seule les tables connues et accessibles. Ce fichier ne constitue pas une sauvegarde exhaustive de Supabase : les tables non répertoriées, les lignes masquées par RLS, Storage et Authentication sont exclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Archive partielle des tables connues et fichiers Storage accessibles. Une sauvegarde exhaustive nécessite un export administrateur côté Supabase (base, Storage et configuration).</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
 
 <section id="page-forecast" class="view">
   <div class="card" id="forecastDedicatedCard">
@@ -3279,6 +3279,24 @@ const RML_FULL_BACKUP_TABLES=[
  'erp_stock_products','erp_subcontract_assignments','erp_subcontract_documents',
  'erp_subcontractors','erp_user_access','rml_heures_employees','erp_pliage_sync'
 ];
+// PostgREST ne permet pas de découvrir toutes les tables du schéma avec la clé publique.
+// Une table absente est signalée et ignorée; une erreur d'accès ou de réseau interrompt l'export.
+function rmlBackupMissingTable(error){
+ const code=String(error?.code||'');
+ const msg=String(error?.message||'');
+ return code==='PGRST205'||code==='42P01'||/Could not find the table .* in the schema cache/i.test(msg)||/relation .* does not exist/i.test(msg);
+}
+async function rmlBackupReadTable(name){
+ const rows=[];let start=0;
+ while(true){
+  const {data,error}=await sb.from(name).select('*').range(start,start+499);
+  if(error){if(start===0&&rmlBackupMissingTable(error))return {missing:true,rows:[]};throw new Error(name+' : '+error.message);}
+  if(!Array.isArray(data))throw new Error('Réponse invalide pour '+name);
+  rows.push(...data);if(data.length<500)break;
+  start+=500;if(start>1000000)throw new Error('Limite de sécurité dépassée : '+name);
+ }
+ return {missing:false,rows};
+}
 async function rmlExportFullERP(){
  const button=document.getElementById('rmlFullBackupBtn');
  const status=document.getElementById('rmlFullBackupStatus');
@@ -3287,28 +3305,22 @@ async function rmlExportFullERP(){
  }
  if(!confirm('Exporter les données ERP et PLIAGE accessibles dans un fichier JSON ? Ce fichier peut contenir des informations confidentielles.'))return;
  button.disabled=true;
- const tables={};const counts={};
+ const tables={};const counts={};const missingTables=[];
  try{
   for(let i=0;i<RML_FULL_BACKUP_TABLES.length;i++){
-   const name=RML_FULL_BACKUP_TABLES[i];const rows=[];let start=0;
+   const name=RML_FULL_BACKUP_TABLES[i];
    status.textContent='Lecture '+(i+1)+'/'+RML_FULL_BACKUP_TABLES.length+' : '+name+'…';
-   while(true){
-    const pageSize=500;
-    const {data,error}=await sb.from(name).select('*').range(start,start+pageSize-1);
-    if(error)throw new Error(name+' : '+error.message);
-    if(!Array.isArray(data))throw new Error('Réponse invalide pour '+name);
-    rows.push(...data);
-    if(data.length<pageSize)break;
-    start+=pageSize;
-    if(start>1000000)throw new Error('Limite de sécurité dépassée : '+name);
-   }
+   const result=await rmlBackupReadTable(name);
+   if(result.missing){missingTables.push(name);continue;}
+   const rows=result.rows;
    tables[name]=rows;counts[name]=rows.length;
   }
   const backup={format:'RML_ERP_BACKUP_JSON_V1',created_at:new Date().toISOString(),
    source:'RML ERP DEV / Supabase, lecture par compte connecté',
    scope:'Tables listées et lignes visibles selon les droits Supabase (RLS)',
    excluded:['Supabase Storage : contenu binaire des fichiers','Supabase Auth : comptes et mots de passe','Tables absentes de la liste','Données non visibles selon les politiques RLS'],
-   table_counts:counts,tables};
+   table_counts:counts,missing_tables:missingTables,complete:false,
+   note:'Export des tables connues uniquement. La découverte exhaustive du schéma, les droits RLS et Storage ne sont pas vérifiables depuis le navigateur.',tables};
   const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');
   const stamp=new Date().toISOString().replace(/[:.]/g,'-');
@@ -3316,7 +3328,7 @@ async function rmlExportFullERP(){
   document.body.appendChild(a);a.click();a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),30000);
   const total=Object.values(counts).reduce((a,b)=>a+b,0);
-  status.textContent='Export JSON généré : '+RML_FULL_BACKUP_TABLES.length+' tables, '+total+' lignes visibles. Conservez le fichier en lieu sûr. Les fichiers Storage et Auth ne sont pas inclus.';
+  status.textContent='Export JSON partiel généré : '+Object.keys(counts).length+' tables, '+total+' lignes visibles. '+missingTables.length+' table(s) absente(s) : '+(missingTables.join(', ')||'aucune')+'. Export non exhaustif : Storage, Auth et tables inconnues exclus.';
  }catch(err){status.textContent='ÉCHEC — aucune sauvegarde complète créée : '+err.message;alert('Sauvegarde interrompue : '+err.message+'\nAucun fichier incomplet n’a été téléchargé.');}
  finally{button.disabled=false;}
 }
@@ -3329,20 +3341,16 @@ async function rmlExportERPZip(){
  if(typeof JSZip==='undefined'){alert('Bibliothèque ZIP indisponible. Vérifiez votre connexion Internet.');return;}
  if(!confirm('Télécharger les données et fichiers ERP accessibles ? Le ZIP contient des informations confidentielles et peut être volumineux.'))return;
  btn.disabled=true;
- const zip=new JSZip(), tables={}, counts={}, errors=[], bucketInventory={}, seen=new Set();
+ const zip=new JSZip(), tables={}, counts={}, errors=[], missingTables=[], bucketInventory={}, seen=new Set();
  const expectedBuckets=['erp-documents','erp-subcontractor-documents','rml-atelier-documents'];
  let totalBytes=0, fileCount=0;
  try{
   for(let i=0;i<RML_FULL_BACKUP_TABLES.length;i++){
-   const name=RML_FULL_BACKUP_TABLES[i], rows=[];let start=0;
+   const name=RML_FULL_BACKUP_TABLES[i];
    status.textContent='Tables '+(i+1)+'/'+RML_FULL_BACKUP_TABLES.length+' : '+name;
-   while(true){
-    const {data,error}=await sb.from(name).select('*').range(start,start+499);
-    if(error)throw new Error('Lecture de '+name+' impossible : '+error.message);
-    if(!Array.isArray(data))throw new Error('Réponse invalide : '+name);
-    rows.push(...data);if(data.length<500)break;
-    start+=500;if(start>1000000)throw new Error('Limite dépassée : '+name);
-   }
+   const result=await rmlBackupReadTable(name);
+   if(result.missing){missingTables.push(name);errors.push('Table absente du schéma : '+name);continue;}
+   const rows=result.rows;
    tables[name]=rows;counts[name]=rows.length;
    zip.file('donnees/'+name+'.json',JSON.stringify(rows));
   }
@@ -3381,17 +3389,18 @@ async function rmlExportERPZip(){
    scope:'Données et fichiers visibles par le compte connecté selon RLS et permissions Storage',
    tables:counts,storage_files:bucketInventory,total_files:fileCount,total_file_bytes:totalBytes,
    inspected_buckets:[...bucketNames],expected_buckets:expectedBuckets,
-   errors,complete:errors.length===0,
+   errors,missing_tables:missingTables,complete:false,
+   completeness_note:"Impossible de garantir l’exhaustivité des tables, des données RLS ou des buckets depuis le navigateur.",
    exclusions:['Supabase Auth et mots de passe','Schéma SQL, politiques RLS, fonctions et secrets','Données invisibles au compte connecté']};
   zip.file('manifeste.json',JSON.stringify(manifest,null,2));
   zip.file('donnees/toutes_les_tables.json',JSON.stringify({format:'RML_ERP_BACKUP_JSON_V1',created_at:manifest.created_at,tables,table_counts:counts}));
   status.textContent='Création de l’archive ZIP…';
   const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:2}},meta=>{status.textContent='Compression ZIP : '+Math.round(meta.percent)+' %';});
   const url=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=url;a.download='RML_ERP_SAUVEGARDE_'+new Date().toISOString().replace(/[:.]/g,'-')+(errors.length?'_INCOMPLETE':'')+'.zip';
+  a.href=url;a.download='RML_ERP_SAUVEGARDE_'+new Date().toISOString().replace(/[:.]/g,'-')+'_PARTIEL.zip';
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
-  status.textContent=(errors.length?'ATTENTION : sauvegarde partielle':'Sauvegarde ZIP générée')+' — '+Object.keys(counts).length+' tables, '+fileCount+' fichiers, '+errors.length+' erreur(s). Consultez manifeste.json.';
-  if(errors.length)alert('Archive INCOMPLÈTE : '+errors.length+' problème(s). Consultez manifeste.json. Ne pas utiliser pour restaurer intégralement.');
+  status.textContent='Archive ZIP PARTIELLE — '+Object.keys(counts).length+' tables, '+fileCount+' fichiers, '+errors.length+' avertissement(s). Consultez manifeste.json. Ne pas utiliser comme sauvegarde exhaustive.';
+  alert('Archive PARTIELLE : l’exhaustivité ne peut pas être garantie depuis le navigateur. '+errors.length+' avertissement(s). Consultez manifeste.json.');
  }catch(e){status.textContent='ÉCHEC : '+e.message;alert('Sauvegarde ZIP interrompue : '+e.message);}
  finally{btn.disabled=false;}
 }
