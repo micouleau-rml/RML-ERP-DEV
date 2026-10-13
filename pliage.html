@@ -1768,17 +1768,22 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
   <!-- V63 : plis transversaux en bout gauche/droit, vue de dessus, comptage et longueur de débit -->
   <!-- V38 : calcul sur prépli 55°, affichage final avec retour strictement parallèle et petit rayon en 2D/3D -->
 <!-- V63 : repères d’angles rapprochés et cotes courtes placées à l’intérieur -->
+<style>
+.sync-main-status{display:none!important}
+.project-action-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;width:100%!important;gap:10px!important}
+.project-action-grid #saveProjectBtn,.project-action-grid #rmlSendAtelierBtn{width:100%!important;min-width:0!important;max-width:none!important;box-sizing:border-box!important;margin:0!important}
+</style>
 </head>
 <body>
 <div class="container">
   <div class="hero">
     <div class="brand">
-      <img src="header-logo.png" alt="RML PLIAGE ALU" class="header-logo">
+      
       <div class="brand-text">
         <h1>RML PLIAGE ALU</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
-        <div class="app-version rml-version-highlight">VERSION 121 ERP · interface corrigée</div>
+        <div class="app-version rml-version-highlight">VERSION 123 ERP · interface et stockage corrigés</div>
       </div>
     </div>
     <div class="install">
