@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="rml-app-version" content="22">
+<meta name="rml-app-version" content="27">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -644,7 +644,7 @@ const roleTemplates={collaborateur:{clients:false,chantiers:false,preparation:fa
 const $=id=>document.getElementById(id);
 function esc(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function clientName(id){return db.clients.find(c=>c.id===id)?.nom||'Client inconnu'}
-function setSync(ok,text){syncPill.textContent=text;syncPill.className='pill '+(ok?'ok':'danger')}
+function setSync(ok,text){const clean=String(text||'').replace(/\s*[·•-]\s*\d+\s*clients?\b/gi,'').replace(/\s*\(\s*\d+\s*clients?\s*\)/gi,'');syncPill.textContent=clean;syncPill.className='pill '+(ok?'ok':'danger')}
 function hasPerm(key){return !!currentAccess?.active && (!!currentAccess?.permissions?.[key] || currentAccess?.role==='administrateur')}
 const PREP_COLORS=['NEUTRE','BLANC','IVOIRE','MIEL','MARRON','ARDOISE','ROUGE TUILE','BEIGE ROSÉ','ROUGE BORDEAUX','VERT MOUSSE','ROUGE CARMIN','JAUNE COLZA','BLEU AZUR','NOIR','GRIS MÉTAL','VERT OLIVE','OCRE','VERT RÉSÉDA','BLEU GENTIANE','VERT SAPIN','CUIVRE FRANÇAIS','BRONZE','BLEU PIGEON','IMITATION ZINC','SABLE','BEIGE CENDRÉ','TITANE','NOIR SABLÉ','CRÈME','GRIS CLAIR','BLEU 5008','ZINC PATINA','GRIS 2900','GRIS GALET 7035','GRIS 9007'];
 const PREP_CATALOG={gouttieres:['GF300','GF380','GFDR300','GFT330','GFC300','GFC380'],accessoires_gouttieres:['FOND GAUCHE','FOND DROIT','FOND STANDARD','ANGLE INTÉRIEUR','ANGLE EXTÉRIEUR','NAISSANCE Ø70','NAISSANCE Ø80','NAISSANCE Ø90','NAISSANCE Ø100','MANCHON DE NAISSANCE Ø80','MANCHON DE NAISSANCE Ø100','GRILLE PARE-FEUILLES GRILLAGÉE 300','GRILLE PARE-FEUILLES GRILLAGÉE 380','GRILLE PARE-FEUILLES PERFORÉE 300','GRILLE PARE-FEUILLES PERFORÉE 380'],descentes_formes:['RONDE','RECTANGLE'],descentes_rondes:['Ø80','Ø100','Ø120','Ø140','Ø160','Ø180','Ø200'],descentes_rectangles:['60×80','70×110'],accessoires_descentes:['COUDE RECTANGLE 60×80','COUDE RECTANGLE 70×110','COUDE ROND Ø80','COUDE ROND Ø100','COUDE ROND Ø120','COUDE ROND Ø140','COUDE ROND Ø160','COUDE ROND Ø180','COUDE ROND Ø200','JAMBON Ø80','JAMBON Ø100','DAUPHIN ALU Ø80','DAUPHIN ALU Ø100','DAUPHIN FONTE Ø80','DAUPHIN FONTE Ø100','BOÎTE À EAU STANDARD 20×20×20','BOÎTE À EAU SUR MESURE','RÉCUPÉRATEUR EP ROND','RÉCUPÉRATEUR EP RECTANGLE'],couvertines:['340','360','380','400','420','440','460','480','500','520','540','560','580','600'],crochets:['AVEC PENTE','SANS PENTE'],accessoires_couvertines:['ANGLE','FOND STANDARD','CHAPEAU DE POTEAU'],bandeaux:['LAMBREQUIN ALUMINIUM TYPE ORNON','BANDEAU ALU 10/10','BANDEAU ALU 15/10'],sous_faces:['ALUMINIUM','PVC'],unites_personnalisees:['U','ML','M²','ENS']};
@@ -3113,20 +3113,6 @@ if(window.rmlRefreshNavEditor)rmlRefreshNavEditor();
   const h=document.getElementById('rmlVersionHeader');if(h)h.textContent=label;
   document.querySelectorAll('.login-card p').forEach(el=>{if(el.textContent.includes('Connexion sécurisée à RML ERP'))el.textContent='Connexion sécurisée à RML ERP DEV — '+label+'.';});
   document.title='RML ERP — '+label+' · Atelier et fabrication';
-  const badge=document.createElement('div');badge.id='rmlVersionIndicator';
-  badge.setAttribute('aria-label','Version du fichier ERP actuellement chargé');
-  badge.style.cssText='position:fixed;right:12px;bottom:12px;z-index:7000;background:#113a5d;color:white;padding:8px 11px;border-radius:12px;box-shadow:0 3px 12px #0003;font:700 12px system-ui,sans-serif;display:flex;align-items:center;gap:9px';
-  const versionText=document.createElement('span');versionText.textContent='ERP '+label;
-  const refresh=document.createElement('button');refresh.type='button';refresh.textContent='Actualiser';refresh.title='Recharger le fichier ERP depuis GitHub en contournant le cache';
-  refresh.style.cssText='background:white;color:#113a5d;border:0;border-radius:7px;padding:5px 8px;font:700 12px system-ui,sans-serif;cursor:pointer';
-  refresh.addEventListener('click',function(){
-    const url=new URL(location.href);url.searchParams.set('rml_refresh',String(Date.now()));
-    location.replace(url.toString());
-  });
-  const syncText=document.createElement('span');syncText.textContent='· Connexion : en attente';syncText.style.cssText='font-weight:600;font-size:11px';
-  const syncSource=document.getElementById('syncPill');
-  if(syncSource){const updateSync=()=>{const t=syncSource.textContent||'';syncText.textContent='· '+t.replace('Supabase : ','');syncText.style.color=syncSource.classList.contains('ok')?'#9af0c2':'#ffd5a5';};new MutationObserver(updateSync).observe(syncSource,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});updateSync();}
-  badge.append(versionText,syncText,refresh);document.body.appendChild(badge);
   window.RML_ERP_VERSION=version;
 })();
 </script><div id="rmlV19PlanModal"></div><div id="rmlPrintArea" class="rml-print-area"></div><style>.rml-atelier-doc-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;padding:10px;border:1px solid #cbd5e1;background:#f0f7ff;border-radius:10px}</style><script id="rml-v1920-finished-script">
