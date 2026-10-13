@@ -1769,7 +1769,10 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
   <!-- V38 : calcul sur prépli 55°, affichage final avec retour strictement parallèle et petit rayon en 2D/3D -->
 <!-- V63 : repères d’angles rapprochés et cotes courtes placées à l’intérieur -->
 <style>
-.sync-main-status{display:none!important}
+.sync-main-status{display:block!important;color:#475467!important;font-weight:600!important}
+.actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:10px!important;width:100%!important}
+.actions > .project-action-grid,.actions > .manual-backup-wrap{grid-column:1 / -1!important;width:100%!important}
+.actions > #printBtn,.actions > #quotePdfBtn{width:100%!important;max-width:100%!important;box-sizing:border-box!important;margin:0!important;min-height:74px!important}
 .project-action-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;width:100%!important;gap:10px!important}
 .project-action-grid #saveProjectBtn,.project-action-grid #rmlSendAtelierBtn{width:100%!important;min-width:0!important;max-width:none!important;box-sizing:border-box!important;margin:0!important}
 </style>
@@ -1783,7 +1786,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <h1>RML PLIAGE ALU</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
-        <div class="app-version rml-version-highlight">VERSION 123 ERP · interface et stockage corrigés</div>
+        <div class="app-version rml-version-highlight">VERSION 124 ERP · interface et stockage corrigés</div>
       </div>
     </div>
     <div class="install">
@@ -8942,8 +8945,8 @@ if(quotePdfBtn){
     if(!elements.length)return;
     const pending=loadPending().length;
     elements.forEach(el=>{
-      el.textContent=kind==="ok"?"":message+(pending?` — ${pending} changement(s) en attente`:"");
-      el.style.display=kind==="ok"?"none":"";
+      el.textContent=message+(pending?` — ${pending} changement(s) en attente`:"");
+      el.style.display="block";
       el.style.color=kind==="error"?"#b42318":kind==="ok"?"#067647":"#475467";
       el.style.fontWeight=kind==="neutral"?"600":"800";
     });
