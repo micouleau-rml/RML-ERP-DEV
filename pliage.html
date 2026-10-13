@@ -63,7 +63,7 @@ h1{margin:0;font-size:clamp(1.8rem,3vw,2.6rem);line-height:1.05}
 .col-12{grid-column:span 12}.col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-3{grid-column:span 3}.col-2{grid-column:span 2}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .project-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;flex:1 0 100%;width:100%}
-.project-action-grid button{width:100%}
+.project-action-grid button{width:100%;min-width:0;box-sizing:border-box;min-height:74px;white-space:normal;overflow-wrap:break-word}
 .manual-backup-wrap{flex:1 0 100%;width:100%}
 .manual-backup-toggle{width:100%;position:relative;display:flex;align-items:center;justify-content:center;text-align:center}
 .manual-backup-label{display:block;width:100%;text-align:center}
@@ -1778,7 +1778,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <h1>RML PLIAGE ALU</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
-        <div class="app-version rml-version-highlight">VERSION 121 ERP</div>
+        <div class="app-version rml-version-highlight">VERSION 121 ERP · interface corrigée</div>
       </div>
     </div>
     <div class="install">
@@ -8835,8 +8835,49 @@ if(quotePdfBtn){
     }
   }
 
-  const loadBaselines=()=>parse(localStorage.getItem(BASELINE_KEY),{});
-  const saveBaselines=value=>nativeSetItem.call(localStorage,BASELINE_KEY,JSON.stringify(value));
+  // V122 : les instantanés volumineux de synchronisation sont stockés dans IndexedDB,
+  // sans limite localStorage de 5 Mo. Migration non destructive et atomique.
+  function openBaselineDB(){
+    return new Promise((resolve,reject)=>{
+      if(!window.indexedDB){reject(new Error("IndexedDB indisponible"));return;}
+      const req=indexedDB.open("rml_pliage_sync_v122",1);
+      req.onupgradeneeded=()=>req.result.createObjectStore("snapshots");
+      req.onsuccess=()=>resolve(req.result);
+      req.onerror=()=>reject(req.error);
+    });
+  }
+  async function baselineDbGet(){
+    const db=await openBaselineDB();
+    try{return await new Promise((resolve,reject)=>{
+      const tx=db.transaction("snapshots","readonly");
+      const req=tx.objectStore("snapshots").get("baselines");
+      req.onsuccess=()=>resolve(req.result);
+      req.onerror=()=>reject(req.error);
+    });}finally{db.close();}
+  }
+  async function baselineDbPut(value){
+    const db=await openBaselineDB();
+    try{await new Promise((resolve,reject)=>{
+      const tx=db.transaction("snapshots","readwrite");
+      tx.objectStore("snapshots").put(value,"baselines");
+      tx.oncomplete=resolve;
+      tx.onerror=()=>reject(tx.error);
+      tx.onabort=()=>reject(tx.error);
+    });}finally{db.close();}
+  }
+  const loadBaselines=async()=>{
+    // Tant que l'ancienne archive existe, elle reste la référence si la migration
+    // n'a pas encore réussi. Après migration, IndexedDB devient la référence.
+    try{const stored=await baselineDbGet();if(stored!==undefined)return stored;}
+    catch(e){console.warn("Lecture IndexedDB impossible : lecture locale conservée",e);}
+    return parse(localStorage.getItem(BASELINE_KEY),{});
+  };
+  const saveBaselines=async value=>{
+    await baselineDbPut(value); // Ne rien effacer si l'écriture échoue.
+    // L'ancienne copie n'est supprimée qu'après validation de la transaction.
+    if(localStorage.getItem(BASELINE_KEY)!==null)
+      nativeRemoveItem.call(localStorage,BASELINE_KEY);
+  };
   const now=()=>new Date().toISOString();
   const parse=(raw,fallback)=>{try{return raw?JSON.parse(raw):fallback}catch{return fallback}};
   const loadConfig=()=>{
@@ -8896,7 +8937,8 @@ if(quotePdfBtn){
     if(!elements.length)return;
     const pending=loadPending().length;
     elements.forEach(el=>{
-      el.textContent=message+(pending?` — ${pending} changement(s) en attente`:"");
+      el.textContent=kind==="ok"?"":message+(pending?` — ${pending} changement(s) en attente`:"");
+      el.style.display=kind==="ok"?"none":"";
       el.style.color=kind==="error"?"#b42318":kind==="ok"?"#067647":"#475467";
       el.style.fontWeight=kind==="neutral"?"600":"800";
     });
@@ -9140,7 +9182,7 @@ if(quotePdfBtn){
       }
       const remoteMap=new Map(remote.map(row=>[rowKey(row.entity_type,row.entity_id),row]));
       const locals=readLocalEntities();
-      const baselines=loadBaselines();
+      const baselines=await loadBaselines();
       const nextBaselines={...baselines};
       const incoming=[], toInsert=[], toUpdate=[], conflicts=[];
       let unchanged=0;
@@ -9242,7 +9284,7 @@ if(quotePdfBtn){
         }
         // If another computer modified it concurrently, do not overwrite it.
       }
-      saveBaselines(nextBaselines);
+      await saveBaselines(nextBaselines);
       // Retain unresolved queue entries, clear only verified synchronized ones.
       const syncedKeys=new Set(Object.keys(nextBaselines).filter(key=>{
         const [type,...parts]=key.split(":");const id=parts.join(":");
