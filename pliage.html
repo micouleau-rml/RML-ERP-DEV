@@ -1775,6 +1775,51 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
 .actions > #printBtn,.actions > #quotePdfBtn{width:100%!important;max-width:100%!important;box-sizing:border-box!important;margin:0!important;min-height:74px!important}
 .project-action-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;width:100%!important;gap:10px!important}
 .project-action-grid #saveProjectBtn,.project-action-grid #rmlSendAtelierBtn{width:100%!important;min-width:0!important;max-width:none!important;box-sizing:border-box!important;margin:0!important}
+/* V125 : boutons compacts sur iPhone, sans changement tablette/ordinateur. */
+@media (max-width: 600px) {
+  .actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: min-content !important;
+    align-content: start !important;
+    align-items: start !important;
+    gap: 10px !important;
+  }
+  .actions > #printBtn,
+  .actions > #quotePdfBtn {
+    min-height: 52px !important;
+    height: 52px !important;
+    max-height: 52px !important;
+    padding: 8px 5px !important;
+    font-size: 14px !important;
+    align-self: start !important;
+  }
+  .actions > .project-action-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: min-content !important;
+    align-content: start !important;
+    align-self: start !important;
+    gap: 10px !important;
+  }
+  .project-action-grid > #saveProjectBtn,
+  .project-action-grid > #rmlSendAtelierBtn {
+    min-height: 60px !important;
+    height: 60px !important;
+    max-height: 60px !important;
+    padding: 8px 5px !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    align-self: start !important;
+    flex: none !important;
+  }
+  .project-action-grid > #loadProjectBtn {
+    min-height: 48px !important;
+    height: 48px !important;
+    align-self: start !important;
+    flex: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -1786,7 +1831,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <h1>RML PLIAGE ALU</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
-        <div class="app-version rml-version-highlight">VERSION 124 ERP · interface et stockage corrigés</div>
+        <div class="app-version rml-version-highlight">VERSION 125 ERP · affichage iPhone corrigé</div>
       </div>
     </div>
     <div class="install">
@@ -1915,7 +1960,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <button class="btn-danger" id="quotePdfBtn">Visualiser PDF</button>  
         <div class="project-action-grid">
           <button class="btn-primary" id="saveProjectBtn">Enregistrer projet</button>
-          <button type="button" class="btn-primary" id="rmlSendAtelierBtn" style="background:#176b48">Envoyer à l’atelier (équipe 8)</button>
+          <button type="button" class="btn-primary" id="rmlSendAtelierBtn" style="background:#176b48">Envoyer Atelier</button>
           <button class="btn-secondary" id="loadProjectBtn">Mes projets</button>
         </div>
         <div class="manual-backup-wrap">
@@ -9490,7 +9535,7 @@ create policy "RML Pliage modification" on public.${TABLE}
   const rows=Array.isArray(proj.pieces)?proj.pieces:[];if(!rows.length){alert('Ce projet ne contient aucune pièce.');return}
   const client=typeof clients!=='undefined'?clients.find(c=>String(c.id)===String(proj.clientId)):null;
   const overlay=document.createElement('div');overlay.id='rmlAtelierOverlay';overlay.style='position:fixed;inset:0;background:#0009;z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px';
-  overlay.innerHTML=`<div style="background:white;color:#182333;border-radius:14px;padding:20px;max-width:750px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 10px 50px #0004"><h2 style="margin-top:0">Envoyer à l’atelier — Équipe 8</h2><div><b>${esc(proj.name)}</b> · ${esc(client?.name||'Client non renseigné')}</div><p><label><input type="radio" name="rmlMode" value="all" checked> Projet complet</label> &nbsp; <label><input type="radio" name="rmlMode" value="selected"> Pièces sélectionnées</label></p><div id="rmlPieceChoices" style="max-height:40vh;overflow:auto;border:1px solid #ddd;border-radius:8px">${rows.map((x,i)=>`<label style="display:flex;align-items:center;gap:12px;padding:9px;border-bottom:1px solid #eee"><input type="checkbox" data-piece="${i}" checked><span style="flex:1">Pièce ${i+1} — ${esc(x.name||x.nom||x.label||x.designation||'')}</span><span>Qté</span><input type="number" min="1" step="1" data-qty="${i}" value="${Math.max(1,Math.round(Number(x.quantity??x.qty??x.quantite??1)||1))}" style="width:75px;padding:5px"></label>`).join('')}</div><p><label>Priorité <select id="rmlAtelierPriority"><option value="normale">Normale</option><option value="urgente">Urgente</option></select></label> &nbsp; <label>Date souhaitée <input type="date" id="rmlAtelierDue"></label></p><p><label><input type="checkbox" id="rmlAtelierNewOrder"> Créer une nouvelle commande indépendante (même client et référence autorisés)</label></p><div id="rmlAtelierMsg" style="color:#b42318;min-height:22px"></div><div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" id="rmlAtelierCancel">Annuler</button><button type="button" id="rmlAtelierConfirm" style="background:#176b48;color:white;border:0;border-radius:8px;padding:10px 16px">Confirmer l’envoi</button></div></div>`;
+  overlay.innerHTML=`<div style="background:white;color:#182333;border-radius:14px;padding:20px;max-width:750px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 10px 50px #0004"><h2 style="margin-top:0">Envoyer à l’atelier — Équipe Atelier</h2><div><b>${esc(proj.name)}</b> · ${esc(client?.name||'Client non renseigné')}</div><p><label><input type="radio" name="rmlMode" value="all" checked> Projet complet</label> &nbsp; <label><input type="radio" name="rmlMode" value="selected"> Pièces sélectionnées</label></p><div id="rmlPieceChoices" style="max-height:40vh;overflow:auto;border:1px solid #ddd;border-radius:8px">${rows.map((x,i)=>`<label style="display:flex;align-items:center;gap:12px;padding:9px;border-bottom:1px solid #eee"><input type="checkbox" data-piece="${i}" checked><span style="flex:1">Pièce ${i+1} — ${esc(x.name||x.nom||x.label||x.designation||'')}</span><span>Qté</span><input type="number" min="1" step="1" data-qty="${i}" value="${Math.max(1,Math.round(Number(x.quantity??x.qty??x.quantite??1)||1))}" style="width:75px;padding:5px"></label>`).join('')}</div><p><label>Priorité <select id="rmlAtelierPriority"><option value="normale">Normale</option><option value="urgente">Urgente</option></select></label> &nbsp; <label>Date souhaitée <input type="date" id="rmlAtelierDue"></label></p><p><label><input type="checkbox" id="rmlAtelierNewOrder"> Créer une nouvelle commande indépendante (même client et référence autorisés)</label></p><div id="rmlAtelierMsg" style="color:#b42318;min-height:22px"></div><div style="display:flex;justify-content:flex-end;gap:10px"><button type="button" id="rmlAtelierCancel">Annuler</button><button type="button" id="rmlAtelierConfirm" style="background:#176b48;color:white;border:0;border-radius:8px;padding:10px 16px">Confirmer l’envoi</button></div></div>`;
   document.body.appendChild(overlay);const q=s=>overlay.querySelector(s);q('#rmlAtelierCancel').onclick=()=>overlay.remove();
   overlay.querySelectorAll('[name=rmlMode]').forEach(el=>el.onchange=()=>{const all=q('[name=rmlMode]:checked').value==='all';overlay.querySelectorAll('[data-piece]').forEach(c=>{c.checked=all;c.disabled=all})});
   q('#rmlAtelierConfirm').onclick=async()=>{
