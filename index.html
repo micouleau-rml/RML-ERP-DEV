@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="rml-app-version" content="27.9">
+<meta name="rml-app-version" content="28">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -323,12 +323,15 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobModal .job-save-top:hover{background:#0c6b36!important}
 @media(max-width:640px){#jobModal .modal-head{align-items:flex-start;flex-wrap:wrap}#jobModal .job-modal-header-actions{width:100%;justify-content:space-between}#jobModal .job-save-top{flex:1;font-size:14px!important;padding:12px 10px!important}}
 </style>
-<style id="rml-job-actions-below-v2710">
+<style id="rml-job-actions-below-v28">
 /* Une ligne d’actions distincte sous chaque chantier. */
 #jobsTable .rml-job-actions-row td { padding: 5px 12px 13px; border-top: 0; background: #f7f9fc; }
 #jobsTable .rml-job-actions-row .actions { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
 #jobsTable .rml-job-actions-row .actions button { white-space:nowrap; }
-#jobsTable .rml-job-actions-row + tr td { border-top: 2px solid #dbe3ec; }
+#jobsTable .rml-job-actions-row + tr td { border-top: 5px solid #8297ac; padding-top: 15px; }
+#jobsTable .rml-job-actions-row td { border-bottom: 0; padding-bottom: 16px; }
+#jobsTable .rml-job-actions-row + tr { background: #ffffff; }
+#jobsTable tbody tr:first-child td { border-top: 0; }
 </style>
 </head>
 <body>
@@ -1179,7 +1182,7 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V27.10',err);
+   console.error('Erreur connexion RML ERP V28',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
@@ -3401,7 +3404,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V27.10';
+const RML_ERP_VERSION='V28';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
