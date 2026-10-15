@@ -323,15 +323,30 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobModal .job-save-top:hover{background:#0c6b36!important}
 @media(max-width:640px){#jobModal .modal-head{align-items:flex-start;flex-wrap:wrap}#jobModal .job-modal-header-actions{width:100%;justify-content:space-between}#jobModal .job-save-top{flex:1;font-size:14px!important;padding:12px 10px!important}}
 </style>
-<style id="rml-job-actions-below-v28">
-/* Une ligne d’actions distincte sous chaque chantier. */
-#jobsTable .rml-job-actions-row td { padding: 5px 12px 13px; border-top: 0; background: #f7f9fc; }
-#jobsTable .rml-job-actions-row .actions { display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
-#jobsTable .rml-job-actions-row .actions button { white-space:nowrap; }
-#jobsTable .rml-job-actions-row + tr td { border-top: 5px solid #8297ac; padding-top: 15px; }
-#jobsTable .rml-job-actions-row td { border-bottom: 0; padding-bottom: 16px; }
-#jobsTable .rml-job-actions-row + tr { background: #ffffff; }
-#jobsTable tbody tr:first-child td { border-top: 0; }
+<style id="rml-job-cards-v28-1">
+/* Un encadrement complet et arrondi pour chaque chantier, sans modifier les actions. */
+#jobsTable .tablewrap{border:0;border-radius:0;overflow-x:auto;}
+#jobsTable .table{border-collapse:separate;border-spacing:0 11px;background:transparent;}
+#jobsTable .table thead th{border-bottom:1px solid #d7e0e9;}
+#jobsTable .table tbody tr:not(.rml-job-actions-row) td{
+  background:#fff;border-top:3px solid #8297ac;border-bottom:1px solid #dbe3eb;
+}
+#jobsTable .table tbody tr:not(.rml-job-actions-row) td:first-child{
+  border-left:3px solid #8297ac;border-top-left-radius:9px;
+}
+#jobsTable .table tbody tr:not(.rml-job-actions-row) td:last-child{
+  border-right:3px solid #8297ac;border-top-right-radius:9px;
+}
+#jobsTable .table tbody tr.rml-job-actions-row td{
+  padding:7px 11px 12px;background:#f7f9fc;
+  border:3px solid #8297ac;border-top:0;
+  border-radius:0 0 9px 9px;
+}
+#jobsTable .rml-job-actions-row .actions{display:flex;flex-wrap:wrap;gap:7px;align-items:center;}
+#jobsTable .rml-job-actions-row .actions button{white-space:nowrap;}
+/* Les deux lignes du même chantier restent jointives. */
+#jobsTable .table tbody tr:not(.rml-job-actions-row){transform:translateY(5.5px);}
+#jobsTable .table tbody tr.rml-job-actions-row{transform:translateY(-5.5px);}
 </style>
 </head>
 <body>
@@ -1182,7 +1197,7 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V28',err);
+   console.error('Erreur connexion RML ERP V28.1',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
@@ -3404,7 +3419,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V28';
+const RML_ERP_VERSION='V28.1';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
