@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="rml-app-version" content="27.3">
+<meta name="rml-app-version" content="27.6">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -492,7 +492,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 </div></div>
 <section id="analyse" class="view"><div class="panel"><div class="analyse-head"><div><h2>Analyse chantier</h2><div class="muted">Synthèse des données déjà reliées au chantier dans ERP DEV.</div></div><button class="btn secondary" onclick="loadAnalysis()">Actualiser</button></div><div class="field" style="margin-top:12px"><label>Rechercher</label><input id="analysisSearch" placeholder="Rechercher un client ou un chantier…" oninput="searchAnalysisContext()"></div><div class="grid2" style="margin-top:12px"><div class="field"><label>Client</label><select id="analysisClient"></select></div><div class="field"><label>Chantier</label><select id="analysisJob"></select></div></div><div id="analysisStatus" class="notice">Sélectionnez un chantier.</div><div id="analysisContent"></div><div id="financePanel" style="margin-top:16px"></div></div></section>
 <section id="users" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Utilisateurs & droits d’accès</h2><div class="muted" style="margin-top:4px">Choisis les modules visibles pour chaque utilisateur.</div></div><button class="btn secondary" id="refreshUsersBtn">Actualiser</button></div><div class="notice" style="margin-bottom:12px">Pour créer un nouveau compte, ajoute d’abord l’utilisateur dans <strong>Supabase → Authentication → Users</strong>. Il apparaîtra ici dès que son accès est enregistré dans Supabase. Tu peux lui attribuer le rôle Collaborateur et définir ses droits module par module.</div><div id="usersTable"></div></div></section>
-<section id="security" class="view"><div class="panel" id="rmlNavEditorPanel" style="margin-top:16px"><h2>Organisation des modules</h2><p class="muted">Réorganiser les modules du menu ERP. Réservé à l’administrateur.</p></div><div class="panel" id="rmlSupabaseMonitor" style="margin-top:16px"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Consommation Supabase</h2><p class="muted">Surveillance administrateur — ERP DEV. Compteurs d'enregistrements actualisés automatiquement ; quotas officiels à renseigner depuis Supabase Usage.</p></div><button type="button" class="btn secondary" onclick="rmlMonitorRefresh()">Actualiser les compteurs</button></div><div id="rmlMonitorCounts" class="notice">Ouvrez cette rubrique pour consulter les compteurs.</div><p class="muted" style="margin-top:12px">Saisissez les volumes relevés dans <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase → Usage</a>. Ces valeurs sont manuelles et ne représentent pas une mesure automatique en temps réel.</p><div class="grid2" id="rmlMonitorInputs"><div class="field"><label>Base de données utilisée (Go / 8 Go)</label><input type="number" id="rmlQuotaDb" min="0" step="0.01" placeholder="Ex. 0,25"></div><div class="field"><label>Stockage fichiers utilisé (Go / 100 Go)</label><input type="number" id="rmlQuotaStorage" min="0" step="0.01" placeholder="Ex. 2,5"></div><div class="field"><label>Transfert mensuel utilisé (Go / 250 Go)</label><input type="number" id="rmlQuotaTransfer" min="0" step="0.01" placeholder="Ex. 10"></div></div><div class="actions" style="margin:10px 0"><button class="btn ok" type="button" onclick="rmlMonitorSave()">Enregistrer les relevés</button></div><div id="rmlMonitorQuotaDisplay" aria-live="polite"></div><p class="muted">Alertes à 70 %, 85 % et 95 %. Les seuils correspondent aux quotas Pro indicatifs : vérifiez les limites réelles de votre projet et votre facturation dans Supabase. Les relevés sont conservés uniquement dans ce navigateur ; aucune clé secrète n'est utilisée.</p></div><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte en lecture seule les tables connues et accessibles. Ce fichier ne constitue pas une sauvegarde exhaustive de Supabase : les tables non répertoriées, les lignes masquées par RLS, Storage et Authentication sont exclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Archive partielle des tables connues et fichiers Storage accessibles. Une sauvegarde exhaustive nécessite un export administrateur côté Supabase (base, Storage et configuration).</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
+<section id="security" class="view"><div class="panel" id="rmlNavEditorPanel" style="margin-top:16px"><h2>Organisation des modules</h2><p class="muted">Réorganiser les modules du menu ERP. Réservé à l’administrateur.</p></div><div class="panel" id="rmlSupabaseMonitor" style="margin-top:16px"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Consommation Supabase</h2><p class="muted">Offre Free — surveillance administrateur. Compteurs d'enregistrements actualisés automatiquement ; quotas officiels à renseigner depuis Supabase Usage.</p></div><button type="button" class="btn secondary" onclick="rmlMonitorRefresh()">Actualiser les compteurs</button></div><div id="rmlMonitorCounts" class="notice">Ouvrez cette rubrique pour consulter les compteurs.</div><p class="muted" style="margin-top:12px">Saisissez les volumes relevés dans <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase → Usage</a>. Ces valeurs sont manuelles et ne représentent pas une mesure automatique en temps réel.</p><div class="grid2" id="rmlMonitorInputs"><div class="field"><label>Base de données utilisée (Go / 0,5 Go)</label><input type="number" id="rmlQuotaDb" min="0" step="0.001" placeholder="Ex. 0.125"></div><div class="field"><label>Stockage fichiers utilisé (Go / 1 Go)</label><input type="number" id="rmlQuotaStorage" min="0" step="0.001" placeholder="Ex. 0.250"></div><div class="field"><label>Transfert mensuel utilisé (Go / 5 Go)</label><input type="number" id="rmlQuotaTransfer" min="0" step="0.001" placeholder="Ex. 1.5"></div></div><div class="actions" style="margin:10px 0"><button class="btn ok" type="button" onclick="rmlMonitorSave()">Enregistrer les relevés</button></div><div id="rmlMonitorQuotaDisplay" aria-live="polite"></div><p class="muted">Alertes à 70 %, 85 % et 95 %. Surveillance configurée pour l’offre Free (base 0,5 Go, stockage 1 Go, bande passante 5 Go, valeurs indicatives). Vérifiez les quotas applicables à votre projet dans Supabase → Usage. Le transfert mensuel peut comporter plusieurs catégories de trafic ; reportez la valeur correspondant au quota de 5 Go. Les relevés sont conservés uniquement dans ce navigateur ; aucune clé secrète n'est utilisée.</p></div><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte en lecture seule les tables connues et accessibles. Ce fichier ne constitue pas une sauvegarde exhaustive de Supabase : les tables non répertoriées, les lignes masquées par RLS, Storage et Authentication sont exclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Archive partielle des tables connues et fichiers Storage accessibles. Une sauvegarde exhaustive nécessite un export administrateur côté Supabase (base, Storage et configuration).</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
 
 <section id="page-forecast" class="view">
   <div class="card" id="forecastDedicatedCard">
@@ -540,7 +540,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div class="actions"><button class="btn" type="submit">Valider le mouvement</button><button class="btn secondary" type="button" data-close="stockMoveModal">Annuler</button></div></form></div></div>
 
 <div class="modal" id="stockHistoryModal"><div class="modal-card"><div class="modal-head"><h2 id="stockHistoryTitle">Historique du stock</h2><button class="btn secondary" data-close="stockHistoryModal">Fermer</button></div><div id="stockHistoryList"></div></div></div>
-<div class="modal" id="clientModal"><div class="modal-card"><div class="modal-head"><h3 id="clientModalTitle">Nouveau client</h3><div class="client-edit-nav" id="clientEditNav" style="display:none"><button class="btn secondary" type="button" id="clientPrevBtn">← Précédent</button><span class="client-edit-position" id="clientEditPosition"></span><button class="btn secondary" type="button" id="clientNextBtn">Suivant →</button></div><button class="close" data-close="clientModal">Fermer</button></div><div class="client-edit-tools" id="clientEditTools" style="display:none"><button class="btn portal-direct" type="button" id="clientPortalBtn">⌕ Portail des entreprises</button><span class="client-edit-dirty clean" id="clientDraftStatus">Aucune modification en attente</span><button class="btn save-batch" type="button" id="clientSaveBatchBtn" disabled>Enregistrer les modifications</button><button class="btn danger" type="button" id="clientDeleteFromEditBtn" style="margin-left:auto">Supprimer le client</button></div><form id="clientForm" class="grid2" style="margin-top:14px"><input type="hidden" id="clientId"><div class="field"><label>Nom du client *</label><input id="clientNom" required></div><div class="field"><label>Code client (automatique)</label><input id="clientCode" readonly placeholder="Attribué automatiquement"></div><div class="field"><label>Responsable / Contact principal</label><input id="clientResponsable"></div><div class="field"><label>Profession / Catégorie</label><div style="display:flex;gap:8px;align-items:center"><select id="clientCategorie" style="flex:1"></select><button class="btn secondary" type="button" id="addProfessionBtn">+ Ajouter</button></div></div><div class="field"><label>SIREN</label><input id="clientSiren" inputmode="numeric" maxlength="9" placeholder="Prévu pour le rapprochement Pennylane"></div><div class="field"><label>SIRET du siège</label><input id="clientSiret" inputmode="numeric" maxlength="14" placeholder="Renseigné automatiquement"></div><div class="field"><label>Téléphone</label><input id="clientTel" inputmode="tel"></div><div class="field"><label>E-mail</label><input id="clientEmail" type="email"></div><div class="field full"><label>Adresse</label><input id="clientAdresse"></div><div class="field full"><label>Notes</label><textarea id="clientNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer et fermer</button><button class="btn secondary" type="button" data-close="clientModal">Fermer</button></div></form></div></div>
+<div class="modal" id="clientModal"><div class="modal-card"><div class="modal-head"><h3 id="clientModalTitle">Nouveau client</h3><div class="client-edit-nav" id="clientEditNav" style="display:none"><button class="btn secondary" type="button" id="clientPrevBtn">← Précédent</button><span class="client-edit-position" id="clientEditPosition"></span><button class="btn secondary" type="button" id="clientNextBtn">Suivant →</button></div><button class="close" data-close="clientModal">Fermer</button></div><div class="client-edit-tools" id="clientEditTools" style="display:none"><button class="btn portal-direct" type="button" id="clientPortalBtn">⌕ Portail des entreprises</button><span class="client-edit-dirty clean" id="clientDraftStatus">Aucune modification en attente</span><button class="btn save-batch" type="button" id="clientSaveBatchBtn" disabled>Enregistrer les modifications</button><button class="btn danger" type="button" id="clientDeleteFromEditBtn" style="margin-left:auto">Supprimer le client</button></div><form id="clientForm" class="grid2" style="margin-top:14px"><input type="hidden" id="clientId"><div class="field"><label>Nom du client *</label><input id="clientNom" required></div><div class="field"><label>Code client (automatique)</label><input id="clientCode" readonly placeholder="Attribué automatiquement"></div><div class="field"><label>Responsable / Contact principal</label><input id="clientResponsable"></div><div class="field"><label>Profession / Catégorie</label><div style="display:flex;gap:8px;align-items:center"><select id="clientCategorie" style="flex:1"></select><button class="btn secondary" type="button" id="addProfessionBtn">+ Ajouter</button></div></div><div class="field"><label>SIREN</label><input id="clientSiren" inputmode="numeric" maxlength="9" placeholder="Prévu pour le rapprochement Pennylane"></div><div class="field"><label>SIRET du siège</label><input id="clientSiret" inputmode="numeric" maxlength="14" placeholder="Renseigné automatiquement"></div><div class="field"><label>Téléphone</label><input id="clientTel" inputmode="tel"></div><div class="field"><label>E-mail</label><textarea id="clientEmail" rows="2" placeholder="Une adresse e-mail par ligne (plusieurs responsables possibles)"></textarea><div class="muted">Saisissez une adresse par ligne. Vous pourrez choisir le destinataire depuis le chantier.</div></div><div class="field full"><label>Adresse</label><input id="clientAdresse"></div><div class="field full"><label>Notes</label><textarea id="clientNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer et fermer</button><button class="btn secondary" type="button" data-close="clientModal">Fermer</button></div></form></div></div>
 <div class="modal" id="professionModal"><div class="modal-card" style="max-width:620px"><div class="modal-head"><h3>Ajouter une profession</h3><button class="close" data-close="professionModal">Fermer</button></div><div class="field" style="margin-top:14px"><label>Nouvelle profession</label><input id="newProfessionName" placeholder="Ex. Façadier"></div><div class="actions"><button class="btn" type="button" id="saveProfessionBtn">Ajouter à la liste</button><button class="btn secondary" type="button" data-close="professionModal">Annuler</button></div><div class="muted" style="margin-top:12px">Cette profession sera enregistrée dans Supabase ERP DEV et disponible sur vos autres appareils.</div></div></div>
 <div class="modal" id="subAssignModal"><div class="modal-card" style="max-width:760px">
  <div class="modal-head"><h3>Affecter un chantier / créer le contrat</h3><button class="close" data-close="subAssignModal">Fermer</button></div>
@@ -573,6 +573,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
   <div class="actions"><button class="btn secondary" id="rmlClearSignBtn" onclick="clearRmlSignature()">Effacer la signature</button><button class="btn" id="rmlSignBtn" onclick="signRmlContract()">Signer pour RML</button></div>
  </div>
 </div></div>
+<div class="modal" id="rmlFinishMailModal"><div class="modal-card" style="max-width:650px"><div class="modal-head"><h3>Avis de fin de travaux</h3><button class="close" type="button" onclick="closeModal('rmlFinishMailModal')">Fermer</button></div><div class="field"><label>Destinataire</label><select id="rmlFinishRecipient"></select></div><div class="field" id="rmlFinishNewEmailBox" style="margin-top:10px;display:none"><label>Nouvelle adresse e-mail</label><input id="rmlFinishNewEmail" type="email" placeholder="responsable@entreprise.fr" autocomplete="email"><div class="actions" style="margin-top:8px"><button type="button" class="btn secondary" onclick="rmlSaveFinishEmail()">Enregistrer dans la fiche client</button></div><p id="rmlFinishEmailStatus" class="muted" role="status"></p></div><div class="field" style="margin-top:12px"><label>Objet</label><input id="rmlFinishSubject"></div><div class="field" style="margin-top:12px"><label>Message</label><textarea id="rmlFinishBody" rows="9"></textarea></div><p class="muted">Le message s'ouvrira dans votre messagerie. Vérifiez-le, puis cliquez sur Envoyer. L'ERP ne peut pas confirmer l'envoi depuis votre messagerie.</p><div class="actions"><button type="button" class="btn" onclick="rmlOpenFinishEmail()">Ouvrir dans ma messagerie</button><button type="button" class="btn secondary" onclick="closeModal('rmlFinishMailModal')">Annuler</button></div></div></div>
 <div class="modal" id="jobModal"><div class="modal-card"><div class="modal-head"><div><h3 id="jobModalTitle">Nouveau chantier</h3><div class="muted" id="jobModalHelp" style="margin-top:4px">3 informations suffisent pour créer le chantier. Les autres renseignements peuvent être ajoutés plus tard.</div></div><div class="job-modal-header-actions"><button class="btn job-save-top" id="jobSubmitBtn" type="submit" form="jobForm">Enregistrer les modifications</button><button class="close" data-close="jobModal">Fermer</button></div></div><form id="jobForm" class="grid2" style="margin-top:14px"><input type="hidden" id="jobId"><div class="field full"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><label style="margin:0">1. Rechercher le client *</label><button class="btn secondary" type="button" id="jobCreateClientBtn">+ Créer un nouveau client</button></div><input id="jobClientSearch" type="search" placeholder="Tapez le nom du client…" autocomplete="off" style="margin-top:7px"><select id="jobClient" required style="margin-top:7px"></select><div class="muted" style="margin-top:6px">Si le client n’existe pas, crée-le ici puis tu reviendras automatiquement sur ce chantier.</div></div><div class="field full"><label>2. Nom du chantier *</label><input id="jobNom" required placeholder="Ex. Résidence Les Pins"></div><div class="field full"><label>3. Adresse du chantier</label><input id="jobAdresse" placeholder="Adresse, ville…"></div><details class="full" id="jobAdvanced" style="border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:var(--soft)"><summary style="cursor:pointer;font-weight:800;color:var(--navy)">Informations complémentaires (facultatif)</summary><div class="grid2" style="margin-top:12px"><div class="field"><label>Contact chantier</label><input id="jobContact"></div><div class="field"><label>Téléphone contact</label><input id="jobTel" inputmode="tel"></div><div class="field"><label>Responsable / chef d’équipe</label><input id="jobChef"></div><div class="field"><label>Statut</label><select id="jobStatut"><option value="actif">Actif</option><option value="attente">En attente</option><option value="en_cours">En cours</option><option value="termine">Terminé</option><option value="archive">Archivé</option><option value="sav">SAV</option></select></div><div class="field"><label>Date de début</label><input id="jobDebut" type="date"></div><div class="field"><label>Date de fin</label><input id="jobFin" type="date"></div><div class="field full"><label>Notes</label><textarea id="jobNotes"></textarea></div></div></details><div class="full actions"><button class="btn secondary" type="button" data-close="jobModal">Annuler</button></div></form></div></div>
 <div class="modal" id="accessModal"><div class="modal-card"><div class="modal-head"><h3 id="accessModalTitle">Droits utilisateur</h3><button class="close" data-close="accessModal">Fermer</button></div><form id="accessForm" style="margin-top:14px"><input type="hidden" id="accessUserId"><div class="grid2"><div class="field"><label>Compte de connexion</label><input id="accessEmail" disabled><div class="muted" style="margin-top:5px">Pour un compte équipe : Equipe1 correspond en arrière-plan à equipe1@login.rml.local.</div></div><div class="field"><label>Rôle</label><select id="accessRole"><option value="administrateur">Administrateur</option><option value="direction">Direction</option><option value="collaborateur">Collaborateur</option><option value="chef_equipe">Chef d’équipe</option><option value="ouvrier">Ouvrier</option><option value="atelier">Atelier</option><option value="sous_traitant">Sous-traitant</option><option value="lecture">Lecture seule</option></select></div><div class="field full"><label><input id="accessActive" type="checkbox" checked> Compte actif</label></div><div id="accessEmployeeLinkField" class="field full employee-link-field"><label>Équipe permanente</label><select id="accessEmployeeLink"><option value="">— Choisir l’équipe —</option><option value="1">Équipe 1</option><option value="2">Équipe 2</option><option value="3">Équipe 3</option><option value="4">Équipe 4</option><option value="5">Équipe 5</option><option value="6">Équipe 6</option><option value="7">Équipe 7</option><option value="8">ATELIER RML</option></select><div class="muted" style="margin-top:5px">Le compte suit cette équipe dans le Planning. Les salariés de l’équipe peuvent changer sans modifier ce compte.</div></div></div><h3 style="margin:16px 0 10px;color:var(--navy)">Modules autorisés</h3><div id="permissionGrid" class="perm-grid"></div><div class="actions" style="margin-top:16px"><button class="btn" type="submit">Enregistrer les droits</button><button class="btn secondary" type="button" data-close="accessModal">Annuler</button></div></form></div></div>
 
@@ -718,19 +719,7 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
 
 
 
-<script>
-/* V27.3 : suivi non destructif ; les quotas officiels nécessitent l'API de gestion côté serveur. */
-(function(){
- const key='rml_erp_supabase_usage_manual_v272';
- const fields=[['rmlQuotaDb','Base de données',8],['rmlQuotaStorage','Stockage fichiers',100],['rmlQuotaTransfer','Transfert mensuel',250]];
- function paint(){const target=document.getElementById('rmlMonitorQuotaDisplay');if(!target)return;let html='';let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
- for(const [id,label,limit] of fields){const input=document.getElementById(id);if(!input)continue;if(saved[id]!==undefined&&input.dataset.loaded!=='yes'){input.value=saved[id];input.dataset.loaded='yes'}const raw=input.value.trim();if(!raw)continue;const n=Number(raw);if(!Number.isFinite(n)||n<0)continue;const pct=n/limit*100;const color=pct>=95?'#b91c1c':pct>=85?'#c2410c':pct>=70?'#a16207':'#16804b';const state=pct>=95?'Critique':pct>=85?'Alerte rouge':pct>=70?'Vigilance':'Normal';html+='<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>'+label+'</strong><span>'+n.toLocaleString('fr-FR')+' / '+limit+' Go — '+pct.toFixed(1)+' % · '+state+'</span></div><div style="height:10px;border-radius:8px;background:#e2e8f0;overflow:hidden"><div style="width:'+Math.min(100,pct)+'%;height:100%;background:'+color+'"></div></div></div>'}target.innerHTML=html||'<div class="notice">Aucun relevé saisi. Les quotas ne sont pas mesurés automatiquement.</div>';
- }
- window.rmlMonitorSave=function(){if(window.currentAccess?.role!=='administrateur')return;const values={};for(const [id] of fields){const input=document.getElementById(id);if(!input)continue;const v=input.value.trim();if(v&&(Number(v)<0||!Number.isFinite(Number(v)))){alert('Saisissez un volume valide.');return}if(v)values[id]=v;}values.savedAt=new Date().toISOString();try{localStorage.setItem(key,JSON.stringify(values))}catch(e){alert('Impossible de conserver les relevés dans ce navigateur.')}paint();};
- window.rmlMonitorRefresh=async function(){if(window.currentAccess?.role!=='administrateur')return;paint();const box=document.getElementById('rmlMonitorCounts');if(!box||typeof countTable!=='function')return;box.textContent='Lecture des compteurs…';const tables=[['erp_clients','Clients'],['erp_chantiers','Chantiers'],['erp_modules_data','Données modules'],['erp_user_access','Accès utilisateurs']];const results=await Promise.all(tables.map(async ([t,label])=>{try{return label+' : '+(await countTable(t)).toLocaleString('fr-FR')}catch(e){return label+' : indisponible ('+e.message+')'}}));box.textContent='Enregistrements visibles selon vos droits — '+results.join(' · ')+'. Ces nombres ne permettent pas de déduire les Go utilisés.';};
- document.addEventListener('DOMContentLoaded',paint);
-})();
-</script></body></html>`);win.document.close()}
+</body></html>`);win.document.close()}
 
 
 function prepNumber(v){const n=Number(String(v??'').replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:0}
@@ -1112,7 +1101,19 @@ async function saveEmployeeTeamTime(jobId,date){
 }
 async function uploadEmployeePhotos(jobId,date,inputId='employeePhotoInput'){const input=document.getElementById(inputId);if(!input?.files?.length){alert('Choisissez au moins une photo.');return}const j=db.chantiers.find(x=>x.id===jobId);let ok=0;for(const f of [...input.files]){if(!String(f.type||'').startsWith('image/'))continue;const safe=f.name.replace(/[^a-zA-Z0-9._-]+/g,'_'),path=`${jobId}/employee/${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${safe}`;const up=await sb.storage.from(DOC_BUCKET).upload(path,f,{upsert:false,contentType:f.type||undefined});if(up.error){alert('Envoi impossible : '+up.error.message);return}const row={client_id:j?.client_id||null,chantier_id:jobId,category:'Photo',file_name:f.name,storage_path:path,mime_type:f.type||null,file_size:f.size,note:'Photo terrain ajoutée par '+(employeeAccount?.employee_name||'un salarié'),employee_visible:true,subcontractor_visible:false};const ins=await sb.from('erp_documents').insert(row).select('id,chantier_id,file_name,storage_path,employee_visible').single();if(ins.error){await sb.storage.from(DOC_BUCKET).remove([path]);alert('Enregistrement impossible : '+ins.error.message);return}if(!ins.data?.id){await sb.storage.from(DOC_BUCKET).remove([path]);alert('La photo a été envoyée mais son enregistrement chantier n’a pas pu être confirmé.');return}ok++}input.value='';alert(ok+' photo(s) ajoutée(s) au chantier.');await openEmployeeJobFolder(jobId,date)}
 
-async function loadCurrentAccess(){const {data,error}=await sb.from('erp_user_access').select('*').eq('user_id',currentUser.id).single();if(error){console.error('Accès ERP :',error);return {error}}currentAccess=data;return {data}}
+async function loadCurrentAccess(){
+  // Sur Safari iOS, la session peut être restaurée avec un léger décalage.
+  // Une erreur réseau ne doit jamais provoquer une déconnexion silencieuse.
+  let lastError=null;
+  for(let attempt=0;attempt<3;attempt++){
+    const {data,error}=await sb.from('erp_user_access').select('*').eq('user_id',currentUser.id).maybeSingle();
+    if(!error){currentAccess=data;return {data};}
+    lastError=error;
+    console.warn('Lecture des droits ERP, tentative '+(attempt+1),error);
+    if(attempt<2)await new Promise(resolve=>setTimeout(resolve,450*(attempt+1)));
+  }
+  return {error:lastError};
+}
 async function fetchAllRows(table,orderCol,ascending=true){const pageSize=1000;let from=0,all=[];while(true){let q=sb.from(table).select('*').order(orderCol,{ascending}).range(from,from+pageSize-1);const {data,error}=await q;if(error)throw error;const rows=data||[];all.push(...rows);if(rows.length<pageSize)break;from+=pageSize}return all}
 async function refreshData(){setSync(false,'Supabase : synchronisation…');try{if(isSubcontractorUser()){db={clients:[],chantiers:[],users:[]};renderAll();applyAccessUI();go('subPortal');await loadSubcontractorPortal();setSync(true,'Supabase : espace sous-traitant synchronisé');return true}if(isEmployeeUser()){db={clients:[],chantiers:[],users:[]};renderAll();applyAccessUI();go('employeePortal');await loadEmployeePortal();setSync(true,'Supabase : espace salarié synchronisé');return true}const promises=[fetchAllRows('erp_clients','nom',true),fetchAllRows('erp_chantiers','updated_at',false)];if(hasPerm('utilisateurs'))promises.push(fetchAllRows('erp_user_access','email',true));const results=await Promise.all(promises);db.clients=results[0]||[];db.chantiers=results[1]||[];db.users=results[2]||[];renderAll();applyAccessUI();go('dashboard');loadHomeAlerts();setSync(true,`Supabase : synchronisé`);return true}catch(err){console.error(err);setSync(false,'Supabase : erreur de synchronisation');alert('Erreur Supabase : '+err.message);return false}}
 let passwordRecoveryMode=false;
@@ -1149,10 +1150,7 @@ function rmlLoginEmail(value){
  const id=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9._-]+/g,'').replace(/^[._-]+|[._-]+$/g,'');
  return id?id+'@login.rml.local':'';
 }
-let rmlLoginInProgress=false;
 loginForm.onsubmit=async e=>{
- if(rmlLoginInProgress)return;
- rmlLoginInProgress=true;
  e.preventDefault();
  loginError.style.display='none';
  const submitBtn=loginForm.querySelector('button[type="submit"]');
@@ -1174,44 +1172,40 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V27.3',err);
+   console.error('Erreur connexion RML ERP V27.8',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
-   rmlLoginInProgress=false;
    if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='Se connecter'}
  }
 }
-let rmlSignedInPromise=null;
 async function onSignedIn(){
- if(rmlSignedInPromise)return rmlSignedInPromise;
- rmlSignedInPromise=(async()=>{
-  const user=currentUser;
-  if(!user)return;
-  let access;
-  try{access=await loadCurrentAccess()}catch(err){access={error:err}}
-  if(currentUser?.id!==user.id)return;
-  if(access?.error){
-   // Ne pas déconnecter sur une erreur réseau / Safari : conserver la session Supabase.
-   loginOverlay.classList.remove('hidden');
-   loginError.textContent='Connexion validée, mais impossible de charger les droits ERP : '+(access.error.message||String(access.error))+'. Réessayez dans quelques instants.';
-   loginError.style.display='block';
-   setSync(false,'Supabase : droits indisponibles');return;
+  const access=await loadCurrentAccess();
+  if(access.error){
+    // Conserver la session et les champs sur iPhone en cas d'erreur réseau/RLS.
+    loginOverlay.classList.remove('hidden');
+    loginError.textContent='Connexion établie, mais impossible de vérifier les droits ERP : '+(access.error.message||'erreur Supabase')+'. Réessayez dans quelques instants.';
+    loginError.style.display='block';
+    setSync(false,'Supabase : droits indisponibles');
+    return false;
   }
   if(!currentAccess){
-   loginOverlay.classList.remove('hidden');
-   loginError.textContent='Connexion validée, mais aucun droit ERP n’est associé à ce compte. Contactez l’administrateur.';
-   loginError.style.display='block';return;
+    loginOverlay.classList.remove('hidden');
+    loginError.textContent='Compte connecté, mais aucun accès ERP associé à cet utilisateur. Contactez l’administrateur.';
+    loginError.style.display='block';
+    return false;
   }
   if(!currentAccess.active){
-   loginOverlay.classList.remove('hidden');
-   loginError.textContent='Ce compte ERP est désactivé.';loginError.style.display='block';return;
+    loginOverlay.classList.remove('hidden');
+    loginError.textContent='Ce compte ERP est désactivé.';
+    loginError.style.display='block';
+    return false;
   }
-  loginOverlay.classList.add('hidden');loginError.style.display='none';
+  loginOverlay.classList.add('hidden');
   userPill.textContent='Utilisateur : '+(currentUser?.email||'connecté')+' · '+roleLabel(currentAccess.role);
-  applyAccessUI();await refreshData();
- })();
- try{return await rmlSignedInPromise}finally{rmlSignedInPromise=null}
+  applyAccessUI();
+  await refreshData();
+  return true;
 }
 logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
 async function resetClientForm(){clientForm.reset();clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools){clientEditTools.style.display='flex';}if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='none';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='none';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Créer le client';updateClientDraftStatus()}
@@ -1865,7 +1859,88 @@ function closeCommandes(){
 function jobModuleCard(key,title,text,label='À intégrer'){if(!hasPerm(key))return '';if(key==='preparation')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openPreparation(currentPrepSourceJobId)">Ouvrir</button></div>`;if(key==='suivi')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openSuivi(currentPrepSourceJobId)">Ouvrir</button></div>`;if(key==='commandes')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openCommandes(currentPrepSourceJobId)">Ouvrir</button></div>`;if(key==='pliage')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openAtelier(currentPrepSourceJobId)">Ouvrir</button></div>`;if(key==='heures')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openHeures(currentPrepSourceJobId)">Ouvrir</button></div>`;if(key==='planning')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openPlanning(currentPrepSourceJobId)">Ouvrir</button></div>`;if(key==='materiel')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openMaintenance()">Ouvrir</button></div>`;if(key==='documents')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openDocuments(currentPrepSourceJobId)">Ouvrir</button></div>`;if(key==='analyse')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openAnalyse(currentPrepSourceJobId)">Ouvrir</button></div>`;if(key==='sous_traitants')return `<div class="module"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn ok" onclick="openSubcontractors(currentPrepSourceJobId)">Ouvrir</button></div>`;return `<div class="module disabled"><h3>${esc(title)}</h3><p>${esc(text)}</p><button class="btn secondary" disabled>${esc(label)}</button></div>`}
 function openJob(id){const j=db.chantiers.find(x=>x.id===id);if(!j)return;currentPrepSourceJobId=id;openPreparation(id)}
 function formatDateFR(v){if(!v)return '—';const s=String(v).slice(0,10),m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:s}
-function renderJobs(){const q=jobSearch.value.trim().toLowerCase(),f=jobFilter.value;const rows=db.chantiers.filter(j=>{const hit=!q||[j.nom,j.adresse,j.contact_nom,j.chef_equipe,clientName(j.client_id)].join(' ').toLowerCase().includes(q);return hit&&(f==='tous'||j.statut===f)}).sort((a,b)=>(b.updated_at||'').localeCompare(a.updated_at||''));if(!rows.length){jobsTable.innerHTML='<div class="empty">Aucun chantier correspondant.</div>';return}jobsTable.innerHTML='<div class="tablewrap"><table class="table"><thead><tr><th>Client</th><th>Chantier</th><th>Responsable</th><th>Statut</th><th>Créé le</th><th>Date programmée</th><th>Actions</th></tr></thead><tbody>'+rows.map(j=>`<tr><td><strong>${esc(clientName(j.client_id))}</strong></td><td><strong>${esc(j.nom)}</strong><br><span class="muted">${esc(j.adresse||'')}</span></td><td>${esc(j.chef_equipe||'')}</td><td><span class="status ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}">${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</span></td><td>${formatDateFR(j.created_at)}</td><td>${formatDateFR(j.date_debut)}</td><td><div class="actions"><button onclick="openJob('${j.id}')">Ouvrir</button><button class="btn secondary" onclick="openJobHistory('${j.id}')">Historique interventions</button>${hasPerm('chantiers')?`<button onclick="editJob('${j.id}')">Modifier</button>${hasPerm('analyse')?`<button class="btn secondary" onclick="openAnalyse('${j.id}')">Analyse chantier</button>`:''}<button style="background:#fdecec;color:var(--danger)" onclick="deleteJob('${j.id}')">Supprimer</button>`:''}</div></td></tr>`).join('')+'</tbody></table></div>'}
+function rmlClientEmails(client){
+ const raw=String(client?.email||'');
+ return [...new Set(raw.split(/[\n,;]+/).map(x=>x.trim()).filter(x=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x)))];
+}
+let rmlFinishCurrentClientId=null;
+function rmlFinishRecipientChanged(){
+ const select=document.getElementById('rmlFinishRecipient');
+ const box=document.getElementById('rmlFinishNewEmailBox');
+ box.style.display=select.value==='__new__'?'block':'none';
+ document.getElementById('rmlFinishEmailStatus').textContent='';
+ if(select.value==='__new__')document.getElementById('rmlFinishNewEmail').focus();
+}
+function rmlFinishMail(jobId){
+ const j=db.chantiers.find(x=>x.id===jobId);if(!j)return;
+ const c=db.clients.find(x=>x.id===j.client_id);
+ if(!c){alert('Impossible de retrouver la fiche client de ce chantier.');return;}
+ rmlFinishCurrentClientId=c.id;
+ const emails=rmlClientEmails(c);
+ const select=document.getElementById('rmlFinishRecipient');
+ select.innerHTML=emails.map(x=>'<option value="'+esc(x)+'">'+esc(x)+'</option>').join('')+'<option value="__new__">+ Ajouter une nouvelle adresse e-mail…</option>';
+ select.onchange=rmlFinishRecipientChanged;
+ document.getElementById('rmlFinishNewEmail').value='';
+ document.getElementById('rmlFinishSubject').value='RML — Fin de travaux — '+(j.nom||'Chantier');
+ document.getElementById('rmlFinishBody').value='Bonjour,\n\nNous vous informons que les travaux réalisés par RML sur le chantier « '+(j.nom||'')+' »'+(j.adresse?' situé '+j.adresse:'')+' sont terminés.\n\nNous vous remercions pour votre confiance et restons à votre disposition pour toute question.\n\nCordialement,\nL’équipe RML — Micouleau & Lherisson\n05 56 67 33 89';
+ if(!emails.length)select.value='__new__';
+ rmlFinishRecipientChanged();
+ openModal('rmlFinishMailModal');
+}
+async function rmlSaveFinishEmail(){
+ const input=document.getElementById('rmlFinishNewEmail');
+ const status=document.getElementById('rmlFinishEmailStatus');
+ const email=input.value.trim().toLowerCase();
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){status.textContent='Veuillez saisir une adresse e-mail valide.';return false;}
+ const client=db.clients.find(c=>c.id===rmlFinishCurrentClientId);
+ if(!client){status.textContent='Fiche client introuvable.';return false;}
+ const existing=rmlClientEmails(client);
+ if(existing.some(e=>e.toLowerCase()===email)){
+   const select=document.getElementById('rmlFinishRecipient');select.value=existing.find(e=>e.toLowerCase()===email);
+   rmlFinishRecipientChanged();return true;
+ }
+ if(!hasPerm('clients')){status.textContent='Vous ne disposez pas des droits pour modifier la fiche client.';return false;}
+ if(!confirm('Voulez-vous enregistrer cette nouvelle adresse dans la fiche client « '+client.nom+' » ?'))return false;
+ const newValue=[...existing,email].join('\n');
+ status.textContent='Enregistrement en cours…';
+ try{
+   const {data,error}=await sb.from('erp_clients').update({email:newValue}).eq('id',client.id).select('id,email').single();
+   if(error)throw error;
+   client.email=data.email;
+   const select=document.getElementById('rmlFinishRecipient');
+   const option=document.createElement('option');option.value=email;option.textContent=email;
+   select.insertBefore(option,select.querySelector('option[value="__new__"]'));
+   select.value=email;
+   rmlFinishRecipientChanged();
+   renderClients();
+   return true;
+ }catch(err){status.textContent='Enregistrement impossible : '+(err?.message||String(err));return false;}
+}
+async function rmlOpenFinishEmail(){
+ const select=document.getElementById('rmlFinishRecipient');
+ let to=select.value;
+ if(to==='__new__'){
+   to=document.getElementById('rmlFinishNewEmail').value.trim().toLowerCase();
+   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)){alert('Saisissez une adresse e-mail valide.');return;}
+   // L'envoi peut être préparé même si l'utilisateur refuse d'enregistrer l'adresse.
+   if(!rmlClientEmails(db.clients.find(c=>c.id===rmlFinishCurrentClientId)).some(x=>x.toLowerCase()===to)){
+     if(hasPerm('clients') && confirm('Voulez-vous enregistrer cette nouvelle adresse dans la fiche client avant de préparer le mail ?')){
+       const client=db.clients.find(c=>c.id===rmlFinishCurrentClientId);
+       const newValue=[...rmlClientEmails(client),to].join('\n');
+       try{
+         const {data,error}=await sb.from('erp_clients').update({email:newValue}).eq('id',client.id).select('id,email').single();
+         if(error)throw error;
+         client.email=data.email;renderClients();
+       }catch(err){alert('Impossible d’enregistrer l’adresse : '+(err?.message||String(err))+'\nLe mail peut néanmoins être préparé.');}
+     }
+   }
+ }
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)){alert('Sélectionnez une adresse valide.');return;}
+ const subject=document.getElementById('rmlFinishSubject').value;
+ const body=document.getElementById('rmlFinishBody').value;
+ window.location.href='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+function renderJobs(){const q=jobSearch.value.trim().toLowerCase(),f=jobFilter.value;const rows=db.chantiers.filter(j=>{const hit=!q||[j.nom,j.adresse,j.contact_nom,j.chef_equipe,clientName(j.client_id)].join(' ').toLowerCase().includes(q);return hit&&(f==='tous'||j.statut===f)}).sort((a,b)=>(b.updated_at||'').localeCompare(a.updated_at||''));if(!rows.length){jobsTable.innerHTML='<div class="empty">Aucun chantier correspondant.</div>';return}jobsTable.innerHTML='<div class="tablewrap"><table class="table"><thead><tr><th>Client</th><th>Chantier</th><th>Responsable</th><th>Statut</th><th>Créé le</th><th>Date programmée</th><th>Actions</th></tr></thead><tbody>'+rows.map(j=>`<tr><td><strong>${esc(clientName(j.client_id))}</strong></td><td><strong>${esc(j.nom)}</strong><br><span class="muted">${esc(j.adresse||'')}</span></td><td>${esc(j.chef_equipe||'')}</td><td><span class="status ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}">${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</span></td><td>${formatDateFR(j.created_at)}</td><td>${formatDateFR(j.date_debut)}</td><td><div class="actions"><button onclick="openJob('${j.id}')">Ouvrir</button><button class="btn secondary" onclick="openJobHistory('${j.id}')">Historique interventions</button><button class="btn secondary" onclick="rmlFinishMail('${j.id}')">✉ Avis fin de travaux</button>${hasPerm('chantiers')?`<button onclick="editJob('${j.id}')">Modifier</button>${hasPerm('analyse')?`<button class="btn secondary" onclick="openAnalyse('${j.id}')">Analyse chantier</button>`:''}<button style="background:#fdecec;color:var(--danger)" onclick="deleteJob('${j.id}')">Supprimer</button>`:''}</div></td></tr>`).join('')+'</tbody></table></div>'}
 jobSearch.oninput=renderJobs;jobFilter.onchange=renderJobs;
 
 function epurePliageHeader(){
@@ -2145,7 +2220,20 @@ async function executeReset(){if(!ensureAdminReset()||!pendingResetType)return;c
 executeResetBtn.onclick=executeReset;
 function renderDashboard(){mClients.textContent=db.clients.filter(c=>c.actif).length;mChantiers.textContent=db.chantiers.filter(j=>['actif','en_cours'].includes(j.statut)).length;mArchives.textContent=db.chantiers.filter(j=>['archive','termine'].includes(j.statut)).length}
 function renderAll(){renderDashboard();renderClients();renderJobs();renderUsers();fillClientSelect(jobClient?.value||'');applyAccessUI()}
-(async()=>{try{const {data:{session},error}=await sb.auth.getSession();if(error)throw error;if(session?.user){if(!rmlLoginInProgress){currentUser=session.user;await onSignedIn()}}else if(!rmlLoginInProgress){setSync(false,'Supabase : déconnecté');renderAll()}}catch(err){console.error('Initialisation session ERP :',err);setSync(false,'Supabase : session indisponible');loginError.textContent='Impossible de vérifier la session : '+(err.message||String(err));loginError.style.display='block'}})();
+(async()=>{
+  try{
+    const {data,error}=await sb.auth.getSession();
+    if(error)throw error;
+    if(data?.session?.user){currentUser=data.session.user;await onSignedIn()}
+    else{setSync(false,'Supabase : déconnecté');renderAll()}
+  }catch(err){
+    console.error('Restauration session ERP sur cet appareil',err);
+    setSync(false,'Supabase : session à vérifier');
+    loginOverlay.classList.remove('hidden');
+    loginError.textContent='Impossible de restaurer la session : '+(err.message||String(err));
+    loginError.style.display='block';
+  }
+})();
 
 function forecastMonthLabel(ym){
   if(ym==='SANS_DATE')return 'Sans date';
@@ -2857,6 +2945,19 @@ async function bridgePreparationContext(){
   #commandesFrame{display:block!important;flex:none!important;min-height:520px!important;max-height:none!important;box-sizing:border-box!important}
 }
 </style>
+<script>
+/* V27.8 : surveillance Free non destructive ; relevés manuels. */
+(function(){
+ const key='rml_erp_supabase_usage_manual_v272'; // Conserver les relevés déjà enregistrés
+ const fields=[['rmlQuotaDb','Base de données',0.5],['rmlQuotaStorage','Stockage fichiers',1],['rmlQuotaTransfer','Transfert mensuel',5]];
+ function paint(){const target=document.getElementById('rmlMonitorQuotaDisplay');if(!target)return;let html='';let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+ for(const [id,label,limit] of fields){const input=document.getElementById(id);if(!input)continue;if(saved[id]!==undefined&&input.dataset.loaded!=='yes'){input.value=saved[id];input.dataset.loaded='yes'}const raw=input.value.trim();if(!raw)continue;const n=Number(raw.replace(',','.'));if(!Number.isFinite(n)||n<0)continue;const pct=n/limit*100;const color=pct>=95?'#b91c1c':pct>=85?'#c2410c':pct>=70?'#a16207':'#16804b';const state=pct>=95?'Critique':pct>=85?'Alerte rouge':pct>=70?'Vigilance':'Normal';html+='<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>'+label+'</strong><span>'+n.toLocaleString('fr-FR')+' / '+limit+' Go — '+pct.toFixed(1)+' % · '+state+'</span></div><div style="height:10px;border-radius:8px;background:#e2e8f0;overflow:hidden"><div style="width:'+Math.min(100,pct)+'%;height:100%;background:'+color+'"></div></div></div>'}target.innerHTML=html||'<div class="notice">Aucun relevé saisi. Les quotas ne sont pas mesurés automatiquement.</div>';
+ }
+ window.rmlMonitorSave=function(){if(currentAccess?.role!=='administrateur')return;const values={};for(const [id] of fields){const input=document.getElementById(id);if(!input)continue;const v=input.value.trim();if(v&&(Number(v.replace(',','.'))<0||!Number.isFinite(Number(v.replace(',','.'))))){alert('Saisissez un volume valide.');return}if(v)values[id]=v.replace(',','.');}values.savedAt=new Date().toISOString();try{localStorage.setItem(key,JSON.stringify(values))}catch(e){alert('Impossible de conserver les relevés dans ce navigateur.')}paint();};
+ window.rmlMonitorRefresh=async function(){if(currentAccess?.role!=='administrateur')return;paint();const box=document.getElementById('rmlMonitorCounts');if(!box||typeof countTable!=='function')return;box.textContent='Lecture des compteurs…';const tables=[['erp_clients','Clients'],['erp_chantiers','Chantiers'],['erp_modules_data','Données modules'],['erp_user_access','Accès utilisateurs']];const results=await Promise.all(tables.map(async ([t,label])=>{try{return label+' : '+(await countTable(t)).toLocaleString('fr-FR')}catch(e){return label+' : indisponible ('+e.message+')'}}));box.textContent='Enregistrements visibles selon vos droits — '+results.join(' · ')+'. Ces nombres ne permettent pas de déduire les Go utilisés.';};
+ document.addEventListener('DOMContentLoaded',paint);
+})();
+</script>
 <script id="v152-commandes-resize">
 (function(){
   function sizeCommandesFrame(){
@@ -3292,7 +3393,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V27.3';
+const RML_ERP_VERSION='V27.2';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
