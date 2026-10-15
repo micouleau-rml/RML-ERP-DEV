@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="rml-app-version" content="27.4">
+<meta name="rml-app-version" content="27.3">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -719,7 +719,7 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
 
 
 <script>
-/* V27.2 : suivi non destructif ; les quotas officiels nécessitent l'API de gestion côté serveur. */
+/* V27.3 : suivi non destructif ; les quotas officiels nécessitent l'API de gestion côté serveur. */
 (function(){
  const key='rml_erp_supabase_usage_manual_v272';
  const fields=[['rmlQuotaDb','Base de données',8],['rmlQuotaStorage','Stockage fichiers',100],['rmlQuotaTransfer','Transfert mensuel',250]];
@@ -1112,19 +1112,7 @@ async function saveEmployeeTeamTime(jobId,date){
 }
 async function uploadEmployeePhotos(jobId,date,inputId='employeePhotoInput'){const input=document.getElementById(inputId);if(!input?.files?.length){alert('Choisissez au moins une photo.');return}const j=db.chantiers.find(x=>x.id===jobId);let ok=0;for(const f of [...input.files]){if(!String(f.type||'').startsWith('image/'))continue;const safe=f.name.replace(/[^a-zA-Z0-9._-]+/g,'_'),path=`${jobId}/employee/${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${safe}`;const up=await sb.storage.from(DOC_BUCKET).upload(path,f,{upsert:false,contentType:f.type||undefined});if(up.error){alert('Envoi impossible : '+up.error.message);return}const row={client_id:j?.client_id||null,chantier_id:jobId,category:'Photo',file_name:f.name,storage_path:path,mime_type:f.type||null,file_size:f.size,note:'Photo terrain ajoutée par '+(employeeAccount?.employee_name||'un salarié'),employee_visible:true,subcontractor_visible:false};const ins=await sb.from('erp_documents').insert(row).select('id,chantier_id,file_name,storage_path,employee_visible').single();if(ins.error){await sb.storage.from(DOC_BUCKET).remove([path]);alert('Enregistrement impossible : '+ins.error.message);return}if(!ins.data?.id){await sb.storage.from(DOC_BUCKET).remove([path]);alert('La photo a été envoyée mais son enregistrement chantier n’a pas pu être confirmé.');return}ok++}input.value='';alert(ok+' photo(s) ajoutée(s) au chantier.');await openEmployeeJobFolder(jobId,date)}
 
-async function loadCurrentAccess(){
-  // Sur Safari iOS, la session peut être restaurée avec un léger décalage.
-  // Une erreur réseau ne doit jamais provoquer une déconnexion silencieuse.
-  let lastError=null;
-  for(let attempt=0;attempt<3;attempt++){
-    const {data,error}=await sb.from('erp_user_access').select('*').eq('user_id',currentUser.id).maybeSingle();
-    if(!error){currentAccess=data;return {data};}
-    lastError=error;
-    console.warn('Lecture des droits ERP, tentative '+(attempt+1),error);
-    if(attempt<2)await new Promise(resolve=>setTimeout(resolve,450*(attempt+1)));
-  }
-  return {error:lastError};
-}
+async function loadCurrentAccess(){const {data,error}=await sb.from('erp_user_access').select('*').eq('user_id',currentUser.id).single();if(error){console.error('Accès ERP :',error);return {error}}currentAccess=data;return {data}}
 async function fetchAllRows(table,orderCol,ascending=true){const pageSize=1000;let from=0,all=[];while(true){let q=sb.from(table).select('*').order(orderCol,{ascending}).range(from,from+pageSize-1);const {data,error}=await q;if(error)throw error;const rows=data||[];all.push(...rows);if(rows.length<pageSize)break;from+=pageSize}return all}
 async function refreshData(){setSync(false,'Supabase : synchronisation…');try{if(isSubcontractorUser()){db={clients:[],chantiers:[],users:[]};renderAll();applyAccessUI();go('subPortal');await loadSubcontractorPortal();setSync(true,'Supabase : espace sous-traitant synchronisé');return true}if(isEmployeeUser()){db={clients:[],chantiers:[],users:[]};renderAll();applyAccessUI();go('employeePortal');await loadEmployeePortal();setSync(true,'Supabase : espace salarié synchronisé');return true}const promises=[fetchAllRows('erp_clients','nom',true),fetchAllRows('erp_chantiers','updated_at',false)];if(hasPerm('utilisateurs'))promises.push(fetchAllRows('erp_user_access','email',true));const results=await Promise.all(promises);db.clients=results[0]||[];db.chantiers=results[1]||[];db.users=results[2]||[];renderAll();applyAccessUI();go('dashboard');loadHomeAlerts();setSync(true,`Supabase : synchronisé`);return true}catch(err){console.error(err);setSync(false,'Supabase : erreur de synchronisation');alert('Erreur Supabase : '+err.message);return false}}
 let passwordRecoveryMode=false;
@@ -1161,7 +1149,10 @@ function rmlLoginEmail(value){
  const id=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9._-]+/g,'').replace(/^[._-]+|[._-]+$/g,'');
  return id?id+'@login.rml.local':'';
 }
+let rmlLoginInProgress=false;
 loginForm.onsubmit=async e=>{
+ if(rmlLoginInProgress)return;
+ rmlLoginInProgress=true;
  e.preventDefault();
  loginError.style.display='none';
  const submitBtn=loginForm.querySelector('button[type="submit"]');
@@ -1183,40 +1174,44 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V27.4',err);
+   console.error('Erreur connexion RML ERP V27.3',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
+   rmlLoginInProgress=false;
    if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='Se connecter'}
  }
 }
+let rmlSignedInPromise=null;
 async function onSignedIn(){
-  const access=await loadCurrentAccess();
-  if(access.error){
-    // Conserver la session et les champs sur iPhone en cas d'erreur réseau/RLS.
-    loginOverlay.classList.remove('hidden');
-    loginError.textContent='Connexion établie, mais impossible de vérifier les droits ERP : '+(access.error.message||'erreur Supabase')+'. Réessayez dans quelques instants.';
-    loginError.style.display='block';
-    setSync(false,'Supabase : droits indisponibles');
-    return false;
+ if(rmlSignedInPromise)return rmlSignedInPromise;
+ rmlSignedInPromise=(async()=>{
+  const user=currentUser;
+  if(!user)return;
+  let access;
+  try{access=await loadCurrentAccess()}catch(err){access={error:err}}
+  if(currentUser?.id!==user.id)return;
+  if(access?.error){
+   // Ne pas déconnecter sur une erreur réseau / Safari : conserver la session Supabase.
+   loginOverlay.classList.remove('hidden');
+   loginError.textContent='Connexion validée, mais impossible de charger les droits ERP : '+(access.error.message||String(access.error))+'. Réessayez dans quelques instants.';
+   loginError.style.display='block';
+   setSync(false,'Supabase : droits indisponibles');return;
   }
   if(!currentAccess){
-    loginOverlay.classList.remove('hidden');
-    loginError.textContent='Compte connecté, mais aucun accès ERP associé à cet utilisateur. Contactez l’administrateur.';
-    loginError.style.display='block';
-    return false;
+   loginOverlay.classList.remove('hidden');
+   loginError.textContent='Connexion validée, mais aucun droit ERP n’est associé à ce compte. Contactez l’administrateur.';
+   loginError.style.display='block';return;
   }
   if(!currentAccess.active){
-    loginOverlay.classList.remove('hidden');
-    loginError.textContent='Ce compte ERP est désactivé.';
-    loginError.style.display='block';
-    return false;
+   loginOverlay.classList.remove('hidden');
+   loginError.textContent='Ce compte ERP est désactivé.';loginError.style.display='block';return;
   }
-  loginOverlay.classList.add('hidden');
+  loginOverlay.classList.add('hidden');loginError.style.display='none';
   userPill.textContent='Utilisateur : '+(currentUser?.email||'connecté')+' · '+roleLabel(currentAccess.role);
-  applyAccessUI();
-  await refreshData();
-  return true;
+  applyAccessUI();await refreshData();
+ })();
+ try{return await rmlSignedInPromise}finally{rmlSignedInPromise=null}
 }
 logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
 async function resetClientForm(){clientForm.reset();clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools){clientEditTools.style.display='flex';}if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='none';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='none';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Créer le client';updateClientDraftStatus()}
@@ -2150,20 +2145,7 @@ async function executeReset(){if(!ensureAdminReset()||!pendingResetType)return;c
 executeResetBtn.onclick=executeReset;
 function renderDashboard(){mClients.textContent=db.clients.filter(c=>c.actif).length;mChantiers.textContent=db.chantiers.filter(j=>['actif','en_cours'].includes(j.statut)).length;mArchives.textContent=db.chantiers.filter(j=>['archive','termine'].includes(j.statut)).length}
 function renderAll(){renderDashboard();renderClients();renderJobs();renderUsers();fillClientSelect(jobClient?.value||'');applyAccessUI()}
-(async()=>{
-  try{
-    const {data,error}=await sb.auth.getSession();
-    if(error)throw error;
-    if(data?.session?.user){currentUser=data.session.user;await onSignedIn()}
-    else{setSync(false,'Supabase : déconnecté');renderAll()}
-  }catch(err){
-    console.error('Restauration session ERP sur cet appareil',err);
-    setSync(false,'Supabase : session à vérifier');
-    loginOverlay.classList.remove('hidden');
-    loginError.textContent='Impossible de restaurer la session : '+(err.message||String(err));
-    loginError.style.display='block';
-  }
-})();
+(async()=>{try{const {data:{session},error}=await sb.auth.getSession();if(error)throw error;if(session?.user){if(!rmlLoginInProgress){currentUser=session.user;await onSignedIn()}}else if(!rmlLoginInProgress){setSync(false,'Supabase : déconnecté');renderAll()}}catch(err){console.error('Initialisation session ERP :',err);setSync(false,'Supabase : session indisponible');loginError.textContent='Impossible de vérifier la session : '+(err.message||String(err));loginError.style.display='block'}})();
 
 function forecastMonthLabel(ym){
   if(ym==='SANS_DATE')return 'Sans date';
@@ -3310,7 +3292,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V27.2';
+const RML_ERP_VERSION='V27.3';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
