@@ -360,7 +360,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#f0f5fa;border-color:#8196ac;}
 </style>
 <style id="rml-v28-3-white-actions-contrast">
-/* V28.6 : fond blanc sur toute la fiche, boutons plus contrastés. */
+/* V28.7 : fond blanc sur toute la fiche, boutons plus contrastés. */
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#ffffff;border-color:#8196ac;}
 #jobsTable .rml-job-actions-row .actions button{
  background:#dce7f2;color:#173b5c;border:1px solid #b5c8db;
@@ -373,7 +373,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .rml-job-actions-row .actions button:last-child:hover{background:#f3c7c7;}
 </style>
 <style id="rml-v28-5-client-name">
-/* V28.6 : noms des clients plus lisibles dans la liste des chantiers. */
+/* V28.7 : noms des clients plus lisibles dans la liste des chantiers. */
 #jobsTable .table tbody tr:not(.rml-job-actions-row) td:first-child strong {
   font-size:16px;
   font-weight:800;
@@ -386,7 +386,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée à RML ERP DEV — V28.6.</p>
+    <p>Connexion sécurisée à RML ERP DEV — V28.7.</p>
     <div class="field"><label>Identifiant</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex. Equipe1, Dupont ou adresse e-mail" required><div class="muted" style="margin-top:5px">Ouvriers / équipes / collaborateurs / sous-traitants : utilisez votre identifiant. Les comptes existants peuvent toujours utiliser leur adresse e-mail.</div></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -403,7 +403,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V28.6</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V28.7</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -1229,7 +1229,7 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V28.6',err);
+   console.error('Erreur connexion RML ERP V28.7',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
@@ -1514,7 +1514,7 @@ async function deleteClient(id){
   }catch(err){alert('Erreur Supabase : '+err.message);return false}
 }
 
-/* V28.6 — Export Excel des clients, sans modification des données Supabase. */
+/* V28.7 — Export Excel des clients, sans modification des données Supabase. */
 function exportClientsExcel(){
   if(typeof hasPerm==='function' && !hasPerm('clients')){alert('Accès aux clients non autorisé.');return;}
   const clients=Array.isArray(db?.clients)?db.clients:[];
@@ -2149,7 +2149,7 @@ if(a.inspection_due_date){
   });
   if(!alerts.length){st.className='notice';st.textContent='✓ Aucune alerte à traiter.';return}
   st.className='notice';st.textContent=`${alerts.length} alerte(s) à traiter.`;
-  box.innerHTML=alerts.map((a,i)=>`<div class="erp-alert ${a.urgent?'urgent':''}"><div class="erp-alert-head"><div><div class="erp-alert-title">${esc(a.title)}</div><div class="erp-alert-meta">${esc(a.meta)}</div></div></div><div class="erp-alert-actions">${a.type==='materials'?`<button class="btn ok" onclick="completeHomeAlert('${a.key}','materials','${a.job.id}')">Marchandise commandée</button><button class="btn secondary" onclick="openJobCard('${a.job.id}')">Voir le chantier</button>`:a.type==='oil'?`<button class="btn ok" onclick="completeHomeAlert('${a.key}','oil','${a.asset.id}')">Vidange faite</button><button class="btn secondary" onclick="go('maintenance');selectAsset('${a.asset.id}')">Voir le véhicule</button>`:`<button class="btn ok" onclick="completeHomeAlert('${a.key}','inspection','${a.asset.id}')">${a.asset.inspection_type==='pollution'?'Pollution faite':'Contrôle technique fait'}</button><button class="btn secondary" onclick="go('maintenance');selectAsset('${a.asset.id}')">Voir le véhicule</button>`}</div></div>`).join('');
+  box.innerHTML=alerts.map((a,i)=>`<div class="erp-alert ${a.urgent?'urgent':''}"><div class="erp-alert-head"><div><div class="erp-alert-title">${esc(a.title)}</div><div class="erp-alert-meta">${esc(a.meta)}</div></div></div><div class="erp-alert-actions">${a.type==='materials'?`<button class="btn ok" onclick="completeHomeAlert('${a.key}','materials','${a.job.id}')">Marchandise commandée</button><button class="btn secondary" onclick="openJob('${a.job.id}')">Voir le chantier</button>`:a.type==='oil'?`<button class="btn ok" onclick="completeHomeAlert('${a.key}','oil','${a.asset.id}')">Vidange faite</button><button class="btn secondary" onclick="go('maintenance');selectAsset('${a.asset.id}')">Voir le véhicule</button>`:`<button class="btn ok" onclick="completeHomeAlert('${a.key}','inspection','${a.asset.id}')">${a.asset.inspection_type==='pollution'?'Pollution faite':'Contrôle technique fait'}</button><button class="btn secondary" onclick="go('maintenance');selectAsset('${a.asset.id}')">Voir le véhicule</button>`}</div></div>`).join('');
  }catch(e){st.className='notice danger';st.textContent='Alertes non disponibles : '+e.message}
 }
 async function completeHomeAlert(key,type,id){
@@ -3475,7 +3475,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V28.6';
+const RML_ERP_VERSION='V28.7';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
