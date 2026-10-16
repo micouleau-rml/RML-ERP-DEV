@@ -360,7 +360,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#f0f5fa;border-color:#8196ac;}
 </style>
 <style id="rml-v28-3-white-actions-contrast">
-/* V28.5 : fond blanc sur toute la fiche, boutons plus contrastés. */
+/* V28.6 : fond blanc sur toute la fiche, boutons plus contrastés. */
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#ffffff;border-color:#8196ac;}
 #jobsTable .rml-job-actions-row .actions button{
  background:#dce7f2;color:#173b5c;border:1px solid #b5c8db;
@@ -373,7 +373,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .rml-job-actions-row .actions button:last-child:hover{background:#f3c7c7;}
 </style>
 <style id="rml-v28-5-client-name">
-/* V28.5 : noms des clients plus lisibles dans la liste des chantiers. */
+/* V28.6 : noms des clients plus lisibles dans la liste des chantiers. */
 #jobsTable .table tbody tr:not(.rml-job-actions-row) td:first-child strong {
   font-size:16px;
   font-weight:800;
@@ -386,7 +386,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée à RML ERP DEV — V28.5.</p>
+    <p>Connexion sécurisée à RML ERP DEV — V28.6.</p>
     <div class="field"><label>Identifiant</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex. Equipe1, Dupont ou adresse e-mail" required><div class="muted" style="margin-top:5px">Ouvriers / équipes / collaborateurs / sous-traitants : utilisez votre identifiant. Les comptes existants peuvent toujours utiliser leur adresse e-mail.</div></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -403,7 +403,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V28.5</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V28.6</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -438,7 +438,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 </section>
 <section id="clients" class="view"><div class="panel client-panel">
 <div class="client-head"><div><h2>Clients</h2><div class="muted">Clique directement sur un client pour ouvrir son dossier.</div></div><button class="btn" id="newClientBtn">+ Nouveau client</button></div>
-<div class="client-filters"><input id="clientSearch" placeholder="Rechercher un client, responsable, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select><details class="client-tools"><summary>Import / Outils</summary><div class="client-tools-menu"><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="exportClientsBtn" type="button" onclick="exportClientsExcel()">Exporter Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer le dernier import Excel</button></div></details><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div>
+<div class="client-filters"><input id="clientSearch" placeholder="Rechercher un client, responsable, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option><option>SAV</option></select><details class="client-tools"><summary>Import / Outils</summary><div class="client-tools-menu"><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="exportClientsBtn" type="button" onclick="exportClientsExcel()">Exporter Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer le dernier import Excel</button></div></details><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div>
 <div id="clientAlphabet" class="client-alphabet" aria-label="Classement alphabétique"></div>
 <div class="client-list-meta"><span id="clientResultCount">0 client</span><span class="muted">Sélection : <b id="clientLetterLabel">Tous</b></span></div>
 <div id="clientsTable"></div></div></section>
@@ -668,7 +668,7 @@ const HEURES_SUPABASE_URL='https://dbsibzcqhtecknpkkuxa.supabase.co';
 const HEURES_SUPABASE_KEY='sb_publishable_WE_zFh9O23cF7zEDie4L3w_JUsSb9ao';
 const heuresSb=window.supabase.createClient(HEURES_SUPABASE_URL,HEURES_SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},global:{headers:{'X-Client-Info':'rml-erp-planning-readonly'}}});
 let db={clients:[],chantiers:[],users:[]};
-const DEFAULT_PROFESSIONS=['Architecte','Maître d’œuvre','Charpentier','Maçon','Constructeur maison','Constructeur métallique','Professionnel divers','Particulier','Étancheur','Plombier','Zingueur','Couvreur','Menuisier','Plieur','Poseur gouttière alu','Revendeur','Fournisseur MP'];
+const DEFAULT_PROFESSIONS=['Architecte','Maître d’œuvre','Charpentier','Maçon','Constructeur maison','Constructeur métallique','Professionnel divers','Particulier','Étancheur','Plombier','Zingueur','Couvreur','Menuisier','Plieur','Poseur gouttière alu','Revendeur','Fournisseur MP','SAV'];
 let clientProfessions=[...DEFAULT_PROFESSIONS];
 function professionSort(a,b){return a.localeCompare(b,'fr',{sensitivity:'base'})}
 function renderProfessionSelect(keepValue){
@@ -1229,7 +1229,7 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V28.5',err);
+   console.error('Erreur connexion RML ERP V28.6',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
@@ -1514,7 +1514,7 @@ async function deleteClient(id){
   }catch(err){alert('Erreur Supabase : '+err.message);return false}
 }
 
-/* V28.4 — Export Excel des clients, sans modification des données Supabase. */
+/* V28.6 — Export Excel des clients, sans modification des données Supabase. */
 function exportClientsExcel(){
   if(typeof hasPerm==='function' && !hasPerm('clients')){alert('Accès aux clients non autorisé.');return;}
   const clients=Array.isArray(db?.clients)?db.clients:[];
@@ -3475,7 +3475,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V28.5';
+const RML_ERP_VERSION='V28.6';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
