@@ -360,7 +360,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#f0f5fa;border-color:#8196ac;}
 </style>
 <style id="rml-v28-3-white-actions-contrast">
-/* V28.9 : fond blanc sur toute la fiche, boutons plus contrastés. */
+/* V28.10 : fond blanc sur toute la fiche, boutons plus contrastés. */
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#ffffff;border-color:#8196ac;}
 #jobsTable .rml-job-actions-row .actions button{
  background:#dce7f2;color:#173b5c;border:1px solid #b5c8db;
@@ -373,7 +373,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .rml-job-actions-row .actions button:last-child:hover{background:#f3c7c7;}
 </style>
 <style id="rml-v28-5-client-name">
-/* V28.9 : noms des clients plus lisibles dans la liste des chantiers. */
+/* V28.10 : noms des clients plus lisibles dans la liste des chantiers. */
 #jobsTable .table tbody tr:not(.rml-job-actions-row) td:first-child strong {
   font-size:16px;
   font-weight:800;
@@ -386,7 +386,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée à RML ERP DEV — V28.9.</p>
+    <p>Connexion sécurisée à RML ERP DEV — V28.10.</p>
     <div class="field"><label>Identifiant</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex. Equipe1, Dupont ou adresse e-mail" required><div class="muted" style="margin-top:5px">Ouvriers / équipes / collaborateurs / sous-traitants : utilisez votre identifiant. Les comptes existants peuvent toujours utiliser leur adresse e-mail.</div></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -403,7 +403,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V28.9</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V28.10</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -648,7 +648,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div class="modal" id="clientFolderModal"><div class="modal-card" style="max-width:1000px"><div class="modal-head"><h3 id="clientFolderTitle">Dossier client</h3><button class="close" data-close="clientFolderModal">Fermer</button></div><div id="clientFolderContent" style="margin-top:14px"></div></div></div>
 <div class="modal" id="chantierImportModal"><div class="modal-card" style="max-width:900px"><div class="modal-head"><h3>Import ancienne application Chantier</h3><button class="close" data-close="chantierImportModal">Fermer</button></div><div class="notice" style="margin-top:14px">Cet import lit une sauvegarde complète RML Préparation Chantier. Il crée/rattache les clients, crée les chantiers manquants et enregistre chaque fiche dans le module Préparation de RML ERP DEV. Aucun fichier de production n'est modifié.</div><div id="chantierImportSummary" style="margin-top:14px"></div><div id="chantierImportPreview" style="max-height:380px;overflow:auto;margin-top:12px"></div><div class="actions" style="margin-top:14px"><button class="btn ok" id="executeChantierImportBtn" type="button">Importer dans ERP DEV</button><button class="btn secondary" type="button" data-close="chantierImportModal">Annuler</button></div></div></div>
 
-<div class="modal" id="planningJobModal"><div class="modal-card" style="max-width:980px"><div class="modal-head"><h3>Choisir le client puis le chantier</h3><button class="close" data-close="planningJobModal">Fermer</button></div><div class="pick-layout" style="margin-top:14px"><div><div class="field"><label>Rechercher un client</label><input id="planningClientSearch" placeholder="Nom du client…" oninput="renderPlanningClientPicker()"></div><div id="planningClientList" class="pick-list" style="margin-top:8px"></div></div><div><div class="field"><label>Rechercher un chantier</label><input id="planningChantierSearch" placeholder="Nom ou adresse du chantier…" oninput="renderPlanningJobPicker()"></div><div id="planningJobList" class="pick-list" style="margin-top:8px"></div></div></div></div></div>
+<div class="modal" id="planningJobModal"><div class="modal-card" style="max-width:980px"><div class="modal-head"><h3>Choisir le client puis le chantier</h3><button class="close" data-close="planningJobModal">Fermer</button></div><div class="pick-layout" style="margin-top:14px"><div><div class="field"><label>Catégorie de chantier</label><select id="planningStatutFilter" onchange="planningPickerClient='';renderPlanningClientPicker();renderPlanningJobPicker()"><option value="">Toutes les catégories</option><option value="actif">Actif</option><option value="attente">En attente</option><option value="en_cours">En cours</option><option value="sav">SAV</option><option value="termine">Terminé</option><option value="archive">Archivé</option></select></div><div class="field"><label>Rechercher un client</label><input id="planningClientSearch" placeholder="Nom du client…" oninput="renderPlanningClientPicker()"></div><div id="planningClientList" class="pick-list" style="margin-top:8px"></div></div><div><div class="field"><label>Rechercher un chantier</label><input id="planningChantierSearch" placeholder="Nom ou adresse du chantier…" oninput="renderPlanningJobPicker()"></div><div id="planningJobList" class="pick-list" style="margin-top:8px"></div></div></div></div></div>
 <div class="modal" id="assetModal"><div class="modal-card"><div class="modal-head"><h3 id="assetModalTitle">Matériel / véhicule</h3></div><form id="assetForm" class="grid2" style="margin-top:14px"><div class="asset-top-actions"><button class="btn" type="submit">Enregistrer</button><button class="btn secondary" type="button" data-close="assetModal">Annuler</button></div><input type="hidden" id="assetId"><div class="field"><label>Type *</label><select id="assetType" required><option>Véhicule</option><option>Machine</option><option>Outillage</option></select></div><div class="field"><label>Désignation *</label><input id="assetName" required></div><div class="field"><label>Marque</label><input id="assetBrand"></div><div class="field"><label>Modèle</label><input id="assetModel"></div><div class="field"><label>Immatriculation</label><input id="assetPlate"></div><div class="field"><label>N° de série</label><input id="assetSerial"></div><div class="field"><label>Date mise en service</label><input id="assetStart" type="date"></div><div class="field"><label>Localisation</label><input id="assetLocation"></div><div class="field"><label>État</label><select id="assetState"><option>En service</option><option>À surveiller</option><option>Immobilisé</option><option>Hors service</option></select></div><div class="field"><label>Kilométrage / heures</label><input id="assetCounter" type="number" min="0" step="1"></div><div class="field"><label>Dernière vidange (km)</label><input id="assetOilLastCounter" type="number" min="0" step="1"></div>
 <div class="field"><label>Vidange tous les (km)</label><input id="assetOilInterval" type="number" min="0" step="1000" value="30000"></div><div class="field"><label>Dernière distribution (km)</label><input id="assetTimingLastCounter" type="number" min="0"></div><div class="field"><label>Dernière distribution (date)</label><input id="assetTimingLastDate" type="date"></div><div class="field"><label>Distribution tous les (km)</label><input id="assetTimingIntervalKm" type="number" min="0" step="1000"></div><div class="field"><label>Distribution tous les (années)</label><input id="assetTimingIntervalYears" type="number" min="0" step="1"></div>
 <div class="field"><label>Prochain Auto Bilan / contrôle technique</label><input id="assetInspectionDue" type="date"></div><div class="field"><label>Type du prochain contrôle</label><select id="assetInspectionType"><option value="controle_technique">Contrôle technique complet</option><option value="pollution">Contrôle pollution</option></select></div>
@@ -777,7 +777,7 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
 
 
 
-<!-- RML ERP V28.9 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
+<!-- RML ERP V28.10 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
 <style>
 #rmlSavDialog{border:0;border-radius:15px;padding:0;width:min(760px,96vw);max-height:94vh;box-shadow:0 15px 55px #0005;color:#183c58}
 #rmlSavDialog::backdrop{background:#102b43aa}
@@ -1273,7 +1273,7 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V28.9',err);
+   console.error('Erreur connexion RML ERP V28.10',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
@@ -1558,7 +1558,7 @@ async function deleteClient(id){
   }catch(err){alert('Erreur Supabase : '+err.message);return false}
 }
 
-/* V28.9 — Export Excel des clients, sans modification des données Supabase. */
+/* V28.10 — Export Excel des clients, sans modification des données Supabase. */
 function exportClientsExcel(){
   if(typeof hasPerm==='function' && !hasPerm('clients')){alert('Accès aux clients non autorisé.');return;}
   const clients=Array.isArray(db?.clients)?db.clients:[];
@@ -2111,7 +2111,7 @@ async function loadPlanning(force=false){
  try{if(force||!planningEmployees.length){const {data,error}=await heuresSb.from('rml_heures_employees').select('id,name,hourly_rate,active').eq('active',true).order('name');if(error)throw new Error('Salariés RML Heures : '+error.message);planningEmployees=(data||[]).map(e=>({id:String(e.id),name:e.name||'Salarié'}))}
  const {data,error}=await sb.from('erp_modules_data').select('chantier_id,payload,updated_at').eq('module','planning').eq('entity_type','chantier').eq('deleted',false);if(error)throw error;planningAssignments=[];(data||[]).forEach(r=>{const a=Array.isArray(r.payload?.assignments)?r.payload.assignments:[];a.forEach(x=>planningAssignments.push({...x,chantier_id:r.chantier_id}))});await planningLoadLocks();planningLoaded=true;renderPlanning();planningSetStatus(`${planningEmployees.length} salarié(s) RML Heures · ${planningAssignments.length} affectation(s) enregistrée(s).`,'ok')
  }catch(err){planningSetStatus('Impossible de charger le planning : '+err.message,'danger');planningGrid.innerHTML='<div class="pempty">Le planning n’a pas pu être chargé. Aucune donnée Clients n’a été modifiée.</div>'}finally{planningBusy=false}}
-function planningJobs(){return db.chantiers.filter(j=>j.statut==='actif'||j.statut==='attente').sort((a,b)=>(clientName(a.client_id)+' '+a.nom).localeCompare(clientName(b.client_id)+' '+b.nom,'fr'))}
+function planningJobs(){const status=document.getElementById('planningStatutFilter')?.value||'';return db.chantiers.filter(j=>!status||j.statut===status).sort((a,b)=>(clientName(a.client_id)+' '+a.nom).localeCompare(clientName(b.client_id)+' '+b.nom,'fr'))}
 function planningJobLabel(id){const j=db.chantiers.find(x=>x.id===id);return j?clientName(j.client_id)+' — '+j.nom:'Chantier'}
 function planningGroups(date){const a=planningAssignments.filter(x=>x.date===date);const m=new Map();a.forEach(x=>{const key=x.team_id||x.chantier_id;if(!m.has(key))m.set(key,{team_id:key,team_name:x.team_name||'',team_number:Number(x.team_number)||null,jobs:[],members:[]});const g=m.get(key);if(!g.team_number&&x.team_number)g.team_number=Number(x.team_number);if(x.chantier_id&&!g.jobs.includes(x.chantier_id))g.jobs.push(x.chantier_id);if(x.employee_id&&!g.members.some(y=>String(y.employee_id)===String(x.employee_id)))g.members.push(x)});const groups=[...m.values()];const used=new Set(groups.map(g=>g.team_number).filter(Boolean));let next=1;groups.forEach(g=>{if(!g.team_number){while(used.has(next))next++;g.team_number=next;used.add(next)}});return groups.sort((a,b)=>a.team_number-b.team_number)}
 function renderPlanning(){if(!planningWeekStart)planningWeekStart=planningMonday();const days=Array.from({length:6},(_,i)=>planningAddDays(planningWeekStart,i));planningWeekTitle.textContent=`Semaine du ${planningFR(days[0])} au ${planningFR(days[5])}`;if(!planningEmployees.length){planningGrid.innerHTML='<div class="pempty">Aucun salarié actif trouvé dans RML Heures.</div>';return}planningGrid.innerHTML=`<div class="planning-days">${days.map((d,i)=>renderPlanningDay(d,i)).join('')}</div>`}
@@ -2133,11 +2133,11 @@ function planningToday(){planningWeekStart=planningMonday();renderPlanning()}
 function openPlanning(jobId=''){if(!hasPerm('planning'))return;planningWeekStart=planningMonday();go('planning');if(jobId){setTimeout(()=>{const job=db.chantiers.find(j=>j.id===jobId);if(job)planningSetStatus(`Planning ouvert depuis le chantier : ${clientName(job.client_id)} — ${job.nom}`,'ok')},500)}}
 
 let planningPickerDate='',planningPickerTeam='',planningPickerClient='';
-function openPlanningJobPicker(date,teamId){if(!planningEnsureEdit(date))return;planningPickerDate=date;planningPickerTeam=teamId;planningPickerClient='';planningClientSearch.value='';planningChantierSearch.value='';renderPlanningClientPicker();renderPlanningJobPicker();openModal('planningJobModal');setTimeout(()=>planningClientSearch.focus(),80)}
-function planningPickerClients(){const jobClientIds=new Set(planningJobs().map(j=>j.client_id));return db.clients.filter(c=>c.actif&&jobClientIds.has(c.id)).sort((a,b)=>(a.nom||'').localeCompare(b.nom||'','fr'))}
+function openPlanningJobPicker(date,teamId){if(!planningEnsureEdit(date))return;planningPickerDate=date;planningPickerTeam=teamId;planningPickerClient='';planningStatutFilter.value='';planningClientSearch.value='';planningChantierSearch.value='';renderPlanningClientPicker();renderPlanningJobPicker();openModal('planningJobModal');setTimeout(()=>planningClientSearch.focus(),80)}
+function planningPickerClients(){const jobClientIds=new Set(planningJobs().map(j=>j.client_id));return db.clients.filter(c=>jobClientIds.has(c.id)).sort((a,b)=>(a.nom||'').localeCompare(b.nom||'','fr'))}
 function renderPlanningClientPicker(){const q=(planningClientSearch.value||'').trim().toLowerCase();const rows=planningPickerClients().filter(c=>!q||(c.nom||'').toLowerCase().includes(q)||(c.code||'').toLowerCase().includes(q)).slice(0,150);planningClientList.innerHTML=rows.length?rows.map(c=>`<button class="pick-item ${planningPickerClient===c.id?'active':''}" onclick="selectPlanningClient('${c.id}')"><strong>${esc(c.nom)}</strong><small>${esc(c.code||'')}</small></button>`).join(''):'<div class="pempty">Aucun client trouvé.</div>'}
 function selectPlanningClient(id){planningPickerClient=id;planningChantierSearch.value='';renderPlanningClientPicker();renderPlanningJobPicker()}
-function renderPlanningJobPicker(){if(!planningPickerClient){planningJobList.innerHTML='<div class="pempty">Sélectionnez d’abord un client.</div>';return}const q=(planningChantierSearch.value||'').trim().toLowerCase();const rows=planningJobs().filter(j=>j.client_id===planningPickerClient&&(!q||(j.nom||'').toLowerCase().includes(q)||(j.adresse||'').toLowerCase().includes(q)));planningJobList.innerHTML=rows.length?rows.map(j=>`<button class="pick-item" onclick="choosePlanningJob('${j.id}')"><strong>${esc(j.nom)}</strong><small>${esc(j.adresse||'Adresse non renseignée')} · ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</small></button>`).join(''):'<div class="pempty">Aucun chantier actif/en attente pour ce client.</div>'}
+function renderPlanningJobPicker(){if(!planningPickerClient){planningJobList.innerHTML='<div class="pempty">Sélectionnez d’abord un client.</div>';return}const q=(planningChantierSearch.value||'').trim().toLowerCase();const rows=planningJobs().filter(j=>j.client_id===planningPickerClient&&(!q||(j.nom||'').toLowerCase().includes(q)||(j.adresse||'').toLowerCase().includes(q)));planningJobList.innerHTML=rows.length?rows.map(j=>`<button class="pick-item" onclick="choosePlanningJob('${j.id}')"><strong>${esc(j.nom)}</strong><small>${esc(j.adresse||'Adresse non renseignée')} · ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</small></button>`).join(''):'<div class="pempty">Aucun chantier dans cette catégorie pour ce client.</div>'}
 function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))return;planningTeamJob(planningPickerDate,planningPickerTeam,jobId);closeModal('planningJobModal')}
 
 
@@ -2710,7 +2710,7 @@ function printSubContract(){
  ${clauses.map(x=>`<section class="clause"><h2>${esc(x.title||'')}</h2><div>${esc(x.text||'').replace(/\n/g,'<br>')}</div></section>`).join('')}
  <div class="signatures"><div><strong>L’entrepreneur principal — RML</strong><br>${esc(a.rml_signer_name||'')} ${esc(a.rml_signer_role||'')}<br>${rmlSig}<br>${a.rml_signed_at?'Signé le '+new Date(a.rml_signed_at).toLocaleString('fr-FR'):'Signature RML en attente'}</div><div><strong>Le sous-traitant</strong><br>${esc(a.signer_name||'')} ${esc(a.signer_role||'')}<br>${sig}<br>${a.signed_at?'Signé le '+new Date(a.signed_at).toLocaleString('fr-FR'):''}</div></div>
  
-<!-- RML ERP V28.9 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
+<!-- RML ERP V28.10 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
 <style>
 #rmlSavDialog{border:0;border-radius:15px;padding:0;width:min(760px,96vw);max-height:94vh;box-shadow:0 15px 55px #0005;color:#183c58}
 #rmlSavDialog::backdrop{background:#102b43aa}
@@ -3243,7 +3243,7 @@ function rmlAtelier8PlanDocument(o,index){
  .screen-actions{position:fixed;right:18px;top:16px;display:flex;gap:8px;padding:9px;background:white;border:1px solid #cbd5df;border-radius:12px;box-shadow:0 8px 24px #0002}.screen-actions button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer;background:#0f62fe;color:white}
  @media print{html,body{background:#fff;padding:0}.page{margin:0;width:196mm;height:283mm}.screen-actions{display:none}}
  </style></head><body>${pages.join('')}<div class="screen-actions"><button onclick="window.print()">Imprimer / Enregistrer PDF</button><button onclick="window.close()">Fermer</button></div>
-<!-- RML ERP V28.9 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
+<!-- RML ERP V28.10 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
 <style>
 #rmlSavDialog{border:0;border-radius:15px;padding:0;width:min(760px,96vw);max-height:94vh;box-shadow:0 15px 55px #0005;color:#183c58}
 #rmlSavDialog::backdrop{background:#102b43aa}
@@ -3607,7 +3607,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V28.9';
+const RML_ERP_VERSION='V28.10';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
@@ -3802,7 +3802,7 @@ async function rmlExportERPZip(){
 
 </script>
 
-<!-- RML ERP V28.9 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
+<!-- RML ERP V28.10 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
 <style>
 #rmlSavDialog{border:0;border-radius:15px;padding:0;width:min(760px,96vw);max-height:94vh;box-shadow:0 15px 55px #0005;color:#183c58}
 #rmlSavDialog::backdrop{background:#102b43aa}
