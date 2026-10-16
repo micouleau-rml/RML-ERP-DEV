@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="rml-app-version" content="28.3">
+<meta name="rml-app-version" content="28.4">
 <meta name="theme-color" content="#113a5d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -438,7 +438,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 </section>
 <section id="clients" class="view"><div class="panel client-panel">
 <div class="client-head"><div><h2>Clients</h2><div class="muted">Clique directement sur un client pour ouvrir son dossier.</div></div><button class="btn" id="newClientBtn">+ Nouveau client</button></div>
-<div class="client-filters"><input id="clientSearch" placeholder="Rechercher un client, responsable, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select><details class="client-tools"><summary>Import / Outils</summary><div class="client-tools-menu"><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer le dernier import Excel</button></div></details><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div>
+<div class="client-filters"><input id="clientSearch" placeholder="Rechercher un client, responsable, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option></select><details class="client-tools"><summary>Import / Outils</summary><div class="client-tools-menu"><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="exportClientsBtn" type="button" onclick="exportClientsExcel()">Exporter Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer le dernier import Excel</button></div></details><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div>
 <div id="clientAlphabet" class="client-alphabet" aria-label="Classement alphabétique"></div>
 <div class="client-list-meta"><span id="clientResultCount">0 client</span><span class="muted">Sélection : <b id="clientLetterLabel">Tous</b></span></div>
 <div id="clientsTable"></div></div></section>
@@ -975,7 +975,7 @@ function applyAccessUI(){
     const homeBtn=document.querySelector('#mainNav [data-view="dashboard"]');if(homeBtn){homeBtn.style.display='';homeBtn.textContent='Mon espace'}
     const a8=document.getElementById('rmlAtelier8Nav');if(a8&&isEmployeeUser()&&Number(employeeAccount?.team_number)===8)a8.style.display='inline-flex';
     if(window.rmlRefreshNavEditor)rmlRefreshNavEditor();
-    if(window.newClientBtn)newClientBtn.style.display='none';if(window.importClientsBtn)importClientsBtn.style.display='none';if(window.newJobBtn)newJobBtn.style.display='none';
+    if(window.newClientBtn)newClientBtn.style.display='none';if(window.importClientsBtn)importClientsBtn.style.display='none';if(window.exportClientsBtn)exportClientsBtn.style.display='none';if(window.newJobBtn)newJobBtn.style.display='none';
     return;
   }
   const clientsBtn=document.querySelector('#mainNav [data-view="clients"]');
@@ -988,7 +988,7 @@ function applyAccessUI(){
   const atelierNav=document.getElementById('rmlAtelier8Nav');if(atelierNav)atelierNav.style.display=rmlCanAtelier8()?'inline-flex':'none';
   if(window.rmlRefreshNavEditor)rmlRefreshNavEditor();
   newClientBtn.style.display=hasPerm('clients')?'':'none';
-  importClientsBtn.style.display=hasPerm('clients')?'':'none';if(window.importChantierBackupBtn)importChantierBackupBtn.style.display=(hasPerm('clients')&&hasPerm('chantiers')&&hasPerm('preparation'))?'':'none';if(window.deleteLastImportBtn)deleteLastImportBtn.style.display=hasPerm('clients')?'':'none';
+  importClientsBtn.style.display=hasPerm('clients')?'':'none';if(window.exportClientsBtn)exportClientsBtn.style.display=hasPerm('clients')?'':'none';if(window.importChantierBackupBtn)importChantierBackupBtn.style.display=(hasPerm('clients')&&hasPerm('chantiers')&&hasPerm('preparation'))?'':'none';if(window.deleteLastImportBtn)deleteLastImportBtn.style.display=hasPerm('clients')?'':'none';
   newJobBtn.style.display=hasPerm('chantiers')?'':'none';
   document.querySelectorAll('#modules [data-permission]').forEach(el=>el.style.display=hasPerm(el.dataset.permission)?'':'none');
 }
@@ -1513,6 +1513,30 @@ async function deleteClient(id){
     return true;
   }catch(err){alert('Erreur Supabase : '+err.message);return false}
 }
+
+/* V28.4 — Export Excel des clients, sans modification des données Supabase. */
+function exportClientsExcel(){
+  if(typeof hasPerm==='function' && !hasPerm('clients')){alert('Accès aux clients non autorisé.');return;}
+  const clients=Array.isArray(db?.clients)?db.clients:[];
+  if(!clients.length){alert('Aucun client à exporter.');return;}
+  if(typeof XLSX==='undefined'){alert('La bibliothèque Excel est indisponible. Vérifiez votre connexion Internet.');return;}
+  const rows=[...clients].sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr',{sensitivity:'base'})).map(c=>({
+    'Nom':c.nom||'',
+    'Catégorie':c.categorie||'',
+    'Responsable':c.responsable||'',
+    'Téléphone':c.telephone||'',
+    'Email':c.email||'',
+    'Adresse':c.adresse||'',
+    'Notes':c.notes||'',
+    'Statut':c.actif===false?'Archivé':'Actif'
+  }));
+  const sheet=XLSX.utils.json_to_sheet(rows);
+  sheet['!cols']=[{wch:32},{wch:25},{wch:27},{wch:20},{wch:35},{wch:48},{wch:55},{wch:12}];
+  const book=XLSX.utils.book_new();XLSX.utils.book_append_sheet(book,sheet,'Clients');
+  const date=new Date();const stamp=[date.getFullYear(),String(date.getMonth()+1).padStart(2,'0'),String(date.getDate()).padStart(2,'0')].join('-');
+  XLSX.writeFile(book,'RML_Clients_'+stamp+'.xlsx');
+}
+
 let pendingClientImport=[];
 function normHeader(v){return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ')}
 function pickCol(row,aliases){for(const [k,v] of Object.entries(row)){const nk=normHeader(k);if(aliases.some(a=>nk===normHeader(a)))return v}return ''}
