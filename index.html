@@ -360,7 +360,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#f0f5fa;border-color:#8196ac;}
 </style>
 <style id="rml-v28-3-white-actions-contrast">
-/* V30.1 : fond blanc sur toute la fiche, boutons plus contrastés. */
+/* V30.2 : fond blanc sur toute la fiche, boutons plus contrastés. */
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#ffffff;border-color:#8196ac;}
 #jobsTable .rml-job-actions-row .actions button{
  background:#dce7f2;color:#173b5c;border:1px solid #b5c8db;
@@ -373,7 +373,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .rml-job-actions-row .actions button:last-child:hover{background:#f3c7c7;}
 </style>
 <style id="rml-v28-5-client-name">
-/* V30.1 : noms des clients plus lisibles dans la liste des chantiers. */
+/* V30.2 : noms des clients plus lisibles dans la liste des chantiers. */
 #jobsTable .table tbody tr:not(.rml-job-actions-row) td:first-child strong {
   font-size:16px;
   font-weight:800;
@@ -386,7 +386,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée à RML ERP DEV — V30.1.</p>
+    <p>Connexion sécurisée à RML ERP DEV — V30.2.</p>
     <div class="field"><label>Identifiant</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex. Equipe1, Dupont ou adresse e-mail" required><div class="muted" style="margin-top:5px">Ouvriers / équipes / collaborateurs / sous-traitants : utilisez votre identifiant. Les comptes existants peuvent toujours utiliser leur adresse e-mail.</div></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -403,7 +403,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V30.1</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V30.2</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -1231,7 +1231,7 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V30.1',err);
+   console.error('Erreur connexion RML ERP V30.2',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
@@ -1276,7 +1276,7 @@ async function generateClientCodes(count=1){
   (data||[]).forEach(c=>{const m=String(c.code||'').trim().match(/^CLI(\d+)$/i);if(m)max=Math.max(max,Number(m[1])||0)});
   return Array.from({length:count},(_,i)=>'CLI'+String(max+i+1).padStart(4,'0'));
 }
-// V30.1 — Suggestions d'adresses via le géocodeur public français, sans clé API.
+// V30.2 — Suggestions d'adresses via le géocodeur public français, sans clé API.
 // Les adresses restent modifiables librement et la recherche n'empêche jamais l'enregistrement.
 (function initRmlClientAddressAutocomplete(){
   const input=document.getElementById('clientAdresse');
@@ -1524,7 +1524,7 @@ Cette opération est irréversible.`;
    if(jobErr)throw jobErr;
 
    closeModal('jobCardModal');
-   // V30.1 : une fiche SAV autonome supprimée laisse l'utilisateur dans Chantiers.
+   // V30.2 : une fiche SAV autonome supprimée laisse l'utilisateur dans Chantiers.
    // Les suppressions des chantiers terminés/archivés conservent leur comportement.
    await refreshData(j.statut==='sav' ? 'chantiers' : 'dashboard');
    alert(`Le chantier « ${j.nom} » et ses données rattachées ont été supprimés.\n\nLe client a été conservé.`);
@@ -1557,7 +1557,7 @@ async function deleteClient(id){
   }catch(err){alert('Erreur Supabase : '+err.message);return false}
 }
 
-/* V30.1 — Export Excel des clients, sans modification des données Supabase. */
+/* V30.2 — Export Excel des clients, sans modification des données Supabase. */
 function exportClientsExcel(){
   if(typeof hasPerm==='function' && !hasPerm('clients')){alert('Accès aux clients non autorisé.');return;}
   const clients=Array.isArray(db?.clients)?db.clients:[];
@@ -3524,7 +3524,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V30.1';
+const RML_ERP_VERSION='V30.2';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
@@ -3720,11 +3720,16 @@ async function rmlExportERPZip(){
 </script>
 
 
-<!-- RML ERP V30.1 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
+<!-- RML ERP V30.2 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
 <style>
 #rmlSavDialog{border:0;border-radius:15px;padding:0;width:min(1050px,97vw);max-height:94vh;box-shadow:0 15px 55px #0005;color:#183c58}
 #rmlSavDialog::backdrop{background:#102b43aa}
-#rmlSavDialog .sav-body{padding:22px;overflow:auto;max-height:calc(94dvh - 20px);box-sizing:border-box}
+#rmlSavDialog .sav-body{padding:16px;overflow-y:auto;overflow-x:hidden;max-height:calc(100dvh - 32px);box-sizing:border-box;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#rmlSavDialog{position:fixed;inset:0;margin:auto;max-height:calc(100dvh - 24px);overflow:hidden}
+#rmlSavDialog .sav-client-info{max-height:210px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#rmlSavDialog .sav-footer{position:static!important;bottom:auto!important}
+@media(max-width:650px){#rmlSavDialog{width:calc(100vw - 14px);max-height:calc(100dvh - 14px)}#rmlSavDialog .sav-body{padding:12px;max-height:calc(100dvh - 14px)}#rmlSavDialog .sav-header{top:-12px;flex-wrap:wrap}#rmlSavDialog .sav-client-info{max-height:180px}#rmlSavDialog .sav-footer .btn{font-size:14px;padding:11px 12px}#rmlSavDialog input,#rmlSavDialog textarea{font-size:16px!important}#rmlSavDialog canvas{height:200px}}
+
 #rmlSavDialog .sav-header{position:sticky;top:-22px;z-index:2;background:white;padding:12px 0;border-bottom:1px solid #dce5ed}
 #rmlSavDialog .sav-footer{position:sticky;bottom:-22px;z-index:2;background:white;padding:12px 0;border-top:1px solid #dce5ed}
 #rmlSavDialog label{display:block;font-weight:700;margin:10px 0 5px}
@@ -3756,9 +3761,11 @@ const rmlSavFields=['Date','Workers','Issue','Work','Material','Notes','Signer']
 function rmlSavStatus(t){document.getElementById('rmlSavStatus').textContent=t}
 function rmlSavClearSignature(){const c=document.getElementById('rmlSavSignature');c.getContext('2d').clearRect(0,0,c.width,c.height);rmlSavSignatureData='';rmlSavSigned=false}
 function rmlSavInitCanvas(){const c=document.getElementById('rmlSavSignature');if(c.dataset.ready)return;c.dataset.ready='1';let drawing=false;const xy=e=>{const r=c.getBoundingClientRect();return [(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height]};c.addEventListener('pointerdown',e=>{drawing=true;c.setPointerCapture(e.pointerId);const [x,y]=xy(e),ctx=c.getContext('2d');ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+.1,y+.1);ctx.stroke();rmlSavSigned=true});c.addEventListener('pointermove',e=>{if(!drawing)return;const [x,y]=xy(e),ctx=c.getContext('2d');ctx.strokeStyle='#102e46';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.lineTo(x,y);ctx.stroke()});c.addEventListener('pointerup',()=>drawing=false);c.addEventListener('pointercancel',()=>drawing=false)}
+// Compatibilité avec les versions iOS ne prenant pas en charge Pointer Events sur canvas.
+(function(){if(window.PointerEvent)return;const c=document.getElementById('rmlSavSignature');let active=false;const pos=e=>{const r=c.getBoundingClientRect(),t=e.changedTouches[0];return [(t.clientX-r.left)*c.width/r.width,(t.clientY-r.top)*c.height/r.height]};c.addEventListener('touchstart',e=>{e.preventDefault();active=true;const [x,y]=pos(e),ctx=c.getContext('2d');ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+.1,y+.1);ctx.stroke();rmlSavSigned=true},{passive:false});c.addEventListener('touchmove',e=>{if(!active)return;e.preventDefault();const [x,y]=pos(e),ctx=c.getContext('2d');ctx.strokeStyle='#102e46';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.lineTo(x,y);ctx.stroke()},{passive:false});c.addEventListener('touchend',()=>active=false);c.addEventListener('touchcancel',()=>active=false)})();
 function rmlSavRead(){const d={};rmlSavFields.forEach(k=>d[k.toLowerCase()]=document.getElementById('rmlSav'+k).value);d.signature=rmlSavSigned?document.getElementById('rmlSavSignature').toDataURL('image/png'):rmlSavSignatureData;return d}
 function rmlSavFill(d){rmlSavFields.forEach(k=>document.getElementById('rmlSav'+k).value=d?.[k.toLowerCase()]||'');rmlSavClearSignature();if(d?.signature){rmlSavSignatureData=d.signature;const img=new Image();img.onload=()=>document.getElementById('rmlSavSignature').getContext('2d').drawImage(img,0,0,900,240);img.src=d.signature}}
-async function rmlSavOpen(id){const j=db.chantiers.find(x=>x.id===id);if(!j)return;rmlSavJobId=id;rmlSavInitCanvas();const c=db.clients.find(x=>x.id===j.client_id);document.getElementById('rmlSavJobLabel').textContent=`${c?.nom||''} — ${j.nom} — ${j.adresse||''}`;const safe=v=>String(v||'Non renseigné').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const item=(k,v)=>`<div><strong>${k} :</strong> ${safe(v)}</div>`;document.getElementById('rmlSavClientInfo').innerHTML='<div class="sav-grid">'+item('Client',c?.nom)+item('Référence client',c?.code)+item('Responsable',c?.responsable)+item('Téléphone client',c?.telephone)+`<div><strong>Contacts :</strong>${rmlContactHtml(c?.telephone)}</div>`+item('E-mail',c?.email)+item('Adresse client',c?.adresse)+item('Chantier',j.nom)+item('Adresse intervention',j.adresse)+item('Contact chantier',j.contact_nom)+item('Téléphone chantier',j.contact_telephone||j.contact_tel)+item('Chef d’équipe',j.chef_equipe)+item('Date prévue',j.date_debut)+'</div>';rmlSavFill({date:new Date().toLocaleDateString('en-CA')});document.querySelectorAll('.rml-sav-office-only').forEach(b=>b.style.display=isEmployeeUser()?'none':'');document.getElementById('rmlSavDialog').showModal();rmlSavStatus('Chargement de la fiche…');try{const {data,error}=await sb.from('erp_modules_data').select('payload').eq('chantier_id',id).eq('module','sav_fiche').eq('entity_type','chantier').eq('entity_id',id).maybeSingle();if(error)throw error;if(data?.payload)rmlSavFill(data.payload);rmlSavStatus(data?'Fiche SAV enregistrée — modifiable.':'Nouvelle fiche SAV.')}catch(e){rmlSavStatus('Chargement impossible : '+e.message)}}
+async function rmlSavOpen(id){const j=db.chantiers.find(x=>x.id===id);if(!j)return;rmlSavJobId=id;const c=db.clients.find(x=>x.id===j.client_id);document.getElementById('rmlSavJobLabel').textContent=`${c?.nom||''} — ${j.nom} — ${j.adresse||''}`;const safe=v=>String(v||'Non renseigné').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const item=(k,v)=>`<div><strong>${k} :</strong> ${safe(v)}</div>`;document.getElementById('rmlSavClientInfo').innerHTML='<div class="sav-grid">'+item('Client',c?.nom)+item('Référence client',c?.code)+item('Responsable',c?.responsable)+item('Téléphone client',c?.telephone)+`<div><strong>Contacts :</strong>${rmlContactHtml(c?.telephone)}</div>`+item('E-mail',c?.email)+item('Adresse client',c?.adresse)+item('Chantier',j.nom)+item('Adresse intervention',j.adresse)+item('Contact chantier',j.contact_nom)+item('Téléphone chantier',j.contact_telephone||j.contact_tel)+item('Chef d’équipe',j.chef_equipe)+item('Date prévue',j.date_debut)+'</div>';rmlSavFill({date:new Date().toLocaleDateString('en-CA')});document.querySelectorAll('.rml-sav-office-only').forEach(b=>b.style.display=isEmployeeUser()?'none':'');document.getElementById('rmlSavDialog').showModal();rmlSavInitCanvas();document.querySelector('#rmlSavDialog .sav-body').scrollTop=0;rmlSavStatus('Chargement de la fiche…');try{const {data,error}=await sb.from('erp_modules_data').select('payload').eq('chantier_id',id).eq('module','sav_fiche').eq('entity_type','chantier').eq('entity_id',id).maybeSingle();if(error)throw error;if(data?.payload)rmlSavFill(data.payload);rmlSavStatus(data?'Fiche SAV enregistrée — modifiable.':'Nouvelle fiche SAV.')}catch(e){rmlSavStatus('Chargement impossible : '+e.message)}}
 function rmlSavClose(){document.getElementById('rmlSavDialog').close()}
 async function rmlSavSave(){if(!rmlSavJobId)return;const d=rmlSavRead();rmlSavStatus('Enregistrement dans Supabase…');try{const {data:existing,error:readError}=await sb.from('erp_modules_data').select('id').eq('chantier_id',rmlSavJobId).eq('module','sav_fiche').eq('entity_type','chantier').eq('entity_id',rmlSavJobId).maybeSingle();if(readError)throw readError;let q=existing?.id?sb.from('erp_modules_data').update({payload:d,updated_at:new Date().toISOString()}).eq('id',existing.id):sb.from('erp_modules_data').insert({chantier_id:rmlSavJobId,module:'sav_fiche',entity_type:'chantier',entity_id:rmlSavJobId,payload:d});const {error}=await q;if(error)throw error;rmlSavStatus(d.signature?'Dossier SAV signé enregistré dans Supabase.':'Brouillon SAV enregistré dans Supabase — signature à recueillir après intervention.')}catch(e){rmlSavStatus('Erreur enregistrement : '+e.message)}}
 function rmlSavPrintable(){const j=db.chantiers.find(x=>x.id===rmlSavJobId),c=db.clients.find(x=>x.id===j?.client_id),d=rmlSavRead();if(!j)return null;const clean=x=>String(x||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const row=(label,v)=>`<div class="row"><b>${label}</b><div>${clean(v).replace(/\n/g,'<br>')||'—'}</div></div>`;return {client:c,job:j,html:`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche SAV — ${clean(j.nom)}</title><style>body{font:15px Arial,sans-serif;color:#173c5b;margin:28px;max-width:850px}h1{border-bottom:3px solid #12669a;padding-bottom:12px}.row{padding:10px;border-bottom:1px solid #d9e2eb;white-space:normal}.row b{display:block;margin-bottom:5px}img{width:320px;max-width:90%;height:110px;object-fit:contain;border-bottom:1px solid #777}.actions{margin:20px 0}@media print{.actions{display:none}body{margin:12mm}}</style></head><body><h1>RML GOUTTIERE ALU — Dossier d'intervention SAV</h1>${row('Client',c?.nom)}${row('Référence client',c?.code)}${row('Téléphone client',c?.telephone)}${row('Contacts',rmlContactParse(c?.telephone).map(x=>[x.name,x.role,x.phone].filter(Boolean).join(' — ')).join('\n'))}${row('E-mail client',c?.email)}${row('Adresse client',c?.adresse)}${row('Responsable client',c?.responsable)}${row('Chantier',j.nom)}${row('Adresse intervention',j.adresse)}${row('Contact chantier',j.contact_nom)}${row('Téléphone chantier',j.contact_telephone||j.contact_tel)}${row('Chef d’équipe',j.chef_equipe)}${row('Date',d.date)}${row('Intervenants',d.workers)}${row('Motif du SAV',d.issue)}${row('Travaux réalisés',d.work)}${row('Matériel utilisé',d.material)}${row('Observations',d.notes)}${row('Signataire',d.signer)}<div class="row"><b>Signature du client</b>${d.signature?`<img src="${d.signature}" alt="Signature du client">`:'Non signée'}</div><div class="actions"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button></div></body></html>`}}
