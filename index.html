@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V30.9</title>
+<title>RML ERP — V30.10</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -360,7 +360,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#f0f5fa;border-color:#8196ac;}
 </style>
 <style id="rml-v28-3-white-actions-contrast">
-/* V30.9 : fond blanc sur toute la fiche, boutons plus contrastés. */
+/* V30.10 : fond blanc sur toute la fiche, boutons plus contrastés. */
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#ffffff;border-color:#8196ac;}
 #jobsTable .rml-job-actions-row .actions button{
  background:#dce7f2;color:#173b5c;border:1px solid #b5c8db;
@@ -373,7 +373,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .rml-job-actions-row .actions button:last-child:hover{background:#f3c7c7;}
 </style>
 <style id="rml-v28-5-client-name">
-/* V30.9 : noms des clients plus lisibles dans la liste des chantiers. */
+/* V30.10 : noms des clients plus lisibles dans la liste des chantiers. */
 #jobsTable .table tbody tr:not(.rml-job-actions-row) td:first-child strong {
   font-size:16px;
   font-weight:800;
@@ -386,7 +386,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
     <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée à RML ERP DEV — V30.9.</p>
+    <p>Connexion sécurisée à RML ERP DEV — V30.10.</p>
     <div class="field"><label>Identifiant</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex. Equipe1, Dupont ou adresse e-mail" required><div class="muted" style="margin-top:5px">Ouvriers / équipes / collaborateurs / sous-traitants : utilisez votre identifiant. Les comptes existants peuvent toujours utiliser leur adresse e-mail.</div></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -403,7 +403,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V30.9</div><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V30.9</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V30.10</div><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V30.10</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
 <main>
 <div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -1231,7 +1231,7 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V30.9',err);
+   console.error('Erreur connexion RML ERP V30.10',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
@@ -1276,7 +1276,7 @@ async function generateClientCodes(count=1){
   (data||[]).forEach(c=>{const m=String(c.code||'').trim().match(/^CLI(\d+)$/i);if(m)max=Math.max(max,Number(m[1])||0)});
   return Array.from({length:count},(_,i)=>'CLI'+String(max+i+1).padStart(4,'0'));
 }
-// V30.9 — Suggestions d'adresses via le géocodeur public français, sans clé API.
+// V30.10 — Suggestions d'adresses via le géocodeur public français, sans clé API.
 // Les adresses restent modifiables librement et la recherche n'empêche jamais l'enregistrement.
 (function initRmlClientAddressAutocomplete(){
   const input=document.getElementById('clientAdresse');
@@ -1524,7 +1524,7 @@ Cette opération est irréversible.`;
    if(jobErr)throw jobErr;
 
    closeModal('jobCardModal');
-   // V30.9 : une fiche SAV autonome supprimée laisse l'utilisateur dans Chantiers.
+   // V30.10 : une fiche SAV autonome supprimée laisse l'utilisateur dans Chantiers.
    // Les suppressions des chantiers terminés/archivés conservent leur comportement.
    await refreshData(j.statut==='sav' ? 'chantiers' : 'dashboard');
    alert(`Le chantier « ${j.nom} » et ses données rattachées ont été supprimés.\n\nLe client a été conservé.`);
@@ -1557,7 +1557,7 @@ async function deleteClient(id){
   }catch(err){alert('Erreur Supabase : '+err.message);return false}
 }
 
-/* V30.9 — Export Excel des clients, sans modification des données Supabase. */
+/* V30.10 — Export Excel des clients, sans modification des données Supabase. */
 function exportClientsExcel(){
   if(typeof hasPerm==='function' && !hasPerm('clients')){alert('Accès aux clients non autorisé.');return;}
   const clients=Array.isArray(db?.clients)?db.clients:[];
@@ -2443,7 +2443,7 @@ async function renderMonthlyForecast(){
             </details></td>
           </tr>`).join('')}
           </tbody></table></div>`).join('');
-        return `<details class="forecast-month" ${mi===0?'open':''}>
+        return `<details class="forecast-month">
           <summary>${forecastMonthLabel(ym)} — ${all.length} référence${all.length>1?'s':''}</summary>
           ${all.length?familyHtml:'<div class="muted" style="padding:10px">Aucun produit dans les préparations de ce mois.</div>'}
         </details>`;
@@ -3524,7 +3524,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V30.9';
+const RML_ERP_VERSION='V30.10';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
@@ -3720,7 +3720,7 @@ async function rmlExportERPZip(){
 </script>
 
 
-<!-- RML ERP V30.9 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
+<!-- RML ERP V30.10 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
 <style>
 #rmlSavDialog{border:0;border-radius:15px;padding:0;width:min(1050px,97vw);max-height:94vh;box-shadow:0 15px 55px #0005;color:#183c58}
 #rmlSavDialog::backdrop{background:#102b43aa}
@@ -3737,7 +3737,7 @@ async function rmlExportERPZip(){
 #rmlSavDialog canvas{width:100%;height:165px;border:2px dashed #829bb1;background:white;touch-action:none;border-radius:8px;display:block}
 #rmlSavDialog .sav-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
 #rmlSavDialog .sav-section{background:#eaf2f8;padding:11px 14px;border-left:4px solid #18547d;margin:18px 0 10px;font-size:17px;font-weight:750}#rmlSavDialog .sav-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 16px}#rmlSavDialog .sav-client-info{padding:14px;background:#f4f8fc;border:1px solid #cbdce9;border-radius:9px;line-height:1.9;overflow-wrap:anywhere}@media(max-width:650px){#rmlSavDialog .sav-grid{grid-template-columns:1fr}}#rmlSavDialog .sav-hint{font-size:13px;color:#526779}
-/* V30.9 — correction du décalage : la règle globale dialog[open] applique
+/* V30.10 — correction du décalage : la règle globale dialog[open] applique
    translate(-50%,-50%) alors que cette fenêtre est déjà centrée par inset/margin.
    Neutraliser la translation et ancrer la fenêtre à la zone visible. */
 #rmlSavDialog[open]{
@@ -3757,7 +3757,7 @@ async function rmlExportERPZip(){
 }
 @media(max-width:650px){#rmlSavDialog[open]{width:calc(100vw - 12px)!important;max-width:calc(100vw - 12px)!important}}
 
-/* V30.9 — Fiche SAV responsive iPhone / tablette / Mac */
+/* V30.10 — Fiche SAV responsive iPhone / tablette / Mac */
 #rmlSavDialog{box-sizing:border-box!important;max-width:1050px!important;min-width:0!important;width:min(1050px,calc(100vw - 24px))!important;max-height:calc(100dvh - 24px)!important;height:auto!important;inset:0!important;margin:auto!important;padding:0!important;overflow:hidden!important}
 #rmlSavDialog[open]{display:block!important}
 #rmlSavDialog .sav-body{box-sizing:border-box!important;width:100%!important;min-width:0!important;max-height:calc(100dvh - 24px)!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain;padding:16px!important}
@@ -3827,7 +3827,7 @@ async function rmlSavSave(){
   const code=e?.code?' ['+e.code+']':'';
   const detail=e?.message||String(e);
   rmlSavStatus('Échec de l’enregistrement'+code+' : '+detail+(isEmployeeUser()?' — Demandez à l’administrateur de vérifier les autorisations Supabase de votre équipe.':''));
-  console.error('RML SAV V30.9', {code:e?.code,message:detail,chantier_id:jobId,role:currentAccess?.role});
+  console.error('RML SAV V30.10', {code:e?.code,message:detail,chantier_id:jobId,role:currentAccess?.role});
  }finally{if(btn)btn.disabled=false}
 }
 function rmlSavPrintable(){const j=db.chantiers.find(x=>x.id===rmlSavJobId),c=db.clients.find(x=>x.id===j?.client_id),d=rmlSavRead();if(!j)return null;const clean=x=>String(x||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const row=(label,v)=>`<div class="row"><b>${label}</b><div>${clean(v).replace(/\n/g,'<br>')||'—'}</div></div>`;return {client:c,job:j,html:`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche SAV — ${clean(j.nom)}</title><style>body{font:15px Arial,sans-serif;color:#173c5b;margin:28px;max-width:850px}h1{border-bottom:3px solid #12669a;padding-bottom:12px}.row{padding:10px;border-bottom:1px solid #d9e2eb;white-space:normal}.row b{display:block;margin-bottom:5px}img{width:320px;max-width:90%;height:110px;object-fit:contain;border-bottom:1px solid #777}.actions{margin:20px 0}@media print{.actions{display:none}body{margin:12mm}}</style></head><body><h1>RML GOUTTIERE ALU — Dossier d'intervention SAV</h1>${row('Client',c?.nom)}${row('Référence client',c?.code)}${row('Téléphone client',c?.telephone)}${row('Contacts',rmlContactParse(c?.telephone).map(x=>[x.name,x.role,x.phone].filter(Boolean).join(' — ')).join('\n'))}${row('E-mail client',c?.email)}${row('Adresse client',c?.adresse)}${row('Responsable client',c?.responsable)}${row('Chantier',j.nom)}${row('Adresse intervention',j.adresse)}${row('Contact chantier',j.contact_nom)}${row('Téléphone chantier',j.contact_telephone||j.contact_tel)}${row('Chef d’équipe',j.chef_equipe)}${row('Date',d.date)}${row('Intervenants',d.workers)}${row('Motif du SAV',d.issue)}${row('Travaux réalisés',d.work)}${row('Matériel utilisé',d.material)}${row('Observations',d.notes)}${row('Signataire',d.signer)}<div class="row"><b>Signature du client</b>${d.signature?`<img src="${d.signature}" alt="Signature du client">`:'Non signée'}</div><div class="actions"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button></div></body></html>`}}
@@ -3847,6 +3847,6 @@ function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V30.9';document.documentElement.dataset.rmlVersion='V30.9';window.RML_ERP_VERSION='30.9';</script>
+<script>document.title='RML ERP — V30.10';document.documentElement.dataset.rmlVersion='V30.10';window.RML_ERP_VERSION='30.10';</script>
 </body>
 </html>
