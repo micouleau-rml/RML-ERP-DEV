@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V31.7</title>
+<title>RML ERP — V31.8</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -417,7 +417,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V31.7</div><span id="rmlVersionHeader" hidden>V31.7</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V31.8</div><span id="rmlVersionHeader" hidden>V31.8</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -733,7 +733,19 @@ const RML_CATALOG_LABELS={gouttieres:'Gouttières',accessoires_gouttieres:'Acces
 function rmlCatalogAdmin(){return !!currentAccess?.active&&currentAccess?.role==='administrateur'}
 function rmlCatalogStatus(message,error=false){const el=$('rmlCatalogStatus');if(el){el.textContent=message;el.style.color=error?'#ad2424':''}}
 function rmlApplyCatalog(data){if(!data||typeof data!=='object')return;for(const key of Object.keys(PREP_CATALOG)){if(Array.isArray(data[key]))PREP_CATALOG[key].splice(0,PREP_CATALOG[key].length,...data[key].filter(v=>typeof v==='string'&&v.trim()).map(v=>v.trim()));}}
-async function rmlLoadCatalog(){try{const {data,error}=await sb.from('erp_prep_catalog').select('products').eq('id',1).maybeSingle();if(error)throw error;if(data?.products)rmlApplyCatalog(data.products);return true}catch(e){console.warn('Catalogue central non disponible',e);rmlCatalogStatus('Catalogue non synchronisé : '+e.message+' — exécutez le script SQL V31.6 dans Supabase.',true);return false}}
+async function rmlLoadCatalog(){
+ try{
+  const {data,error}=await sb.from('erp_prep_catalog').select('products').eq('id',1).maybeSingle();
+  if(error)throw error;
+  if(!data?.products||typeof data.products!=='object')throw new Error('Aucun catalogue général trouvé dans Supabase.');
+  rmlApplyCatalog(data.products);
+  return true;
+ }catch(e){
+  console.warn('Catalogue central non disponible',e);
+  rmlCatalogStatus('Catalogue non synchronisé : '+e.message,true);
+  return false;
+ }
+}
 function rmlRenderCatalog(){const el=$('rmlCatalogEditor');if(!el)return;el.innerHTML=Object.entries(RML_CATALOG_LABELS).map(([key,label])=>`<div class="panel" style="margin:12px 0;background:#f8fbff"><h3>${esc(label)}</h3><div data-rml-catalog="${key}">${(PREP_CATALOG[key]||[]).map(v=>rmlCatalogRow(v)).join('')}</div><button class="btn secondary" type="button" onclick="rmlCatalogAdd('${key}')">+ Ajouter un produit</button></div>`).join('');}
 function rmlCatalogRow(value=''){return `<div class="rml-catalog-row" draggable="true" ondragstart="rmlCatalogDragStart(event)" ondragover="rmlCatalogDragOver(event)" ondrop="rmlCatalogDrop(event)" ondragend="rmlCatalogDragEnd(event)" style="display:flex;gap:8px;margin:6px 0;align-items:center"><span class="rml-catalog-handle" title="Glisser pour réorganiser" aria-label="Glisser pour réorganiser" style="cursor:grab;touch-action:none;user-select:none;font-size:22px;padding:5px 10px;border-radius:7px;background:#e6edf6;color:#123a5a">☰</span><input type="text" aria-label="Nom du produit" value="${esc(value)}" style="flex:1;min-width:100px"><button type="button" class="btn secondary" onclick="rmlCatalogDuplicate(this)" title="Créer une copie de ce produit">Dupliquer</button><button type="button" class="btn danger" onclick="rmlCatalogDelete(this)">Supprimer</button></div>`}
 // V31.6 : ordre manuel par glisser-déposer, y compris sur tablette tactile.
@@ -839,12 +851,17 @@ function setPrepStatus(text,kind=''){prepSaveStatus.textContent=text;prepSaveSta
 function emptyPrepPayload(job){return {version:'ERP-V0.6',info:{date:job.date_debut||'',horaires:'',acces:'',chef:job.chef_equipe||'',remarques:''},sections:{}}}
 function loadPrepPayload(payload,job){const p=payload||emptyPrepPayload(job),i=p.info||{};prepDate.value=i.date||job.date_debut||'';prepHoraires.value=i.horaires||'';prepAcces.value=i.acces||'';prepChef.value=i.chef||job.chef_equipe||'';prepRemarques.value=i.remarques||'';renderPrepSections(p.sections||{})}
 async function openPreparation(jobId){
- await rmlLoadCatalog();
+ const catalogReady=await rmlLoadCatalog();
+ if(!catalogReady){
+  alert('Le catalogue général des produits n’a pas pu être chargé depuis Supabase. La préparation n’est pas ouverte pour éviter de sélectionner des produits obsolètes. Vérifiez la connexion et les droits de lecture de la table erp_prep_catalog.');
+  return;
+ }
  if(!hasPerm('preparation')){alert('Accès non autorisé au module Préparation chantier.');return}
  const job=db.chantiers.find(j=>j.id===jobId); if(!job)return;
  currentPrepJobId=jobId; currentPrepSourceJobId=jobId;
  closeModal('jobCardModal'); closeModal('prepSelectModal');
  go('preparation');
+ setPrepStatus('Catalogue général chargé : '+Object.values(PREP_CATALOG).reduce((n,a)=>n+a.length,0)+' références disponibles.','ok');
  setTimeout(()=>{bridgePreparationContext();loadJobDocumentsPanel(jobId);updateJobDocumentSourceUI();},150);
 }
 function closePreparation(){const id=currentPrepSourceJobId;go('chantiers');if(id)setTimeout(()=>openJob(id),0)}
@@ -3950,6 +3967,6 @@ function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V31.7';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
+<script>document.title='RML ERP — V31.8';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
 </body>
 </html>
