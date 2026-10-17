@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V31.4</title>
+<title>RML ERP — V31.6</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -360,7 +360,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#f0f5fa;border-color:#8196ac;}
 </style>
 <style id="rml-v28-3-white-actions-contrast">
-/* V31.4 : fond blanc sur toute la fiche, boutons plus contrastés. */
+/* V31.6 : fond blanc sur toute la fiche, boutons plus contrastés. */
 #jobsTable .table tbody tr.rml-job-actions-row td{background:#ffffff;border-color:#8196ac;}
 #jobsTable .rml-job-actions-row .actions button{
  background:#dce7f2;color:#173b5c;border:1px solid #b5c8db;
@@ -373,20 +373,25 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 #jobsTable .rml-job-actions-row .actions button:last-child:hover{background:#f3c7c7;}
 </style>
 <style id="rml-v28-5-client-name">
-/* V31.4 : noms des clients plus lisibles dans la liste des chantiers. */
+/* V31.6 : noms des clients plus lisibles dans la liste des chantiers. */
 #jobsTable .table tbody tr:not(.rml-job-actions-row) td:first-child strong {
   font-size:16px;
   font-weight:800;
   line-height:1.3;
 }
 </style>
+<style id="rml-v31-6-catalog-nav-border">
+#mainNav button.nav-catalog-colored{border:2px solid #4a91a8!important;border-radius:9px!important;background:#e5f5f9!important;color:#13516a!important;box-shadow:inset 0 0 0 1px #b6dbe5!important}
+#mainNav button.nav-catalog-colored:hover{background:#d0edf5!important}
+#mainNav button.nav-catalog-colored.active{background:#123f62!important;color:white!important;border-color:#123f62!important}
+</style>
 </head>
 <body>
 <div id="erpSaveToast" class="erp-save-toast" role="status" aria-live="polite"></div>
 <div id="loginOverlay" class="login-overlay">
   <form id="loginForm" class="login-card">
-    <h2>RML ERP DEV</h2>
-    <p>Connexion sécurisée à RML ERP DEV — V31.4.</p>
+    <h2>RML ERP</h2>
+    <p>Connexion sécurisée à RML ERP — V31.6.</p>
     <div class="field"><label>Identifiant</label><input id="loginEmail" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ex. Equipe1, Dupont ou adresse e-mail" required><div class="muted" style="margin-top:5px">Ouvriers / équipes / collaborateurs / sous-traitants : utilisez votre identifiant. Les comptes existants peuvent toujours utiliser leur adresse e-mail.</div></div>
     <div class="field"><label>Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
     <button class="btn" type="submit">Se connecter</button>
@@ -403,10 +408,10 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header"><div class="brand"><h1>RML ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V31.4</div><p>Environnement de développement séparé — <strong id="rmlVersionHeader">V31.4</strong></p></div><div class="badge">DEV — HORS PRODUCTION</div></div></header>
+<header><div class="header"><div class="brand"><h1>RML ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V31.6</div><p>Version <strong id="rmlVersionHeader">V31.6</strong></p></div></div></header>
 <main>
-<div class="statusbar"><div class="pill ok">Applications actuelles : non modifiées</div><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
-<nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
+<div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
+<nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>7/9</strong><span>modules opérationnels</span></div></div>
   <div class="panel" id="rmlV1920FinishedPanel" style="display:none;margin-top:15px"><div class="planning-head"><div><h2>Travaux terminés à traiter</h2><div class="muted">Fabrications et chantiers terminés. Chaque utilisateur valide ses propres alertes.</div></div><button class="btn secondary" type="button" onclick="rmlV1920LoadFinished()">Actualiser</button></div><div id="rmlV1920FinishedList" class="muted">Chargement…</div></div>
@@ -415,7 +420,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="homeAlertsStatus" class="notice" style="margin-top:10px">Chargement…</div>
     <div id="homeAlertsList" class="alert-grid"></div>
   </div>
-  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette application utilise le projet Supabase RML ERP DEV. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP DEV.</p><div class="notice">Cette application reste un environnement de développement séparé. Elle ne lit ni ne modifie les données de tes applications RML actuellement en production.</div></div>
+  <div class="panel" style="margin-top:15px"><h2>Référentiel central connecté</h2><p class="muted">Cette application utilise le référentiel Supabase RML ERP. Les clients et chantiers restent synchronisés entre les appareils connectés. Le premier module métier, Préparation chantier, est maintenant intégré directement au chantier et enregistré dans la base ERP.</p></div>
   </div>
 </section>
 <section id="subPortal" class="view">
@@ -714,15 +719,15 @@ function setSync(ok,text){syncPill.textContent=text;syncPill.className='pill '+(
 function hasPerm(key){return !!currentAccess?.active && (!!currentAccess?.permissions?.[key] || currentAccess?.role==='administrateur')}
 const PREP_COLORS=['NEUTRE','BLANC','IVOIRE','MIEL','MARRON','ARDOISE','ROUGE TUILE','BEIGE ROSÉ','ROUGE BORDEAUX','VERT MOUSSE','ROUGE CARMIN','JAUNE COLZA','BLEU AZUR','NOIR','GRIS MÉTAL','VERT OLIVE','OCRE','VERT RÉSÉDA','BLEU GENTIANE','VERT SAPIN','CUIVRE FRANÇAIS','BRONZE','BLEU PIGEON','IMITATION ZINC','SABLE','BEIGE CENDRÉ','TITANE','NOIR SABLÉ','CRÈME','GRIS CLAIR','BLEU 5008','ZINC PATINA','GRIS 2900','GRIS GALET 7035','GRIS 9007'];
 const PREP_CATALOG={gouttieres:['GF300','GF380','GFDR300','GFT330','GFC300','GFC380'],accessoires_gouttieres:['FOND GAUCHE','FOND DROIT','FOND STANDARD','ANGLE INTÉRIEUR','ANGLE EXTÉRIEUR','NAISSANCE Ø70','NAISSANCE Ø80','NAISSANCE Ø90','NAISSANCE Ø100','MANCHON DE NAISSANCE Ø80','MANCHON DE NAISSANCE Ø100','GRILLE PARE-FEUILLES GRILLAGÉE 300','GRILLE PARE-FEUILLES GRILLAGÉE 380','GRILLE PARE-FEUILLES PERFORÉE 300','GRILLE PARE-FEUILLES PERFORÉE 380'],descentes_formes:['RONDE','RECTANGLE'],descentes_rondes:['Ø80','Ø100','Ø120','Ø140','Ø160','Ø180','Ø200'],descentes_rectangles:['60×80','70×110'],accessoires_descentes:['COUDE RECTANGLE 60×80','COUDE RECTANGLE 70×110','COUDE ROND Ø80','COUDE ROND Ø100','COUDE ROND Ø120','COUDE ROND Ø140','COUDE ROND Ø160','COUDE ROND Ø180','COUDE ROND Ø200','JAMBON Ø80','JAMBON Ø100','DAUPHIN ALU Ø80','DAUPHIN ALU Ø100','DAUPHIN FONTE Ø80','DAUPHIN FONTE Ø100','BOÎTE À EAU STANDARD 20×20×20','BOÎTE À EAU SUR MESURE','RÉCUPÉRATEUR EP ROND','RÉCUPÉRATEUR EP RECTANGLE'],couvertines:['340','360','380','400','420','440','460','480','500','520','540','560','580','600'],crochets:['AVEC PENTE','SANS PENTE'],accessoires_couvertines:['ANGLE','FOND STANDARD','CHAPEAU DE POTEAU'],bandeaux:['LAMBREQUIN ALUMINIUM TYPE ORNON','BANDEAU ALU 10/10','BANDEAU ALU 15/10'],sous_faces:['ALUMINIUM','PVC'],pliage:[],zinguerie:[],unites_personnalisees:['U','ML','M²','ENS']};
-// V31.4 — catalogue central administrateur, sauvegardé dans une table Supabase dédiée.
+// V31.6 — catalogue central administrateur, sauvegardé dans une table Supabase dédiée.
 const RML_CATALOG_LABELS={gouttieres:'Gouttières',accessoires_gouttieres:'Accessoires gouttières',descentes_formes:'Formes descentes',descentes_rondes:'Dimensions rondes',descentes_rectangles:'Dimensions rectangulaires',accessoires_descentes:'Accessoires descentes',couvertines:'Couvertines',crochets:'Crochets',accessoires_couvertines:'Accessoires couvertines',bandeaux:'Bandeaux',sous_faces:'Sous-faces',pliage:'Pliage — produits personnalisés',zinguerie:'Zinguerie — produits personnalisés',unites_personnalisees:'Unités'};
 function rmlCatalogAdmin(){return !!currentAccess?.active&&currentAccess?.role==='administrateur'}
 function rmlCatalogStatus(message,error=false){const el=$('rmlCatalogStatus');if(el){el.textContent=message;el.style.color=error?'#ad2424':''}}
 function rmlApplyCatalog(data){if(!data||typeof data!=='object')return;for(const key of Object.keys(PREP_CATALOG)){if(Array.isArray(data[key]))PREP_CATALOG[key].splice(0,PREP_CATALOG[key].length,...data[key].filter(v=>typeof v==='string'&&v.trim()).map(v=>v.trim()));}}
-async function rmlLoadCatalog(){try{const {data,error}=await sb.from('erp_prep_catalog').select('products').eq('id',1).maybeSingle();if(error)throw error;if(data?.products)rmlApplyCatalog(data.products);return true}catch(e){console.warn('Catalogue central non disponible',e);rmlCatalogStatus('Catalogue non synchronisé : '+e.message+' — exécutez le script SQL V31.4 dans Supabase.',true);return false}}
+async function rmlLoadCatalog(){try{const {data,error}=await sb.from('erp_prep_catalog').select('products').eq('id',1).maybeSingle();if(error)throw error;if(data?.products)rmlApplyCatalog(data.products);return true}catch(e){console.warn('Catalogue central non disponible',e);rmlCatalogStatus('Catalogue non synchronisé : '+e.message+' — exécutez le script SQL V31.6 dans Supabase.',true);return false}}
 function rmlRenderCatalog(){const el=$('rmlCatalogEditor');if(!el)return;el.innerHTML=Object.entries(RML_CATALOG_LABELS).map(([key,label])=>`<div class="panel" style="margin:12px 0;background:#f8fbff"><h3>${esc(label)}</h3><div data-rml-catalog="${key}">${(PREP_CATALOG[key]||[]).map(v=>rmlCatalogRow(v)).join('')}</div><button class="btn secondary" type="button" onclick="rmlCatalogAdd('${key}')">+ Ajouter un produit</button></div>`).join('');}
 function rmlCatalogRow(value=''){return `<div class="rml-catalog-row" draggable="true" ondragstart="rmlCatalogDragStart(event)" ondragover="rmlCatalogDragOver(event)" ondrop="rmlCatalogDrop(event)" ondragend="rmlCatalogDragEnd(event)" style="display:flex;gap:8px;margin:6px 0;align-items:center"><span class="rml-catalog-handle" title="Glisser pour réorganiser" aria-label="Glisser pour réorganiser" style="cursor:grab;touch-action:none;user-select:none;font-size:22px;padding:5px 10px;border-radius:7px;background:#e6edf6;color:#123a5a">☰</span><input type="text" aria-label="Nom du produit" value="${esc(value)}" style="flex:1;min-width:100px"><button type="button" class="btn secondary" onclick="rmlCatalogDuplicate(this)" title="Créer une copie de ce produit">Dupliquer</button><button type="button" class="btn danger" onclick="rmlCatalogDelete(this)">Supprimer</button></div>`}
-// V31.4 : ordre manuel par glisser-déposer, y compris sur tablette tactile.
+// V31.6 : ordre manuel par glisser-déposer, y compris sur tablette tactile.
 let rmlCatalogDragged=null;
 function rmlCatalogDragStart(e){if(!rmlCatalogAdmin())return e.preventDefault();if(e.target.closest('input,button'))return e.preventDefault();rmlCatalogDragged=e.currentTarget;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','catalog-row');e.currentTarget.style.opacity='.45';}
 function rmlCatalogDragOver(e){if(!rmlCatalogDragged)return;const target=e.currentTarget;if(target.parentElement!==rmlCatalogDragged.parentElement||target===rmlCatalogDragged)return;e.preventDefault();e.dataTransfer.dropEffect='move';const rect=target.getBoundingClientRect();target.parentElement.insertBefore(rmlCatalogDragged,e.clientY<rect.top+rect.height/2?target:target.nextSibling);}
@@ -734,7 +739,7 @@ document.addEventListener('pointermove',e=>{if(!rmlTouchDrag||e.pointerId!==rmlT
 function rmlTouchDragEnd(e){if(!rmlTouchDrag||e.pointerId!==rmlTouchDrag.id)return;rmlTouchDrag.row.style.opacity='';rmlTouchDrag=null;}
 document.addEventListener('pointerup',rmlTouchDragEnd);document.addEventListener('pointercancel',rmlTouchDragEnd);
 function rmlCatalogAdd(key){if(!rmlCatalogAdmin())return;const box=document.querySelector('[data-rml-catalog="'+key+'"]');if(!box)return;box.insertAdjacentHTML('beforeend',rmlCatalogRow());box.lastElementChild.querySelector('input').focus();}
-// V31.4 : dupliquer une désignation juste sous l’original, sans toucher au catalogue tant que l’administrateur n’enregistre pas.
+// V31.6 : dupliquer une désignation juste sous l’original, sans toucher au catalogue tant que l’administrateur n’enregistre pas.
 function rmlCatalogDuplicate(btn){
  if(!rmlCatalogAdmin())return;
  const row=btn.closest('.rml-catalog-row');if(!row)return;
@@ -748,7 +753,7 @@ function rmlCatalogDuplicate(btn){
  rmlCatalogStatus('Produit dupliqué. Modifiez son nom, puis cliquez sur « Enregistrer les modifications ».');
 }
 function rmlCatalogDelete(btn){if(!rmlCatalogAdmin())return;if(confirm('Voulez-vous supprimer ce produit du catalogue général ?'))btn.closest('.rml-catalog-row').remove()}
-// V31.4 : importer explicitement les désignations saisies dans les préparations existantes.
+// V31.6 : importer explicitement les désignations saisies dans les préparations existantes.
 // La récupération n'altère jamais les fiches historiques et n'enregistre rien sans confirmation de l'administrateur.
 async function rmlImportPrepProducts(){
  if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}
@@ -783,7 +788,7 @@ async function rmlImportPrepProducts(){
  }catch(e){rmlCatalogStatus('Récupération impossible : '+e.message+' (aucune modification enregistrée).',true);}
 }
 async function rmlOpenCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}go('rmlCatalogView');const ok=await rmlLoadCatalog();rmlRenderCatalog();if(ok)rmlCatalogStatus('Catalogue chargé. Modifiez les produits puis enregistrez.');}
-async function rmlSaveCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}const products={};for(const key of Object.keys(PREP_CATALOG)){const box=document.querySelector('[data-rml-catalog="'+key+'"]');const vals=[...(box?.querySelectorAll('input')||[])].map(e=>e.value.trim()).filter(Boolean);if(new Set(vals.map(v=>v.toLocaleLowerCase('fr'))).size!==vals.length){rmlCatalogStatus('Doublon détecté dans « '+RML_CATALOG_LABELS[key]+' ».',true);return;}products[key]=vals;}rmlCatalogStatus('Enregistrement dans Supabase…');try{const {error}=await sb.from('erp_prep_catalog').upsert({id:1,products,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)throw error;rmlApplyCatalog(products);rmlCatalogStatus('Modifications enregistrées dans Supabase. Les nouvelles préparations utiliseront le catalogue actualisé.');}catch(e){rmlCatalogStatus('Enregistrement impossible : '+e.message+'. Vérifiez que le script SQL V31.4 a été exécuté.',true);}}
+async function rmlSaveCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}const products={};for(const key of Object.keys(PREP_CATALOG)){const box=document.querySelector('[data-rml-catalog="'+key+'"]');const vals=[...(box?.querySelectorAll('input')||[])].map(e=>e.value.trim()).filter(Boolean);if(new Set(vals.map(v=>v.toLocaleLowerCase('fr'))).size!==vals.length){rmlCatalogStatus('Doublon détecté dans « '+RML_CATALOG_LABELS[key]+' ».',true);return;}products[key]=vals;}rmlCatalogStatus('Enregistrement dans Supabase…');try{const {error}=await sb.from('erp_prep_catalog').upsert({id:1,products,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)throw error;rmlApplyCatalog(products);rmlCatalogStatus('Modifications enregistrées dans Supabase. Les nouvelles préparations utiliseront le catalogue actualisé.');}catch(e){rmlCatalogStatus('Enregistrement impossible : '+e.message+'. Vérifiez que le script SQL V31.6 a été exécuté.',true);}}
 const PREP_SCHEMAS={
  gouttieres:{label:'Gouttières',headers:['Type','Couleur','Quantité / ML','Observations'],fields:[['type','select',PREP_CATALOG.gouttieres],['color','select',PREP_COLORS],['qty','text'],['note','text']]},
  accessoires_gouttieres:{label:'Accessoires gouttières',headers:['Accessoire','Couleur','Quantité','Observations'],fields:[['type','select',PREP_CATALOG.accessoires_gouttieres],['color','select',PREP_COLORS],['qty','number'],['note','text']]},
@@ -799,8 +804,26 @@ const PREP_SCHEMAS={
 let currentPrepJobId=null;
 let currentPrepSourceJobId=null;
 function prepOptions(options,selected=''){return '<option value="">Choisir</option>'+options.map(v=>`<option value="${esc(v)}" ${v===selected?'selected':''}>${esc(v)}</option>`).join('')}
-function prepFieldHtml(field,value='',rowData={}){const [key,type,options]=field;if(type==='select'&&key==='type'){const listId='rmlPrepProducts_'+(++window.rmlPrepDatalistIndex|| (window.rmlPrepDatalistIndex=1));const items=(options||[]).map(v=>`<option value="${esc(v)}"></option>`).join('');return `<input data-key="type" type="text" list="${listId}" value="${esc(value)}" placeholder="Choisir ou saisir un produit" autocomplete="off" style="min-width:150px;width:100%"><datalist id="${listId}">${items}</datalist>`;}if(type==='select')return `<select data-key="${key}">${prepOptions(options||[],value)}</select>`;if(type==='dimension'){const opts=rowData.shape==='RONDE'?PREP_CATALOG.descentes_rondes:rowData.shape==='RECTANGLE'?PREP_CATALOG.descentes_rectangles:[];return `<select data-key="dimension">${prepOptions(opts,value)}</select>`}return `<input data-key="${key}" type="${type==='number'?'number':'text'}" value="${esc(value||'')}">`}
-function renderPrepSections(data={}){prepSections.innerHTML='';Object.entries(PREP_SCHEMAS).forEach(([key,schema])=>{const section=document.createElement('div');section.className='prep-section';section.innerHTML=`<h3>${esc(schema.label)}</h3><div class="prep-tablewrap"><table class="prep-table"><thead><tr>${schema.headers.map(h=>`<th>${esc(h)}</th>`).join('')}<th></th></tr></thead><tbody id="prep_${key}"></tbody></table></div><div class="actions" style="margin-top:8px"><button class="btn secondary" type="button" onclick="addPrepRow('${key}')">+ Ajouter</button></div>`;prepSections.appendChild(section);const rows=data[key]||[];(rows.length?rows:[{}]).forEach(r=>addPrepRow(key,r));})}
+function prepFieldHtml(field,value='',rowData={}){const [key,type,options]=field;if(type==='select'&&key==='type'){return `<div class="rml-prep-picker" style="display:flex;gap:4px;min-width:180px"><input data-key="type" type="text" value="${esc(value)}" placeholder="Choisir ou saisir un produit" autocomplete="off" style="min-width:120px;width:100%"><button type="button" class="btn secondary" aria-label="Afficher tous les produits" title="Afficher tous les produits" onclick="rmlShowPrepChoices(this)" style="padding:5px 9px">▼</button></div>`;}if(type==='select')return `<select data-key="${key}">${prepOptions(options||[],value)}</select>`;if(type==='dimension'){const opts=rowData.shape==='RONDE'?PREP_CATALOG.descentes_rondes:rowData.shape==='RECTANGLE'?PREP_CATALOG.descentes_rectangles:[];return `<select data-key="dimension">${prepOptions(opts,value)}</select>`}return `<input data-key="${key}" type="${type==='number'?'number':'text'}" value="${esc(value||'')}">`}
+// V31.6 : liste complète du catalogue, sans limite du datalist natif du navigateur.
+let rmlPrepChoicesPanel=null;
+function rmlClosePrepChoices(){if(rmlPrepChoicesPanel){rmlPrepChoicesPanel.remove();rmlPrepChoicesPanel=null;}}
+function rmlShowPrepChoices(button){
+ const picker=button.closest('.rml-prep-picker'),input=picker?.querySelector('input[data-key="type"]');if(!input)return;
+ if(rmlPrepChoicesPanel?.rmlPicker===picker){rmlClosePrepChoices();return;}
+ rmlClosePrepChoices();const section=button.closest('tbody')?.id?.replace(/^prep_/,'');
+ const schema=PREP_SCHEMAS[section],field=schema?.fields.find(f=>f[0]==='type');
+ const choices=field?.[2]||[];
+ const panel=document.createElement('div');panel.className='rml-prep-choices';panel.rmlPicker=picker;
+ Object.assign(panel.style,{position:'fixed',zIndex:'99999',background:'#fff',border:'2px solid #4a91a8',borderRadius:'8px',boxShadow:'0 8px 25px #0003',maxHeight:'min(370px,55vh)',overflowY:'auto',minWidth:'260px',maxWidth:'min(460px,90vw)',padding:'6px'});
+ const rect=button.getBoundingClientRect();panel.style.left=Math.max(5,Math.min(rect.left-200,innerWidth-310))+'px';panel.style.top=(rect.bottom+380>innerHeight?Math.max(5,rect.top-380):rect.bottom+4)+'px';
+ const search=document.createElement('input');search.placeholder='Rechercher dans tous les produits';search.style.cssText='width:100%;box-sizing:border-box;margin-bottom:6px;padding:9px';panel.appendChild(search);
+ const list=document.createElement('div');panel.appendChild(list);
+ function draw(){list.replaceChildren();const q=search.value.trim().toLocaleLowerCase('fr');let count=0;for(const name of choices){if(q&&!name.toLocaleLowerCase('fr').includes(q))continue;count++;const opt=document.createElement('button');opt.type='button';opt.textContent=name;opt.style.cssText='display:block;width:100%;text-align:left;padding:9px;border:0;border-bottom:1px solid #eee;background:white;cursor:pointer;white-space:normal';opt.onclick=()=>{input.value=name;input.dispatchEvent(new Event('change',{bubbles:true}));rmlClosePrepChoices();};list.appendChild(opt)}if(!count)list.textContent='Aucun produit correspondant.';}
+ search.addEventListener('input',draw);draw();document.body.appendChild(panel);rmlPrepChoicesPanel=panel;search.focus();
+}
+document.addEventListener('pointerdown',e=>{if(rmlPrepChoicesPanel&&!rmlPrepChoicesPanel.contains(e.target)&&!e.target.closest('.rml-prep-picker'))rmlClosePrepChoices();});
+function renderPrepSections(data={}){rmlClosePrepChoices();prepSections.innerHTML='';Object.entries(PREP_SCHEMAS).forEach(([key,schema])=>{const section=document.createElement('div');section.className='prep-section';section.innerHTML=`<h3>${esc(schema.label)}</h3><div class="prep-tablewrap"><table class="prep-table"><thead><tr>${schema.headers.map(h=>`<th>${esc(h)}</th>`).join('')}<th></th></tr></thead><tbody id="prep_${key}"></tbody></table></div><div class="actions" style="margin-top:8px"><button class="btn secondary" type="button" onclick="addPrepRow('${key}')">+ Ajouter</button></div>`;prepSections.appendChild(section);const rows=data[key]||[];(rows.length?rows:[{}]).forEach(r=>addPrepRow(key,r));})}
 function addPrepRow(section,data={}){const schema=PREP_SCHEMAS[section],tbody=document.getElementById('prep_'+section);if(!tbody)return;const tr=document.createElement('tr');tr.innerHTML=schema.fields.map(f=>`<td>${prepFieldHtml(f,data[f[0]]||'',data)}</td>`).join('')+`<td><button class="prep-delete" type="button">Supprimer</button></td>`;tbody.appendChild(tr);tr.querySelector('.prep-delete').onclick=()=>{tr.remove();setPrepStatus('Modifications non enregistrées.','')};tr.querySelectorAll('input,select').forEach(el=>el.addEventListener('change',()=>setPrepStatus('Modifications non enregistrées.','')));if(section==='descentes'){const shape=tr.querySelector('[data-key="shape"]');shape.addEventListener('change',()=>{const dim=tr.querySelector('[data-key="dimension"]');const opts=shape.value==='RONDE'?PREP_CATALOG.descentes_rondes:shape.value==='RECTANGLE'?PREP_CATALOG.descentes_rectangles:[];dim.innerHTML=prepOptions(opts,'')})}}
 function collectPrepSections(){const out={};Object.keys(PREP_SCHEMAS).forEach(section=>{out[section]=[...document.querySelectorAll(`#prep_${section} tr`)].map(tr=>{const row={};tr.querySelectorAll('[data-key]').forEach(el=>row[el.dataset.key]=el.value);return row})});return out}
 function setPrepStatus(text,kind=''){prepSaveStatus.textContent=text;prepSaveStatus.className='prep-save-status'+(kind?' '+kind:'')}
@@ -1302,7 +1325,7 @@ loginForm.onsubmit=async e=>{
    currentUser=data.user;
    await onSignedIn()
  }catch(err){
-   console.error('Erreur connexion RML ERP V31.4',err);
+   console.error('Erreur connexion RML ERP V31.6',err);
    loginError.textContent='Erreur de connexion : '+(err?.message||String(err));
    loginError.style.display='block'
  }finally{
@@ -1347,7 +1370,7 @@ async function generateClientCodes(count=1){
   (data||[]).forEach(c=>{const m=String(c.code||'').trim().match(/^CLI(\d+)$/i);if(m)max=Math.max(max,Number(m[1])||0)});
   return Array.from({length:count},(_,i)=>'CLI'+String(max+i+1).padStart(4,'0'));
 }
-// V31.4 — Suggestions d'adresses via le géocodeur public français, sans clé API.
+// V31.6 — Suggestions d'adresses via le géocodeur public français, sans clé API.
 // Les adresses restent modifiables librement et la recherche n'empêche jamais l'enregistrement.
 (function initRmlClientAddressAutocomplete(){
   const input=document.getElementById('clientAdresse');
@@ -1595,7 +1618,7 @@ Cette opération est irréversible.`;
    if(jobErr)throw jobErr;
 
    closeModal('jobCardModal');
-   // V31.4 : une fiche SAV autonome supprimée laisse l'utilisateur dans Chantiers.
+   // V31.6 : une fiche SAV autonome supprimée laisse l'utilisateur dans Chantiers.
    // Les suppressions des chantiers terminés/archivés conservent leur comportement.
    await refreshData(j.statut==='sav' ? 'chantiers' : 'dashboard');
    alert(`Le chantier « ${j.nom} » et ses données rattachées ont été supprimés.\n\nLe client a été conservé.`);
@@ -1628,7 +1651,7 @@ async function deleteClient(id){
   }catch(err){alert('Erreur Supabase : '+err.message);return false}
 }
 
-/* V31.4 — Export Excel des clients, sans modification des données Supabase. */
+/* V31.6 — Export Excel des clients, sans modification des données Supabase. */
 function exportClientsExcel(){
   if(typeof hasPerm==='function' && !hasPerm('clients')){alert('Accès aux clients non autorisé.');return;}
   const clients=Array.isArray(db?.clients)?db.clients:[];
@@ -3507,7 +3530,7 @@ if(window.rmlRefreshNavEditor)rmlRefreshNavEditor();
   const label='V'+version;
   document.documentElement.dataset.rmlVersion=label;
   const h=document.getElementById('rmlVersionHeader');if(h)h.textContent=label;
-  document.querySelectorAll('.login-card p').forEach(el=>{if(el.textContent.includes('Connexion sécurisée à RML ERP'))el.textContent='Connexion sécurisée à RML ERP DEV — '+label+'.';});
+  document.querySelectorAll('.login-card p').forEach(el=>{if(el.textContent.includes('Connexion sécurisée à RML ERP'))el.textContent='Connexion sécurisée à RML ERP — '+label+'.';});
   document.title='RML ERP — '+label+' · Atelier et fabrication';
   window.RML_ERP_VERSION=version;
 })();
@@ -3595,7 +3618,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V31.4';
+const RML_ERP_VERSION='V31.6';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
@@ -3791,7 +3814,7 @@ async function rmlExportERPZip(){
 </script>
 
 
-<!-- RML ERP V31.4 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
+<!-- RML ERP V31.6 : fiche SAV avec signature client, archivage Supabase et envoi manuel depuis le bureau -->
 <style>
 #rmlSavDialog{border:0;border-radius:15px;padding:0;width:min(1050px,97vw);max-height:94vh;box-shadow:0 15px 55px #0005;color:#183c58}
 #rmlSavDialog::backdrop{background:#102b43aa}
@@ -3808,7 +3831,7 @@ async function rmlExportERPZip(){
 #rmlSavDialog canvas{width:100%;height:165px;border:2px dashed #829bb1;background:white;touch-action:none;border-radius:8px;display:block}
 #rmlSavDialog .sav-buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
 #rmlSavDialog .sav-section{background:#eaf2f8;padding:11px 14px;border-left:4px solid #18547d;margin:18px 0 10px;font-size:17px;font-weight:750}#rmlSavDialog .sav-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 16px}#rmlSavDialog .sav-client-info{padding:14px;background:#f4f8fc;border:1px solid #cbdce9;border-radius:9px;line-height:1.9;overflow-wrap:anywhere}@media(max-width:650px){#rmlSavDialog .sav-grid{grid-template-columns:1fr}}#rmlSavDialog .sav-hint{font-size:13px;color:#526779}
-/* V31.4 — correction du décalage : la règle globale dialog[open] applique
+/* V31.6 — correction du décalage : la règle globale dialog[open] applique
    translate(-50%,-50%) alors que cette fenêtre est déjà centrée par inset/margin.
    Neutraliser la translation et ancrer la fenêtre à la zone visible. */
 #rmlSavDialog[open]{
@@ -3828,7 +3851,7 @@ async function rmlExportERPZip(){
 }
 @media(max-width:650px){#rmlSavDialog[open]{width:calc(100vw - 12px)!important;max-width:calc(100vw - 12px)!important}}
 
-/* V31.4 — Fiche SAV responsive iPhone / tablette / Mac */
+/* V31.6 — Fiche SAV responsive iPhone / tablette / Mac */
 #rmlSavDialog{box-sizing:border-box!important;max-width:1050px!important;min-width:0!important;width:min(1050px,calc(100vw - 24px))!important;max-height:calc(100dvh - 24px)!important;height:auto!important;inset:0!important;margin:auto!important;padding:0!important;overflow:hidden!important}
 #rmlSavDialog[open]{display:block!important}
 #rmlSavDialog .sav-body{box-sizing:border-box!important;width:100%!important;min-width:0!important;max-height:calc(100dvh - 24px)!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior-y:contain;padding:16px!important}
@@ -3898,7 +3921,7 @@ async function rmlSavSave(){
   const code=e?.code?' ['+e.code+']':'';
   const detail=e?.message||String(e);
   rmlSavStatus('Échec de l’enregistrement'+code+' : '+detail+(isEmployeeUser()?' — Demandez à l’administrateur de vérifier les autorisations Supabase de votre équipe.':''));
-  console.error('RML SAV V31.4', {code:e?.code,message:detail,chantier_id:jobId,role:currentAccess?.role});
+  console.error('RML SAV V31.6', {code:e?.code,message:detail,chantier_id:jobId,role:currentAccess?.role});
  }finally{if(btn)btn.disabled=false}
 }
 function rmlSavPrintable(){const j=db.chantiers.find(x=>x.id===rmlSavJobId),c=db.clients.find(x=>x.id===j?.client_id),d=rmlSavRead();if(!j)return null;const clean=x=>String(x||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const row=(label,v)=>`<div class="row"><b>${label}</b><div>${clean(v).replace(/\n/g,'<br>')||'—'}</div></div>`;return {client:c,job:j,html:`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche SAV — ${clean(j.nom)}</title><style>body{font:15px Arial,sans-serif;color:#173c5b;margin:28px;max-width:850px}h1{border-bottom:3px solid #12669a;padding-bottom:12px}.row{padding:10px;border-bottom:1px solid #d9e2eb;white-space:normal}.row b{display:block;margin-bottom:5px}img{width:320px;max-width:90%;height:110px;object-fit:contain;border-bottom:1px solid #777}.actions{margin:20px 0}@media print{.actions{display:none}body{margin:12mm}}</style></head><body><h1>RML GOUTTIERE ALU — Dossier d'intervention SAV</h1>${row('Client',c?.nom)}${row('Référence client',c?.code)}${row('Téléphone client',c?.telephone)}${row('Contacts',rmlContactParse(c?.telephone).map(x=>[x.name,x.role,x.phone].filter(Boolean).join(' — ')).join('\n'))}${row('E-mail client',c?.email)}${row('Adresse client',c?.adresse)}${row('Responsable client',c?.responsable)}${row('Chantier',j.nom)}${row('Adresse intervention',j.adresse)}${row('Contact chantier',j.contact_nom)}${row('Téléphone chantier',j.contact_telephone||j.contact_tel)}${row('Chef d’équipe',j.chef_equipe)}${row('Date',d.date)}${row('Intervenants',d.workers)}${row('Motif du SAV',d.issue)}${row('Travaux réalisés',d.work)}${row('Matériel utilisé',d.material)}${row('Observations',d.notes)}${row('Signataire',d.signer)}<div class="row"><b>Signature du client</b>${d.signature?`<img src="${d.signature}" alt="Signature du client">`:'Non signée'}</div><div class="actions"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button></div></body></html>`}}
@@ -3918,6 +3941,6 @@ function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V31.4';document.documentElement.dataset.rmlVersion='V31.4';window.RML_ERP_VERSION='31.1';</script>
+<script>document.title='RML ERP — V31.6';document.documentElement.dataset.rmlVersion='V31.6';window.RML_ERP_VERSION='31.1';</script>
 </body>
 </html>
