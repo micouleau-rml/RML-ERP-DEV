@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V32.5</title>
+<title>RML ERP — V32.6</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -417,7 +417,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.5</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.6</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -1195,7 +1195,7 @@ async function loadSubcontractorPortal(){
   if(!erpSubcontractors.length){subPortalStatus.className='notice warn';subPortalStatus.innerHTML='Votre compte est bien identifié comme sous-traitant, mais il n’est encore rattaché à aucune fiche sous-traitant. Aucun chantier n’est visible.';return}
   const ids=erpSubcontractors.map(x=>x.id);
   const {data:assign,error:ae}=await sb.from('erp_subcontract_assignments').select('*').in('subcontractor_id',ids).order('created_at',{ascending:false});if(ae)throw ae;
-  erpSubAssignments=assign||[];
+  erpSubAssignments=(assign||[]).filter(a=>!a.archived_at);
   const jobIds=[...new Set(erpSubAssignments.map(x=>x.chantier_id).filter(Boolean))];
   let jobs=[];if(jobIds.length){const {data,error}=await sb.from('erp_chantiers').select('*').in('id',jobIds);if(error)throw error;jobs=data||[]}
   const clientIds=[...new Set(jobs.map(x=>x.client_id).filter(Boolean))];
@@ -2735,6 +2735,7 @@ function removeSubClause(i){if(confirm('Supprimer cette clause ?')){subClauseDra
 function resetSubClauses(){if(confirm('Réinitialiser toutes les clauses ?')){subClauseDraft=cloneDefaultSubClauses();renderSubClauseEditor()}}
 function subClausesFromAssignment(a){if(Array.isArray(a?.contract_clauses)&&a.contract_clauses.length)return a.contract_clauses;if(a?.contract_terms)return [{title:'Conditions du contrat',text:a.contract_terms}];return cloneDefaultSubClauses()}
 let erpSubcontractors=[],erpSubAssignments=[],erpSubAccessUsers=[],subSignatureDirty=false,subSignatureDrawing=false;
+let rmlShowArchivedSubContracts=false;
 
 function openSubcontractors(jobId=''){go('sous-traitants');setTimeout(()=>{loadSubcontractors(jobId)},0)}
 async function loadSubcontractors(focusJob=''){
@@ -2748,17 +2749,18 @@ async function loadSubcontractors(focusJob=''){
  if(a.error||b.error){subStatus.className='notice danger';subStatus.textContent='Module indisponible : '+(a.error?.message||b.error?.message)+' — exécutez le SQL V0.11.4 dans Supabase ERP DEV.';return}
  erpSubcontractors=a.data||[];erpSubAssignments=b.data||[];erpSubAccessUsers=u.error?[]:(u.data||[]);
  if(window.subAuthUser){const current=subAuthUser.value;subAuthUser.innerHTML='<option value="">Aucun compte rattaché</option>'+erpSubAccessUsers.map(x=>`<option value="${esc(x.user_id)}">${esc(x.nom||x.email)} — ${esc(x.email)}</option>`).join('');subAuthUser.value=current;}
- subStatus.className='notice';subStatus.textContent=`${erpSubcontractors.length} sous-traitant(s) · ${erpSubAssignments.length} contrat(s)`;
+ subStatus.className='notice';subStatus.textContent=`${erpSubcontractors.length} sous-traitant(s) · ${erpSubAssignments.filter(a=>!a.archived_at).length} contrat(s) actif(s) · ${erpSubAssignments.filter(a=>!!a.archived_at).length} archivé(s)`;
+ if(currentAccess?.role==='administrateur'){subStatus.innerHTML+=' <button type="button" class="btn secondary" style="margin-left:12px;padding:5px 10px" onclick="rmlToggleSubArchives()">'+(rmlShowArchivedSubContracts?'Masquer les archives':'Contrats archivés')+'</button>';} 
  renderSubcontractors(focusJob);
 }
 function renderSubcontractors(focusJob=''){
  if(!window.subList)return;
- let rows=focusJob?erpSubcontractors.filter(x=>erpSubAssignments.some(a=>a.subcontractor_id===x.id&&a.chantier_id===focusJob)):erpSubcontractors;
+ let rows=focusJob?erpSubcontractors.filter(x=>erpSubAssignments.some(a=>a.subcontractor_id===x.id&&a.chantier_id===focusJob&&!a.archived_at)):erpSubcontractors;
  const q=(window.subSearch?.value||'').trim().toLowerCase();
  if(q)rows=rows.filter(x=>[x.company,x.contact_name,x.email,x.phone].some(v=>String(v||'').toLowerCase().includes(q)));
  subList.innerHTML=rows.length?rows.map(x=>{
-  const as=erpSubAssignments.filter(a=>a.subcontractor_id===x.id);
-  const contracts=as.map(a=>{const j=db.chantiers.find(z=>z.id===a.chantier_id),c=db.clients.find(z=>z.id===j?.client_id),signed=!!a.signature_data,rmlSigned=!!a.rml_signature_data,signedLabel=signed&&a.signed_at?`<div class="sub-meta" style="margin-top:5px"><strong>Sous-traitant signé le :</strong> ${esc(new Date(a.signed_at).toLocaleString('fr-FR'))}${a.signer_name?' · '+esc(a.signer_name):''}${rmlSigned&&a.rml_signed_at?'<br><strong>RML signé le :</strong> '+esc(new Date(a.rml_signed_at).toLocaleString('fr-FR'))+(a.rml_signer_name?' · '+esc(a.rml_signer_name):''):'<br><strong>Signature RML en attente</strong>'}</div>`:'';return `<div class="sub-contract"><strong>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}</strong><div class="sub-meta">${esc(a.work_description||'Travaux non précisés')}${a.amount_ht!=null?' · '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}</div>${signedLabel}<div style="margin-top:8px"><span class="sub-status ${esc(a.status||'brouillon')}">${signed?(rmlSigned?'SIGNÉ PAR LES DEUX PARTIES':'À SIGNER PAR RML'):esc(a.status||'brouillon')}</span> ${!signed?`<button class="btn secondary" style="padding:6px 9px" onclick="editSubAssignment('${a.id}')">Modifier</button> `:''}<button class="btn secondary" style="padding:6px 9px" onclick="openSubContract('${a.id}')">${signed?(rmlSigned?'Voir le contrat signé':'Signer RML'):'Ouvrir / signer'}</button> ${signed?`<button class="btn secondary" style="padding:6px 9px" onclick="printSubContractById('${a.id}')">Imprimer / PDF</button>`:`<button class="btn danger" style="padding:6px 9px" onclick="deleteSubAssignmentDraft('${a.id}')">Supprimer le contrat</button>`}</div></div>`}).join('');
+  const as=erpSubAssignments.filter(a=>a.subcontractor_id===x.id && (!!a.archived_at===rmlShowArchivedSubContracts));
+  const contracts=as.map(a=>{const j=db.chantiers.find(z=>z.id===a.chantier_id),c=db.clients.find(z=>z.id===j?.client_id),signed=!!a.signature_data,rmlSigned=!!a.rml_signature_data,signedLabel=signed&&a.signed_at?`<div class="sub-meta" style="margin-top:5px"><strong>Sous-traitant signé le :</strong> ${esc(new Date(a.signed_at).toLocaleString('fr-FR'))}${a.signer_name?' · '+esc(a.signer_name):''}${rmlSigned&&a.rml_signed_at?'<br><strong>RML signé le :</strong> '+esc(new Date(a.rml_signed_at).toLocaleString('fr-FR'))+(a.rml_signer_name?' · '+esc(a.rml_signer_name):''):'<br><strong>Signature RML en attente</strong>'}</div>`:'';return `<div class="sub-contract"><strong>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}</strong><div class="sub-meta">${esc(a.work_description||'Travaux non précisés')}${a.amount_ht!=null?' · '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}</div>${signedLabel}<div style="margin-top:8px"><span class="sub-status ${esc(a.status||'brouillon')}">${signed?(rmlSigned?'SIGNÉ PAR LES DEUX PARTIES':'À SIGNER PAR RML'):esc(a.status||'brouillon')}</span> ${!signed?`<button class="btn secondary" style="padding:6px 9px" onclick="editSubAssignment('${a.id}')">Modifier</button> `:''}<button class="btn secondary" style="padding:6px 9px" onclick="openSubContract('${a.id}')">${signed?(rmlSigned?'Voir le contrat signé':'Signer RML'):'Ouvrir / signer'}</button> ${signed?`<button class="btn secondary" style="padding:6px 9px" onclick="printSubContractById('${a.id}')">Imprimer / PDF</button>`:''}${currentAccess?.role==='administrateur'?` <button class="btn secondary" style="padding:6px 9px" onclick="rmlArchiveSubContract('${a.id}',${a.archived_at?'false':'true'})">${a.archived_at?'Restaurer':'Archiver'}</button> <button class="btn danger" style="padding:6px 9px" onclick="rmlDeleteSubContractAdmin('${a.id}')">Supprimer le contrat</button>`:''}</div></div>`}).join('');
   return `<div class="sub-card"><h3>${esc(x.company)}</h3><div class="sub-meta">${esc(x.contact_name||'')}${x.email?'<br>'+esc(x.email):''}${x.phone?'<br>'+esc(x.phone):''}${x.auth_user_id?'<br><strong>Accès ERP :</strong> '+esc(erpSubAccessUsers.find(u=>u.user_id===x.auth_user_id)?.email||'Compte rattaché'):''}</div><div class="actions"><button class="btn secondary" onclick="editSubcontractor('${x.id}')">Modifier</button><button class="btn" onclick="openSubAssignment('${x.id}')">+ Affecter un chantier</button><button class="btn secondary" onclick="openSubDocuments('${x.id}')">Documents administratifs</button><button class="btn danger" onclick="deleteSubcontractor('${x.id}')">Supprimer</button></div>${contracts||'<div class="muted" style="margin-top:10px">Aucun chantier affecté.</div>'}</div>`;
  }).join(''):'<div class="empty">Aucun sous-traitant enregistré.</div>';
 }
@@ -2781,6 +2783,32 @@ async function saveSubcontractor(){
  else {delete row.updated_at;({error}=await sb.from('erp_subcontractors').insert(row))}
  if(error){alert('Erreur Supabase : '+error.message);return}
  cancelSubcontractorEdit();await loadSubcontractors();
+}
+function rmlToggleSubArchives(){
+ if(currentAccess?.role!=='administrateur')return;
+ rmlShowArchivedSubContracts=!rmlShowArchivedSubContracts;
+ loadSubcontractors();
+}
+async function rmlArchiveSubContract(id,archive){
+ if(currentAccess?.role!=='administrateur'){alert('Réservé à l’administrateur.');return;}
+ const a=erpSubAssignments.find(x=>x.id===id);if(!a)return;
+ if(!confirm(archive?'Archiver ce contrat ? Il sera conservé avec ses signatures et retiré des contrats actifs.':'Restaurer ce contrat dans les contrats actifs ?'))return;
+ const {data,error}=await sb.from('erp_subcontract_assignments').update({archived_at:archive?new Date().toISOString():null}).eq('id',id).select('id,archived_at').maybeSingle();
+ if(error||!data){alert('Archivage impossible : '+(error?.message||'Mise à jour non confirmée')+'\nVérifiez que le SQL V32.6 a été exécuté.');return;}
+ await loadSubcontractors();
+}
+async function rmlDeleteSubContractAdmin(id){
+ if(currentAccess?.role!=='administrateur'){alert('Réservé à l’administrateur.');return;}
+ const a=erpSubAssignments.find(x=>x.id===id);if(!a)return;
+ const j=db.chantiers.find(x=>x.id===a.chantier_id),sub=erpSubcontractors.find(x=>x.id===a.subcontractor_id);
+ const signed=!!(a.signature_data||a.rml_signature_data||a.signed_at||a.rml_signed_at);
+ const label=(j?.nom||'Chantier')+' — '+(sub?.company||'Sous-traitant');
+ if(!confirm('SUPPRESSION DÉFINITIVE du contrat : '+label+' ?\n\n'+(signed?'ATTENTION : ce contrat est signé. Les signatures et le contrat seront définitivement perdus.\n\n':'')+'Le chantier et le sous-traitant seront conservés.'))return;
+ const check=prompt('Pour confirmer cette suppression irréversible, saisissez SUPPRIMER en majuscules :');
+ if(check!=='SUPPRIMER'){if(check!==null)alert('Suppression annulée : confirmation incorrecte.');return;}
+ const {data,error}=await sb.from('erp_subcontract_assignments').delete().eq('id',id).select('id');
+ if(error||!data?.length){alert('Suppression impossible : '+(error?.message||'Suppression non autorisée par Supabase.'));return;}
+ await loadSubcontractors();alert('Contrat supprimé. Le chantier et le sous-traitant sont conservés.');
 }
 async function deleteSubAssignmentDraft(id){
  if(!hasPerm('sous_traitants')||isSubcontractorUser()){alert('Vous ne disposez pas des droits pour supprimer ce contrat.');return}
@@ -4095,6 +4123,6 @@ function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V32.5';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
+<script>document.title='RML ERP — V32.6';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
 </body>
 </html>
