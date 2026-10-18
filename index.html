@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V32</title>
+<title>RML ERP — V32.1</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -417,7 +417,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.1</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -731,6 +731,26 @@ const PREP_CATALOG={gouttieres:['GF300','GF380','GFDR300','GFT330','GFC300','GFC
 // V31.6 — catalogue central administrateur, sauvegardé dans une table Supabase dédiée.
 const RML_CATALOG_LABELS={gouttieres:'Gouttières',accessoires_gouttieres:'Accessoires gouttières',descentes_formes:'Formes descentes',descentes_rondes:'Dimensions rondes',descentes_rectangles:'Dimensions rectangulaires',accessoires_descentes:'Accessoires descentes',couvertines:'Couvertines',crochets:'Crochets',accessoires_couvertines:'Accessoires couvertines',bandeaux:'Bandeaux',sous_faces:'Sous-faces',pliage:'Pliage — produits personnalisés',zinguerie:'Zinguerie — produits personnalisés',unites_personnalisees:'Unités'};
 function rmlGetPrepCatalog(){return PREP_CATALOG;}
+let rmlCatalogSavedSnapshot=null;
+let rmlCatalogSaveBusy=false;
+function rmlCatalogSnapshot(){
+ const result={};
+ for(const key of Object.keys(PREP_CATALOG)){
+  const box=document.querySelector('[data-rml-catalog="'+key+'"]');
+  result[key]=box?[...box.querySelectorAll('.rml-catalog-row input')].map(e=>e.value):[...PREP_CATALOG[key]];
+ }
+ return JSON.stringify(result);
+}
+function rmlCatalogMarkClean(){rmlCatalogSavedSnapshot=rmlCatalogSnapshot();}
+function rmlCatalogHasChanges(){return rmlCatalogSavedSnapshot!==null&&rmlCatalogSnapshot()!==rmlCatalogSavedSnapshot;}
+function rmlCatalogLeaveDecision(){
+ if(!rmlCatalogHasChanges())return 'leave';
+ const answer=prompt('Voulez-vous enregistrer les modifications ?\n\n1 = Enregistrer et quitter\n2 = Quitter sans enregistrer\n3 = Annuler et rester dans Modifier produits','1');
+ if(answer===null||answer.trim()==='3')return 'stay';
+ if(answer.trim()==='2')return 'leave';
+ if(answer.trim()==='1')return 'save';
+ alert('Choisissez 1, 2 ou 3.');return 'stay';
+}
 function rmlCatalogAdmin(){return !!currentAccess?.active&&currentAccess?.role==='administrateur'}
 function rmlCatalogStatus(message,error=false){const el=$('rmlCatalogStatus');if(el){el.textContent=message;el.style.color=error?'#ad2424':''}}
 function rmlApplyCatalog(data){if(!data||typeof data!=='object')return;for(const key of Object.keys(PREP_CATALOG)){if(Array.isArray(data[key]))PREP_CATALOG[key].splice(0,PREP_CATALOG[key].length,...data[key].filter(v=>typeof v==='string'&&v.trim()).map(v=>v.trim()));}}
@@ -809,8 +829,8 @@ async function rmlImportPrepProducts(){
   rmlCatalogStatus(found?`${found} produit(s) récupéré(s) depuis ${checked} préparation(s). Vérifiez les noms, puis cliquez sur « Enregistrer les modifications » pour les sauvegarder dans Supabase.`:`${checked} préparation(s) consultée(s). Aucun nouveau nom de produit à ajouter. Les noms déjà présents sont conservés.`);
  }catch(e){rmlCatalogStatus('Récupération impossible : '+e.message+' (aucune modification enregistrée).',true);}
 }
-async function rmlOpenCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}go('rmlCatalogView');const ok=await rmlLoadCatalog();rmlRenderCatalog();if(ok)rmlCatalogStatus('Catalogue chargé. Modifiez les produits puis enregistrez.');}
-async function rmlSaveCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}const products={};for(const key of Object.keys(PREP_CATALOG)){const box=document.querySelector('[data-rml-catalog="'+key+'"]');const vals=[...(box?.querySelectorAll('input')||[])].map(e=>e.value.trim()).filter(Boolean);if(new Set(vals.map(v=>v.toLocaleLowerCase('fr'))).size!==vals.length){rmlCatalogStatus('Doublon détecté dans « '+RML_CATALOG_LABELS[key]+' ».',true);return;}products[key]=vals;}rmlCatalogStatus('Enregistrement dans Supabase…');try{const {error}=await sb.from('erp_prep_catalog').upsert({id:1,products,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)throw error;rmlApplyCatalog(products);rmlCatalogStatus('Modifications enregistrées dans Supabase. Les nouvelles préparations utiliseront le catalogue actualisé.');}catch(e){rmlCatalogStatus('Enregistrement impossible : '+e.message+'. Vérifiez que le script SQL V31.6 a été exécuté.',true);}}
+async function rmlOpenCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}go('rmlCatalogView');const ok=await rmlLoadCatalog();rmlRenderCatalog();if(ok)rmlCatalogStatus('Catalogue chargé. Modifiez les produits puis enregistrez.');rmlCatalogMarkClean();}
+async function rmlSaveCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return false;}const products={};for(const key of Object.keys(PREP_CATALOG)){const box=document.querySelector('[data-rml-catalog="'+key+'"]');const vals=[...(box?.querySelectorAll('input')||[])].map(e=>e.value.trim()).filter(Boolean);if(new Set(vals.map(v=>v.toLocaleLowerCase('fr'))).size!==vals.length){rmlCatalogStatus('Doublon détecté dans « '+RML_CATALOG_LABELS[key]+' ».',true);return false;}products[key]=vals;}rmlCatalogStatus('Enregistrement dans Supabase…');try{const {error}=await sb.from('erp_prep_catalog').upsert({id:1,products,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)throw error;rmlApplyCatalog(products);rmlCatalogMarkClean();rmlCatalogStatus('Modifications enregistrées dans Supabase. Les nouvelles préparations utiliseront le catalogue actualisé.');return true;}catch(e){rmlCatalogStatus('Enregistrement impossible : '+e.message+'. Vérifiez que le script SQL V31.6 a été exécuté.',true);return false;}}
 const PREP_SCHEMAS={
  gouttieres:{label:'Gouttières',headers:['Type','Couleur','Quantité / ML','Observations'],fields:[['type','select',PREP_CATALOG.gouttieres],['color','select',PREP_COLORS],['qty','text'],['note','text']]},
  accessoires_gouttieres:{label:'Accessoires gouttières',headers:['Accessoire','Couleur','Quantité','Observations'],fields:[['type','select',PREP_CATALOG.accessoires_gouttieres],['color','select',PREP_COLORS],['qty','number'],['note','text']]},
@@ -863,7 +883,7 @@ async function openPreparation(jobId){
  closeModal('jobCardModal'); closeModal('prepSelectModal');
  go('preparation');
  setPrepStatus('Catalogue général chargé : '+Object.values(PREP_CATALOG).reduce((n,a)=>n+a.length,0)+' références disponibles.','ok');
- setTimeout(()=>{bridgePreparationContext();loadJobDocumentsPanel(jobId);updateJobDocumentSourceUI();},150);
+ setTimeout(()=>{bridgePreparationContext();loadJobDocumentsPanel(jobId);rmlStartJobDocsAutoRefresh(jobId);updateJobDocumentSourceUI();},150);
 }
 function closePreparation(){const id=currentPrepSourceJobId;go('chantiers');if(id)setTimeout(()=>openJob(id),0)}
 function buildPrepPayload(){return {version:'ERP-V0.6',saved_at:new Date().toISOString(),info:{date:prepDate.value,horaires:prepHoraires.value,acces:prepAcces.value,chef:prepChef.value,remarques:prepRemarques.value},sections:collectPrepSections()}}
@@ -1115,10 +1135,24 @@ function applyAccessUI(){
   newJobBtn.style.display=hasPerm('chantiers')?'':'none';
   document.querySelectorAll('#modules [data-permission]').forEach(el=>el.style.display=hasPerm(el.dataset.permission)?'':'none');
 }
+async function rmlNavigateFromCatalog(view){
+ const choice=rmlCatalogLeaveDecision();
+ if(choice==='stay')return;
+ if(choice==='save'){
+  if(rmlCatalogSaveBusy)return;
+  rmlCatalogSaveBusy=true;
+  try{if(!await rmlSaveCatalog())return;}finally{rmlCatalogSaveBusy=false;}
+ }
+ if(choice==='leave')rmlCatalogSavedSnapshot=null;
+ go(view);
+}
+window.addEventListener('beforeunload',e=>{if(document.getElementById('rmlCatalogView')?.classList.contains('active')&&rmlCatalogHasChanges()){e.preventDefault();e.returnValue='';}});
 function go(view){
+if(document.getElementById('rmlCatalogView')?.classList.contains('active')&&view!=='rmlCatalogView'&&rmlCatalogHasChanges()){rmlNavigateFromCatalog(view);return;}
+
 if(isSubcontractorUser()){view='subPortal'}else if(isEmployeeUser() && view!=='atelierPliage8' && !(currentAccess?.role==='chef_equipe'&&view==='suivi')){view='employeePortal'}
 if(view==='atelierPliage8'&&!rmlCanAtelier8())view=isEmployeeUser()?'employeePortal':'dashboard';
-if(view==='atelierPliage8')setTimeout(rmlLoadAtelier8,0);if(view==='preparation')setTimeout(loadPreparationApp,0);if(view==='stock'&&!hasPerm('stock'))view='dashboard';if(view==='equipes'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='stock')loadStock();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='equipes')loadTeamsAdmin();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security'){renderResetStats();rmlMonitorRefresh();}if(view==='page-forecast')renderMonthlyForecast();
+if(view==='atelierPliage8')setTimeout(rmlLoadAtelier8,0);if(view==='preparation')setTimeout(()=>{loadPreparationApp();if(currentPrepJobId)loadJobDocumentsPanel(currentPrepJobId);},0);if(view==='stock'&&!hasPerm('stock'))view='dashboard';if(view==='equipes'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='stock')loadStock();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='equipes')loadTeamsAdmin();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security'){renderResetStats();rmlMonitorRefresh();}if(view==='page-forecast')renderMonthlyForecast();
 // V27 mobile : afficher immédiatement le module sélectionné sous l'en-tête.
 // Aucun changement de navigation ou de données sur ordinateur.
 if(window.matchMedia('(max-width: 760px)').matches){
@@ -2926,13 +2960,23 @@ async function loadAdminJobTeamTime(jobId){
  box.className='';
  box.innerHTML=`<div class="notice" style="margin-bottom:10px"><strong>Total chantier : ${total.toLocaleString('fr-FR')} h</strong></div><div style="display:grid;gap:8px">${rows.map(r=>`<div class="employee-doc"><div><strong>${esc(new Date(r.work_date+'T12:00:00').toLocaleDateString('fr-FR'))} — Équipe ${esc(r.team_number)}</strong><div class="muted">${r.note?esc(r.note):'Sans observation'}</div></div><div style="font-size:18px;font-weight:800;white-space:nowrap">${Number(r.hours||0).toLocaleString('fr-FR')} h</div></div>`).join('')}</div>`;
 }
+let rmlDocsRefreshing=false;
+let rmlDocsRefreshTimer=null;
+function rmlStartJobDocsAutoRefresh(jobId){
+ if(rmlDocsRefreshTimer)clearInterval(rmlDocsRefreshTimer);
+ rmlDocsRefreshTimer=setInterval(()=>{
+  if(currentPrepJobId===jobId&&document.getElementById('preparation')?.classList.contains('active')&&!rmlDocsRefreshing){loadJobDocumentsPanel(jobId);}
+ },30000);
+}
 async function loadJobDocumentsPanel(jobId){
- const status=document.getElementById('jobDocumentsStatus'),list=document.getElementById('jobDocumentsList');if(!status||!list)return;
+ const status=document.getElementById('jobDocumentsStatus'),list=document.getElementById('jobDocumentsList');if(!status||!list||!jobId||rmlDocsRefreshing)return;
+ rmlDocsRefreshing=true;
  status.className='notice';status.textContent='Chargement des documents…';
- const [{data:docs,error},{data:recips,error:re}]=await Promise.all([sb.from('erp_documents').select('*').eq('chantier_id',jobId).order('created_at',{ascending:false}),sb.from('erp_document_subcontractors').select('*')]);
- if(error){status.className='notice danger';status.textContent='Documents indisponibles : '+error.message;list.innerHTML='';return}
+ let docs,error,recips,re;try{const responses=await Promise.all([sb.from('erp_documents').select('*').eq('chantier_id',jobId).order('created_at',{ascending:false}),sb.from('erp_document_subcontractors').select('*')]);({data:docs,error}=responses[0]);({data:recips,error:re}=responses[1]);}catch(e){status.className='notice danger';status.textContent='Documents indisponibles : '+e.message;rmlDocsRefreshing=false;return;}
+ if(error){status.className='notice danger';status.textContent='Documents indisponibles : '+error.message;list.innerHTML='';rmlDocsRefreshing=false;return}
  const rows=docs||[],links=re?[]:(recips||[]);const terrain=rows.filter(d=>String(d.storage_path||'').includes('/employee/'));status.textContent=`${rows.length} document(s) lié(s) à ce chantier${terrain.length?' · '+terrain.length+' photo(s) terrain reçue(s) des salariés':''}.`;
  list.innerHTML=rows.length?rows.map(d=>{const n=links.filter(r=>r.document_id===d.id).length;let vis=[];if(d.employee_visible)vis.push('Salariés');if(d.subcontractor_visible)vis.push('Sous-traitants'+(n?' ('+n+')':''));if(!vis.length)vis.push('Interne RML');const terrain=String(d.storage_path||'').includes('/employee/');const source=terrain?'Photo terrain reçue du salarié':'Document RML';return `<div class="doc-row"${terrain?' style="border-left:4px solid var(--navy)"':''}><div><div class="doc-name">${esc(d.file_name||'Document')}</div><div class="doc-meta"><strong>${esc(source)}</strong>${d.note?' · '+esc(d.note):''}</div></div><div>${esc(d.category||'Autre')}<div class="doc-meta">${vis.join(' · ')}</div></div><div class="doc-meta">${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR'):''}</div><div class="actions"><button class="btn secondary" type="button" onclick="openJobDocument('${d.id}','${jobId}')">Ouvrir</button><button class="btn secondary" type="button" onclick="toggleJobEmployeeVisibility('${d.id}','${jobId}',${d.employee_visible?'false':'true'})">${d.employee_visible?'Masquer aux salariés':'Rendre visible salariés'}</button><button class="btn danger" type="button" onclick="deleteJobDocument('${d.id}','${jobId}')">Supprimer</button></div></div>`}).join(''):'<div class="empty">Aucun document pour ce chantier.</div>';
+ rmlDocsRefreshing=false;
 }
 
 function updateJobDocumentSourceUI(){const isPhoto=document.getElementById('jobDocCategory')?.value==='Photo';const std=document.getElementById('jobDocStandardSource'),pho=document.getElementById('jobDocPhotoSource'),emp=document.getElementById('jobDocEmployee');if(std)std.style.display=isPhoto?'none':'';if(pho)pho.style.display=isPhoto?'':'none';if(isPhoto&&emp)emp.checked=true}
@@ -3991,6 +4035,6 @@ function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V32';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
+<script>document.title='RML ERP — V32.1';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
 </body>
 </html>
