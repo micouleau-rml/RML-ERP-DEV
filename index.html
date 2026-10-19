@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V32.7</title>
+<title>RML ERP — V32.8</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -417,7 +417,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.7</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.8</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -489,7 +489,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <div class="upload-box" style="margin-top:12px">
 <div class="upload-grid"><div class="field"><label>Catégorie</label><select id="jobDocCategory" onchange="updateJobDocumentSourceUI()"><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div>
 <div class="field"><label>Source</label><div id="jobDocStandardSource"><input id="jobDocFile" type="file" multiple onchange="jobDocsAddFiles(this.files)" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.heic,.heif"></div><div id="jobDocPhotoSource" style="display:none"><div class="actions"><button class="btn secondary" type="button" onclick="chooseJobPhotoFile()">Choisir un fichier photo</button><button class="btn secondary" type="button" onclick="chooseJobPhotoLibrary()">Photothèque</button></div><div id="jobDocPhotoSelected" class="muted" style="margin-top:6px">Aucune photo sélectionnée.</div><input id="jobDocPhotoFile" type="file" accept="image/*" multiple hidden onchange="jobDocsAddFiles(this.files)"><input id="jobDocPhotoLibrary" type="file" accept="image/*,.heic,.heif" multiple hidden onchange="jobDocsAddFiles(this.files)"></div></div></div>
-<div id="jobDocsDropZone" tabindex="0" role="button" aria-label="Glisser des fichiers ou sélectionner plusieurs documents" onclick="document.getElementById('jobDocFile').click()" ondragover="jobDocsDrag(event)" ondragleave="jobDocsDragLeave(event)" ondrop="jobDocsDrop(event)" style="border:2px dashed #8296af;border-radius:12px;padding:17px;text-align:center;background:#f5f8fc;cursor:pointer;margin:10px 0"><strong>Glissez-déposez ici plusieurs photos, plans ou documents</strong><div class="muted">Ou cliquez pour sélectionner plusieurs fichiers en une fois.</div></div><div id="jobDocsQueue" style="margin:8px 0" aria-live="polite"></div>
+<div id="jobDocsDropZone" tabindex="0" role="button" aria-label="Glisser des fichiers ou sélectionner plusieurs documents" onclick="document.getElementById('jobDocFile').click()" ondragover="jobDocsDrag(event)" ondragleave="jobDocsDragLeave(event)" ondrop="jobDocsDrop(event)" style="border:2px dashed #8296af;border-radius:12px;padding:17px;text-align:center;background:#f5f8fc;cursor:pointer;margin:10px 0"><strong>Glissez-déposez ici plusieurs photos, plans ou documents (copie)</strong><div class="muted">Ou cliquez pour sélectionner plusieurs fichiers en une fois.</div></div><div id="jobDocsQueue" style="margin:8px 0" aria-live="polite"></div>
 <div class="field"><label>Note</label><input id="jobDocNote" placeholder="Description facultative"></div>
 <div class="grid2"><div class="field"><label><input id="jobDocEmployee" type="checkbox"> Salarié — visible par les salariés affectés au chantier</label></div><div class="field"><label><input id="jobDocSub" type="checkbox"> Sous-traitant — visible par les sous-traitants affectés au chantier</label></div></div>
 <div class="actions"><button class="btn" type="button" onclick="currentPrepJobId&&uploadJobDocument(currentPrepJobId)" id="jobDocsUploadButton">Ajouter les documents</button></div></div>
@@ -3057,9 +3057,28 @@ function jobDocsRenderQueue(){
  el.innerHTML=jobDocsPending.length?'<strong>'+jobDocsPending.length+' fichier(s) prêt(s) à envoyer :</strong>'+jobDocsPending.map((f,i)=>'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #e2e8f0"><span style="overflow-wrap:anywhere">'+esc(f.name)+' <small>('+Math.round(f.size/1024)+' Ko)</small></span><button class="btn secondary" type="button" onclick="jobDocsRemove('+i+')">Retirer</button></div>').join(''):'<span class="muted">Aucun fichier en attente.</span>';
 }
 function jobDocsRemove(i){jobDocsPending.splice(i,1);jobDocsRenderQueue()}
-function jobDocsDrag(e){e.preventDefault();e.stopPropagation();document.getElementById('jobDocsDropZone').style.background='#e1efff'}
-function jobDocsDragLeave(e){e.preventDefault();document.getElementById('jobDocsDropZone').style.background='#f5f8fc'}
-function jobDocsDrop(e){e.preventDefault();e.stopPropagation();jobDocsDragLeave(e);jobDocsAddFiles(e.dataTransfer?.files)}
+// V32.8 : le dépôt de documents externes demande explicitement une COPIE.
+// Le navigateur ne peut toutefois pas imposer à Apple Notes de conserver sa pièce jointe.
+function jobDocsDrag(e){
+ e.preventDefault();e.stopPropagation();
+ if(e.dataTransfer)e.dataTransfer.dropEffect='copy';
+ const zone=document.getElementById('jobDocsDropZone');if(zone)zone.style.background='#e1efff';
+}
+function jobDocsDragLeave(e){e.preventDefault();e.stopPropagation();const zone=document.getElementById('jobDocsDropZone');if(zone)zone.style.background='#f5f8fc'}
+function jobDocsDrop(e){
+ e.preventDefault();e.stopPropagation();
+ if(e.dataTransfer)e.dataTransfer.dropEffect='copy';
+ jobDocsDragLeave(e);
+ const files=Array.from(e.dataTransfer?.files||[]).filter(f=>f&&f.size>=0);
+ if(!files.length){
+  const status=document.getElementById('jobDocumentsStatus');
+  if(status)status.textContent='Aucun fichier reçu. Depuis Notes, utilisez Partager → Enregistrer dans Fichiers, puis sélectionnez le document ici.';
+  return;
+ }
+ jobDocsAddFiles(files);
+ const status=document.getElementById('jobDocumentsStatus');
+ if(status)status.textContent=files.length+' fichier(s) ajouté(s) à la liste. Cliquez sur Enregistrer pour les copier dans le chantier. Les originaux ne sont pas modifiés par l’ERP.';
+}
 async function uploadJobDocument(jobId){
  if(!hasPerm('chantiers'))return;
  const files=[...jobDocsPending];if(!files.length){alert('Sélectionnez ou glissez-déposez un ou plusieurs fichiers.');return}
@@ -4152,6 +4171,6 @@ function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V32.7';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
+<script>document.title='RML ERP — V32.8';document.documentElement.dataset.rmlVersion='V32.8';window.RML_ERP_VERSION='32.8';</script>
 </body>
 </html>
