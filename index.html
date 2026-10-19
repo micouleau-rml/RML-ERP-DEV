@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V32.6</title>
+<title>RML ERP — V32.7</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -417,7 +417,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.6</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.7</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -2794,7 +2794,7 @@ async function rmlArchiveSubContract(id,archive){
  const a=erpSubAssignments.find(x=>x.id===id);if(!a)return;
  if(!confirm(archive?'Archiver ce contrat ? Il sera conservé avec ses signatures et retiré des contrats actifs.':'Restaurer ce contrat dans les contrats actifs ?'))return;
  const {data,error}=await sb.from('erp_subcontract_assignments').update({archived_at:archive?new Date().toISOString():null}).eq('id',id).select('id,archived_at').maybeSingle();
- if(error||!data){alert('Archivage impossible : '+(error?.message||'Mise à jour non confirmée')+'\nVérifiez que le SQL V32.6 a été exécuté.');return;}
+ if(error||!data){alert('Archivage impossible : '+(error?.message||'Mise à jour non confirmée')+'\nVérifiez que le SQL V32.7 a été exécuté.');return;}
  await loadSubcontractors();
 }
 async function rmlDeleteSubContractAdmin(id){
@@ -3037,7 +3037,7 @@ async function loadJobDocumentsPanel(jobId){
  let docs,error,recips,re;try{const responses=await Promise.all([sb.from('erp_documents').select('*').eq('chantier_id',jobId).order('created_at',{ascending:false}),sb.from('erp_document_subcontractors').select('*')]);({data:docs,error}=responses[0]);({data:recips,error:re}=responses[1]);}catch(e){status.className='notice danger';status.textContent='Documents indisponibles : '+e.message;rmlDocsRefreshing=false;return;}
  if(error){status.className='notice danger';status.textContent='Documents indisponibles : '+error.message;list.innerHTML='';rmlDocsRefreshing=false;return}
  const rows=docs||[],links=re?[]:(recips||[]);const terrain=rows.filter(d=>String(d.storage_path||'').includes('/employee/'));status.textContent=`${rows.length} document(s) lié(s) à ce chantier${terrain.length?' · '+terrain.length+' photo(s) terrain reçue(s) des salariés':''}.`;
- list.innerHTML=rows.length?rows.map(d=>{const n=links.filter(r=>r.document_id===d.id).length;let vis=[];if(d.employee_visible)vis.push('Salariés');if(d.subcontractor_visible)vis.push('Sous-traitants'+(n?' ('+n+')':''));if(!vis.length)vis.push('Interne RML');const terrain=String(d.storage_path||'').includes('/employee/');const source=terrain?'Photo terrain reçue du salarié':'Document RML';return `<div class="doc-row"${terrain?' style="border-left:4px solid var(--navy)"':''}><div><div class="doc-name">${esc(d.file_name||'Document')}</div><div class="doc-meta"><strong>${esc(source)}</strong>${d.note?' · '+esc(d.note):''}</div></div><div>${esc(d.category||'Autre')}<div class="doc-meta">${vis.join(' · ')}</div></div><div class="doc-meta">${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR').replaceAll('/','-'):''}</div><div class="actions"><button class="btn secondary" type="button" onclick="openJobDocument('${d.id}','${jobId}')">Ouvrir</button><button class="btn secondary" type="button" onclick="toggleJobEmployeeVisibility('${d.id}','${jobId}',${d.employee_visible?'false':'true'})">${d.employee_visible?'Masquer aux salariés':'Rendre visible salariés'}</button><button class="btn danger" type="button" onclick="deleteJobDocument('${d.id}','${jobId}')">Supprimer</button></div></div>`}).join(''):'<div class="empty">Aucun document pour ce chantier.</div>';
+ list.innerHTML=rows.length?rows.map(d=>{const n=links.filter(r=>r.document_id===d.id).length;let vis=[];if(d.employee_visible)vis.push('Salariés');if(d.subcontractor_visible)vis.push('Sous-traitants'+(n?' ('+n+')':''));if(!vis.length)vis.push('Interne RML');const terrain=String(d.storage_path||'').includes('/employee/');const source=terrain?'Photo terrain reçue du salarié':'Document RML';return `<div class="doc-row"${terrain?' style="border-left:4px solid var(--navy)"':''}><div><div class="doc-name">${esc(d.file_name||'Document')}</div><div class="doc-meta"><strong>${esc(source)}</strong>${d.note?' · '+esc(d.note):''}</div></div><div>${esc(d.category||'Autre')}<div class="doc-meta">${vis.join(' · ')}</div></div><div class="doc-meta">${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR').replaceAll('/','-'):''}</div><div class="actions"><button class="btn secondary" type="button" onclick="openJobDocument('${d.id}','${jobId}')">Visualiser</button><button class="btn secondary" type="button" onclick="printJobDocument('${d.id}','${jobId}')">Imprimer</button><button class="btn secondary" type="button" onclick="downloadJobDocument('${d.id}','${jobId}')">Télécharger</button><button class="btn secondary" type="button" onclick="toggleJobEmployeeVisibility('${d.id}','${jobId}',${d.employee_visible?'false':'true'})">${d.employee_visible?'Masquer aux salariés':'Rendre visible salariés'}</button><button class="btn danger" type="button" onclick="deleteJobDocument('${d.id}','${jobId}')">Supprimer</button></div></div>`}).join(''):'<div class="empty">Aucun document pour ce chantier.</div>';
  rmlDocsRefreshing=false;
 }
 
@@ -3096,6 +3096,35 @@ async function uploadJobDocument(jobId){
 
 async function toggleJobEmployeeVisibility(docId,jobId,visible){if(!hasPerm('chantiers'))return;const {error}=await sb.from('erp_documents').update({employee_visible:!!visible}).eq('id',docId).eq('chantier_id',jobId);if(error){alert('Modification impossible : '+error.message);return}await loadJobDocumentsPanel(jobId)}
 async function openJobDocument(docId,jobId){const viewer=rmlV22PrepareViewer();const {data:d,error}=await sb.from('erp_documents').select('*').eq('id',docId).eq('chantier_id',jobId).single();if(error||!d){rmlV22ViewerError(viewer,'Document inaccessible.');return}const r=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,300);if(r.error){rmlV22ViewerError(viewer,'Ouverture impossible : '+r.error.message);return}rmlV22ShowViewer(viewer,r.data.signedUrl)}
+// V32.7 — actions directes sur les documents du chantier.
+async function rmlJobDocumentAction(docId,jobId,action){
+ const viewer=action==='download'?null:rmlV22PrepareViewer();
+ try{
+  const {data:d,error}=await sb.from('erp_documents').select('file_name,storage_path,mime_type').eq('id',docId).eq('chantier_id',jobId).single();
+  if(error||!d||!d.storage_path)throw Error('Document inaccessible.');
+  if(action==='download'){
+   const result=await sb.storage.from(DOC_BUCKET).download(d.storage_path);
+   if(result.error)throw result.error;
+   const url=URL.createObjectURL(result.data),a=document.createElement('a');a.href=url;a.download=d.file_name||'document';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);return;
+  }
+  const result=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,300);
+  if(result.error||!result.data?.signedUrl)throw Error(result.error?.message||'Lien indisponible.');
+  if(action==='print'){
+   // La fenêtre affiche le document et donne accès à la commande Imprimer du navigateur.
+   const url=result.data.signedUrl;
+   if(viewer&&!viewer.closed){
+    const name=String(d.file_name||'Document').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const safeUrl=url.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const page=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Impression — ${name}</title><style>body{margin:0;font-family:Arial}header{padding:10px 16px;background:#102a43;color:white;display:flex;align-items:center;gap:14px}button{padding:9px 15px;cursor:pointer}iframe{width:100%;height:calc(100vh - 65px);border:0}@media print{header{display:none}iframe{height:100vh}}</style></head><body><header><strong>${name}</strong><button id="printBtn">Imprimer</button><button id="openBtn">Ouvrir le fichier</button></header><iframe id="rmlPrintFrame" title="Document à imprimer" src="${safeUrl}"></iframe></body></html>`;
+    viewer.document.open();viewer.document.write(page);viewer.document.close();
+    viewer.document.getElementById('printBtn').onclick=()=>{try{viewer.document.getElementById('rmlPrintFrame').contentWindow.print()}catch(e){viewer.print()}};
+    viewer.document.getElementById('openBtn').onclick=()=>viewer.open(url,'_blank');
+   }else rmlV22ShowViewer(viewer,url);
+  }else rmlV22ShowViewer(viewer,result.data.signedUrl);
+ }catch(e){if(viewer)rmlV22ViewerError(viewer,'Impossible de '+(action==='print'?'préparer l’impression':'télécharger')+' : '+(e.message||e));else alert('Téléchargement impossible : '+(e.message||e));}
+}
+function printJobDocument(docId,jobId){return rmlJobDocumentAction(docId,jobId,'print')}
+function downloadJobDocument(docId,jobId){return rmlJobDocumentAction(docId,jobId,'download')}
 async function deleteJobDocument(docId,jobId){if(!confirm('Voulez-vous supprimer ce document du chantier ?'))return;const {data:d}=await sb.from('erp_documents').select('storage_path').eq('id',docId).eq('chantier_id',jobId).maybeSingle();await sb.from('erp_document_subcontractors').delete().eq('document_id',docId);const {error}=await sb.from('erp_documents').delete().eq('id',docId).eq('chantier_id',jobId);if(error){alert('Suppression impossible : '+error.message);return}if(d?.storage_path)await sb.storage.from(DOC_BUCKET).remove([d.storage_path]);await loadJobDocumentsPanel(jobId)}
 
 async function loadDocuments(){if(!hasPerm('documents'))return;initDocumentSelectors();documentsStatus.textContent='Chargement des documents…';const [{data,error},{data:recips,error:re}]=await Promise.all([sb.from('erp_documents').select('*').order('created_at',{ascending:false}),sb.from('erp_document_subcontractors').select('*')]);if(error){erpDocuments=[];documentsStatus.textContent='Documents indisponibles : '+error.message;documentsStatus.className='notice danger';renderDocuments();return}erpDocuments=data||[];erpDocumentRecipients=re?[]:(recips||[]);documentsStatus.className='notice';documentsStatus.textContent=`${erpDocuments.length} document(s) enregistré(s).`;renderDocuments()}
@@ -4123,6 +4152,6 @@ function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V32.6';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
+<script>document.title='RML ERP — V32.7';document.documentElement.dataset.rmlVersion='V31.7';window.RML_ERP_VERSION='31.7';</script>
 </body>
 </html>
