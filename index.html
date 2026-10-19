@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V32.8</title>
+<title>RML ERP — V32.10</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -417,7 +417,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.8</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V32.10</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -880,6 +880,8 @@ async function openPreparation(jobId){
  }
  if(!hasPerm('preparation')){alert('Accès non autorisé au module Préparation chantier.');return}
  const job=db.chantiers.find(j=>j.id===jobId); if(!job)return;
+ // V32.10 : les fichiers en attente appartiennent exclusivement au chantier actif.
+ if(currentPrepJobId!==jobId)rmlResetJobDocsPending();
  currentPrepJobId=jobId; currentPrepSourceJobId=jobId;
  closeModal('jobCardModal'); closeModal('prepSelectModal');
  go('preparation');
@@ -3036,6 +3038,7 @@ async function loadJobDocumentsPanel(jobId){
  status.className='notice';status.textContent='Chargement des documents…';
  let docs,error,recips,re;try{const responses=await Promise.all([sb.from('erp_documents').select('*').eq('chantier_id',jobId).order('created_at',{ascending:false}),sb.from('erp_document_subcontractors').select('*')]);({data:docs,error}=responses[0]);({data:recips,error:re}=responses[1]);}catch(e){status.className='notice danger';status.textContent='Documents indisponibles : '+e.message;rmlDocsRefreshing=false;return;}
  if(error){status.className='notice danger';status.textContent='Documents indisponibles : '+error.message;list.innerHTML='';rmlDocsRefreshing=false;return}
+ if(jobId!==currentPrepJobId){rmlDocsRefreshing=false;return;}
  const rows=docs||[],links=re?[]:(recips||[]);const terrain=rows.filter(d=>String(d.storage_path||'').includes('/employee/'));status.textContent=`${rows.length} document(s) lié(s) à ce chantier${terrain.length?' · '+terrain.length+' photo(s) terrain reçue(s) des salariés':''}.`;
  list.innerHTML=rows.length?rows.map(d=>{const n=links.filter(r=>r.document_id===d.id).length;let vis=[];if(d.employee_visible)vis.push('Salariés');if(d.subcontractor_visible)vis.push('Sous-traitants'+(n?' ('+n+')':''));if(!vis.length)vis.push('Interne RML');const terrain=String(d.storage_path||'').includes('/employee/');const source=terrain?'Photo terrain reçue du salarié':'Document RML';return `<div class="doc-row"${terrain?' style="border-left:4px solid var(--navy)"':''}><div><div class="doc-name">${esc(d.file_name||'Document')}</div><div class="doc-meta"><strong>${esc(source)}</strong>${d.note?' · '+esc(d.note):''}</div></div><div>${esc(d.category||'Autre')}<div class="doc-meta">${vis.join(' · ')}</div></div><div class="doc-meta">${d.created_at?new Date(d.created_at).toLocaleDateString('fr-FR').replaceAll('/','-'):''}</div><div class="actions"><button class="btn secondary" type="button" onclick="openJobDocument('${d.id}','${jobId}')">Visualiser</button><button class="btn secondary" type="button" onclick="printJobDocument('${d.id}','${jobId}')">Imprimer</button><button class="btn secondary" type="button" onclick="downloadJobDocument('${d.id}','${jobId}')">Télécharger</button><button class="btn secondary" type="button" onclick="toggleJobEmployeeVisibility('${d.id}','${jobId}',${d.employee_visible?'false':'true'})">${d.employee_visible?'Masquer aux salariés':'Rendre visible salariés'}</button><button class="btn danger" type="button" onclick="deleteJobDocument('${d.id}','${jobId}')">Supprimer</button></div></div>`}).join(''):'<div class="empty">Aucun document pour ce chantier.</div>';
  rmlDocsRefreshing=false;
@@ -3047,6 +3050,18 @@ function chooseJobPhotoLibrary(){const a=document.getElementById('jobDocPhotoFil
 function jobPhotoSelected(id){const f=document.getElementById(id)?.files?.[0],el=document.getElementById('jobDocPhotoSelected');if(el)el.textContent=f?('Photo sélectionnée : '+f.name):'Aucune photo sélectionnée.'}
 async function uploadJobPhotos(jobId,inputId){if(!hasPerm('chantiers'))return;const input=document.getElementById(inputId);if(!input?.files?.length)return;const j=db.chantiers.find(x=>x.id===jobId);if(!j)return;let ok=0;for(const f of [...input.files]){if(!String(f.type||'').startsWith('image/'))continue;const safe=f.name.replace(/[^a-zA-Z0-9._-]+/g,'_'),path=`${jobId}/admin/${Date.now()}_${Math.random().toString(36).slice(2,7)}_${safe}`;const up=await sb.storage.from(DOC_BUCKET).upload(path,f,{upsert:false,contentType:f.type||undefined});if(up.error){alert('Envoi impossible : '+up.error.message);return}const storedPath=up.data?.path||path;const verify=await sb.storage.from(DOC_BUCKET).createSignedUrl(storedPath,60);if(verify.error||!verify.data?.signedUrl){await sb.storage.from(DOC_BUCKET).remove([storedPath]);alert('La photo a été envoyée mais sa lecture dans le stockage a échoué : '+(verify.error?.message||'URL indisponible'));return}const emp=document.getElementById('jobDocEmployee'),sub=document.getElementById('jobDocSub');const row={client_id:j.client_id,chantier_id:jobId,category:'Photo',file_name:f.name,storage_path:storedPath,mime_type:f.type||null,file_size:f.size,note:'Photo ajoutée depuis la fiche chantier',employee_visible:emp?!!emp.checked:true,subcontractor_visible:sub?!!sub.checked:false};const ins=await sb.from('erp_documents').insert(row).select('id,chantier_id,file_name,storage_path,employee_visible').single();if(ins.error){await sb.storage.from(DOC_BUCKET).remove([path]);alert('Enregistrement impossible : '+ins.error.message);return}if(!ins.data?.id){await sb.storage.from(DOC_BUCKET).remove([path]);alert('La photo a été envoyée mais son enregistrement chantier n’a pas pu être confirmé.');return}ok++}input.value='';await loadJobDocumentsPanel(jobId);alert(ok+' photo(s) ajoutée(s) au chantier.')}
 let jobDocsPending=[];
+function rmlResetJobDocsPending(){
+ jobDocsPending=[];
+ for(const id of ['jobDocFile','jobDocPhotoFile','jobDocPhotoLibrary']){
+  const input=document.getElementById(id);if(input)input.value='';
+ }
+ const note=document.getElementById('jobDocNote');if(note)note.value='';
+ const emp=document.getElementById('jobDocEmployee');if(emp)emp.checked=false;
+ const sub=document.getElementById('jobDocSub');if(sub)sub.checked=false;
+ const status=document.getElementById('jobDocumentsStatus');if(status)status.textContent='';
+ jobDocsRenderQueue();
+}
+
 function jobDocsAddFiles(files){
  for(const f of Array.from(files||[]))if(!jobDocsPending.some(x=>x.name===f.name&&x.size===f.size&&x.lastModified===f.lastModified))jobDocsPending.push(f);
  jobDocsRenderQueue();
@@ -3057,7 +3072,7 @@ function jobDocsRenderQueue(){
  el.innerHTML=jobDocsPending.length?'<strong>'+jobDocsPending.length+' fichier(s) prêt(s) à envoyer :</strong>'+jobDocsPending.map((f,i)=>'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #e2e8f0"><span style="overflow-wrap:anywhere">'+esc(f.name)+' <small>('+Math.round(f.size/1024)+' Ko)</small></span><button class="btn secondary" type="button" onclick="jobDocsRemove('+i+')">Retirer</button></div>').join(''):'<span class="muted">Aucun fichier en attente.</span>';
 }
 function jobDocsRemove(i){jobDocsPending.splice(i,1);jobDocsRenderQueue()}
-// V32.8 : le dépôt de documents externes demande explicitement une COPIE.
+// V32.10 : le dépôt de documents externes demande explicitement une COPIE.
 // Le navigateur ne peut toutefois pas imposer à Apple Notes de conserver sa pièce jointe.
 function jobDocsDrag(e){
  e.preventDefault();e.stopPropagation();
@@ -3081,6 +3096,7 @@ function jobDocsDrop(e){
 }
 async function uploadJobDocument(jobId){
  if(!hasPerm('chantiers'))return;
+ if(jobId!==currentPrepJobId){alert('Le chantier a changé. Ouvrez le chantier concerné avant d’ajouter des documents.');return}
  const files=[...jobDocsPending];if(!files.length){alert('Sélectionnez ou glissez-déposez un ou plusieurs fichiers.');return}
  const j=db.chantiers.find(x=>x.id===jobId);if(!j)return;
  const cat=document.getElementById('jobDocCategory')?.value||'Autre';
@@ -3114,34 +3130,52 @@ async function uploadJobDocument(jobId){
 }
 
 async function toggleJobEmployeeVisibility(docId,jobId,visible){if(!hasPerm('chantiers'))return;const {error}=await sb.from('erp_documents').update({employee_visible:!!visible}).eq('id',docId).eq('chantier_id',jobId);if(error){alert('Modification impossible : '+error.message);return}await loadJobDocumentsPanel(jobId)}
-async function openJobDocument(docId,jobId){const viewer=rmlV22PrepareViewer();const {data:d,error}=await sb.from('erp_documents').select('*').eq('id',docId).eq('chantier_id',jobId).single();if(error||!d){rmlV22ViewerError(viewer,'Document inaccessible.');return}const r=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,300);if(r.error){rmlV22ViewerError(viewer,'Ouverture impossible : '+r.error.message);return}rmlV22ShowViewer(viewer,r.data.signedUrl)}
-// V32.7 — actions directes sur les documents du chantier.
+// V32.10 : aperçu intégré, sans fenêtre surgissante ni URL signée imposant le téléchargement.
+let rmlJobPreviewUrl=null;
+function rmlCloseJobPreview(){
+ const modal=document.getElementById('rmlJobPreviewModal');if(modal)modal.remove();
+ if(rmlJobPreviewUrl){URL.revokeObjectURL(rmlJobPreviewUrl);rmlJobPreviewUrl=null;}
+}
 async function rmlJobDocumentAction(docId,jobId,action){
- const viewer=action==='download'?null:rmlV22PrepareViewer();
+ if(action!=='download'){
+  rmlCloseJobPreview();
+  const modal=document.createElement('div');modal.id='rmlJobPreviewModal';
+  modal.style.cssText='position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.8);display:flex;align-items:center;justify-content:center;padding:12px';
+  modal.innerHTML='<div style="width:min(1200px,100%);height:min(94vh,100%);background:white;border-radius:12px;display:flex;flex-direction:column;overflow:hidden"><div style="padding:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><strong id="rmlJobPreviewTitle" style="flex:1;overflow-wrap:anywhere">Chargement du plan…</strong><button type="button" class="btn secondary" id="rmlJobPreviewPrint">Imprimer</button><button type="button" class="btn secondary" id="rmlJobPreviewOpen">Ouvrir dans un onglet</button><button type="button" class="btn secondary" id="rmlJobPreviewClose">Fermer</button></div><div id="rmlJobPreviewBody" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center">Chargement…</div></div>';
+  document.body.appendChild(modal);
+  modal.querySelector('#rmlJobPreviewClose').onclick=rmlCloseJobPreview;
+  modal.addEventListener('click',e=>{if(e.target===modal)rmlCloseJobPreview()});
+ }
+ const body=document.getElementById('rmlJobPreviewBody');
  try{
   const {data:d,error}=await sb.from('erp_documents').select('file_name,storage_path,mime_type').eq('id',docId).eq('chantier_id',jobId).single();
-  if(error||!d||!d.storage_path)throw Error('Document inaccessible.');
+  if(error||!d?.storage_path)throw Error(error?.message||'Document introuvable pour ce chantier.');
+  const result=await sb.storage.from(DOC_BUCKET).download(d.storage_path);
+  if(result.error||!result.data)throw Error(result.error?.message||'Téléchargement impossible.');
+  const name=d.file_name||'document';
   if(action==='download'){
-   const result=await sb.storage.from(DOC_BUCKET).download(d.storage_path);
-   if(result.error)throw result.error;
-   const url=URL.createObjectURL(result.data),a=document.createElement('a');a.href=url;a.download=d.file_name||'document';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);return;
+   const url=URL.createObjectURL(result.data),link=document.createElement('a');link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);return;
   }
-  const result=await sb.storage.from(DOC_BUCKET).createSignedUrl(d.storage_path,300);
-  if(result.error||!result.data?.signedUrl)throw Error(result.error?.message||'Lien indisponible.');
-  if(action==='print'){
-   // La fenêtre affiche le document et donne accès à la commande Imprimer du navigateur.
-   const url=result.data.signedUrl;
-   if(viewer&&!viewer.closed){
-    const name=String(d.file_name||'Document').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const safeUrl=url.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-    const page=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Impression — ${name}</title><style>body{margin:0;font-family:Arial}header{padding:10px 16px;background:#102a43;color:white;display:flex;align-items:center;gap:14px}button{padding:9px 15px;cursor:pointer}iframe{width:100%;height:calc(100vh - 65px);border:0}@media print{header{display:none}iframe{height:100vh}}</style></head><body><header><strong>${name}</strong><button id="printBtn">Imprimer</button><button id="openBtn">Ouvrir le fichier</button></header><iframe id="rmlPrintFrame" title="Document à imprimer" src="${safeUrl}"></iframe></body></html>`;
-    viewer.document.open();viewer.document.write(page);viewer.document.close();
-    viewer.document.getElementById('printBtn').onclick=()=>{try{viewer.document.getElementById('rmlPrintFrame').contentWindow.print()}catch(e){viewer.print()}};
-    viewer.document.getElementById('openBtn').onclick=()=>viewer.open(url,'_blank');
-   }else rmlV22ShowViewer(viewer,url);
-  }else rmlV22ShowViewer(viewer,result.data.signedUrl);
- }catch(e){if(viewer)rmlV22ViewerError(viewer,'Impossible de '+(action==='print'?'préparer l’impression':'télécharger')+' : '+(e.message||e));else alert('Téléchargement impossible : '+(e.message||e));}
+  if(!body||!body.isConnected)return;
+  const ext=name.split('.').pop().toLowerCase();
+  const type=d.mime_type||result.data.type||(ext==='pdf'?'application/pdf':ext==='png'?'image/png':ext==='jpg'||ext==='jpeg'?'image/jpeg':'');
+  const blob=new Blob([result.data],{type});rmlJobPreviewUrl=URL.createObjectURL(blob);
+  document.getElementById('rmlJobPreviewTitle').textContent=name;
+  const pdf=type==='application/pdf'||ext==='pdf',img=type.startsWith('image/')||['png','jpg','jpeg','gif','webp','bmp'].includes(ext);
+  if(pdf){const frame=document.createElement('iframe');frame.src=rmlJobPreviewUrl;frame.title=name;frame.style.cssText='width:100%;height:100%;border:0';body.replaceChildren(frame);}
+  else if(img){const picture=document.createElement('img');picture.src=rmlJobPreviewUrl;picture.alt=name;picture.style.cssText='max-width:100%;max-height:100%;object-fit:contain';body.replaceChildren(picture);}
+  else body.textContent='Ce format ne peut pas être affiché directement. Utilisez « Ouvrir dans un onglet » ou « Télécharger ».';
+  document.getElementById('rmlJobPreviewOpen').onclick=()=>{const w=window.open(rmlJobPreviewUrl,'_blank');if(!w)alert('Autorisez les fenêtres surgissantes pour ouvrir le fichier.')};
+  document.getElementById('rmlJobPreviewPrint').onclick=()=>{
+   if(pdf){const frame=body.querySelector('iframe');try{frame.contentWindow.focus();frame.contentWindow.print();return}catch(e){}}
+   const w=window.open('','_blank');if(!w){alert('Autorisez les fenêtres surgissantes pour imprimer.');return}
+   const safe=rmlJobPreviewUrl.replace(/"/g,'&quot;');
+   w.document.write('<!doctype html><html><head><title>Imprimer</title><style>body{margin:0}img{max-width:100%;height:auto}@media print{button{display:none}}</style></head><body><button onclick="window.print()">Imprimer</button>'+(img?'<img src="'+safe+'">':'<iframe src="'+safe+'" style="width:100%;height:95vh;border:0"></iframe>')+'</body></html>');w.document.close();
+  };
+  if(action==='print')document.getElementById('rmlJobPreviewPrint').focus();
+ }catch(e){if(body&&body.isConnected)body.textContent='Impossible de lire le plan : '+(e.message||e);else alert('Document inaccessible : '+(e.message||e));}
 }
+function openJobDocument(docId,jobId){return rmlJobDocumentAction(docId,jobId,'view')}
 function printJobDocument(docId,jobId){return rmlJobDocumentAction(docId,jobId,'print')}
 function downloadJobDocument(docId,jobId){return rmlJobDocumentAction(docId,jobId,'download')}
 async function deleteJobDocument(docId,jobId){if(!confirm('Voulez-vous supprimer ce document du chantier ?'))return;const {data:d}=await sb.from('erp_documents').select('storage_path').eq('id',docId).eq('chantier_id',jobId).maybeSingle();await sb.from('erp_document_subcontractors').delete().eq('document_id',docId);const {error}=await sb.from('erp_documents').delete().eq('id',docId).eq('chantier_id',jobId);if(error){alert('Suppression impossible : '+error.message);return}if(d?.storage_path)await sb.storage.from(DOC_BUCKET).remove([d.storage_path]);await loadJobDocumentsPanel(jobId)}
@@ -4171,6 +4205,6 @@ function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V32.8';document.documentElement.dataset.rmlVersion='V32.8';window.RML_ERP_VERSION='32.8';</script>
+<script>document.title='RML ERP — V32.10';document.documentElement.dataset.rmlVersion='V32.10';window.RML_ERP_VERSION='32.9';</script>
 </body>
 </html>
