@@ -426,7 +426,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V34.1</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V34.2</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -4332,29 +4332,56 @@ async function rmlSavSave(){
 }
 function rmlSavPrintable(){const j=db.chantiers.find(x=>x.id===rmlSavJobId),c=db.clients.find(x=>x.id===j?.client_id),d=rmlSavRead();if(!j)return null;const clean=x=>String(x||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const row=(label,v)=>`<div class="row"><b>${label}</b><div>${clean(v).replace(/\n/g,'<br>')||'—'}</div></div>`;return {client:c,job:j,html:`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche SAV — ${clean(j.nom)}</title><style>body{font:15px Arial,sans-serif;color:#173c5b;margin:28px;max-width:850px}h1{border-bottom:3px solid #12669a;padding-bottom:12px}.row{padding:10px;border-bottom:1px solid #d9e2eb;white-space:normal}.row b{display:block;margin-bottom:5px}img{width:320px;max-width:90%;height:110px;object-fit:contain;border-bottom:1px solid #777}.actions{margin:20px 0}@media print{.actions{display:none}body{margin:12mm}}</style></head><body><h1>RML GOUTTIERE ALU — Dossier d'intervention SAV</h1>${row('Client',c?.nom)}${row('Adresse client',c?.adresse)}${row('Chantier',j.nom)}${row('Adresse intervention',j.adresse)}${row('Contact chantier',j.contact_nom)}${row('Téléphone chantier',j.contact_telephone||j.contact_tel)}${row('Référence client',c?.code)}${row('Chef d’équipe',j.chef_equipe)}${row('Date d’intervention',rmlSavDateFR(d.date))}${row('Intervenants',d.workers)}${row('Motif du SAV',d.issue)}${row('Travaux réalisés',d.work)}${row('Matériel utilisé',d.material)}${row('Observations',d.notes)}${row('Signataire',d.signer)}<div class="row"><b>Signature du client</b>${d.signature?`<img src="${d.signature}" alt="Signature du client">`:'Non signée'}</div><div class="actions"><button onclick="window.print()">Imprimer / Enregistrer en PDF</button></div></body></html>`}}
 function rmlSavPrint(){const p=rmlSavPrintable();if(!p)return;const w=window.open('','_blank');if(!w){alert('Autorisez les fenêtres surgissantes pour ouvrir le PDF.');return}w.document.open();w.document.write(p.html);w.document.close()}
+// Générateur PDF autonome : pages A4 dessinées sur canvas puis assemblées en PDF JPEG.
+// Aucune bibliothèque externe et aucune connexion réseau nécessaires.
+async function rmlSavBuildOfflinePdf(p){
+ const d=rmlSavRead(),j=p.job,c=p.client;
+ const W=1240,H=1754,margin=90,usable=W-2*margin,footer=H-95;
+ const pages=[];let canvas,ctx,y;
+ function page(){canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.fillStyle='#173c5b';ctx.font='bold 37px Arial,sans-serif';ctx.fillText('RML GOUTTIERE ALU',margin,110);ctx.font='bold 25px Arial,sans-serif';ctx.fillText('COMPTE RENDU D’INTERVENTION SAV',margin,158);ctx.strokeStyle='#12669a';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(margin,178);ctx.lineTo(W-margin,178);ctx.stroke();y=225;pages.push(canvas)}
+ function wrap(text,maxWidth,font){ctx.font=font;const result=[];for(const paragraph of String(text??'').split(/\r?\n/)){const words=paragraph.split(/\s+/);let line='';for(const word of words){if(!word)continue;let trial=line?line+' '+word:word;if(ctx.measureText(trial).width>maxWidth&&line){result.push(line);line=word}else line=trial;if(ctx.measureText(line).width>maxWidth){let part='';for(const char of line){if(ctx.measureText(part+char).width>maxWidth&&part){result.push(part);part=char}else part+=char}line=part}}result.push(line||' ')}return result}
+ function row(label,value){const font='25px Arial,sans-serif';const lines=wrap(value||'—',usable,font);const needed=40+lines.length*36+20;if(y+needed>footer)page();ctx.fillStyle='#173c5b';ctx.font='bold 24px Arial,sans-serif';ctx.fillText(label,margin,y);y+=37;ctx.fillStyle='#222';ctx.font=font;for(const line of lines){ctx.fillText(line,margin,y);y+=36}y+=18;ctx.strokeStyle='#e2e8ef';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(margin,y);ctx.lineTo(W-margin,y);ctx.stroke();y+=19}
+ page();for(const [label,value] of [['Client',c?.nom],['Adresse client',c?.adresse],['Chantier',j.nom],['Adresse chantier',j.adresse],['Contact chantier',j.contact_nom],['Téléphone chantier',j.contact_telephone||j.contact_tel],['Date intervention',rmlSavDateFR(d.date)],['Intervenants',d.workers],['Motif du SAV',d.issue],['Travaux réalisés',d.work],['Matériel utilisé',d.material],['Observations / réserves',d.notes],['Nom du signataire',d.signer]])row(label,value);
+ if(y+245>footer)page();ctx.fillStyle='#173c5b';ctx.font='bold 24px Arial,sans-serif';ctx.fillText('Signature du client',margin,y);y+=20;
+ if(d.signature){try{const img=new Image();img.src=d.signature;await img.decode();ctx.drawImage(img,margin,y,510,150)}catch(e){ctx.fillStyle='#a00';ctx.font='22px Arial';ctx.fillText('Signature illisible',margin,y+45)}}else{ctx.fillStyle='#555';ctx.font='22px Arial';ctx.fillText('Non signée',margin,y+45)}
+ // PDF 1.4 avec une image JPEG par page. Les textes et la signature sont rendus
+ // dans les pages canvas pour préserver les accents et fonctionner hors ligne.
+ const encoder=new TextEncoder(),chunks=[],offsets=[0];let position=0;
+ function push(bytes){chunks.push(bytes);position+=bytes.length}
+ function ascii(s){push(encoder.encode(s))}
+ ascii('%PDF-1.4\n');const total=2+pages.length*3;
+ function obj(n,body){offsets[n]=position;ascii(n+' 0 obj\n'+body+'\nendobj\n')}
+ obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+ const kids=pages.map((_,i)=>(3+i*3)+' 0 R').join(' ');obj(2,'<< /Type /Pages /Kids [ '+kids+' ] /Count '+pages.length+' >>');
+ for(let i=0;i<pages.length;i++){
+  const base=3+i*3,imgNum=base+1,contentNum=base+2;
+  obj(base,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 '+imgNum+' 0 R >> >> /Contents '+contentNum+' 0 R >>');
+  const dataUrl=pages[i].toDataURL('image/jpeg',0.83),binary=atob(dataUrl.split(',')[1]);const bytes=new Uint8Array(binary.length);for(let k=0;k<binary.length;k++)bytes[k]=binary.charCodeAt(k);
+  offsets[imgNum]=position;ascii(imgNum+' 0 obj\n<< /Type /XObject /Subtype /Image /Width '+W+' /Height '+H+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+bytes.length+' >>\nstream\n');push(bytes);ascii('\nendstream\nendobj\n');
+  const commands='q\n595.28 0 0 841.89 0 0 cm\n/Im0 Do\nQ\n';
+  offsets[contentNum]=position;ascii(contentNum+' 0 obj\n<< /Length '+encoder.encode(commands).length+' >>\nstream\n'+commands+'endstream\nendobj\n');
+ }
+ const startXref=position;ascii('xref\n0 '+(total+1)+'\n0000000000 65535 f \n');for(let i=1;i<=total;i++)ascii(String(offsets[i]).padStart(10,'0')+' 00000 n \n');ascii('trailer\n<< /Size '+(total+1)+' /Root 1 0 R >>\nstartxref\n'+startXref+'\n%%EOF');
+ return new Blob(chunks,{type:'application/pdf'});
+}
 async function rmlSavEmail(){
  const p=rmlSavPrintable();if(!p)return;
  const emails=String(p.client?.email||'').split(/[;,\n]/).map(x=>x.trim()).filter(x=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x));
  const subject='RML — Fiche intervention SAV — '+p.job.nom;
  const body='Bonjour,\n\nVeuillez trouver ci-joint le compte rendu de notre intervention SAV pour le chantier « '+p.job.nom+' ».\n\nCordialement,\nRML GOUTTIERE ALU';
- const status=m=>rmlSavStatus(m);
- status('Préparation du PDF SAV…');
+ rmlSavStatus('Préparation du PDF SAV hors connexion…');
  try{
-  if(!window.jspdf?.jsPDF){await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js';script.onload=resolve;script.onerror=()=>reject(new Error('Bibliothèque PDF indisponible (connexion Internet nécessaire).'));document.head.appendChild(script)})}
-  const d=rmlSavRead(),j=p.job,c=p.client,doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
-  let y=18;const line=(label,value)=>{const lines=doc.splitTextToSize(label+' : '+String(value||'—'),175);if(y+lines.length*6>273){doc.addPage();y=18}doc.text(lines,17,y);y+=lines.length*6+3};
-  doc.setFont('helvetica','bold');doc.setFontSize(16);doc.text('RML - COMPTE RENDU SAV',17,y);y+=12;doc.setFont('helvetica','normal');doc.setFontSize(10);
-  [['Client',c?.nom],['Adresse client',c?.adresse],['Chantier',j.nom],['Adresse chantier',j.adresse],['Contact chantier',j.contact_nom],['Telephone chantier',j.contact_telephone||j.contact_tel],['Date intervention',rmlSavDateFR(d.date)],['Intervenants',d.workers],['Motif SAV',d.issue],['Travaux realises',d.work],['Materiel utilise',d.material],['Observations',d.notes],['Signataire',d.signer]].forEach(([a,b])=>line(a,b));
-  if(d.signature){if(y>235){doc.addPage();y=18}doc.text('Signature du client :',17,y);y+=4;doc.addImage(d.signature,'PNG',17,y,90,36)}
-  const filename='RML_SAV_'+String(j.nom||'chantier').replace(/[^a-z0-9_-]+/gi,'_')+'.pdf';
-  const blob=doc.output('blob');const file=new File([blob],filename,{type:'application/pdf'});
-  if(navigator.share && navigator.canShare?.({files:[file]})){
-   try{await navigator.share({files:[file],title:subject,text:body});status('Compte rendu PDF transmis au partage de l’appareil. Vérifiez l’envoi dans votre messagerie.');return}catch(e){if(e.name==='AbortError'){status('Partage annulé. Aucun e-mail envoyé.');return}}
+  const blob=await rmlSavBuildOfflinePdf(p);
+  const filename='RML_SAV_'+String(p.job.nom||'chantier').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9_-]+/gi,'_')+'.pdf';
+  const file=new File([blob],filename,{type:'application/pdf'});
+  if(navigator.share&&navigator.canShare?.({files:[file]})){
+   try{await navigator.share({files:[file],title:subject,text:body});rmlSavStatus('PDF transmis au menu de partage. Vérifiez l’envoi dans votre messagerie.');return}
+   catch(e){if(e.name==='AbortError'){rmlSavStatus('Partage annulé. Aucun e-mail envoyé.');return}}
   }
-  doc.save(filename);
-  status('PDF téléchargé. Votre messagerie va s’ouvrir : joignez le fichier '+filename+' au message.');
+  const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=filename;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  rmlSavStatus('PDF téléchargé : '+filename+'. Joignez-le manuellement à l’e-mail préparé.');
   window.location.href='mailto:'+encodeURIComponent(emails[0]||'')+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
- }catch(e){console.error('PDF SAV',e);status('PDF automatique indisponible : '+e.message+' Utilisez « Imprimer / PDF » puis joignez le document manuellement.');alert('Impossible de préparer le PDF automatiquement : '+e.message)}
+ }catch(e){console.error('PDF SAV hors ligne',e);rmlSavStatus('Impossible de créer le PDF : '+e.message+'. Utilisez « Imprimer / PDF ».');alert('Impossible de créer le PDF SAV : '+e.message)}
 }
 
 </script>
@@ -4362,6 +4389,6 @@ async function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V34.1';document.documentElement.dataset.rmlVersion='V34.1';window.RML_ERP_VERSION='34.1';</script>
+<script>document.title='RML ERP — V34.2';document.documentElement.dataset.rmlVersion='V34.2';window.RML_ERP_VERSION='34.2';</script>
 </body>
 </html>
