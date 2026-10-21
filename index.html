@@ -468,11 +468,11 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <section id="chantiers" class="view"><div class="panel"><div class="toolbar"><input id="jobSearch" placeholder="Rechercher un chantier, client, adresse…"><select id="jobFilter"><option value="actif">Actifs</option><option value="attente">En attente</option><option value="en_cours">En cours</option><option value="termine">Terminés</option><option value="archive">Archivés</option><option value="sav">SAV</option><option value="tous">Tous</option></select><select id="jobActivityFilter" onchange="renderJobs()"><option value="tous">Toutes les activités</option><option value="gouttiere">Gouttière</option><option value="couvertine">Couvertine</option><option value="atelier">Atelier</option><option value="non_classe">Non classé</option></select><button class="btn" id="newJobBtn">+ Nouveau chantier</button></div><div id="jobsTable"></div></div></section>
 
 <section id="stock" class="view"><div class="panel">
-<div class="toolbar"><div style="flex:1"><h2>Stock RML — V35</h2><p class="muted">Consultation par catégorie, réception groupée et contrôle des sorties chantier.</p></div><button class="btn secondary" onclick="loadStock()">Actualiser</button></div>
+<div class="toolbar"><div style="flex:1"><h2>Stock RML — V35.1</h2><p class="muted">Consultation par catégorie, réception groupée et contrôle des sorties chantier.</p></div><button class="btn secondary" onclick="loadStock()">Actualiser</button></div>
 <div class="actions" style="margin:12px 0;flex-wrap:wrap"><button class="btn" onclick="rml35Tab('catalogue')">Consulter le stock</button><button class="btn" onclick="rml35Tab('reception')">Entrées de marchandises</button><button class="btn" onclick="rml35Tab('chantiers')">Sorties chantier</button><button class="btn" onclick="rml35Tab('inventaire')">Inventaire physique</button><button class="btn secondary" onclick="rml35Tab('historique')">Historique</button></div>
 <div class="cards"><div class="metric"><strong id="stockRefs">0</strong><span>références</span></div><div class="metric"><strong id="stockLow">0</strong><span>stock faible / rupture</span></div><div class="metric"><strong id="stockValue">0 €</strong><span>valeur indicative</span></div></div>
 <div id="stockStatus" class="notice" style="margin:12px 0">Chargement…</div>
-<div id="rml35Catalogue"><div class="toolbar"><input id="stockSearch" placeholder="Rechercher une référence, couleur ou désignation…" oninput="renderStock()"><select id="stockSupplierFilter" onchange="renderStock()"><option value="">Tous les fournisseurs</option></select><select id="stockStateFilter" onchange="renderStock()"><option value="">Tous les stocks</option><option value="low">Stock faible / rupture</option><option value="ok">Stock suffisant</option></select></div><div id="rml35Categories" class="actions" style="margin:12px 0;flex-wrap:wrap"></div><div id="stockTable"></div><div class="actions" style="margin-top:12px"><button class="btn secondary" onclick="openStockProduct()">+ Créer une référence</button><button class="btn secondary" onclick="chooseStockExcel()">Importer Excel</button></div><input id="stockExcelFile" type="file" accept=".xlsx,.xls" hidden onchange="importStockExcelFile(this.files?.[0])"></div>
+<div id="rml35Catalogue"><div class="panel" style="margin-bottom:14px;border:1px solid #d5e3ed;padding:14px"><h3>Catalogue GutterFrance — identique à « Modifier produits »</h3><p class="muted">Les références et les couleurs proviennent du catalogue général de préparation chantier. Choisissez les couleurs à ajouter au stock ; chaque couleur constitue une référence de stock distincte. Les produits déjà enregistrés sont conservés tant que vous ne demandez pas leur suppression.</p><div class="actions" style="flex-wrap:wrap"><button class="btn" type="button" onclick="rml351ShowCatalog()">Afficher les produits GutterFrance</button><button class="btn secondary" type="button" onclick="openStockProduct()">+ Ajouter un autre produit</button><button class="btn secondary" type="button" onclick="rml351DeleteExisting()">Vider les anciennes références du stock</button></div><div id="rml351CatalogArea" style="margin-top:10px"></div><div id="rml351CatalogStatus" class="notice" aria-live="polite"></div></div><div class="toolbar"><input id="stockSearch" placeholder="Rechercher une référence, couleur ou désignation…" oninput="renderStock()"><select id="stockSupplierFilter" onchange="renderStock()"><option value="">Tous les fournisseurs</option></select><select id="stockStateFilter" onchange="renderStock()"><option value="">Tous les stocks</option><option value="low">Stock faible / rupture</option><option value="ok">Stock suffisant</option></select></div><div id="rml35Categories" class="actions" style="margin:12px 0;flex-wrap:wrap"></div><div id="stockTable"></div><div class="actions" style="margin-top:12px"><button class="btn secondary" onclick="openStockProduct()">+ Créer une référence</button><button class="btn secondary" onclick="chooseStockExcel()">Importer Excel</button></div><input id="stockExcelFile" type="file" accept=".xlsx,.xls" hidden onchange="importStockExcelFile(this.files?.[0])"></div>
 <div id="rml35Reception" hidden><div class="grid2"><div class="field"><label>Fournisseur</label><select id="rml35Supplier"><option>GutterFrance</option><option>Gutti</option><option>Sodifab</option><option>Gutterkel</option></select></div><div class="field"><label>Bon de livraison / commentaire</label><input id="rml35DeliveryNote" placeholder="Numéro du BL"></div></div><p class="muted">Choisissez les produits et saisissez les quantités reçues. Les stocks ne sont modifiés qu'après confirmation.</p><div id="rml35ReceiptRows"></div><div class="actions"><button class="btn secondary" onclick="rml35AddReceipt()">+ Ajouter un produit</button><button class="btn ok" id="rml35ReceiptSave" onclick="rml35SaveReceipt()">Valider la réception</button></div><div id="rml35ReceiptStatus" class="notice" style="margin-top:10px"></div></div>
 <div id="rml35Chantiers" hidden><p class="muted">Un chantier terminé nécessite une validation des quantités réellement utilisées. Une référence non reconnue n'est jamais déduite automatiquement.</p><div class="field"><label>Chantier à contrôler</label><select id="rml35JobSelect" onchange="rml35LoadJobReview()"></select></div><div id="rml35JobReview"></div><div id="rml35JobStatus" class="notice" style="margin-top:10px"></div></div>
 <div id="rml35Inventaire" hidden><p class="muted">Correction de stock après comptage réel : les mouvements sont enregistrés dans l'historique.</p><div class="field"><label>Rechercher un produit</label><input id="rml35CountSearch" oninput="rml35RenderCount()" placeholder="Référence, désignation, couleur"></div><div id="rml35CountTable"></div></div>
@@ -4398,7 +4398,7 @@ async function rmlSavEmail(){
 #rmlVersionPublishedBadge{display:inline-block;position:static;margin:5px 0 3px;background:#084d85;color:#fff;border:1px solid #b6d4e8;border-radius:8px;padding:5px 10px;font:700 13px Arial,sans-serif;box-shadow:none;pointer-events:none}
 @media(max-width:600px){#rmlVersionPublishedBadge{font-size:11px;padding:4px 8px;margin:4px 0 2px}}
 </style>
-<script>document.title='RML ERP — V35';document.documentElement.dataset.rmlVersion='V35';window.RML_ERP_VERSION='35';</script>
+<script>document.title='RML ERP — V35.1';document.documentElement.dataset.rmlVersion='V35.1';window.RML_ERP_VERSION='35.1';</script>
 <script>
 
 // RML ERP V35 — module de stock par catégories et mouvements contrôlés.
@@ -4417,6 +4417,49 @@ function rml35RenderCount(){const q=(document.getElementById('rml35CountSearch')
 async function rml35SaveCount(id){const p=stockProducts.find(x=>x.id===id),qty=Number(document.querySelector(`[data-count="${id}"]`)?.value);if(!p||!Number.isFinite(qty)||qty<0){alert('Quantité invalide');return}if(!confirm(`Corriger le stock de ${p.name} de ${p.quantity} à ${qty} ${p.unit||'u'} ?`))return;const {error}=await sb.rpc('erp_stock_move',{p_product_id:id,p_move_type:'inventaire',p_quantity:qty,p_chantier_id:null,p_note:'Comptage inventaire V35'});if(error){alert('Correction impossible : '+error.message);return}await loadStock();rml35RenderCount();alert('Inventaire enregistré dans Supabase.')}
 async function rml35LoadHistory(){const box=document.getElementById('rml35HistoryTable');box.innerHTML='<div class="notice">Chargement…</div>';const {data,error}=await sb.from('erp_stock_movements').select('*').order('created_at',{ascending:false}).limit(200);if(error){box.textContent='Historique indisponible : '+error.message;return}box.innerHTML='<div class="tablewrap"><table class="table"><thead><tr><th>Date</th><th>Produit</th><th>Type</th><th>Variation</th><th>Chantier / Note</th></tr></thead><tbody>'+(data||[]).map(m=>`<tr><td>${new Date(m.created_at).toLocaleString('fr-FR')}</td><td>${esc(stockProducts.find(p=>p.id===m.product_id)?.name||m.product_id)}</td><td>${esc(m.move_type)}</td><td>${Number(m.delta||0)}</td><td>${esc(m.note||'')}</td></tr>`).join('')+'</tbody></table></div>'}
 
+</script>
+<script>
+// V35.1 — liaison directe au catalogue administrateur (PREP_CATALOG + PREP_COLORS).
+const RML351_CATS={gouttieres:'Gouttières',accessoires_gouttieres:'Accessoires gouttières',descentes_rondes:'Descentes rondes',descentes_rectangles:'Descentes rectangulaires',accessoires_descentes:'Accessoires descentes',couvertines:'Couvertines',crochets:'Crochets',accessoires_couvertines:'Accessoires couvertines',bandeaux:'Planches de rives / bandeaux',sous_faces:'Sous-faces',pliage:'Pliages',zinguerie:'Zinguerie'};
+let rml351Busy=false;
+function rml351ShowCatalog(){
+ const area=document.getElementById('rml351CatalogArea');
+ if(typeof PREP_CATALOG==='undefined'||typeof PREP_COLORS==='undefined'){area.textContent='Catalogue général indisponible.';return;}
+ const blocks=Object.entries(RML351_CATS).map(([key,title])=>{
+ const values=(PREP_CATALOG[key]||[]).filter(Boolean);
+ if(!values.length)return '';
+ return `<details style="margin:8px 0;border:1px solid #d8e1e8;border-radius:8px;padding:10px"><summary style="cursor:pointer;font-weight:700">${esc(title)} (${values.length} produits)</summary><div class="tablewrap"><table class="table"><thead><tr><th>Produit</th><th>Couleur</th><th>Quantité initiale</th><th>Action</th></tr></thead><tbody>${values.map((name,index)=>`<tr data-rml351-cat="${esc(key)}" data-rml351-index="${index}"><td>${esc(name)}</td><td><select aria-label="Couleur pour ${esc(name)}"><option value="">Sans couleur</option>${PREP_COLORS.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select></td><td><input aria-label="Quantité initiale" type="number" min="0" step="any" value="0" style="width:95px"></td><td><button class="btn secondary" type="button" onclick="rml351Add(this)">Ajouter au stock</button></td></tr>`).join('')}</tbody></table></div></details>`}).join('');
+ area.innerHTML=blocks||'<div class="notice">Aucun produit dans le catalogue général.</div>';
+ document.getElementById('rml351CatalogStatus').textContent='Catalogue chargé. Sélectionnez une couleur puis ajoutez chaque déclinaison souhaitée. Pour une autre couleur, modifiez la sélection et ajoutez à nouveau.';
+}
+async function rml351Add(btn){
+ if(rml351Busy)return;
+ const tr=btn.closest('tr'),cat=tr.dataset.rml351Cat,index=Number(tr.dataset.rml351Index),base=PREP_CATALOG[cat]?.[index];
+ if(!base)return;
+ const color=tr.querySelector('select').value,qty=Number(tr.querySelector('input').value);
+ if(!Number.isFinite(qty)||qty<0){alert('Quantité invalide.');return;}
+ const name=base+(color?' — '+color:'');
+ const existing=stockProducts.find(p=>p.supplier==='GutterFrance'&&p.name.trim().toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'));
+ if(existing){alert('Ce produit et cette couleur sont déjà présents dans le stock. Utilisez « Modifier » pour ajuster sa fiche.');return;}
+ const unit=['gouttieres','descentes_rondes','descentes_rectangles','couvertines','bandeaux','sous_faces'].includes(cat)?'ml':'u';
+ rml351Busy=true;btn.disabled=true;
+ try{const row={supplier:'GutterFrance',sku:null,name,unit,location:null,quantity:qty,min_quantity:0,unit_price:null,updated_at:new Date().toISOString()};
+ const {error}=await sb.from('erp_stock_products').insert(row);if(error)throw error;
+ document.getElementById('rml351CatalogStatus').textContent='Ajout enregistré : '+name;
+ await loadStock();
+ }catch(e){alert('Enregistrement impossible : '+e.message)}finally{rml351Busy=false;btn.disabled=false;}
+}
+async function rml351DeleteExisting(){
+ if(rml351Busy)return;
+ if(!stockProducts.length){alert('Le stock est déjà vide.');return;}
+ const confirmation=prompt('ATTENTION : cette opération supprime les fiches produits actuellement dans le stock et peut être refusée si elles ont des mouvements historiques. Pour confirmer, saisissez exactement : VIDER LE STOCK');
+ if(confirmation!=='VIDER LE STOCK')return;
+ if(!confirm('Dernière confirmation : supprimer '+stockProducts.length+' fiches produits ? Les données du catalogue « Modifier produits » ne seront pas supprimées.'))return;
+ rml351Busy=true;let deleted=0;let errors=[];
+ try{for(const product of [...stockProducts]){const {error}=await sb.from('erp_stock_products').delete().eq('id',product.id);if(error){errors.push(product.name+' : '+error.message);break;}deleted++;}
+ await loadStock();document.getElementById('rml351CatalogStatus').textContent=errors.length?'Suppression interrompue après '+deleted+' produit(s) : '+errors[0]:'Anciennes références supprimées : '+deleted+'. Le catalogue GutterFrance reste disponible ci-dessus.';
+ }finally{rml351Busy=false;}
+}
 </script>
 </body>
 </html>
