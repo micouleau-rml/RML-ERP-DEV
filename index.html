@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V35.6</title>
+<title>RML ERP — V35.7</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -104,6 +104,14 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 .modal.open{align-items:center!important;justify-content:center!important;overflow-y:auto}
 .modal.open>.modal-card{margin:auto;max-height:calc(100dvh - 28px)}
 dialog[open]{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-height:calc(100dvh - 28px);overflow:auto}
+
+/* V35.7 : planning anticipé et déconnexion visible */
+#logoutBtn.rml-logout-prominent{background:#b91c1c!important;color:#fff!important;border:2px solid #991b1b!important;font-weight:900!important;box-shadow:0 2px 6px rgba(127,29,29,.25)}
+#logoutBtn.rml-logout-prominent:hover{background:#991b1b!important}
+#employeePortal .employee-job.future{border:2px solid #347bb5!important;background:#edf6ff!important}
+#employeePortal .employee-job.future .employee-date{color:#125789!important}
+#employeePortal .employee-job .actions button{white-space:normal}
+@media(max-width:600px){#logoutBtn.rml-logout-prominent{width:auto;max-width:100%;padding:11px 15px!important}#employeePortal .employee-job.future{padding:14px}}
 </style>
 
 <style>
@@ -405,7 +413,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 </style>
 
 <style id="rml-v356-mobile-portals">
-/* V35.6 — corrige les contrôles natifs iOS qui débordent de leurs cartes. */
+/* V35.7 — corrige les contrôles natifs iOS qui débordent de leurs cartes. */
 @media(max-width:760px){
  html,body{max-width:100%;overflow-x:clip}
  main,.view,#employeePortal,#subPortal{min-width:0;max-width:100%}
@@ -451,9 +459,9 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V35.6</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V35.7</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
-<div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn secondary" style="padding:7px 11px">Déconnexion</button></div>
+<div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" style="padding:10px 16px">Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>7/9</strong><span>modules opérationnels</span></div></div>
@@ -1319,7 +1327,7 @@ async function loadEmployeePortal(){
   employeePortalStatus.className='notice';employeePortalStatus.textContent=`${employeeAccount.team_number?'Équipe '+employeeAccount.team_number:'Salarié'} · ${employeeAssignments.length} affectation(s) aujourd’hui et dans les 30 prochains jours.`;
   if(!employeeAssignments.length){employeePortalList.innerHTML='<div class="empty">Aucun chantier ne vous est actuellement affecté dans le planning sur les 30 prochains jours.</div>';return}
   const grouped=new Map();employeeAssignments.forEach(a=>{const k=a.date+'|'+a.chantier_id;if(!grouped.has(k))grouped.set(k,a)});
-  employeePortalList.innerHTML=[...grouped.values()].map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id),today=a.date===start;return `<div class="employee-job ${today?'today':''}"><div class="employee-date">${today?'Aujourd’hui · ':''}${new Date(a.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long'})}</div><h3 style="margin:0 0 5px">${esc(j?.nom||'Chantier')}</h3><div><strong>${esc(c?.nom||'')}</strong></div>${j?.adresse?`<div class="muted">${esc(j.adresse)}</div>`:''}${j?.contact_nom?`<div style="margin-top:7px"><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j?.notes?`<div class="notice" style="margin-top:9px">${esc(j.notes)}</div>`:''}<div class="actions" style="margin-top:12px"><button class="btn" onclick="openEmployeeJobFolder('${j?.id||''}','${a.date}')">Feuille chantier</button>${String(j?.statut||'').toLowerCase()==='sav'?`<button class="btn ok" type="button" onclick="rmlSavOpen('${j?.id||''}')">Fiche SAV / signature client</button>`:''}<button class="btn secondary" onclick="openJobHistory('${j?.id||''}')">Historique interventions</button>${currentAccess?.role==='chef_equipe'?`<button class="btn secondary" onclick="openSuivi('${j?.id||''}')">Suivi chantier</button>`:''}</div></div>`}).join('');
+  employeePortalList.innerHTML=[...grouped.values()].map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id),today=a.date===start,future=a.date>start;return `<div class="employee-job ${today?'today':future?'future':''}"><div class="employee-date">${today?'AUJOURD’HUI · ':future?'À VENIR · ':''}${new Date(a.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long'})}</div><h3 style="margin:0 0 5px">${esc(j?.nom||'Chantier')}</h3><div><strong>${esc(c?.nom||'')}</strong></div>${j?.adresse?`<div class="muted">${esc(j.adresse)}</div>`:''}${j?.contact_nom?`<div style="margin-top:7px"><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j?.notes?`<div class="notice" style="margin-top:9px">${esc(j.notes)}</div>`:''}<div class="actions" style="margin-top:12px"><button class="btn" onclick="openEmployeeJobFolder('${j?.id||''}','${a.date}')">Feuille chantier / Documents</button>${String(j?.statut||'').toLowerCase()==='sav'?`<button class="btn ok" type="button" onclick="rmlSavOpen('${j?.id||''}')">Fiche SAV / signature client</button>`:''}<button class="btn secondary" onclick="openJobHistory('${j?.id||''}')">Historique interventions</button>${currentAccess?.role==='chef_equipe'?`<button class="btn secondary" onclick="openSuivi('${j?.id||''}')">Suivi chantier</button>`:''}</div></div>`}).join('');
  }catch(err){console.error(err);employeePortalStatus.className='notice danger';employeePortalStatus.textContent='Espace salarié indisponible : '+err.message}
 }
 function employeePreparationReadOnlyHtml(payload){const sections=payload?.sections||{};let html='';Object.entries(PREP_SCHEMAS).forEach(([key,schema])=>{const rows=prepFilledRows(sections[key]||[]);if(!rows.length)return;html+=`<div class="readonly-prep-table" style="margin-top:12px"><strong>${esc(schema.label)}</strong><div class="prep-tablewrap" style="margin-top:6px"><table class="prep-table"><thead><tr>${schema.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${schema.fields.map((f,i)=>`<td data-label="${esc(schema.headers[i]||'')}">${esc(r[f[0]]||'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`});return html||'<div class="empty">Aucun quantitatif renseigné dans la préparation chantier.</div>'}
@@ -1328,9 +1336,9 @@ async function openEmployeeJobFolder(jobId,date){
  const modalId='employeeJobModal';let m=document.getElementById(modalId);if(!m){m=document.createElement('div');m.className='modal';m.id=modalId;m.innerHTML='<div class="modal-card" style="max-width:900px"><div class="modal-head"><h3 id="employeeJobTitle">Feuille chantier</h3><button class="close" onclick="closeModal(\'employeeJobModal\')">Fermer</button></div><div id="employeeJobBody" style="margin-top:12px"></div></div>';document.body.appendChild(m)}
  employeeJobTitle.textContent='Feuille chantier — '+j.nom;employeeJobBody.innerHTML='<div class="notice">Chargement du chantier…</div>';openModal(modalId);
  const folder=await sb.rpc('erp_get_my_job_folder',{p_chantier_id:String(jobId)});
- if(folder.error){employeeJobBody.innerHTML='<div class="notice danger"><strong>Données chantier indisponibles.</strong><br>'+esc(folder.error.message)+'<br><span class="muted">La fonction Supabase V13 doit être installée.</span></div>';return}
+ if(folder.error){employeeJobBody.innerHTML='<div class="notice danger"><strong>Données chantier indisponibles.</strong><br>'+esc(folder.error.message)+'<br><span class="muted">Si le chantier est prévu un autre jour, vérifiez que la fonction Supabase autorise également la consultation anticipée des documents.</span></div>';return}
  const fd=Array.isArray(folder.data)?folder.data[0]:folder.data;
- if(!fd||fd.authorized===false){employeeJobBody.innerHTML='<div class="notice danger">Ce chantier n’est pas autorisé pour votre équipe.</div>';return}
+ if(!fd||fd.authorized===false){employeeJobBody.innerHTML='<div class="notice danger">Ce chantier n’est pas autorisé pour votre équipe. Si son intervention est prévue dans les prochains jours, les droits de consultation anticipée doivent être vérifiés dans Supabase.</div>';return}
  employeeDocs=Array.isArray(fd.documents)?fd.documents:[];
  const employeePhotos=employeeDocs.filter(d=>String(d.category||'').toLowerCase()==='photo'||String(d.mime_type||'').toLowerCase().startsWith('image/'));
  const employeeFiles=employeeDocs.filter(d=>!employeePhotos.includes(d));
