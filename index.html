@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V35.8</title>
+<title>RML ERP — V35.10</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -105,13 +105,16 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 .modal.open>.modal-card{margin:auto;max-height:calc(100dvh - 28px)}
 dialog[open]{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-height:calc(100dvh - 28px);overflow:auto}
 
-/* V35.8 : planning anticipé et déconnexion visible */
+/* V35.10 : planning anticipé et déconnexion visible */
 #logoutBtn.rml-logout-prominent{background:#b91c1c!important;color:#fff!important;border:2px solid #991b1b!important;font-weight:900!important;box-shadow:0 2px 6px rgba(127,29,29,.25)}
 #logoutBtn.rml-logout-prominent:hover{background:#991b1b!important}
+/* V35.10 : bouton déconnexion compact sur Mac, iPad et iPhone */
+#logoutBtn.rml-logout-prominent{font-size:13px!important;line-height:1.2!important;padding:7px 12px!important;min-height:34px!important;border-radius:8px!important;white-space:nowrap!important;flex:0 0 auto!important;box-sizing:border-box!important}
+@media(max-width:900px){#logoutBtn.rml-logout-prominent{font-size:12px!important;padding:6px 10px!important;min-height:32px!important}}
 #employeePortal .employee-job.future{border:2px solid #347bb5!important;background:#edf6ff!important}
 #employeePortal .employee-job.future .employee-date{color:#125789!important}
 #employeePortal .employee-job .actions button{white-space:normal}
-@media(max-width:600px){#logoutBtn.rml-logout-prominent{width:auto;max-width:100%;padding:11px 15px!important}#employeePortal .employee-job.future{padding:14px}}
+@media(max-width:600px){#logoutBtn.rml-logout-prominent{width:auto;max-width:100%;padding:6px 10px!important}#employeePortal .employee-job.future{padding:14px}}
 </style>
 
 <style>
@@ -413,7 +416,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 </style>
 
 <style id="rml-v356-mobile-portals">
-/* V35.8 — corrige les contrôles natifs iOS qui débordent de leurs cartes. */
+/* V35.10 — corrige les contrôles natifs iOS qui débordent de leurs cartes. */
 @media(max-width:760px){
  html,body{max-width:100%;overflow-x:clip}
  main,.view,#employeePortal,#subPortal{min-width:0;max-width:100%}
@@ -438,7 +441,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 </style>
 
 <style id="rml-v358-tablet-portal">
-/* V35.8 : même présentation tactile sur téléphone et tablette pour les portails terrain. */
+/* V35.10 : même présentation tactile sur téléphone et tablette pour les portails terrain. */
 @media screen and (max-width: 1200px) and (pointer: coarse) {
   #employeePortal, #subPortal { width:100%; min-width:0; max-width:100%; box-sizing:border-box; }
   #employeePortal *, #subPortal * { box-sizing:border-box; }
@@ -461,6 +464,31 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 }
 @media screen and (max-width: 1200px) and (pointer: coarse) and (orientation: landscape) {
   #employeePortal .employee-grid, #subPortal .sub-grid { grid-template-columns:minmax(0,1fr)!important; }
+}
+</style>
+
+<style id="rml-v3510-action-contrast">
+/* V35.10 : boutons d'action lisibles sur mobile et ordinateur. */
+#employeeMileagePanel button.rml-mileage-save {
+ background:#147a3a!important;color:#fff!important;font-weight:800!important;
+ border:2px solid #0b5527!important;text-shadow:0 1px 1px rgba(0,0,0,.28);
+ box-shadow:0 3px 7px rgba(0,0,0,.18);
+}
+#employeePortalList button.rml-job-docs {
+ background:#124e83!important;color:#fff!important;border:2px solid #0a365d!important;
+ font-weight:800!important;box-shadow:0 3px 7px rgba(0,0,0,.16);
+}
+#employeePortalList button.rml-job-history {
+ background:#f5cf67!important;color:#322408!important;border:2px solid #ad7b13!important;
+ font-weight:800!important;box-shadow:0 3px 7px rgba(0,0,0,.14);
+}
+#employeeMileagePanel button.rml-mileage-save:focus-visible,
+#employeePortalList button.rml-job-docs:focus-visible,
+#employeePortalList button.rml-job-history:focus-visible {outline:3px solid #f97316;outline-offset:3px}
+@media(max-width:850px){
+ #employeePortalList button.rml-job-docs,#employeePortalList button.rml-job-history{
+  min-height:42px;white-space:normal;line-height:1.25;text-align:center;
+ }
 }
 </style>
 </head>
@@ -486,9 +514,9 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V35.8</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V35.10</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
-<div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" style="padding:10px 16px">Déconnexion</button></div>
+<div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>7/9</strong><span>modules opérationnels</span></div></div>
@@ -515,7 +543,7 @@ nav button[onclick*="'security'"]{border-color:#d68ea3;background:#fff1f5}
 <section id="employeePortal" class="view">
   <div class="panel">
     <div class="employee-hero"><div><h2 style="margin:0">Mon espace salarié</h2><div class="muted">Vos chantiers, feuilles chantier, documents et photos terrain.</div></div><button class="btn secondary" type="button" onclick="loadEmployeePortal()">Actualiser</button></div>
-    <div class="panel" id="employeeMileagePanel" style="margin:12px 0;padding:15px"><h3 style="margin:0 0 8px">Kilométrage du fourgon — fin de journée</h3><div class="muted">Saisissez le kilométrage total affiché au compteur, et non les kilomètres parcourus aujourd’hui. La valeur sera transmise à Maintenance.</div><div class="grid2" style="margin-top:12px"><div class="field"><label>Fourgon (nom et immatriculation)</label><select id="employeeMileageVehicle"><option value="">Chargement des fourgons…</option></select></div><div class="field"><label>Kilométrage total au compteur</label><input id="employeeMileageTotal" type="number" min="0" step="1" inputmode="numeric" placeholder="Ex. 125430"></div></div><div class="actions" style="margin-top:10px"><button class="btn ok" type="button" onclick="saveEmployeeMileage()">Enregistrer le kilométrage</button></div><div id="employeeMileageStatus" class="muted" style="margin-top:8px"></div></div><div id="employeePortalStatus" class="notice" style="margin-top:12px">Chargement…</div>
+    <div class="panel" id="employeeMileagePanel" style="margin:12px 0;padding:15px"><h3 style="margin:0 0 8px">Kilométrage du fourgon — fin de journée</h3><div class="muted">Saisissez le kilométrage total affiché au compteur, et non les kilomètres parcourus aujourd’hui. La valeur sera transmise à Maintenance.</div><div class="grid2" style="margin-top:12px"><div class="field"><label>Fourgon (nom et immatriculation)</label><select id="employeeMileageVehicle"><option value="">Chargement des fourgons…</option></select></div><div class="field"><label>Kilométrage total au compteur</label><input id="employeeMileageTotal" type="number" min="0" step="1" inputmode="numeric" placeholder="Ex. 125430"></div></div><div class="actions" style="margin-top:10px"><button class="btn ok" type="button" onclick="saveEmployeeMileage()" class="rml-mileage-save">Enregistrer le kilométrage</button></div><div id="employeeMileageStatus" class="muted" style="margin-top:8px"></div></div><div id="employeePortalStatus" class="notice" style="margin-top:12px">Chargement…</div>
     <div id="employeePortalList" class="employee-grid"></div>
   </div>
 </section>
