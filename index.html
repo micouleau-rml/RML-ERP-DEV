@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V36.1</title>
+<title>RML ERP — V36.2</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -502,6 +502,57 @@ button.btn.ok, input.btn.ok, .btn.ok, button.rml-mileage-save,
 }
 button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#ffffff!important}
 </style>
+
+<style id="rml-v362-encadrements-fiches">
+/* Encadrements bien distincts dans les feuilles chantier des équipes et sous-traitants. */
+#employeeJobModal .panel,
+#subJobFolderModal .panel,
+#employeeJobModal .employee-photo-box,
+#subJobFolderModal .employee-photo-box,
+#employeeJobModal .v16-report,
+#subJobFolderModal .v16-report,
+#employeeJobModal .readonly-prep,
+#subJobFolderModal .readonly-prep,
+#employeeJobModal .readonly-prep-table,
+#subJobFolderModal .readonly-prep-table {
+  border:3px solid #2563eb !important;
+  border-radius:16px !important;
+  box-shadow:0 2px 9px rgba(37,99,235,.10);
+  margin-top:16px;
+  margin-bottom:16px;
+  background-color:#f8fbff;
+  box-sizing:border-box;
+  max-width:100%;
+  min-width:0;
+}
+#employeeJobModal .panel,
+#subJobFolderModal .panel,
+#employeeJobModal .employee-photo-box,
+#subJobFolderModal .employee-photo-box,
+#employeeJobModal .readonly-prep,
+#subJobFolderModal .readonly-prep,
+#employeeJobModal .readonly-prep-table,
+#subJobFolderModal .readonly-prep-table {padding:14px !important;}
+/* Les sous-rubriques gardent leur propre séparation visuelle. */
+#employeeJobModal .v16-report,
+#subJobFolderModal .v16-report {padding:16px !important;}
+#employeeJobModal .modal-card,
+#subJobFolderModal .modal-card,
+#employeeJobModal .modal-card *,
+#subJobFolderModal .modal-card * {box-sizing:border-box;}
+@media(max-width:700px){
+ #employeeJobModal .panel,
+ #subJobFolderModal .panel,
+ #employeeJobModal .v16-report,
+ #subJobFolderModal .v16-report,
+ #employeeJobModal .employee-photo-box,
+ #subJobFolderModal .employee-photo-box,
+ #employeeJobModal .readonly-prep,
+ #subJobFolderModal .readonly-prep,
+ #employeeJobModal .readonly-prep-table,
+ #subJobFolderModal .readonly-prep-table {padding:12px !important;margin-top:14px;margin-bottom:14px;}
+}
+</style>
 </head>
 <body>
 <div id="erpSaveToast" class="erp-save-toast" role="status" aria-live="polite"></div>
@@ -525,7 +576,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V36.1</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V36.2</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
