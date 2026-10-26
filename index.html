@@ -555,7 +555,13 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 }
 </style>
 <style>
-/* V38 — formulaire de contrat sous-traitant plus lisible et sans débordement */
+/* V38.3 — formulaire de contrat sous-traitant plus lisible et sans débordement */
+
+#subAssignModal .sub-quick-contract{background:#f7fafe;border:1px solid #d4e1ef;border-radius:12px;padding:15px;margin:12px 0}
+#subAssignModal .sub-quick-title{font-size:16px;font-weight:800;color:#153d61;margin-bottom:12px}
+#subAssignModal .sub-quick-title span{display:block;font-size:12px;font-weight:400;color:#64748b;margin-top:4px}
+#subAssignModal .sub-quick-contract .field{margin:0 0 10px}
+
 #subAssignModal .modal-card{box-sizing:border-box;width:min(820px,calc(100vw - 28px));max-width:820px;max-height:calc(100dvh - 36px);overflow-y:auto;overflow-x:hidden;padding:20px 22px}
 #subAssignModal .field,#subAssignModal .grid2>*,#subAssignModal .sub-assign-grid>*{min-width:0;max-width:100%}
 #subAssignModal input,#subAssignModal select,#subAssignModal textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0}
@@ -589,7 +595,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V38</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V38.3</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -738,7 +744,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 </div></div>
 <section id="analyse" class="view"><div class="panel"><div class="analyse-head"><div><h2>Analyse chantier</h2><div class="muted">Synthèse des données déjà reliées au chantier dans ERP DEV.</div></div><button class="btn secondary" onclick="loadAnalysis()">Actualiser</button></div><div class="field" style="margin-top:12px"><label>Rechercher</label><input id="analysisSearch" placeholder="Rechercher un client ou un chantier…" oninput="searchAnalysisContext()"></div><div class="grid2" style="margin-top:12px"><div class="field"><label>Client</label><select id="analysisClient"></select></div><div class="field"><label>Chantier</label><select id="analysisJob"></select></div></div><div id="analysisStatus" class="notice">Sélectionnez un chantier.</div><div id="analysisContent"></div><div id="financePanel" style="margin-top:16px"></div></div></section>
 <section id="users" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Utilisateurs & droits d’accès</h2><div class="muted" style="margin-top:4px">Choisis les modules visibles pour chaque utilisateur.</div></div><button class="btn secondary" id="refreshUsersBtn">Actualiser</button></div><div class="notice" style="margin-bottom:12px">Pour créer un nouveau compte, ajoute d’abord l’utilisateur dans <strong>Supabase → Authentication → Users</strong>. Il apparaîtra ici dès que son accès est enregistré dans Supabase. Tu peux lui attribuer le rôle Collaborateur et définir ses droits module par module.</div><div id="usersTable"></div></div></section>
-<section id="rmlCatalogView" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2>Modifier produits — catalogue général</h2><p class="muted">Réservé à l’administrateur. Modifiez les noms, ajoutez, dupliquez ou supprimez des produits, et déplacez-les avec la poignée ☰ pour changer leur ordre, puis cliquez sur Enregistrer les modifications. Les préparations déjà enregistrées ne sont pas modifiées.</p></div><button class="btn ok" onclick="rmlSaveCatalog()">Enregistrer les modifications</button></div><div class="actions" style="margin:10px 0"><button class="btn secondary" type="button" onclick="rmlImportPrepProducts()">Récupérer les produits de mes préparations</button></div><div id="rmlCatalogStatus" class="notice">Chargement du catalogue…</div><div id="rmlCatalogEditor"></div><div class="actions"><button class="btn ok" onclick="rmlSaveCatalog()">Enregistrer les modifications</button></div></div></section><section id="security" class="view"><div class="panel" id="rmlV37Simulator" style="margin-top:16px;border:2px solid #2563eb"><h2>V38 · Simulateur ADMIN — salariés et sous-traitants</h2><p class="muted">Tests depuis Mac, sans changer de compte. Seuls les chantiers autorisés explicitement dans Supabase comme chantiers de test peuvent recevoir des écritures. La fonction SQL V37 doit être installée avant tout enregistrement.</p><div class="grid2"><div class="field"><label>Profil simulé</label><select id="v37Kind" onchange="v37Refresh()"><option value="team">Équipe salariée</option><option value="sub">Sous-traitant</option></select></div><div class="field"><label>Équipe / sous-traitant</label><select id="v37Actor" onchange="v37ShowJob()"></select></div><div class="field"><label>Date simulée</label><input type="date" id="v37Date" onchange="v37Refresh()"></div><div class="field"><label>Affichage</label><select id="v37Device" onchange="v37Resize()"><option value="desktop">Mac</option><option value="tablet">Tablette</option><option value="phone">iPhone</option></select></div><div class="field"><label>Chantier de test</label><select id="v37Job" onchange="v37ShowJob()"></select></div></div><div class="actions"><button type="button" class="btn secondary" onclick="v37Refresh()">Actualiser les affectations</button><button type="button" class="btn secondary" onclick="v37CheckBackend()">Vérifier la connexion V37</button></div><div id="v37Status" class="notice" role="status">Sélectionnez une équipe, une date et un chantier de test.</div><div id="v37DeviceFrame" style="margin:16px auto;padding:16px;border:2px solid #cbd5e1;border-radius:18px;max-width:100%;box-sizing:border-box"><div id="v37Preview"></div><div id="v373Tabs" class="actions" style="display:none;gap:6px;margin:12px 0;flex-wrap:wrap"></div><div id="v373ReadOnly" style="display:none"></div><div id="v37HoursForm" style="display:none;border-top:1px solid #cbd5e1;padding-top:14px;margin-top:14px"><h3>Heures chantier — écriture Supabase réelle</h3><div class="grid2"><div class="field"><label>Heures (0 à 24)</label><input type="number" min="0" max="24" step="0.25" id="v37Hours"></div><div class="field"><label>Observation de test</label><input id="v37Note" maxlength="500" placeholder="Simulation V37"></div></div><button type="button" class="btn ok" onclick="v37SaveHours()">Enregistrer les heures dans Supabase</button></div></div><p class="muted">V38 : aperçu fidèle des espaces salarié et sous-traitant, consultation des données réelles de la fiche chantier, navigation terrain et test des heures. Les affectations affichées ne sont pas une garantie de planning exhaustif. Seul l’enregistrement des heures de salariés est activé via la fonction SQL sécurisée. Les autres rubriques consultent les documents, comptes rendus et affectations réels sans modifier aucune donnée.</p></div><div class="panel" id="rmlNavEditorPanel" style="margin-top:16px"><h2>Organisation des modules</h2><p class="muted">Réorganiser les modules du menu ERP. Réservé à l’administrateur.</p></div><div class="panel" id="rmlSupabaseMonitor" style="margin-top:16px"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Consommation Supabase</h2><p class="muted">Offre Free — surveillance administrateur. Compteurs d'enregistrements actualisés automatiquement ; quotas officiels à renseigner depuis Supabase Usage.</p></div><button type="button" class="btn secondary" onclick="rmlMonitorRefresh()">Actualiser les compteurs</button></div><div id="rmlMonitorCounts" class="notice">Ouvrez cette rubrique pour consulter les compteurs.</div><p class="muted" style="margin-top:12px">Saisissez les volumes relevés dans <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase → Usage</a>. Ces valeurs sont manuelles et ne représentent pas une mesure automatique en temps réel.</p><div class="grid2" id="rmlMonitorInputs"><div class="field"><label>Base de données utilisée (Mo / 500 Mo)</label><input type="number" id="rmlQuotaDb" min="0" step="0.1" placeholder="Ex. 125"></div><div class="field"><label>Stockage fichiers utilisé (Go / 1 Go)</label><input type="number" id="rmlQuotaStorage" min="0" step="0.001" placeholder="Ex. 0.250"></div><div class="field"><label>Transfert mensuel utilisé (Go / 5 Go)</label><input type="number" id="rmlQuotaTransfer" min="0" step="0.001" placeholder="Ex. 1.5"></div></div><div class="actions" style="margin:10px 0"><button class="btn ok" type="button" onclick="rmlMonitorSave()">Enregistrer les relevés</button></div><div id="rmlMonitorQuotaDisplay" aria-live="polite"></div><p class="muted">Alertes à 70 %, 85 % et 95 %. Surveillance configurée pour l’offre Free (base 0,5 Go, stockage 1 Go, bande passante 5 Go, valeurs indicatives). Vérifiez les quotas applicables à votre projet dans Supabase → Usage. Le transfert mensuel peut comporter plusieurs catégories de trafic ; reportez la valeur correspondant au quota de 5 Go. Les relevés sont conservés uniquement dans ce navigateur ; aucune clé secrète n'est utilisée.</p></div><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte en lecture seule les tables connues et accessibles. Ce fichier ne constitue pas une sauvegarde exhaustive de Supabase : les tables non répertoriées, les lignes masquées par RLS, Storage et Authentication sont exclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Archive partielle des tables connues et fichiers Storage accessibles. Une sauvegarde exhaustive nécessite un export administrateur côté Supabase (base, Storage et configuration).</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
+<section id="rmlCatalogView" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2>Modifier produits — catalogue général</h2><p class="muted">Réservé à l’administrateur. Modifiez les noms, ajoutez, dupliquez ou supprimez des produits, et déplacez-les avec la poignée ☰ pour changer leur ordre, puis cliquez sur Enregistrer les modifications. Les préparations déjà enregistrées ne sont pas modifiées.</p></div><button class="btn ok" onclick="rmlSaveCatalog()">Enregistrer les modifications</button></div><div class="actions" style="margin:10px 0"><button class="btn secondary" type="button" onclick="rmlImportPrepProducts()">Récupérer les produits de mes préparations</button></div><div id="rmlCatalogStatus" class="notice">Chargement du catalogue…</div><div id="rmlCatalogEditor"></div><div class="actions"><button class="btn ok" onclick="rmlSaveCatalog()">Enregistrer les modifications</button></div></div></section><section id="security" class="view"><div class="panel" id="rmlV37Simulator" style="margin-top:16px;border:2px solid #2563eb"><h2>V38.3 · Simulateur ADMIN — salariés et sous-traitants</h2><p class="muted">Tests depuis Mac, sans changer de compte. Seuls les chantiers autorisés explicitement dans Supabase comme chantiers de test peuvent recevoir des écritures. La fonction SQL V37 doit être installée avant tout enregistrement.</p><div class="grid2"><div class="field"><label>Profil simulé</label><select id="v37Kind" onchange="v37Refresh()"><option value="team">Équipe salariée</option><option value="sub">Sous-traitant</option></select></div><div class="field"><label>Équipe / sous-traitant</label><select id="v37Actor" onchange="v37ShowJob()"></select></div><div class="field"><label>Date simulée</label><input type="date" id="v37Date" onchange="v37Refresh()"></div><div class="field"><label>Affichage</label><select id="v37Device" onchange="v37Resize()"><option value="desktop">Mac</option><option value="tablet">Tablette</option><option value="phone">iPhone</option></select></div><div class="field"><label>Chantier de test</label><select id="v37Job" onchange="v37ShowJob()"></select></div></div><div class="actions"><button type="button" class="btn secondary" onclick="v37Refresh()">Actualiser les affectations</button><button type="button" class="btn secondary" onclick="v37CheckBackend()">Vérifier la connexion V37</button></div><div id="v37Status" class="notice" role="status">Sélectionnez une équipe, une date et un chantier de test.</div><div id="v37DeviceFrame" style="margin:16px auto;padding:16px;border:2px solid #cbd5e1;border-radius:18px;max-width:100%;box-sizing:border-box"><div id="v37Preview"></div><div id="v373Tabs" class="actions" style="display:none;gap:6px;margin:12px 0;flex-wrap:wrap"></div><div id="v373ReadOnly" style="display:none"></div><div id="v37HoursForm" style="display:none;border-top:1px solid #cbd5e1;padding-top:14px;margin-top:14px"><h3>Heures chantier — écriture Supabase réelle</h3><div class="grid2"><div class="field"><label>Heures (0 à 24)</label><input type="number" min="0" max="24" step="0.25" id="v37Hours"></div><div class="field"><label>Observation de test</label><input id="v37Note" maxlength="500" placeholder="Simulation V37"></div></div><button type="button" class="btn ok" onclick="v37SaveHours()">Enregistrer les heures dans Supabase</button></div></div><p class="muted">V38.3 : aperçu fidèle des espaces salarié et sous-traitant, consultation des données réelles de la fiche chantier, navigation terrain et test des heures. Les affectations affichées ne sont pas une garantie de planning exhaustif. Seul l’enregistrement des heures de salariés est activé via la fonction SQL sécurisée. Les autres rubriques consultent les documents, comptes rendus et affectations réels sans modifier aucune donnée.</p></div><div class="panel" id="rmlNavEditorPanel" style="margin-top:16px"><h2>Organisation des modules</h2><p class="muted">Réorganiser les modules du menu ERP. Réservé à l’administrateur.</p></div><div class="panel" id="rmlSupabaseMonitor" style="margin-top:16px"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Consommation Supabase</h2><p class="muted">Offre Free — surveillance administrateur. Compteurs d'enregistrements actualisés automatiquement ; quotas officiels à renseigner depuis Supabase Usage.</p></div><button type="button" class="btn secondary" onclick="rmlMonitorRefresh()">Actualiser les compteurs</button></div><div id="rmlMonitorCounts" class="notice">Ouvrez cette rubrique pour consulter les compteurs.</div><p class="muted" style="margin-top:12px">Saisissez les volumes relevés dans <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase → Usage</a>. Ces valeurs sont manuelles et ne représentent pas une mesure automatique en temps réel.</p><div class="grid2" id="rmlMonitorInputs"><div class="field"><label>Base de données utilisée (Mo / 500 Mo)</label><input type="number" id="rmlQuotaDb" min="0" step="0.1" placeholder="Ex. 125"></div><div class="field"><label>Stockage fichiers utilisé (Go / 1 Go)</label><input type="number" id="rmlQuotaStorage" min="0" step="0.001" placeholder="Ex. 0.250"></div><div class="field"><label>Transfert mensuel utilisé (Go / 5 Go)</label><input type="number" id="rmlQuotaTransfer" min="0" step="0.001" placeholder="Ex. 1.5"></div></div><div class="actions" style="margin:10px 0"><button class="btn ok" type="button" onclick="rmlMonitorSave()">Enregistrer les relevés</button></div><div id="rmlMonitorQuotaDisplay" aria-live="polite"></div><p class="muted">Alertes à 70 %, 85 % et 95 %. Surveillance configurée pour l’offre Free (base 0,5 Go, stockage 1 Go, bande passante 5 Go, valeurs indicatives). Vérifiez les quotas applicables à votre projet dans Supabase → Usage. Le transfert mensuel peut comporter plusieurs catégories de trafic ; reportez la valeur correspondant au quota de 5 Go. Les relevés sont conservés uniquement dans ce navigateur ; aucune clé secrète n'est utilisée.</p></div><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte en lecture seule les tables connues et accessibles. Ce fichier ne constitue pas une sauvegarde exhaustive de Supabase : les tables non répertoriées, les lignes masquées par RLS, Storage et Authentication sont exclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Archive partielle des tables connues et fichiers Storage accessibles. Une sauvegarde exhaustive nécessite un export administrateur côté Supabase (base, Storage et configuration).</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
 
 <section id="page-forecast" class="view">
   <div class="card" id="forecastDedicatedCard">
@@ -794,9 +800,16 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
  <div class="field" style="margin-top:12px"><label>Rechercher un chantier</label><input id="subAssignJobSearch" type="search" placeholder="Nom du client, chantier ou adresse…" oninput="filterSubAssignJobs()"></div>
  <div class="grid2 sub-assign-grid"><div class="field"><label>Client</label><select id="subAssignClient"></select></div><div class="field"><label>Chantier</label><select id="subAssignJob"></select></div></div>
  <div class="grid2"><div class="field"><label>Date prévue</label><input id="subAssignDate" type="date"></div><div class="field"><label>Montant du contrat HT (€)</label><input id="subAssignAmount" type="number" step="0.01" min="0"></div></div>
- <div class="field"><label>Type de travaux — choix rapide</label><select id="subWorkPreset" onchange="rmlApplySubWorkPreset()"><option value="">— Choisir un type de prestation —</option><option value="Pose de gouttières en aluminium laqué">Pose de gouttières aluminium</option><option value="Pose de descentes d’eaux pluviales">Pose de descentes EP</option><option value="Pose de couvertines en aluminium laqué">Pose de couvertines</option><option value="Pose de sous-faces et habillage de planches de rives">Sous-faces et planches de rives</option><option value="Travaux de pliage et pose d’habillages aluminium">Pliage et habillages aluminium</option><option value="Travaux de pose de produits en aluminium laqué">Pose aluminium — divers</option></select></div>
+ <div class="field"><label>Type de prestation — modèles personnalisables</label><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><select id="rmlSubPresetSelect" style="flex:1;min-width:190px;max-width:100%" aria-label="Choisir une prestation enregistrée"><option value="">— Choisir une prestation enregistrée —</option></select><button type="button" class="btn secondary" onclick="rmlSubUsePreset()">Ajouter au contrat</button></div><div class="actions" style="gap:8px;margin-top:8px;flex-wrap:wrap"><button type="button" class="btn secondary" onclick="rmlSubSavePreset()">+ Enregistrer le descriptif comme modèle</button><button type="button" class="btn secondary" onclick="rmlSubDeletePreset()">Supprimer un modèle personnel</button></div><div class="muted">Sélectionnez un modèle pour compléter la description des travaux. Vous pouvez créer vos propres modèles à partir du texte saisi ci-dessous. Modèles personnels conservés dans ce navigateur.</div></div>
+ <div class="field"><label>Prestations de la fiche chantier — sans quantités</label><div id="subWorkProducts" style="border:1px solid #d5e3ed;border-radius:9px;padding:11px;background:#f8fafc;max-height:210px;overflow:auto"><span class="muted">Sélectionnez un chantier pour charger ses produits.</span></div><div class="actions" style="margin-top:8px;gap:8px"><button type="button" class="btn secondary" onclick="rmlSubToggleProducts(true)">Tout sélectionner</button><button type="button" class="btn secondary" onclick="rmlSubToggleProducts(false)">Tout désélectionner</button><button type="button" class="btn" onclick="rmlSubApplyProducts()">Reprendre les prestations sélectionnées</button></div><div class="muted">Les descriptions proviennent de la préparation du chantier. Les quantités et les prix ne sont jamais copiés.</div></div>
  <div class="sub-assign-address"><strong>Adresse du chantier</strong><div id="subAssignAddressDisplay">Sélectionnez un chantier pour afficher son adresse.</div></div>
  <div class="field"><label>Description des travaux <span class="muted">(modifiable)</span></label><textarea id="subAssignWork" rows="3" placeholder="Décrire précisément les travaux confiés au sous-traitant"></textarea></div>
+ <div class="sub-quick-contract"><div class="sub-quick-title">Contrat simplifié <span>Renseignez uniquement les éléments variables. Les 17 articles du contrat sont conservés.</span></div>
+ <div class="grid2"><div class="field"><label>Maître d’ouvrage</label><input id="subQuickOwner" placeholder="Repris du client" /></div><div class="field"><label>Maître d’œuvre</label><select id="subQuickManager"><option value="Non désigné">Non désigné</option><option value="Le maître d’ouvrage">Le maître d’ouvrage</option><option value="Architecte">Architecte (à préciser)</option><option value="Autre">Autre (à préciser)</option></select></div></div>
+ <div class="grid2"><div class="field"><label>Plan de sécurité PGCSPS</label><select id="subQuickSafety"><option value="NON">Non</option><option value="OUI">Oui</option><option value="À CONFIRMER">À confirmer</option></select></div><div class="field"><label>CISSCT</label><select id="subQuickCissct"><option value="NON">Non</option><option value="OUI">Oui</option><option value="À CONFIRMER">À confirmer</option></select></div></div>
+ <div class="grid2"><div class="field"><label>Assurance décennale obligatoire pour ces travaux</label><select id="subQuickInsurance"><option value="À CONFIRMER">À confirmer</option><option value="OUI">Oui</option><option value="NON">Non</option></select></div><div class="field"><label>Participation aux dépenses communes</label><select id="subQuickCosts"><option value="none">Aucune participation</option><option value="prorata">Selon convention de compte prorata</option><option value="other">Autres modalités — voir clauses</option></select></div></div>
+ <div class="grid2"><div class="field"><label>Réserve de propriété</label><select id="subQuickProperty"><option value="NON">Non</option><option value="OUI">Oui</option></select></div><div class="field"><label>Fait à</label><input id="subQuickCity" value="Beautiran" /></div></div>
+ <div class="actions"><button type="button" class="btn secondary" onclick="rmlApplyQuickContract()">Appliquer les choix au contrat</button><span class="muted" id="subQuickFeedback">Les choix ne modifient le contrat qu'après validation.</span></div></div>
  <details id="subAdvancedClauses"><summary style="cursor:pointer;font-weight:700;padding:12px 0">Clauses contractuelles — options avancées (ouvrir uniquement si nécessaire)</summary><div class="field"><label>Clauses du contrat</label><div class="muted" style="margin-bottom:8px">Toutes les clauses sont modifiables avant signature. Le chantier peut être affecté avant la signature.</div>
 
  <div id="subClauseEditor"></div><div class="actions"><button class="btn secondary" type="button" onclick="addSubClause()">+ Ajouter une clause</button><button class="btn secondary" type="button" onclick="resetSubClauses()">Réinitialiser le modèle</button></div></div></details>
@@ -3157,7 +3170,7 @@ function fillSubAssignJobOptions(selected=''){
  if(q)jobs=jobs.filter(j=>{const c=db.clients.find(x=>x.id===j.client_id);return normalizeSearch([c?.nom,j.nom,j.adresse].filter(Boolean).join(' ')).includes(q)});
  fillSelect(subAssignJob,jobs,'Choisir un chantier','id',j=>j.nom||db.clients.find(x=>x.id===j.client_id)?.nom||'Chantier');
  if(selected&&jobs.some(j=>j.id===selected))subAssignJob.value=selected;
- rmlUpdateSubAddress();
+ rmlUpdateSubAddress();rmlSubLoadProducts();
 }
 function filterSubAssignJobs(){
  const q=normalizeSearch(subAssignJobSearch.value);
@@ -3169,14 +3182,129 @@ function filterSubAssignJobs(){
  }
  fillSubAssignJobOptions();rmlFillSubAssignmentDate();
 }
-function rmlApplySubWorkPreset(){if(subWorkPreset.value)subAssignWork.value=subWorkPreset.value}
+function rmlQuickContractDefaults(){
+ const j=db.chantiers.find(x=>String(x.id)===String(subAssignJob.value));
+ const c=db.clients.find(x=>x.id===j?.client_id);
+ document.getElementById('subQuickOwner').value=c?.nom||'';
+ document.getElementById('subQuickManager').value='Non désigné';
+ document.getElementById('subQuickSafety').value='NON';
+ document.getElementById('subQuickCissct').value='NON';
+ document.getElementById('subQuickInsurance').value='À CONFIRMER';
+ document.getElementById('subQuickCosts').value='none';
+ document.getElementById('subQuickProperty').value='NON';
+ document.getElementById('subQuickCity').value='Beautiran';
+ document.getElementById('subQuickFeedback').textContent='Les choix ne modifient le contrat qu’après validation.';
+}
+function rmlApplyQuickContract(){
+ const j=db.chantiers.find(x=>String(x.id)===String(subAssignJob.value));
+ if(!j){alert('Choisissez d’abord un chantier.');return}
+ const owner=document.getElementById('subQuickOwner').value.trim()||'À compléter';
+ const manager=document.getElementById('subQuickManager').value;
+ const work=subAssignWork.value.trim()||'À compléter';
+ const insurance=document.getElementById('subQuickInsurance').value;
+ const costs=document.getElementById('subQuickCosts').value;
+ const costOptions=['☐ Le sous-traitant ne participe pas aux dépenses d’intérêt commun et de compte prorata éventuellement prévues au marché principal.','☐ Le sous-traitant participe aux dépenses communes précisées par une convention de compte prorata à laquelle il adhère dans le cadre de l’exécution du chantier.'];
+ subClauseDraft=subClauseDraft.map((x,i)=>{
+ let t=x.text||'';
+ if(i===0){t=t.replace(/Les travaux faisant l’objet du présent contrat sont définis comme suit :\n[^\n]*/,`Les travaux faisant l’objet du présent contrat sont définis comme suit :\n${work}`)
+ .replace(/- Maître d’ouvrage :[^\n]*/,`- Maître d’ouvrage : ${owner}`)
+ .replace(/- Maître d’œuvre :[^\n]*/,`- Maître d’œuvre : ${manager}`)
+ .replace(/- Type de travaux :[^\n]*/,`- Type de travaux : ${work}`)
+ .replace(/- Lieu d’exécution :[^\n]*/,`- Lieu d’exécution : ${j.adresse||'À compléter'}`)}
+ if(i===1){t=t.replace(/Le chantier est soumis à un Plan Général de Coordination en matière de Sécurité et de Protection de la Santé \(PGCSPS\) :[^\n]*/,`Le chantier est soumis à un Plan Général de Coordination en matière de Sécurité et de Protection de la Santé (PGCSPS) : ${subQuickSafety.value}`)
+ .replace(/Existence du CISSCT :[^\n]*/,`Existence du CISSCT : ${subQuickCissct.value}`)}
+ if(i===10)t=t.replace(/Le sous-traitant doit justifier d’une assurance décennale \(chantiers de construction relevant du domaine de l’assurance décennale obligatoire\) :[^\n]*/,`Le sous-traitant doit justifier d’une assurance décennale (chantiers de construction relevant du domaine de l’assurance décennale obligatoire) : ${insurance}`);
+ if(i===11){for(let k=0;k<costOptions.length;k++){const plain=costOptions[k].slice(2);t=t.replaceAll('☐ '+plain,(costs===(k===0?'none':'prorata')?'☒ ':'☐ ')+plain)}}
+ if(i===14)t=t.replace(/Le sous-traitant se réserve la propriété des fournitures non mises en œuvre jusqu’à leur complet paiement :[^\n]*/,`Le sous-traitant se réserve la propriété des fournitures non mises en œuvre jusqu’à leur complet paiement : ${subQuickProperty.value}.`);
+ if(i===16)t=t.replace(/Fait à :[^\n]*/,`Fait à : ${subQuickCity.value.trim()||'À compléter'}`).replace(/Le :[^\n]*/,`Le : ${new Date().toLocaleDateString('fr-FR')}`);
+ return {...x,text:t};
+ });
+ renderSubClauseEditor();
+ document.getElementById('subQuickFeedback').textContent='Choix appliqués. Enregistrez le contrat pour les conserver.';
+}
+let rmlSubProductRequest=0;
+async function rmlSubLoadProducts(){
+ const box=document.getElementById('subWorkProducts'),id=subAssignJob.value,request=++rmlSubProductRequest;
+ if(!box)return;
+ if(!id){box.innerHTML='<span class="muted">Sélectionnez un chantier pour charger ses produits.</span>';return}
+ box.innerHTML='<span class="muted">Chargement des prestations de la fiche chantier…</span>';
+ try{
+  const {data,error}=await sb.from('erp_modules_data').select('payload').eq('chantier_id',id).eq('module','preparation').eq('entity_type','chantier').eq('deleted',false).order('updated_at',{ascending:false}).limit(1);
+  if(request!==rmlSubProductRequest||String(subAssignJob.value)!==String(id))return;
+  if(error)throw error;
+  const sections=data?.[0]?.payload?.sections||{},names=[];
+  for(const [section,rows] of Object.entries(sections)){
+   for(const row of (Array.isArray(rows)?rows:[])){
+    if(!row||typeof row!=='object')continue;
+    let label='';
+    if(section==='descentes')label=['Descente',row.shape,row.dimension].filter(Boolean).join(' ');
+    else if(section==='couvertines')label=['Couvertine',row.width,row.hook].filter(Boolean).join(' — ');
+    else label=String(row.type||'').trim();
+    if(!label)continue;
+    if(row.color)label+=' — '+row.color;
+    if(!names.some(n=>n.toLocaleLowerCase('fr')===label.toLocaleLowerCase('fr')))names.push(label);
+   }
+  }
+  box.innerHTML=names.length?names.map((name,i)=>`<label style="display:flex;align-items:flex-start;gap:9px;padding:5px 0;cursor:pointer"><input type="checkbox" class="rml-sub-product" value="${esc(name)}" checked style="width:auto;margin-top:3px;flex:none"><span>${esc(name)}</span></label>`).join(''):'<span class="muted">Aucun produit renseigné dans la fiche de préparation de ce chantier. Vous pouvez saisir la description manuellement.</span>';
+ }catch(e){if(request===rmlSubProductRequest)box.textContent='Impossible de charger les prestations : '+(e?.message||e)}
+}
+const RML_SUB_PRESET_KEY='rml_sub_contract_presets_v1';
+const RML_SUB_DEFAULT_PRESETS=[
+ 'Pose d’éléments en aluminium laqué',
+ 'Pose de bardage',
+ 'Travaux de zinguerie',
+ 'Prestation de service comprenant la fourniture',
+ 'Prestation de pose seule, sans fourniture',
+ 'Fourniture et pose de gouttières en aluminium laqué',
+ 'Fourniture et pose de couvertines en aluminium laqué',
+ 'Pose de sous-faces et habillage de planches de rives'
+];
+function rmlSubGetPresets(){try{const a=JSON.parse(localStorage.getItem(RML_SUB_PRESET_KEY)||'[]');return Array.isArray(a)?a.filter(x=>typeof x==='string'&&x.trim()).slice(0,200):[]}catch(e){return []}}
+function rmlSubRenderPresets(selected=''){
+ const el=document.getElementById('rmlSubPresetSelect');if(!el)return;
+ const presets=[...RML_SUB_DEFAULT_PRESETS,...rmlSubGetPresets().filter(x=>!RML_SUB_DEFAULT_PRESETS.includes(x))];
+ el.replaceChildren(new Option('— Choisir une prestation enregistrée —',''));
+ presets.forEach(p=>el.add(new Option(p,p)));
+ if(selected&&presets.includes(selected))el.value=selected;
+}
+function rmlSubUsePreset(){
+ const sel=document.getElementById('rmlSubPresetSelect'),field=document.getElementById('subAssignWork');
+ if(!sel?.value||!field)return alert('Choisissez une prestation.');
+ const lines=field.value.split('\n').map(x=>x.trim());
+ if(!lines.includes(sel.value))field.value=(field.value.trim()?field.value.trim()+'\n':'')+sel.value;
+ field.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function rmlSubSavePreset(){
+ const field=document.getElementById('subAssignWork');const initial=field?.value.trim()||'';
+ const name=prompt('Nom / descriptif du nouveau modèle de prestation :',initial);
+ if(name===null)return;
+ const val=name.trim();if(!val)return alert('Le descriptif ne peut pas être vide.');
+ if(val.length>1000)return alert('Descriptif trop long (1 000 caractères maximum).');
+ if([...RML_SUB_DEFAULT_PRESETS,...rmlSubGetPresets()].some(x=>x.toLocaleLowerCase('fr')===val.toLocaleLowerCase('fr')))return alert('Ce modèle existe déjà.');
+ try{localStorage.setItem(RML_SUB_PRESET_KEY,JSON.stringify([...rmlSubGetPresets(),val]));rmlSubRenderPresets(val)}catch(e){alert('Impossible d’enregistrer ce modèle dans ce navigateur.')} 
+}
+function rmlSubDeletePreset(){
+ const val=document.getElementById('rmlSubPresetSelect')?.value;
+ if(!val)return alert('Sélectionnez un modèle à supprimer.');
+ if(RML_SUB_DEFAULT_PRESETS.includes(val))return alert('Les modèles de base ne peuvent pas être supprimés.');
+ if(!confirm('Supprimer ce modèle personnel ?'))return;
+ try{localStorage.setItem(RML_SUB_PRESET_KEY,JSON.stringify(rmlSubGetPresets().filter(x=>x!==val)));rmlSubRenderPresets()}catch(e){alert('Suppression impossible dans ce navigateur.')}
+}
+window.addEventListener('DOMContentLoaded',()=>rmlSubRenderPresets());
+function rmlSubToggleProducts(checked){document.querySelectorAll('#subWorkProducts .rml-sub-product').forEach(e=>e.checked=checked)}
+function rmlSubApplyProducts(){
+ const names=[...document.querySelectorAll('#subWorkProducts .rml-sub-product:checked')].map(e=>e.value);
+ if(!names.length){alert('Sélectionnez au moins une prestation.');return}
+ const field=document.getElementById('subAssignWork');field.value=names.join('\n');field.dispatchEvent(new Event('input',{bubbles:true}));
+}
+
 function rmlUpdateSubAddress(){
  const display=document.getElementById('subAssignAddressDisplay');if(!display)return;
  const j=subAssignAllJobs.find(x=>String(x.id)===String(subAssignJob.value));
  display.textContent=j?.adresse||'Aucune adresse renseignée pour ce chantier.';
 }
 function rmlFillSubAssignmentDate(){
- rmlUpdateSubAddress();
+ rmlUpdateSubAddress();rmlSubLoadProducts();
  const j=db.chantiers.find(x=>x.id===subAssignJob.value);
  if(!j)return;
  const prep=db.preparations?.find?.(x=>x.chantier_id===j.id);
@@ -3188,8 +3316,8 @@ function openSubAssignment(id){
  subAssignClient.onchange=()=>{fillSubAssignJobOptions();rmlFillSubAssignmentDate()};
  subAssignJob.onchange=rmlFillSubAssignmentDate;
  subAssignJobSearch.value='';subAssignClient.value='';fillSubAssignJobOptions();
- subAssignDate.value='';subAssignAmount.value='';subAssignWork.value='';subWorkPreset.value='';rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
- subClauseDraft=cloneDefaultSubClauses();renderSubClauseEditor();
+ subAssignDate.value='';subAssignAmount.value='';subAssignWork.value='';rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
+ subClauseDraft=cloneDefaultSubClauses();renderSubClauseEditor();rmlQuickContractDefaults();
  subAssignSaveBtn.textContent='Enregistrer le brouillon';
  openModal('subAssignModal');
 }
@@ -3205,8 +3333,8 @@ function editSubAssignment(id){
  fillSubAssignJobOptions(a.chantier_id);
  subAssignDate.value=a.planned_date||'';
  subAssignAmount.value=a.amount_ht??'';
- subAssignWork.value=a.work_description||'';subWorkPreset.value='';rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
- subClauseDraft=subClausesFromAssignment(a).map(x=>({...x}));renderSubClauseEditor();
+ subAssignWork.value=a.work_description||'';rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
+ subClauseDraft=subClausesFromAssignment(a).map(x=>({...x}));renderSubClauseEditor();rmlQuickContractDefaults();
  subAssignSaveBtn.textContent='Enregistrer les modifications';
  openModal('subAssignModal');
 }
@@ -4778,7 +4906,7 @@ function v37ShowJob(){
 async function v37SaveHours(){if(!v37IsAdmin())return;const job=document.getElementById('v37Job').value,team=Number(document.getElementById('v37Actor').value),date=document.getElementById('v37Date').value,hours=Number(document.getElementById('v37Hours').value),note=document.getElementById('v37Note').value;if(document.getElementById('v37Kind').value!=='team'||!v37Allowed.some(x=>x.id===job)||!Number.isInteger(team)||!date||!Number.isFinite(hours)||hours<0||hours>24||document.getElementById('v37Hours').value===''){v37Status('Saisie invalide ou chantier non autorisé.',true);return}if(!confirm('Enregistrer réellement '+hours+' h pour l’équipe '+team+' le '+date+' sur ce chantier de test ?'))return;v37Status('Enregistrement Supabase en cours…');try{const {data,error}=await sb.rpc('rml_v37_admin_save_test_hours',{p_chantier_id:job,p_date:date,p_team:team,p_hours:hours,p_note:note});if(error)throw error;if(!data?.ok)throw Error('Aucune confirmation serveur');v37Status('Enregistrement Supabase confirmé · '+hours+' h · équipe '+team+' · '+date+' · identifiant '+data.id);alert('Enregistrement réel Supabase confirmé.')}catch(e){v37Status('Échec Supabase : '+e.message,true)}}
 
 
-/* V38 : simulateur visuel fondé sur les composants des portails réels.
+/* V38.3 : simulateur visuel fondé sur les composants des portails réels.
    Aucune mutation supplémentaire de Supabase n'est introduite. */
 function v376Notice(msg){return '<div class="notice warn" style="margin:12px 0">'+esc(msg)+'</div>'}
 function v376Job(){return v374Details||{};}
@@ -4823,7 +4951,7 @@ v373RenderTab=function(){v376OldRender();v376Render();};
 const v376OldShow=v37ShowJob;
 v37ShowJob=function(){v376OldShow();v376Render();};
 
-/* V38 — lecture des dossiers réels dans le simulateur ADMIN.
+/* V38.3 — lecture des dossiers réels dans le simulateur ADMIN.
    Les requêtes sont exclusivement SELECT et limitées au chantier de test autorisé. */
 let v377ReadToken=0;
 let v378PlanningCount=null;
