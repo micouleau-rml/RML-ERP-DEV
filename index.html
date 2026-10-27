@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V39.6</title>
+<title>RML ERP — V39.7</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -609,7 +609,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39.6</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39.7</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -878,6 +878,8 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
   <h3 style="margin-top:0">Signature du sous-traitant</h3>
   <div class="muted" style="margin-bottom:10px">Signez directement avec le doigt ou un stylet dans le cadre ci-dessous.</div>
   <div class="grid2"><div class="field"><label>Nom du signataire</label><input id="subSignerName"></div><div class="field"><label>Qualité</label><input id="subSignerRole" placeholder="Gérant, responsable…"></div></div>
+  <label id="subAcceptanceBox" style="display:flex;align-items:flex-start;gap:10px;margin:14px 0;padding:12px;border:2px solid #1b6297;border-radius:8px;background:#eff7ff;cursor:pointer;line-height:1.5"><input id="subAcceptanceCheck" type="checkbox" style="width:23px;height:23px;flex-shrink:0;margin-top:2px"><span><strong>J’ai lu et j’approuve les conditions du présent contrat.</strong><br>La mention « Lu et approuvé » figurera sur le contrat signé.</span></label>
+  <div id="subAcceptanceSaved" style="display:none;margin:12px 0;padding:12px;border:1px solid #91b8a0;background:#eef9f0;border-radius:8px;font-weight:700">Lu et approuvé — consentement enregistré avec la signature.</div>
   <canvas id="subSignaturePad" class="signature-pad"></canvas>
   <div class="actions"><button class="btn secondary" onclick="clearSubSignature()">Effacer la signature</button><button class="btn" id="subSignBtn" onclick="signSubContract()">Signer et valider le contrat</button></div>
  </div>
@@ -3618,6 +3620,7 @@ function printSubContract(){
  const sub=erpSubcontractors.find(x=>x.id===a.subcontractor_id),j=db.chantiers.find(x=>x.id===a.chantier_id),c=db.clients.find(x=>x.id===j?.client_id);
  const clauses=subClausesFromAssignment(a);
  const principalKey=rmlPrincipalKey(clauses);
+ const acceptance=subContractAcceptance(a);
  const sig=a.signature_data?`<img src="${a.signature_data}" style="max-width:260px;max-height:100px">`:'';
  const rmlSig=a.rml_signature_data?`<img src="${a.rml_signature_data}" style="max-width:260px;max-height:100px">`:'';
  const w=rmlContractPreviewFrame();
@@ -3630,18 +3633,22 @@ function printSubContract(){
  <div class="box"><strong>SOUS-TRAITANT</strong><br>${esc(sub?.company||'')}<br>${esc(sub?.contact_name||'')}<br>${esc(sub?.email||'')}<br>${esc(sub?.phone||'')}<br><strong>Adresse du siège :</strong> ${esc(sub?.head_office_address||'Non renseignée')}${rmlStephaneLegalDetails(sub)}</div></div>
  <div class="box"><strong>CHANTIER</strong><br>Client / maître d’ouvrage : ${esc(c?.nom||'')}<br>Chantier : ${esc(j?.nom||'')}<br>Adresse : ${esc(j?.adresse||'')}<br>Travaux confiés : ${esc(a.work_description||'À compléter')}<br>Montant : ${a.amount_ht!=null?Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2})+' € HT':'À compléter'}</div>
  ${clauses.map(x=>`<section class="clause"><h2>${esc(x.title||'')}</h2><div>${esc(x.text||'').replace(/\n/g,'<br>')}</div></section>`).join('')}
- <div class="signatures"><div>${rmlPrincipalSignerLabel(principalKey,a)}<br>${a.rml_signer_name?'Signataire : '+esc(a.rml_signer_name)+' '+esc(a.rml_signer_role||'')+'<br>':''}${rmlSig}<br>${a.rml_signed_at?'Signé le '+new Date(a.rml_signed_at).toLocaleString('fr-FR'):'Signature RML en attente'}</div><div>${rmlSubcontractSignerLabel(sub,a)}<br>${sig}<br>${a.signed_at?'Signé le '+new Date(a.signed_at).toLocaleString('fr-FR'):''}</div></div>
+ <div class="signatures"><div>${rmlPrincipalSignerLabel(principalKey,a)}<br>${a.rml_signer_name?'Signataire : '+esc(a.rml_signer_name)+' '+esc(a.rml_signer_role||'')+'<br>':''}${rmlSig}<br>${a.rml_signed_at?'Signé le '+new Date(a.rml_signed_at).toLocaleString('fr-FR'):'Signature RML en attente'}</div><div>${rmlSubcontractSignerLabel(sub,a)}<br>${a.signature_data?'Lu et approuvé<br>':''}${sig}<br>${a.signed_at?'Signé le '+new Date(a.signed_at).toLocaleString('fr-FR'):''}</div></div>
  
 
 </body></html>`);w.document.close();setTimeout(()=>w.focus(),150);
 }
 
+function subContractAcceptance(a){
+ const clauses=a?.contract_clauses;
+ return Array.isArray(clauses)?clauses.find(x=>x&&x._sub_acceptance)?. _sub_acceptance||null:null;
+}
 function openSubContract(id){
  const a=erpSubAssignments.find(x=>x.id===id);if(!a)return;const sub=erpSubcontractors.find(x=>x.id===a.subcontractor_id),j=db.chantiers.find(x=>x.id===a.chantier_id),c=db.clients.find(x=>x.id===j?.client_id);
  subContractId.value=id;const subSigned=!!a.signature_data, rmlSigned=!!a.rml_signature_data;subContractSummary.innerHTML=`<strong>${esc(sub?.company||'Sous-traitant')}</strong>${sub?.head_office_address?'<br>Siège : '+esc(sub.head_office_address):''}${rmlStephaneLegalDetails(sub)}<br>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}${j?.adresse?'<br>'+esc(j.adresse):''}${a.planned_date?'<br>Date prévue : '+esc(a.planned_date):''}${a.amount_ht!=null?'<br>Montant : '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}${subSigned&&!rmlSigned?'<br><strong>SOUS-TRAITANT SIGNÉ — SIGNATURE RML EN ATTENTE</strong>':subSigned&&rmlSigned?'<br><strong>CONTRAT SIGNÉ PAR LES DEUX PARTIES</strong>':''}`;
  const clauses=subClausesFromAssignment(a);subContractText.innerHTML='<div class="sub-clause-display"><h4>Entreprise donneuse d’ordre</h4><div>'+rmlPrincipalHtml(rmlPrincipalKey(clauses))+'<br>Représenté par : '+rmlPrincipalRepresentative(rmlPrincipalKey(clauses))+'</div></div>'+`<div class="sub-clause-display"><h4>Travaux confiés</h4><div>${esc(a.work_description||'').replace(/\\n/g,'<br>')}</div></div>`+clauses.map((x,i)=>`<div class="sub-clause-display"><h4>${i+1}. ${esc(x.title||'Clause')}</h4><div>${esc(x.text||'').replace(/\\n/g,'<br>')}</div></div>`).join('');
  subSignerName.value=a.signer_name||sub?.contact_name||'';subSignerRole.value=a.signer_role||'';
- openModal('subContractModal');setTimeout(()=>{setupSubSignaturePad();if(a.signature_data){drawSavedSignature(a.signature_data)}else clearSubSignature();const signed=!!a.signature_data;subEditClausesActions.style.display=(signed||isSubcontractorUser())?'none':'flex';subSignBtn.disabled=signed;subSignBtn.textContent=signed?'Signature sous-traitant enregistrée':'Signer et valider le contrat';subSignerName.disabled=signed;subSignerRole.disabled=signed;subSignaturePad.style.pointerEvents=signed?'none':'auto';
+ openModal('subContractModal');setTimeout(()=>{setupSubSignaturePad();if(a.signature_data){drawSavedSignature(a.signature_data)}else clearSubSignature();const signed=!!a.signature_data;subEditClausesActions.style.display=(signed||isSubcontractorUser())?'none':'flex';subSignBtn.disabled=signed;subSignBtn.textContent=signed?'Signature sous-traitant enregistrée':'Signer et valider le contrat';subSignerName.disabled=signed;subSignerRole.disabled=signed;document.getElementById('subAcceptanceBox').style.display=signed?'none':'flex';document.getElementById('subAcceptanceSaved').style.display=signed?'block':'none';document.getElementById('subAcceptanceCheck').checked=signed;subSignaturePad.style.pointerEvents=signed?'none':'auto';
  const canRml=!isSubcontractorUser()&&(currentAccess?.role==='administrateur'||currentAccess?.role==='direction');rmlSignatureWrap.style.display=(signed&&canRml)?'block':'none';rmlSignerName.value=a.rml_signer_name||'';rmlSignerRole.value=a.rml_signer_role||'Gérant';setupRmlSignaturePad();if(a.rml_signature_data)drawSavedRmlSignature(a.rml_signature_data);else clearRmlSignature();rmlSignBtn.disabled=!!a.rml_signature_data;rmlSignBtn.textContent=a.rml_signature_data?'Signature RML enregistrée':'Signer pour RML';rmlSignerName.disabled=!!a.rml_signature_data;rmlSignerRole.disabled=!!a.rml_signature_data;rmlSignaturePad.style.pointerEvents=a.rml_signature_data?'none':'auto';rmlClearSignBtn.style.display=a.rml_signature_data?'none':'inline-block';},60);
 }
 function setupSubSignaturePad(){
@@ -3655,17 +3662,24 @@ function clearSubSignature(){const c=subSignaturePad,ctx=c.getContext('2d');ctx.
 function drawSavedSignature(data){const img=new Image();img.onload=()=>{const c=subSignaturePad,ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height)};img.src=data;subSignatureDirty=false}
 async function signSubContract(){
  const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a||a.status==='signe')return;if(isSubcontractorUser()&&!erpSubcontractors.some(s=>s.id===a.subcontractor_id)){alert('Accès refusé.');return}
- const name=subSignerName.value.trim(),role=subSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire.');return}if(!subSignatureDirty){alert("Veuillez signer dans le cadre avant de valider.");return}
+ const name=subSignerName.value.trim(),role=subSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire.');return}if(!document.getElementById('subAcceptanceCheck').checked){alert('Veuillez cocher la case « J’ai lu et j’approuve » avant de signer.');return}if(!subSignatureDirty){alert("Veuillez signer dans le cadre avant de valider.");return}
  if(!confirm('Valider définitivement la signature de ce contrat ?'))return;
  const signature_data=subSignaturePad.toDataURL('image/png');
  const signed_at=new Date().toISOString();
+ // Consentement lié à la version du contrat, conservé dans contract_clauses (JSONB existant).
+ const clauses=subClausesFromAssignment(a).map(x=>({...x}));
+ const snapshot=JSON.stringify({contract_terms:a.contract_terms,clauses:clauses.map(({_sub_acceptance,...x})=>x),subcontractor_id:a.subcontractor_id,chantier_id:a.chantier_id,amount_ht:a.amount_ht,work_description:a.work_description});
+ let fingerprint='';
+ try{const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(snapshot));fingerprint=Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,'0')).join('')}catch(e){alert('Impossible de sécuriser la preuve de consentement sur cet appareil. Réessayez en HTTPS.');return}
+ if(!clauses.length)clauses.push({title:'Conditions du contrat',text:a.contract_terms||''});
+ clauses[0]._sub_acceptance={accepted:true,mention:'Lu et approuvé',signer_name:name,signer_role:role||'',accepted_at:signed_at,contract_sha256:fingerprint};
  const {data,error}=await sb.from('erp_subcontract_assignments')
-   .update({status:'signe',signer_name:name,signer_role:role||null,signature_data,signed_at})
+   .update({status:'signe',signer_name:name,signer_role:role||null,signature_data,signed_at,contract_clauses:clauses,updated_at:signed_at})
    .eq('id',id)
-   .select('id,status,signer_name,signer_role,signed_at,signature_data')
+   .select('id,status,signer_name,signer_role,signed_at,signature_data,contract_clauses')
    .maybeSingle();
  if(error){alert('Signature non enregistrée : '+error.message);return}
- if(!data||data.status!=='signe'||!data.signature_data){alert("La signature n'a pas été enregistrée dans Supabase. Vérifiez les droits d'accès du compte sous-traitant.");return}
+ if(!data||data.status!=='signe'||!data.signature_data||!subContractAcceptance(data)?.accepted){alert("La signature n'a pas été enregistrée dans Supabase. Vérifiez les droits d'accès du compte sous-traitant.");return}
  closeModal('subContractModal');
  if(isSubcontractorUser()) await loadSubcontractorPortal(); else await loadSubcontractors();
 }
