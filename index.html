@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V37.2</title>
+<title>RML ERP — V39.1</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -609,7 +609,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39.1</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3272,17 +3272,22 @@ function rmlQuickContractDefaults(){
  document.getElementById('subQuickProperty').value='NON';
  document.getElementById('subQuickCity').value='Beautiran';
  document.getElementById('subQuickPrice').value='Ferme';document.getElementById('subQuickVat').value='autoliquidation';document.getElementById('subQuickGuarantee').value='À préciser';document.getElementById('subQuickPayment').value='Virement bancaire';document.getElementById('subQuickPaymentTerms').value='30 jours à compter de la réception de la facture';document.getElementById('subQuickGuaranteeRef').value='';
+ const stored=subClauseDraft[0]?.quick_choices;
+ if(stored&&typeof stored==='object')for(const [id,value] of Object.entries(stored)){const el=document.getElementById(id);if(el&&typeof value==='string')el.value=value}
  document.getElementById('subQuickFeedback').textContent='Les choix ne modifient le contrat qu’après validation.';rmlSubToggleConditional();
 }
 function rmlApplyQuickContract(){
  const j=db.chantiers.find(x=>String(x.id)===String(subAssignJob.value));
- if(!j){alert('Choisissez d’abord un chantier.');return}
+ if(!j){alert('Choisissez d’abord un chantier.');return false}
  const owner=document.getElementById('subQuickOwner').value.trim()||'À compléter';
  const manager=document.getElementById('subQuickManager').value;
  const work=subAssignWork.value.trim()||'À compléter';
  const insurance=document.getElementById('subQuickInsurance').value;
  const costs=document.getElementById('subQuickCosts').value;
  const costOptions=['☐ Le sous-traitant ne participe pas aux dépenses d’intérêt commun et de compte prorata éventuellement prévues au marché principal.','☐ Le sous-traitant participe aux dépenses communes précisées par une convention de compte prorata à laquelle il adhère dans le cadre de l’exécution du chantier.'];
+ // Synchroniser les modifications faites dans les zones d'édition avant de les reconstruire.
+ document.querySelectorAll('#subClauseEditor .sub-clause-edit').forEach((el,i)=>{if(subClauseDraft[i]){subClauseDraft[i].title=el.querySelector('input')?.value??subClauseDraft[i].title;subClauseDraft[i].text=el.querySelector('textarea')?.value??subClauseDraft[i].text}});
+ const quickChoices={};document.querySelectorAll('.sub-quick-contract input[id],.sub-quick-contract select[id],.sub-quick-contract textarea[id]').forEach(el=>{quickChoices[el.id]=el.value});
  subClauseDraft=subClauseDraft.map((x,i)=>{
  let t=x.text||'';
  if(i===0){t=t.replace(/Les travaux faisant l’objet du présent contrat sont définis comme suit :\n[^\n]*/,`Les travaux faisant l’objet du présent contrat sont définis comme suit :\n${work}`)
@@ -3313,11 +3318,18 @@ function rmlApplyQuickContract(){
  if(i===11){for(let k=0;k<costOptions.length;k++){const plain=costOptions[k].slice(2);t=t.replaceAll('☐ '+plain,(costs===(k===0?'none':'prorata')?'☒ ':'☐ ')+plain)}}
  if(i===14)t=t.replace(/Le sous-traitant se réserve la propriété des fournitures non mises en œuvre jusqu’à leur complet paiement :[^\n]*/,`Le sous-traitant se réserve la propriété des fournitures non mises en œuvre jusqu’à leur complet paiement : ${subQuickProperty.value}.`);
  if(i===16)t=t.replace(/Fait à :[^\n]*/,`Fait à : ${subQuickCity.value.trim()||'À compléter'}`).replace(/Le :[^\n]*/,`Le : ${new Date().toLocaleDateString('fr-FR')}`);
- return {...x,text:t};
+ // Remplacer les valeurs des lignes, indépendamment des valeurs précédentes.
+ const setLine=(re,label,value)=>{if(re.test(t))t=t.replace(re,()=>label+value);else t+='\n'+label+value};
+ if(i===0){setLine(/^- Maître d’ouvrage :[^\n]*/m,'- Maître d’ouvrage : ',owner);setLine(/^- Maître d’œuvre :[^\n]*/m,'- Maître d’œuvre : ',manager)}
+ if(i===1){setLine(/^Le chantier est soumis à un Plan Général de Coordination[^\n]*/m,'Le chantier est soumis à un Plan Général de Coordination en matière de Sécurité et de Protection de la Santé (PGCSPS) : ',document.getElementById('subQuickSafety').value);setLine(/^Existence du CISSCT :[^\n]*/m,'Existence du CISSCT : ',document.getElementById('subQuickCissct').value)}
+ if(i===10)setLine(/^Le sous-traitant doit justifier d’une assurance décennale[^\n]*/m,'Le sous-traitant doit justifier d’une assurance décennale (chantiers de construction relevant du domaine de l’assurance décennale obligatoire) : ',insurance);
+ if(i===14)setLine(/^Le sous-traitant se réserve la propriété des fournitures[^\n]*/m,'Le sous-traitant se réserve la propriété des fournitures non mises en œuvre jusqu’à leur complet paiement : ',subQuickProperty.value+'.');
+ if(i===16)setLine(/^Fait à :[^\n]*/m,'Fait à : ',subQuickCity.value.trim()||'À compléter');
+ return {...x,text:t,...(i===0?{quick_choices:quickChoices}:{})};
  });
  rmlSubApplyAdditionalChoices(subClauseDraft);
  renderSubClauseEditor();
- document.getElementById('subQuickFeedback').textContent='Choix appliqués. Enregistrez le contrat pour les conserver.';
+ document.getElementById('subQuickFeedback').textContent='Choix reportés dans les articles ci-dessous. Cliquez sur Enregistrer les modifications pour les conserver.';return true;
 }
 let rmlSubProductRequest=0;
 async function rmlSubLoadProducts(){
@@ -3521,7 +3533,7 @@ async function saveSubAssignment(confirmAssignment=false){
  const sid=subAssignSubId.value,jid=subAssignJob.value;
  if(!sid){alert('Sous-traitant introuvable.');return}
  // Un brouillon peut être enregistré même si le chantier ou les travaux ne sont pas encore renseignés.
- const clauses=subClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim()})).filter(x=>x.title||x.text);
+ const clauses=subClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim(),...(x.quick_choices?{quick_choices:x.quick_choices}:{})})).filter(x=>x.title||x.text);
  const row={subcontractor_id:sid,planned_date:subAssignDate.value||null,amount_ht:subAssignAmount.value?Number(subAssignAmount.value):null,work_description:subAssignWork.value.trim()||'À compléter',contract_terms:clauses.map(x=>`${x.title}\n${x.text}`).join('\n\n'),contract_clauses:clauses,status:'brouillon',updated_at:new Date().toISOString()};
  if(jid)row.chantier_id=jid;
  const id=subAssignId.value;
