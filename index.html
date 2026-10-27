@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V39.3</title>
+<title>RML ERP — V39.4</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -609,7 +609,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39.3</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39.4</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3277,6 +3277,19 @@ function rmlPrincipalKey(clauses){return clauses?.[0]?.principal_company==='mico
 function rmlPrincipalInfo(key){return RML_PRINCIPAL_COMPANIES[key==='micouleau'?'micouleau':'rml']}
 function rmlPrincipalHtml(key){const x=rmlPrincipalInfo(key);return esc(x.name)+'<br>'+esc(x.address)+'<br>'+esc(x.city)+(x.siret?'<br>SIRET : '+esc(x.siret):'')+(x.phone?'<br>Tél. : '+esc(x.phone):'')}
 function rmlPrincipalRepresentative(key){return esc(rmlPrincipalInfo(key).representative)}
+// Les blocs de signature reprennent les parties identifiées en tête du contrat.
+function rmlSubcontractSignerLabel(sub,assignment){
+ const company=String(sub?.company||sub?.contact_name||'Sous-traitant').trim();
+ const isStephane=/MICOULEAU/i.test(company)&&/St[eé]phane/i.test(company+' '+String(sub?.contact_name||''));
+ const representative=String(assignment?.signer_name|| (isStephane?'M. MICOULEAU Stéphane':sub?.contact_name||'')).trim();
+ const role=String(assignment?.signer_role||(isStephane?'Gérant':'')).trim();
+ return '<strong>Le sous-traitant — '+esc(company)+'</strong>'+(representative?'<br>Représenté par : '+esc(representative):'')+(role?'<br>Qualité : '+esc(role):'');
+}
+function rmlPrincipalSignerLabel(key,assignment){
+ const info=rmlPrincipalInfo(key);
+ return '<strong>L’entrepreneur principal — '+esc(info.name)+'</strong><br>Représenté par : '+rmlPrincipalRepresentative(key);
+}
+
 function rmlQuickContractDefaults(){
  const j=db.chantiers.find(x=>String(x.id)===String(subAssignJob.value));
  const c=db.clients.find(x=>x.id===j?.client_id);
@@ -3520,7 +3533,7 @@ function rmlPreviewSubDraft(){
  <div class="box"><strong>SOUS-TRAITANT</strong><br>${esc(sub?.company||'À compléter')}<br>${esc(sub?.contact_name||'')}<br>${esc(sub?.email||'')}<br>${esc(sub?.phone||'')}<br><strong>Adresse du siège :</strong> ${esc(sub?.head_office_address||'À compléter')}</div></div>
  <div class="box site"><strong>CHANTIER</strong><br>Client / maître d’ouvrage : ${esc(c?.nom||'À compléter')}<br>Chantier : ${esc(j?.nom||'À compléter')}<br>Adresse : ${esc(j?.adresse||'À compléter')}<br>Date prévue : ${esc(date)}<br><strong>Travaux confiés :</strong><br>${esc(work).replace(/\n/g,'<br>')}<br><strong>Montant :</strong> ${esc(amount)}</div>
  ${clauses.map(x=>`<section class="clause"><h2>${esc(x.title)}</h2><div>${esc(x.text).replace(/\n/g,'<br>')}</div></section>`).join('')}
- <div class="signatures"><div><strong>L'entrepreneur principal — RML</strong><br>Signature :</div><div><strong>Le sous-traitant</strong><br>Signature :</div></div>
+ <div class="signatures"><div>${rmlPrincipalSignerLabel(principalKey)}<br>Signature :</div><div>${rmlSubcontractSignerLabel(sub)}<br>Signature :</div></div>
  </body></html>`);w.document.close();w.focus();
 }
 
@@ -3602,7 +3615,7 @@ function printSubContract(){
  <div class="box"><strong>SOUS-TRAITANT</strong><br>${esc(sub?.company||'')}<br>${esc(sub?.contact_name||'')}<br>${esc(sub?.email||'')}<br>${esc(sub?.phone||'')}<br><strong>Adresse du siège :</strong> ${esc(sub?.head_office_address||'Non renseignée')}${rmlStephaneLegalDetails(sub)}</div></div>
  <div class="box"><strong>CHANTIER</strong><br>Client / maître d’ouvrage : ${esc(c?.nom||'')}<br>Chantier : ${esc(j?.nom||'')}<br>Adresse : ${esc(j?.adresse||'')}<br>Travaux confiés : ${esc(a.work_description||'À compléter')}<br>Montant : ${a.amount_ht!=null?Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2})+' € HT':'À compléter'}</div>
  ${clauses.map(x=>`<section class="clause"><h2>${esc(x.title||'')}</h2><div>${esc(x.text||'').replace(/\n/g,'<br>')}</div></section>`).join('')}
- <div class="signatures"><div><strong>L’entrepreneur principal — RML</strong><br>${esc(a.rml_signer_name||'')} ${esc(a.rml_signer_role||'')}<br>${rmlSig}<br>${a.rml_signed_at?'Signé le '+new Date(a.rml_signed_at).toLocaleString('fr-FR'):'Signature RML en attente'}</div><div><strong>Le sous-traitant</strong><br>${esc(a.signer_name||'')} ${esc(a.signer_role||'')}<br>${sig}<br>${a.signed_at?'Signé le '+new Date(a.signed_at).toLocaleString('fr-FR'):''}</div></div>
+ <div class="signatures"><div>${rmlPrincipalSignerLabel(principalKey,a)}<br>${a.rml_signer_name?'Signataire : '+esc(a.rml_signer_name)+' '+esc(a.rml_signer_role||'')+'<br>':''}${rmlSig}<br>${a.rml_signed_at?'Signé le '+new Date(a.rml_signed_at).toLocaleString('fr-FR'):'Signature RML en attente'}</div><div>${rmlSubcontractSignerLabel(sub,a)}<br>${sig}<br>${a.signed_at?'Signé le '+new Date(a.signed_at).toLocaleString('fr-FR'):''}</div></div>
  
 
 </body></html>`);w.document.close();setTimeout(()=>w.focus(),150);
