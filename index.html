@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V40.2</title>
+<title>RML ERP — V40.3</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -130,6 +130,19 @@ dialog[open]{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-
 #subAssignModal .sub-contract-top .sub-contract-section-title{font-size:13px;font-weight:800;color:#17517f;margin:0 0 11px;letter-spacing:.02em}
 #subAssignModal .sub-contract-top .sub-contract-presets .btn{background:#e5f0fa;color:#174c76;border:1px solid #bfd4e8}
 @media(max-width:650px){#subAssignModal .sub-contract-top{padding:12px 10px}#subAssignModal .sub-contract-top .sub-contract-services,#subAssignModal .sub-contract-top .sub-contract-presets{padding:11px 9px}}
+
+/* V40.3 : saisie des quantités sous-traitants adaptée aux téléphones */
+#v40SubFollowup,.v403-follow-list,.v403-follow-card{min-width:0;max-width:100%;box-sizing:border-box}
+.v403-follow-list{display:grid;gap:12px;margin-top:12px}
+.v403-follow-card{border:2px solid #2d66e8;border-radius:12px;padding:12px;background:#fff;overflow-wrap:anywhere}
+.v403-follow-title{font-weight:750;color:#113a5d;line-height:1.4;margin-bottom:12px}
+.v403-follow-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:12px}
+.v403-follow-stats span{background:#edf3fa;border-radius:8px;padding:8px 5px;font-size:12px;text-align:center;min-width:0}
+.v403-follow-stats strong{display:block;font-size:15px;color:#113a5d;overflow-wrap:anywhere;margin-top:4px}
+.v403-follow-input{display:block;font-weight:750;color:#113a5d}
+.v403-follow-input input{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;margin-top:6px;font-size:18px;padding:12px;border:2px solid #2d66e8;border-radius:9px;background:#fff}
+.v403-follow-save{background:#147a3a!important;color:#fff!important;font-weight:800!important;border:2px solid #0b5527!important;padding:13px 20px!important}
+@media(max-width:420px){.v403-follow-stats span{font-size:11px}.v403-follow-stats strong{font-size:13px}}
 </style>
 
 <style>
@@ -620,7 +633,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V40.2</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V40.3</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3978,7 +3991,9 @@ async function v40LoadSubFollowup(assignmentId,prep){
  const {data,error}=await sb.from('erp_subcontract_followups').select('*').eq('chantier_id',a.chantier_id).order('work_date',{ascending:false});
  if(error){host.innerHTML='<div class="notice danger">Suivi indisponible : '+esc(error.message)+'. Vérifiez que le script SQL V40 a été exécuté dans Supabase.</div>';return}
  const rows=data||[],totals={};rows.forEach(r=>{(r.quantities||[]).forEach(q=>{const k=q.section+':'+q.index;totals[k]=(totals[k]||0)+Number(q.installed||0)})});
- host.innerHTML='<div class="field" style="margin:10px 0"><label>Date des travaux</label><input type="date" id="v40FollowDate" value="'+employeeTodayISO()+'"></div><div class="prep-tablewrap"><table class="prep-table"><thead><tr><th>Produit</th><th>Prévu</th><th>Déjà posé</th><th>Reste</th><th>Posé ce jour</th></tr></thead><tbody>'+items.map((it,i)=>{const done=totals[it.section+':'+it.index]||0;return '<tr><td>'+esc(it.label)+'</td><td>'+it.planned+'</td><td>'+done+'</td><td>'+Math.max(0,Math.round((it.planned-done)*100)/100)+'</td><td><input type="number" min="0" step="0.01" data-v40-index="'+i+'" style="min-width:75px;width:100px" placeholder="0"></td></tr>'}).join('')+'</tbody></table></div><div class="field" style="margin-top:12px"><label>Compte rendu des travaux</label><textarea id="v40FollowNote" rows="3" placeholder="Travaux réalisés, difficultés, observations…"></textarea></div><div class="actions" style="margin-top:10px"><button class="btn" id="v40FollowSave" onclick="v40SaveSubFollowup(\''+assignmentId+'\')">Enregistrer le suivi</button></div><div id="v40FollowStatus" class="muted" style="margin-top:8px"></div>'+(rows.length?'<h4>Historique des relevés</h4>'+rows.slice(0,15).map(r=>'<div class="doc-row"><div><strong>'+esc(r.work_date)+'</strong><div class="muted">'+esc(r.notes||'')+'</div></div><div>'+esc((r.quantities||[]).filter(q=>Number(q.installed)>0).map(q=>q.label+': '+q.installed).join(' ; '))+'</div></div>').join(''):'');
+ host.innerHTML=`<div class="field" style="margin:10px 0"><label>Date des travaux</label><input type="date" id="v40FollowDate" value="${employeeTodayISO()}"></div>
+ <div class="v403-follow-list">${items.map((it,i)=>{const done=totals[it.section+':'+it.index]||0;const remaining=Math.max(0,Math.round((it.planned-done)*100)/100);return `<div class="v403-follow-card"><div class="v403-follow-title">${esc(it.label)}</div><div class="v403-follow-stats"><span>Prévu <strong>${it.planned} ${esc(it.unit)}</strong></span><span>Déjà posé <strong>${done} ${esc(it.unit)}</strong></span><span>Reste <strong>${remaining} ${esc(it.unit)}</strong></span></div><label class="v403-follow-input">Quantité posée ce jour <input type="number" min="0" step="0.01" inputmode="decimal" data-v40-index="${i}" placeholder="0"></label></div>`}).join('')}</div>
+ <div class="field" style="margin-top:12px"><label>Compte rendu des travaux</label><textarea id="v40FollowNote" rows="3" placeholder="Travaux réalisés, difficultés, observations…"></textarea></div><div class="actions" style="margin-top:10px"><button class="btn v403-follow-save" id="v40FollowSave" onclick="v40SaveSubFollowup('${assignmentId}')">Enregistrer le suivi</button></div><div id="v40FollowStatus" class="muted" style="margin-top:8px"></div>${rows.length?'<h4>Historique des relevés</h4>'+rows.slice(0,15).map(r=>'<div class="doc-row"><div><strong>'+esc(r.work_date)+'</strong><div class="muted">'+esc(r.notes||'')+'</div></div><div>'+esc((r.quantities||[]).filter(q=>Number(q.installed)>0).map(q=>q.label+': '+q.installed).join(' ; '))+'</div></div>').join(''):''}`;
  host.dataset.v40Items=JSON.stringify(items);
 }
 async function v40SaveSubFollowup(assignmentId){
