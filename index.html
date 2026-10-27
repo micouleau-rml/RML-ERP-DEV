@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V39.4</title>
+<title>RML ERP — V39.6</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -609,7 +609,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39.4</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39.6</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -873,6 +873,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
  <input id="subContractId" type="hidden">
  <div id="subContractSummary" class="notice" style="margin-top:12px"></div>
  <div id="subContractText" class="sub-contract-text"></div><div class="actions" id="subEditClausesActions"><button class="btn secondary" type="button" onclick="editExistingSubContract()">Modifier le contrat</button><button class="btn" type="button" onclick="saveSubContractDraft()">Enregistrer</button><button class="btn secondary" type="button" onclick="printSubContract()">Imprimer / PDF</button></div>
+ <div class="actions" style="margin:12px 0"><button class="btn secondary" type="button" onclick="printSubContract()">Imprimer / Enregistrer le contrat en PDF</button><button class="btn secondary" type="button" onclick="closeModal('subContractModal')">Fermer / Retour</button></div>
  <div class="signature-wrap" style="margin-top:14px">
   <h3 style="margin-top:0">Signature du sous-traitant</h3>
   <div class="muted" style="margin-bottom:10px">Signez directement avec le doigt ou un stylet dans le cadre ci-dessous.</div>
@@ -1484,7 +1485,7 @@ async function loadSubcontractorPortal(){
   db.chantiers=jobs;db.clients=clients;
   subPortalStatus.className='notice';subPortalStatus.textContent=`${erpSubAssignments.length} contrat(s) / chantier(s) attribué(s)`;
   if(!erpSubAssignments.length){subPortalList.innerHTML='<div class="empty">Aucun chantier ne vous est actuellement attribué.</div>';return}
-  subPortalList.innerHTML=erpSubAssignments.map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id);return `<div class="sub-card"><div class="row between"><div><h3>${esc(j?.nom||'Chantier')}</h3><div class="muted">${esc(c?.nom||'')}${j?.adresse?'<br>'+esc(j.adresse):''}</div></div><span class="status ${a.status==='signe'?'actif':'attente'}">${esc(a.status||'brouillon')}</span></div><div style="margin-top:10px"><strong>Travaux confiés</strong><div>${esc(a.work_description||'À compléter').replace(/\n/g,'<br>')}</div>${a.planned_date?'<div><strong>Date prévue :</strong> '+esc(a.planned_date)+'</div>':''}</div><div class="actions" style="margin-top:12px"><button class="btn" onclick="openSubJobFolder('${a.id}')">Feuille chantier</button><button class="btn secondary" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat':'Voir / signer le contrat'}</button><button class="btn secondary" onclick="subContractId.value='${a.id}';printSubContract()">Imprimer / PDF</button></div></div>`}).join('');
+  subPortalList.innerHTML=erpSubAssignments.map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id);return `<div class="sub-card"><div class="row between"><div><h3>${esc(j?.nom||'Chantier')}</h3><div class="muted">${esc(c?.nom||'')}${j?.adresse?'<br>'+esc(j.adresse):''}</div></div><span class="status ${a.status==='signe'?'actif':'attente'}">${esc(a.status||'brouillon')}</span></div><div style="margin-top:10px"><strong>Travaux confiés</strong><div>${esc(a.work_description||'À compléter').replace(/\n/g,'<br>')}</div>${a.planned_date?'<div><strong>Date prévue :</strong> '+esc(a.planned_date)+'</div>':''}</div><div class="actions" style="margin-top:12px"><button class="btn" onclick="openSubJobFolder('${a.id}')">Feuille chantier</button><button class="btn secondary" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat':'Voir / signer le contrat'}</button><button class="btn secondary" onclick="printSubContractById('${a.id}')">${a.signature_data?'Télécharger le contrat signé (PDF)':'Imprimer / PDF'}</button></div></div>`}).join('');
   await loadSubPortalDocuments(ids);
  }catch(err){console.error(err);subPortalStatus.className='notice danger';subPortalStatus.textContent='Erreur : '+err.message}
 }
@@ -3509,6 +3510,20 @@ function editSubAssignment(id){
  subAssignSaveBtn.textContent='Enregistrer les modifications';
  openModal('subAssignModal');
 }
+function rmlContractPreviewFrame(){
+ let overlay=document.getElementById('rmlContractPreviewOverlay');
+ if(!overlay){
+  overlay=document.createElement('div');overlay.id='rmlContractPreviewOverlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:2147483000;background:#eef2f7;display:flex;flex-direction:column';
+  overlay.innerHTML='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:5px 9px;background:#143d61;color:white;min-height:46px;flex-shrink:0"><strong style="font-size:13px;white-space:nowrap">Aperçu</strong><div style="display:flex;gap:6px;align-items:center;min-width:0"><button type="button" id="rmlPreviewPrint" style="padding:9px 12px;border-radius:7px;background:#f4c430;color:#17212e;border:0;font-size:15px;font-weight:800;line-height:1.2;cursor:pointer;white-space:nowrap">Imprimer / PDF</button><button type="button" id="rmlPreviewClose" style="padding:9px 11px;border-radius:7px;background:#c43d3d;color:white;border:0;font-size:14px;font-weight:700;line-height:1.2;cursor:pointer;white-space:nowrap">✕ Fermer</button></div></div><iframe title="Aperçu du contrat" style="border:0;flex:1;min-height:0;width:100%;background:white"></iframe>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('#rmlPreviewClose').onclick=()=>{overlay.remove()};
+  overlay.querySelector('#rmlPreviewPrint').onclick=()=>{overlay.querySelector('iframe').contentWindow.print()};
+ }
+ const frame=overlay.querySelector('iframe');
+ const doc=frame.contentDocument;doc.open();
+ return {document:doc,focus:()=>frame.focus()};
+}
 function rmlPreviewSubDraft(){
  // Prévisualisation locale du formulaire en cours : aucune écriture Supabase.
  const sid=subAssignSubId.value,jid=subAssignJob.value;
@@ -3524,7 +3539,7 @@ function rmlPreviewSubDraft(){
  const work=subAssignWork.value.trim()||'À compléter';
  const amount=subAssignAmount.value?Number(subAssignAmount.value).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':'À compléter';
  const date=subAssignDate.value?new Date(subAssignDate.value+'T12:00:00').toLocaleDateString('fr-FR'):'À compléter';
- const w=window.open('','_blank');if(!w){alert('Autorisez les fenêtres surgissantes pour prévisualiser le contrat.');return}
+ const w=rmlContractPreviewFrame();
  w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aperçu du contrat de sous-traitance</title><style>@page{size:A4;margin:16mm}*{box-sizing:border-box}body{font:11pt/1.45 Arial,sans-serif;color:#17212e;max-width:920px;margin:0 auto;padding:20px}h1{text-align:center;font-size:21pt;margin:24px 0}h2{font-size:12pt;margin:19px 0 7px;break-after:avoid}.head{text-align:center;border-bottom:2px solid #143d61;padding-bottom:13px}.head strong{font-size:17pt}.parties{display:grid;grid-template-columns:1fr 1fr;gap:14px}.box{border:1px solid #bac5d0;border-radius:5px;padding:12px;overflow-wrap:anywhere}.site{margin-top:14px}.clause{break-inside:auto;overflow-wrap:anywhere}.clause div{white-space:normal}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:30px;break-inside:avoid}.signatures>div{min-height:90px;border-top:1px solid #999;padding-top:8px}.bar{position:sticky;top:0;background:#eef5fc;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #bdd0e5;border-radius:8px;margin-bottom:20px}.bar button{background:#174a74;color:white;border:0;border-radius:6px;padding:10px 16px;cursor:pointer}@media print{body{padding:0}.bar{display:none}.box{border-color:#aaa}}@media(max-width:620px){.parties,.signatures{grid-template-columns:1fr}}</style></head><body>
  <div class="bar"><strong>APERÇU — ${esc(sub.company||sub.contact_name||'Sous-traitant')} — non signé</strong><div style="display:flex;gap:8px;flex-wrap:wrap"><button onclick="window.print()">Imprimer / PDF</button><button type="button" style="background:#a83232" onclick="window.close()">Fermer / Retour au contrat</button></div></div>
  <div class="head"><strong>${esc(rmlPrincipalInfo(principalKey).name)}</strong><div>${rmlPrincipalHtml(principalKey)}</div></div>
@@ -3605,10 +3620,10 @@ function printSubContract(){
  const principalKey=rmlPrincipalKey(clauses);
  const sig=a.signature_data?`<img src="${a.signature_data}" style="max-width:260px;max-height:100px">`:'';
  const rmlSig=a.rml_signature_data?`<img src="${a.rml_signature_data}" style="max-width:260px;max-height:100px">`:'';
- const w=window.open('','_blank');if(!w){alert("Autorisez les fenêtres surgissantes pour imprimer le contrat.");return}
+ const w=rmlContractPreviewFrame();
  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Contrat de sous-traitance</title><style>
  @page{size:A4;margin:16mm}body{font-family:Arial,sans-serif;color:#111;font-size:11pt;line-height:1.35}h1{text-align:center;font-size:20pt;margin:8px 0 24px}h2{font-size:12.5pt;margin:18px 0 7px;break-after:avoid}.head{text-align:center;border-bottom:2px solid #111;padding-bottom:12px;margin-bottom:18px}.head strong{font-size:16pt}.parties{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}.box{border:1px solid #bbb;padding:10px}.clause{break-inside:auto;white-space:pre-wrap}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px;break-inside:avoid}.muted{color:#555}.no-print{margin:0 0 15px}@media print{.no-print{display:none}}</style></head><body>
- <button class="no-print" onclick="window.print()">Imprimer / Enregistrer en PDF</button>
+ <div class="no-print" style="padding:8px;background:#eef5fc">Pour conserver le contrat signé, cliquez sur « Imprimer / Enregistrer en PDF » en haut, puis choisissez « Enregistrer au format PDF ».</div>
  <div class="head"><strong>${esc(rmlPrincipalInfo(principalKey).name)}</strong><div>${rmlPrincipalHtml(principalKey)}</div></div>
  <h1>CONTRAT DE SOUS-TRAITANCE</h1>
  <div class="parties"><div class="box"><strong>ENTREPRENEUR PRINCIPAL</strong><br>${rmlPrincipalHtml(principalKey)}<br>Représenté par : ${rmlPrincipalRepresentative(principalKey)}</div>
