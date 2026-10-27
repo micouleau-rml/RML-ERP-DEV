@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V39.9</title>
+<title>RML ERP — V40</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -609,7 +609,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V39.9</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V40</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -1468,6 +1468,21 @@ function requestCloseClientEditor(){
 document.querySelectorAll('[data-close="clientModal"]').forEach(b=>{b.onclick=(e)=>{e.preventDefault();requestCloseClientEditor()}});
 document.getElementById('clientModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget){e.stopImmediatePropagation();requestCloseClientEditor()}},true);
 
+
+async function v40LoadSubMileage(){
+ const sel=document.getElementById('v40SubVehicle'),st=document.getElementById('v40SubKmStatus');if(!sel)return;
+ const {data,error}=await sb.rpc('erp_employee_mileage_vehicles');
+ if(error){sel.innerHTML='<option value="">Fourgons indisponibles</option>';st.textContent='Accès aux véhicules à autoriser côté Supabase : '+error.message;return}
+ sel.innerHTML='<option value="">Choisir un fourgon…</option>'+(data||[]).map(v=>'<option value="'+esc(v.id)+'">'+esc(v.name)+' — '+esc(v.registration||'')+' ('+Number(v.current_counter||0).toLocaleString('fr-FR')+' km)</option>').join('');
+}
+async function v40SaveSubMileage(){
+ const sel=document.getElementById('v40SubVehicle'),input=document.getElementById('v40SubKm'),st=document.getElementById('v40SubKmStatus');
+ const value=input.value.trim();if(!sel.value||!/^[0-9]+$/.test(value)){st.textContent='Choisissez un fourgon et saisissez un kilométrage entier.';return}
+ st.textContent='Enregistrement…';const {error}=await sb.rpc('erp_employee_record_mileage',{p_asset_id:sel.value,p_counter:Number(value)});
+ if(error){st.textContent='Enregistrement refusé par Supabase : '+error.message+'. Les droits de la fonction kilométrique doivent inclure les sous-traitants.';return}
+ st.textContent='Kilométrage enregistré. Le compteur Maintenance est mis à jour par la fonction Supabase.';input.value='';await v40LoadSubMileage();
+}
+
 async function loadSubcontractorPortal(){
  if(!isSubcontractorUser())return;
  subPortalStatus.className='notice';subPortalStatus.textContent='Chargement de vos chantiers…';subPortalList.innerHTML='';
@@ -1488,6 +1503,12 @@ async function loadSubcontractorPortal(){
   subPortalStatus.className='notice';subPortalStatus.textContent=`${erpSubAssignments.length} contrat(s) / chantier(s) attribué(s)`;
   if(!erpSubAssignments.length){subPortalList.innerHTML='<div class="empty">Aucun chantier ne vous est actuellement attribué.</div>';return}
   subPortalList.innerHTML=erpSubAssignments.map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id);return `<div class="sub-card"><div class="row between"><div><h3>${esc(j?.nom||'Chantier')}</h3><div class="muted">${esc(c?.nom||'')}${j?.adresse?'<br>'+esc(j.adresse):''}</div></div><span class="status ${a.status==='signe'?'actif':'attente'}">${esc(a.status||'brouillon')}</span></div><div style="margin-top:10px"><strong>Travaux confiés</strong><div>${esc(a.work_description||'À compléter').replace(/\n/g,'<br>')}</div>${a.planned_date?'<div><strong>Date prévue :</strong> '+esc(a.planned_date)+'</div>':''}</div><div class="actions" style="margin-top:12px"><button class="btn" onclick="openSubJobFolder('${a.id}')">Feuille chantier</button><button class="btn secondary" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat':'Voir / signer le contrat'}</button><button class="btn secondary" onclick="printSubContractById('${a.id}')">${a.signature_data?'Télécharger le contrat signé (PDF)':'Imprimer / PDF'}</button></div></div>`}).join('');
+  if(!document.getElementById('v40SubMileagePanel')){
+   const panel=document.createElement('div');panel.id='v40SubMileagePanel';panel.className='panel';panel.style.margin='12px 0';
+   panel.innerHTML='<h3>Relevé kilométrique du fourgon</h3><div class="muted">Kilométrage total affiché au compteur. Mise à jour Maintenance après validation par Supabase.</div><div class="grid2" style="margin-top:10px"><div class="field"><label>Fourgon RML</label><select id="v40SubVehicle"><option>Chargement…</option></select></div><div class="field"><label>Kilométrage compteur</label><input id="v40SubKm" type="number" min="0" step="1"></div></div><button class="btn" onclick="v40SaveSubMileage()">Enregistrer le kilométrage</button><div id="v40SubKmStatus" class="muted" style="margin-top:8px"></div>';
+   subPortalList.parentNode.insertBefore(panel,subPortalList);
+  }
+  await v40LoadSubMileage();
   await loadSubPortalDocuments(ids);
  }catch(err){console.error(err);subPortalStatus.className='notice danger';subPortalStatus.textContent='Erreur : '+err.message}
 }
@@ -3918,13 +3939,47 @@ async function openSubJobFolder(assignmentId){
  // Afficher tous les documents autorisés du chantier, sans dépendre d'une attribution manuelle.
  const {data:docs,error:docErr}=await sb.from('erp_documents').select('*').eq('chantier_id',a.chantier_id).order('created_at',{ascending:false});
  const rows=docs||[];
- const {data:preps,error:prepErr}=await sb.from('erp_modules_data').select('payload,updated_at').eq('chantier_id',a.chantier_id).eq('module','preparation').eq('deleted',false).order('updated_at',{ascending:false}).limit(1);
- const subPrep=preps?.[0];
- const subQh=prepErr?'<div class="notice danger">Quantitatifs indisponibles : '+esc(prepErr.message)+'</div>':employeePreparationReadOnlyHtml(subPrep?.payload);
+ // Même clé de lecture que la préparation enregistrée par l'administrateur.
+ const {data:subPrepRow,error:prepErr}=await sb.from('erp_modules_data').select('payload,updated_at').eq('chantier_id',a.chantier_id).eq('module','preparation').eq('entity_type','chantier').eq('entity_id',a.chantier_id).eq('deleted',false).maybeSingle();
+ const subPrep=subPrepRow;
+ const subQh=prepErr?'<div class="notice danger">Lecture Supabase refusée : '+esc(prepErr.message)+'</div>':!subPrep?'<div class="notice warn">Aucune préparation visible depuis ce compte pour ce chantier. Si elle existe côté administrateur, vérifier les autorisations de lecture (RLS) de erp_modules_data pour le sous-traitant affecté. Aucune donnée n’a été modifiée.</div>':employeePreparationReadOnlyHtml(subPrep.payload);
  const docHtml=docErr?'<div class="notice danger">Documents indisponibles : '+esc(docErr.message)+'</div>':rows.length?rows.map(d=>`<div class="doc-row"><div><div class="doc-name">${esc(d.file_name||'Document')}</div><div class="doc-meta">${esc(d.note||'')}${d.uploaded_by_subcontractor?' · Ajouté par le sous-traitant':''}</div></div><div>${esc(d.category||'Autre')}</div><div class="actions"><button class="btn secondary" onclick="openSubJobDocument('${d.id}','${assignmentId}')">Ouvrir / imprimer</button></div></div>`).join(''):'<div class="empty">Aucun plan ou document mis à disposition pour le moment.</div>';
- subJobFolderContent.innerHTML=`<div class="panel" style="padding:14px"><h3 style="margin-top:0">Informations chantier</h3><div><strong>Client :</strong> ${esc(c?.nom||'')}</div><div><strong>Chantier :</strong> ${esc(j?.nom||'')}</div>${j?.adresse?`<div><strong>Adresse :</strong> ${esc(j.adresse)}</div>`:''}${j?.contact_nom?`<div><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}<div style="margin-top:8px"><strong>Travaux confiés :</strong><br>${esc(a.work_description||'À compléter').replace(/\n/g,'<br>')}</div>${a.planned_date?`<div><strong>Date prévue :</strong> ${esc(a.planned_date)}</div>`:''}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Quantitatifs / travaux à réaliser</h3><div class="muted">Consultation uniquement.</div>${subQh}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Plans, photos et documents</h3>${docHtml}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Rapports et suivi d’intervention</h3><div id="subJobReports" class="muted">Chargement des rapports…</div></div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Ajouter des photos du chantier</h3><div class="muted">Vous pouvez envoyer plusieurs photos depuis votre téléphone ou votre ordinateur. Elles seront visibles par RML dans le dossier du chantier.</div><div class="actions" style="margin-top:10px"><button class="btn" type="button" onclick="document.getElementById('subJobCameraInput').click()">Prendre une photo</button><button class="btn secondary" type="button" onclick="document.getElementById('subJobPhotoInput').click()">Choisir des photos / fichiers</button></div><input id="subJobCameraInput" type="file" accept="image/*" capture="environment" hidden onchange="uploadSubJobPhotos('${assignmentId}','subJobCameraInput')"><input id="subJobPhotoInput" type="file" accept="image/*" multiple hidden onchange="uploadSubJobPhotos('${assignmentId}','subJobPhotoInput')"><div class="muted" style="margin-top:8px">La photo prise est envoyée directement dans le dossier du chantier après validation.</div></div>`;
+ subJobFolderContent.innerHTML=`<div class="panel" style="padding:14px"><h3 style="margin-top:0">Informations chantier</h3><div><strong>Client :</strong> ${esc(c?.nom||'')}</div><div><strong>Chantier :</strong> ${esc(j?.nom||'')}</div>${j?.adresse?`<div><strong>Adresse :</strong> ${esc(j.adresse)}</div>`:''}${j?.contact_nom?`<div><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}<div style="margin-top:8px"><strong>Travaux confiés :</strong><br>${esc(a.work_description||'À compléter').replace(/\n/g,'<br>')}</div>${a.planned_date?`<div><strong>Date prévue :</strong> ${esc(a.planned_date)}</div>`:''}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Quantitatifs / travaux à réaliser</h3><div class="muted">Consultation uniquement.</div>${subQh}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Fiche de suivi — quantités posées</h3><div class="muted">Renseignez les quantités réellement posées aujourd’hui. Les données sont enregistrées par chantier et par sous-traitant.</div><div id="v40SubFollowup">Chargement…</div></div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Plans, photos et documents</h3>${docHtml}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Rapports et suivi d’intervention</h3><div id="subJobReports" class="muted">Chargement des rapports…</div></div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Ajouter des photos du chantier</h3><div class="muted">Vous pouvez envoyer plusieurs photos depuis votre téléphone ou votre ordinateur. Elles seront visibles par RML dans le dossier du chantier.</div><div class="actions" style="margin-top:10px"><button class="btn" type="button" onclick="document.getElementById('subJobCameraInput').click()">Prendre une photo</button><button class="btn secondary" type="button" onclick="document.getElementById('subJobPhotoInput').click()">Choisir des photos / fichiers</button></div><input id="subJobCameraInput" type="file" accept="image/*" capture="environment" hidden onchange="uploadSubJobPhotos('${assignmentId}','subJobCameraInput')"><input id="subJobPhotoInput" type="file" accept="image/*" multiple hidden onchange="uploadSubJobPhotos('${assignmentId}','subJobPhotoInput')"><div class="muted" style="margin-top:8px">La photo prise est envoyée directement dans le dossier du chantier après validation.</div></div>`;
  await loadSubJobReports(a.chantier_id);
+ await v40LoadSubFollowup(assignmentId,subPrep?.payload);
 }
+
+// V40 : suivi des quantités posées par sous-traitant (écriture sécurisée par RLS Supabase).
+async function v40LoadSubFollowup(assignmentId,prep){
+ const host=document.getElementById('v40SubFollowup'),a=erpSubAssignments.find(x=>x.id===assignmentId);
+ if(!host||!a||!isSubcontractorUser())return;
+ const sections=prep?.sections||{};
+ let items=[];
+ Object.entries(PREP_SCHEMAS).forEach(([section,schema])=>{
+  prepFilledRows(sections[section]||[]).forEach((row,index)=>items.push({section,index,label:schema.label+' — '+schema.fields.filter(f=>f[0]!=='qty'&&f[0]!=='note').map(f=>row[f[0]]).filter(Boolean).join(' / '),planned:Number(String(row.qty).replace(',','.'))||0,unit:row.unit||''}));
+ });
+ if(!items.length){host.innerHTML='<div class="notice warn">Aucune quantité préparée pour ce chantier.</div>';return}
+ const {data,error}=await sb.from('erp_subcontract_followups').select('*').eq('chantier_id',a.chantier_id).order('work_date',{ascending:false});
+ if(error){host.innerHTML='<div class="notice danger">Suivi indisponible : '+esc(error.message)+'. Vérifiez que le script SQL V40 a été exécuté dans Supabase.</div>';return}
+ const rows=data||[],totals={};rows.forEach(r=>{(r.quantities||[]).forEach(q=>{const k=q.section+':'+q.index;totals[k]=(totals[k]||0)+Number(q.installed||0)})});
+ host.innerHTML='<div class="field" style="margin:10px 0"><label>Date des travaux</label><input type="date" id="v40FollowDate" value="'+employeeTodayISO()+'"></div><div class="prep-tablewrap"><table class="prep-table"><thead><tr><th>Produit</th><th>Prévu</th><th>Déjà posé</th><th>Reste</th><th>Posé ce jour</th></tr></thead><tbody>'+items.map((it,i)=>{const done=totals[it.section+':'+it.index]||0;return '<tr><td>'+esc(it.label)+'</td><td>'+it.planned+'</td><td>'+done+'</td><td>'+Math.max(0,Math.round((it.planned-done)*100)/100)+'</td><td><input type="number" min="0" step="0.01" data-v40-index="'+i+'" style="min-width:75px;width:100px" placeholder="0"></td></tr>'}).join('')+'</tbody></table></div><div class="field" style="margin-top:12px"><label>Compte rendu des travaux</label><textarea id="v40FollowNote" rows="3" placeholder="Travaux réalisés, difficultés, observations…"></textarea></div><div class="actions" style="margin-top:10px"><button class="btn" id="v40FollowSave" onclick="v40SaveSubFollowup(\''+assignmentId+'\')">Enregistrer le suivi</button></div><div id="v40FollowStatus" class="muted" style="margin-top:8px"></div>'+(rows.length?'<h4>Historique des relevés</h4>'+rows.slice(0,15).map(r=>'<div class="doc-row"><div><strong>'+esc(r.work_date)+'</strong><div class="muted">'+esc(r.notes||'')+'</div></div><div>'+esc((r.quantities||[]).filter(q=>Number(q.installed)>0).map(q=>q.label+': '+q.installed).join(' ; '))+'</div></div>').join(''):'');
+ host.dataset.v40Items=JSON.stringify(items);
+}
+async function v40SaveSubFollowup(assignmentId){
+ const a=erpSubAssignments.find(x=>x.id===assignmentId),host=document.getElementById('v40SubFollowup'),st=document.getElementById('v40FollowStatus');
+ if(!a||!host||!st||!isSubcontractorUser())return;
+ const date=document.getElementById('v40FollowDate').value,notes=document.getElementById('v40FollowNote').value.trim();
+ const items=JSON.parse(host.dataset.v40Items||'[]');
+ const quantities=items.map((it,i)=>({...it,installed:Number(host.querySelector('[data-v40-index="'+i+'"]').value||0)})).filter(it=>it.installed>0);
+ if(!date||(!quantities.length&&!notes)){st.textContent='Indiquez une date et au moins une quantité ou une observation.';return}
+ if(quantities.some(q=>!Number.isFinite(q.installed)||q.installed<0)){st.textContent='Quantité invalide.';return}
+ st.textContent='Enregistrement dans Supabase…';
+ const {error}=await sb.from('erp_subcontract_followups').upsert({chantier_id:a.chantier_id,subcontractor_id:a.subcontractor_id,work_date:date,quantities,notes,created_by:currentUser.id},{onConflict:'chantier_id,subcontractor_id,work_date'});
+ if(error){st.textContent='Échec de l’enregistrement : '+error.message;return}
+ st.textContent='Enregistrement confirmé dans Supabase.';
+ await v40LoadSubFollowup(assignmentId,(await sb.from('erp_modules_data').select('payload').eq('chantier_id',a.chantier_id).eq('module','preparation').eq('entity_type','chantier').eq('entity_id',a.chantier_id).eq('deleted',false).maybeSingle()).data?.payload);
+}
+
 async function loadSubJobReports(jobId){
  const host=document.getElementById('subJobReports');if(!host)return;
  try{
