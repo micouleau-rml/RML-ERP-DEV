@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V40.4</title>
+<title>RML ERP — V40.5</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -131,7 +131,7 @@ dialog[open]{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-
 #subAssignModal .sub-contract-top .sub-contract-presets .btn{background:#e5f0fa;color:#174c76;border:1px solid #bfd4e8}
 @media(max-width:650px){#subAssignModal .sub-contract-top{padding:12px 10px}#subAssignModal .sub-contract-top .sub-contract-services,#subAssignModal .sub-contract-top .sub-contract-presets{padding:11px 9px}}
 
-/* V40.4 : présentation identique des quantités pour salariés et sous-traitants */
+/* V40.5 : présentation identique des quantités pour salariés et sous-traitants */
 #v40SubFollowup,.v403-follow-list,.v403-follow-card{min-width:0;max-width:100%;box-sizing:border-box}
 .v403-follow-list{display:grid;gap:12px;margin-top:12px}
 #v16ReportSection .v403-follow-card{margin:12px 0}
@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V40.4</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V40.5</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3572,7 +3572,32 @@ function rmlContractPreviewFrame(){
   overlay.innerHTML='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:5px 9px;background:#143d61;color:white;min-height:46px;flex-shrink:0"><strong style="font-size:13px;white-space:nowrap">Aperçu</strong><div style="display:flex;gap:6px;align-items:center;min-width:0"><button type="button" id="rmlPreviewPrint" style="padding:9px 12px;border-radius:7px;background:#f4c430;color:#17212e;border:0;font-size:15px;font-weight:800;line-height:1.2;cursor:pointer;white-space:nowrap">Imprimer / PDF</button><button type="button" id="rmlPreviewClose" style="padding:9px 11px;border-radius:7px;background:#c43d3d;color:white;border:0;font-size:14px;font-weight:700;line-height:1.2;cursor:pointer;white-space:nowrap">✕ Fermer</button></div></div><iframe title="Aperçu du contrat" style="border:0;flex:1;min-height:0;width:100%;background:white"></iframe>';
   document.body.appendChild(overlay);
   overlay.querySelector('#rmlPreviewClose').onclick=()=>{overlay.remove()};
-  overlay.querySelector('#rmlPreviewPrint').onclick=()=>{overlay.querySelector('iframe').contentWindow.print()};
+  overlay.querySelector('#rmlPreviewPrint').onclick=()=>{
+   const frame=overlay.querySelector('iframe');
+   try{
+    const source=frame.contentDocument;
+    if(!source||!source.body||!source.body.innerHTML.trim())throw new Error('Contrat non chargé');
+    // Ouvrir immédiatement depuis le clic : nécessaire sur Safari iPhone/iPad.
+    const popup=window.open('','_blank');
+    if(popup){
+     popup.document.open();
+     popup.document.write(source.documentElement.outerHTML);
+     popup.document.close();
+     // Bouton toujours disponible même si Safari bloque l'impression automatique.
+     const bar=popup.document.createElement('div');
+     bar.setAttribute('style','position:sticky;top:0;z-index:99999;padding:12px;background:#143d61;text-align:center');
+     bar.className='rml-print-controls';
+     const btn=popup.document.createElement('button');btn.textContent='Imprimer / Enregistrer en PDF';
+     btn.setAttribute('style','font:bold 16px Arial;padding:12px 20px;border:0;border-radius:6px;background:#f4c430;color:#17212e');
+     btn.onclick=()=>popup.print();bar.appendChild(btn);
+     popup.document.body.insertBefore(bar,popup.document.body.firstChild);
+     const style=popup.document.createElement('style');style.textContent='@media print{.rml-print-controls,.bar,.no-print{display:none!important}}';popup.document.head.appendChild(style);
+     popup.focus();return;
+    }
+    // Mode application installée : Safari peut refuser une nouvelle fenêtre.
+    frame.contentWindow.focus();frame.contentWindow.print();
+   }catch(err){alert('Impossible de préparer le contrat pour impression : '+err.message)}
+  };
  }
  const frame=overlay.querySelector('iframe');
  const doc=frame.contentDocument;doc.open();
