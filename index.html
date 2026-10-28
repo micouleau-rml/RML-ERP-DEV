@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46</title>
+<title>RML ERP — V40.6</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V40.6</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -4039,13 +4039,13 @@ async function v40SaveSubFollowup(assignmentId){
  await v40LoadSubFollowup(assignmentId,(await sb.from('erp_modules_data').select('payload').eq('chantier_id',a.chantier_id).eq('module','preparation').eq('entity_type','chantier').eq('entity_id',a.chantier_id).eq('deleted',false).maybeSingle()).data?.payload);
 }
 
-// V46 : validation des relevés sous-traitants sur l'accueil ADMIN.
+// V40.6 : validation des relevés sous-traitants sur l'accueil ADMIN.
 async function v46LoadApprovals(){
  const panel=document.getElementById('v46ApprovalPanel'),list=document.getElementById('v46ApprovalList'),count=document.getElementById('v46ApprovalCount');
  if(!panel||!list||isSubcontractorUser()||isEmployeeUser()||!['administrateur','direction'].includes(currentAccess?.role||''))return;
  panel.style.display='block';list.textContent='Recherche des relevés…';
  const {data,error}=await sb.from('erp_subcontract_followups').select('*').eq('approval_status','en_attente').order('created_at',{ascending:true});
- if(error){list.innerHTML='<div class="notice danger">Lecture impossible : '+esc(error.message)+' — exécuter le SQL V46.</div>';return}
+ if(error){list.innerHTML='<div class="notice danger">Lecture impossible : '+esc(error.message)+' — exécuter le SQL V40.6.</div>';return}
  const rows=data||[];count.textContent='('+rows.length+')';
  list.innerHTML=rows.length?rows.map(r=>{const j=db.chantiers.find(x=>x.id===r.chantier_id),c=db.clients.find(x=>x.id===j?.client_id);return `<div class="panel" style="margin:10px 0;border:1px solid #bfdbfe;padding:12px"><strong>${esc(j?.nom||r.chantier_id)}</strong> · ${esc(c?.nom||'')}<div class="muted">Sous-traitant : ${esc((erpSubcontractors||[]).find(x=>x.id===r.subcontractor_id)?.company_name||r.subcontractor_id)} · ${esc(r.work_date)}</div><div>${(r.quantities||[]).map((q,i)=>`<label style="display:block;margin:8px 0">${esc(q.label||q.section)} — quantité à valider <input type="number" min="0" step="0.01" inputmode="decimal" style="max-width:130px" data-v46-row="${r.id}" data-v46-index="${i}" value="${Number(q.installed)||0}"> ${esc(q.unit||'')}</label>`).join('')}</div><div class="muted">${esc(r.notes||'')}</div><div class="actions"><button class="btn ok" onclick="v46Decide('${r.id}','valide')">Valider et intégrer</button><button class="btn danger" onclick="v46Decide('${r.id}','refuse')">Refuser</button><button class="btn secondary" onclick="openJob('${r.chantier_id}')">Voir chantier</button></div></div>`}).join(''):'<div class="notice">Aucun suivi sous-traitant en attente.</div>';
 }
@@ -4056,7 +4056,7 @@ async function v46Decide(id,decision){
  const reason=decision==='refuse'?prompt('Motif du refus :'):' ';if(reason===null)return;
  if(!confirm(decision==='valide'?'Valider ces quantités et les ajouter au suivi ADMIN ?':'Refuser ce relevé ?'))return;
  const {data,error}=await sb.rpc('rml_v46_decide_followup',{p_followup_id:id,p_decision:decision,p_quantities:quantities,p_reason:reason||''});
- if(error)return alert('Validation impossible : '+error.message+'\nVérifiez le script SQL V46.');
+ if(error)return alert('Validation impossible : '+error.message+'\nVérifiez le script SQL V40.6.');
  alert(decision==='valide'?'Suivi validé et quantités intégrées.':'Suivi refusé.');
  if(currentSuiviJobId&&data?.chantier_id===currentSuiviJobId)await openSuivi(currentSuiviJobId);
  await v46LoadApprovals();
