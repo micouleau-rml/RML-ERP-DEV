@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V41.1</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V41.2</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3585,6 +3585,23 @@ function rml41CleanClauses(clauses){
  }
  return result;
 }
+// V41.2 : présenter les prestations chiffrées juste après le chantier, avant les articles.
+// Préserve l'ordre des autres clauses et la sauvegarde du calculateur.
+function rml412OrderedClauses(clauses){
+ const cleaned=rml41CleanClauses(clauses);
+ const financial=cleaned.filter(x=>String(x.title||'').trim()===RML41_ANNEX);
+ const other=cleaned.filter(x=>String(x.title||'').trim()!==RML41_ANNEX);
+ return [...financial,...other];
+}
+function rml412ClauseHtml(clauses,displayClass){
+ return rml412OrderedClauses(clauses).map((x,i)=>{
+  const isFinancial=String(x.title||'').trim()===RML41_ANNEX;
+  const title=isFinancial?'DÉTAIL DES PRESTATIONS CHIFFRÉES':x.title||'Clause';
+  const body=esc(x.text||'').replace(/\n/g,'<br>');
+  if(displayClass==='sub-clause-display')return `<div class="sub-clause-display"><h4>${isFinancial?'':(i+1)+'. '}${esc(title)}</h4><div>${body}</div></div>`;
+  return `<section class="clause"><h2>${esc(title)}</h2><div>${body}</div></section>`;
+ }).join('');
+}
 function rml41FinancialLines(){
  const selected=rml408Lines.filter(x=>x.selected);
  const lines=selected.map(n=>`${n.nom} : ${n.total} ${n.unite} × ${Number(n.price).toFixed(2)} € = ${(n.total*n.price).toFixed(2)} € HT`);
@@ -3811,7 +3828,7 @@ function printSubContract(){
  <div class="parties"><div class="box"><strong>ENTREPRENEUR PRINCIPAL</strong><br>${rmlPrincipalHtml(principalKey)}<br>Représenté par : ${rmlPrincipalRepresentative(principalKey)}</div>
  <div class="box"><strong>SOUS-TRAITANT</strong><br>${esc(sub?.company||'')}<br>${esc(sub?.contact_name||'')}<br>${esc(sub?.email||'')}<br>${esc(sub?.phone||'')}<br><strong>Adresse du siège :</strong> ${esc(sub?.head_office_address||'Non renseignée')}${rmlStephaneLegalDetails(sub)}</div></div>
  <div class="box"><strong>CHANTIER</strong><br>Client / maître d’ouvrage : ${esc(c?.nom||'')}<br>Chantier : ${esc(j?.nom||'')}<br>Adresse : ${esc(j?.adresse||'')}<br>Travaux confiés : ${esc(a.work_description||'À compléter')}<br>Montant : ${a.amount_ht!=null?Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2})+' € HT':'À compléter'}</div>
- ${clauses.map(x=>`<section class="clause"><h2>${esc(x.title||'')}</h2><div>${esc(x.text||'').replace(/\n/g,'<br>')}</div></section>`).join('')}
+ ${rml412ClauseHtml(clauses)}
  <div class="signatures"><div>${rmlPrincipalSignerLabel(principalKey,a)}<br>${a.rml_signer_name?'Signataire : '+esc(a.rml_signer_name)+' '+esc(a.rml_signer_role||'')+'<br>':''}${rmlSig}<br>${a.rml_signed_at?'Signé le '+new Date(a.rml_signed_at).toLocaleString('fr-FR'):'Signature RML en attente'}</div><div>${rmlSubcontractSignerLabel(sub,a)}<br>${a.signature_data?'Lu et approuvé<br>':''}${sig}<br>${a.signed_at?'Signé le '+new Date(a.signed_at).toLocaleString('fr-FR'):''}</div></div>
  
 
@@ -3825,7 +3842,7 @@ function subContractAcceptance(a){
 function openSubContract(id){
  const a=erpSubAssignments.find(x=>x.id===id);if(!a)return;const sub=erpSubcontractors.find(x=>x.id===a.subcontractor_id),j=db.chantiers.find(x=>x.id===a.chantier_id),c=db.clients.find(x=>x.id===j?.client_id);
  subContractId.value=id;const subSigned=!!a.signature_data, rmlSigned=!!a.rml_signature_data;subContractSummary.innerHTML=`<strong>${esc(sub?.company||'Sous-traitant')}</strong>${sub?.head_office_address?'<br>Siège : '+esc(sub.head_office_address):''}${rmlStephaneLegalDetails(sub)}<br>${esc(c?.nom||'')} — ${esc(j?.nom||'Chantier')}${j?.adresse?'<br>'+esc(j.adresse):''}${a.planned_date?'<br>Date prévue : '+esc(a.planned_date):''}${a.amount_ht!=null?'<br>Montant : '+Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT':''}${subSigned&&!rmlSigned?'<br><strong>SOUS-TRAITANT SIGNÉ — SIGNATURE RML EN ATTENTE</strong>':subSigned&&rmlSigned?'<br><strong>CONTRAT SIGNÉ PAR LES DEUX PARTIES</strong>':''}`;
- const clauses=subClausesFromAssignment(a);subContractText.innerHTML='<div class="sub-clause-display"><h4>Entreprise donneuse d’ordre</h4><div>'+rmlPrincipalHtml(rmlPrincipalKey(clauses))+'<br>Représenté par : '+rmlPrincipalRepresentative(rmlPrincipalKey(clauses))+'</div></div>'+`<div class="sub-clause-display"><h4>Travaux confiés</h4><div>${esc(a.work_description||'').replace(/\\n/g,'<br>')}</div></div>`+clauses.map((x,i)=>`<div class="sub-clause-display"><h4>${i+1}. ${esc(x.title||'Clause')}</h4><div>${esc(x.text||'').replace(/\\n/g,'<br>')}</div></div>`).join('');
+ const clauses=subClausesFromAssignment(a);subContractText.innerHTML='<div class="sub-clause-display"><h4>Entreprise donneuse d’ordre</h4><div>'+rmlPrincipalHtml(rmlPrincipalKey(clauses))+'<br>Représenté par : '+rmlPrincipalRepresentative(rmlPrincipalKey(clauses))+'</div></div>'+`<div class="sub-clause-display"><h4>Travaux confiés</h4><div>${esc(a.work_description||'').replace(/\\n/g,'<br>')}</div></div>`+rml412ClauseHtml(clauses,'sub-clause-display');
  subSignerName.value=a.signer_name||sub?.contact_name||'';subSignerRole.value=a.signer_role||'';
  openModal('subContractModal');setTimeout(()=>{setupSubSignaturePad();if(a.signature_data){drawSavedSignature(a.signature_data)}else clearSubSignature();const signed=!!a.signature_data;subEditClausesActions.style.display=(signed||isSubcontractorUser())?'none':'flex';subSignBtn.disabled=signed;subSignBtn.textContent=signed?'Signature sous-traitant enregistrée':'Signer et valider le contrat';subSignerName.disabled=signed;subSignerRole.disabled=signed;document.getElementById('subAcceptanceBox').style.display=signed?'none':'flex';document.getElementById('subAcceptanceSaved').style.display=signed?'block':'none';document.getElementById('subAcceptanceCheck').checked=signed;subSignaturePad.style.pointerEvents=signed?'none':'auto';
  const canRml=!isSubcontractorUser()&&(currentAccess?.role==='administrateur'||currentAccess?.role==='direction');rmlSignatureWrap.style.display=(signed&&canRml)?'block':'none';rmlSignerName.value=a.rml_signer_name||'';rmlSignerRole.value=a.rml_signer_role||'Gérant';setupRmlSignaturePad();if(a.rml_signature_data)drawSavedRmlSignature(a.rml_signature_data);else clearRmlSignature();rmlSignBtn.disabled=!!a.rml_signature_data;rmlSignBtn.textContent=a.rml_signature_data?'Signature RML enregistrée':'Signer pour RML';rmlSignerName.disabled=!!a.rml_signature_data;rmlSignerRole.disabled=!!a.rml_signature_data;rmlSignaturePad.style.pointerEvents=a.rml_signature_data?'none':'auto';rmlClearSignBtn.style.display=a.rml_signature_data?'none':'inline-block';},60);
