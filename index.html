@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V41</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V41.1</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -852,6 +852,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
  <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:end"><label style="flex:1;min-width:135px">Journées prévues<input id="rml408Days" type="number" min="0" step="0.5" value="0" oninput="rml408Total()"></label><label style="flex:1;min-width:135px">Prix par journée HT (€)<input id="rml408DayPrice" type="number" min="0" step="0.01" value="0" oninput="rml408Total()"></label></div>
  <div id="rml408Total" style="font-weight:800;font-size:18px;margin:10px 0">Total prévisionnel : 0,00 € HT</div>
  <button type="button" class="btn ok" onclick="rml408Apply()">Appliquer au montant du contrat</button>
+ <div class="muted" style="margin-top:7px;font-weight:600">Pour conserver vos modifications sur tous vos appareils, cliquez ensuite sur « Enregistrer le brouillon » ou « Enregistrer les modifications ».</div>
  <div class="muted" style="margin-top:7px">Vérifiez les prix et les quantités avant signature. Ce calcul ne supprime aucun produit de la préparation du chantier.</div>
  </div>
  <div class="sub-contract-services"><div class="sub-contract-section-title">Prestations du contrat</div><div class="field"><label>1. Nature de la prestation</label><select id="rmlSubSupplySelect" onchange="rmlSubBuildDescription()"><option value="">— Choisir la fourniture / pose —</option><option value="Comprend la fourniture et la pose">Comprend la fourniture et la pose</option><option value="Comprend la pose sans fourniture">Comprend la pose sans fourniture</option></select></div>
@@ -3593,11 +3594,33 @@ function rml41FinancialLines(){
  lines.push(`TOTAL PRÉVISIONNEL : ${rml408Total().toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})} € HT`);
  return lines.join('\n');
 }
+// V41.1 : mémorisation par contrat dans le JSONB contract_clauses déjà existant.
+// Aucune table SQL supplémentaire ; les données ne sont jamais partagées entre contrats.
+function rml411Snapshot(){
+ return {version:1,lines:rml408Lines.map(n=>({...n})),days:Number(document.getElementById('rml408Days')?.value)||0,dayPrice:Number(document.getElementById('rml408DayPrice')?.value)||0};
+}
+function rml411Restore(clauses){
+ const annex=(clauses||[]).find(x=>x.title===RML41_ANNEX);
+ const saved=annex?.calculation_data;
+ if(!saved||!Array.isArray(saved.lines))return false;
+ rml408Lines=saved.lines.map(n=>({...n,total:Number(n.total)||0,price:Number(n.price)||0,selected:!!n.selected}));
+ document.getElementById('rml408Days').value=Number(saved.days)||0;
+ document.getElementById('rml408DayPrice').value=Number(saved.dayPrice)||0;
+ rml408Render();return true;
+}
+function rml411StoreDraft(){
+ // Ne remplace pas une annexe existante lorsque le calculateur n'a pas été chargé.
+ if(!rml408Lines.length && !(Number(document.getElementById('rml408Days')?.value)>0))return;
+ subClauseDraft=rml41CleanClauses(subClauseDraft);
+ const i=subClauseDraft.findIndex(x=>x.title===RML41_ANNEX);
+ const annex={title:RML41_ANNEX,text:rml41FinancialLines(),calculation_data:rml411Snapshot()};
+ if(i>=0)subClauseDraft[i]={...subClauseDraft[i],...annex};else subClauseDraft.push(annex);
+}
 function rml41SyncAnnex(){
  subAssignWork.value=rml41CleanText(subAssignWork.value);
  subClauseDraft=rml41CleanClauses(subClauseDraft);
  const i=subClauseDraft.findIndex(x=>x.title===RML41_ANNEX);
- const annex={title:RML41_ANNEX,text:rml41FinancialLines()};
+ const annex={title:RML41_ANNEX,text:rml41FinancialLines(),calculation_data:rml411Snapshot()};
  if(i>=0)subClauseDraft[i]={...subClauseDraft[i],...annex};else subClauseDraft.push(annex);
  renderSubClauseEditor();
 }
@@ -3638,7 +3661,7 @@ function editSubAssignment(id){
  subAssignDate.value=a.planned_date||'';
  subAssignAmount.value=a.amount_ht??'';
  subAssignWork.value=rml41CleanText(a.work_description||'');rml408Reset();rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
- subClauseDraft=rml41CleanClauses(subClausesFromAssignment(a)).map(x=>({...x}));renderSubClauseEditor();rmlQuickContractDefaults();
+ subClauseDraft=rml41CleanClauses(subClausesFromAssignment(a)).map(x=>({...x}));renderSubClauseEditor();rmlQuickContractDefaults();rml411Restore(subClauseDraft);
  subAssignSaveBtn.textContent='Enregistrer les modifications';
  openModal('subAssignModal');
 }
@@ -3737,7 +3760,8 @@ async function saveSubAssignment(confirmAssignment=false){
  const sid=subAssignSubId.value,jid=subAssignJob.value;
  if(!sid){alert('Sous-traitant introuvable.');return}
  // Un brouillon peut être enregistré même si le chantier ou les travaux ne sont pas encore renseignés.
- const clauses=rml41CleanClauses(subClauseDraft).map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim(),...(x.quick_choices?{quick_choices:x.quick_choices}:{}),...(x.principal_company?{principal_company:x.principal_company}:{})})).filter(x=>x.title||x.text);
+ rml411StoreDraft();
+ const clauses=rml41CleanClauses(subClauseDraft).map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim(),...(x.quick_choices?{quick_choices:x.quick_choices}:{}),...(x.principal_company?{principal_company:x.principal_company}:{}),...(x.calculation_data?{calculation_data:x.calculation_data}:{})})).filter(x=>x.title||x.text);
  if(clauses.length)clauses[0].principal_company=document.getElementById('subPrincipalCompany').value;
  const row={subcontractor_id:sid,planned_date:subAssignDate.value||null,amount_ht:subAssignAmount.value?Number(subAssignAmount.value):null,work_description:rml41CleanText(subAssignWork.value)||'À compléter',contract_terms:clauses.map(x=>`${x.title}\n${x.text}`).join('\n\n'),contract_clauses:clauses,status:'brouillon',updated_at:new Date().toISOString()};
  if(jid)row.chantier_id=jid;
@@ -3755,7 +3779,7 @@ function renderExistingSubClauseEditor(){subExistingClauseEditor.innerHTML=subEx
 function editExistingSubContract(){const a=erpSubAssignments.find(x=>x.id===subContractId.value);if(!a)return;if(a.status==='signe'){alert('Un contrat signé est verrouillé.');return}subClauseEditContractId.value=a.id;subExistingClauseDraft=subClausesFromAssignment(a).map(x=>({...x}));renderExistingSubClauseEditor();openModal('subClauseEditModal')}
 function addExistingSubClause(){subExistingClauseDraft.push({title:'Nouvelle clause',text:''});renderExistingSubClauseEditor()}
 function removeExistingSubClause(i){if(confirm('Supprimer cette clause ?')){subExistingClauseDraft.splice(i,1);renderExistingSubClauseEditor()}}
-async function saveExistingSubClauses(){const id=subClauseEditContractId.value,clauses=subExistingClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim(),...(x.quick_choices?{quick_choices:x.quick_choices}:{}),...(x.principal_company?{principal_company:x.principal_company}:{})})).filter(x=>x.title||x.text);const {error}=await sb.from('erp_subcontract_assignments').update({contract_clauses:clauses,contract_terms:clauses.map(x=>`${x.title}\n${x.text}`).join('\n\n'),updated_at:new Date().toISOString()}).eq('id',id).neq('status','signe');if(error){alert(error.message);return}closeModal('subClauseEditModal');if(isSubcontractorUser()){await loadSubcontractorPortal();openSubContract(id)}else{await loadSubcontractors();openSubContract(id)}}
+async function saveExistingSubClauses(){const id=subClauseEditContractId.value,clauses=subExistingClauseDraft.map(x=>({title:(x.title||'').trim(),text:(x.text||'').trim(),...(x.quick_choices?{quick_choices:x.quick_choices}:{}),...(x.principal_company?{principal_company:x.principal_company}:{}),...(x.calculation_data?{calculation_data:x.calculation_data}:{})})).filter(x=>x.title||x.text);const {error}=await sb.from('erp_subcontract_assignments').update({contract_clauses:clauses,contract_terms:clauses.map(x=>`${x.title}\n${x.text}`).join('\n\n'),updated_at:new Date().toISOString()}).eq('id',id).neq('status','signe');if(error){alert(error.message);return}closeModal('subClauseEditModal');if(isSubcontractorUser()){await loadSubcontractorPortal();openSubContract(id)}else{await loadSubcontractors();openSubContract(id)}}
 
 async function saveSubContractDraft(){
  const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a)return;
