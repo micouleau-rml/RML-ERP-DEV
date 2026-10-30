@@ -492,7 +492,7 @@ header .wrap{position:relative;z-index:1}
 <circle cx="110" cy="65" r="4.5" fill="white"/>
 <text x="110" y="137" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="56" font-weight="900" fill="white">RML</text>
 <text x="110" y="181" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="31" font-weight="900" fill="#ffd400">HEURES</text>
-</svg></div><div><h1>RML HEURES<span class="app-version-top">V46</span></h1><small>Suivi embauche · débauche · heures supplémentaires</small></div></div>
+</svg></div><div><h1>RML HEURES<span class="app-version-top">V47</span></h1><small>Suivi embauche · débauche · heures supplémentaires</small></div></div>
  <nav>
   <button class="tab active" data-view="saisie">Saisie</button>
   <button class="tab" data-view="mois">Mois</button>
@@ -575,7 +575,7 @@ header .wrap{position:relative;z-index:1}
 <section id="recap" class="view">
  <div class="card">
   <div class="grid grid2"><div class="field"><label>Mois</label><input id="recapMonth" type="month"></div><div class="field"><label>&nbsp;</label><button class="secondary" id="printRecap">Imprimer / PDF</button></div></div>
-  <div class="recap-toolbar no-print"><button type="button" class="secondary" id="toggleMoneyColumns">Masquer les montants</button></div><div class="table-wrap"><table><thead><tr><th>Salarié</th><th>Taux horaire</th><th>Jours saisis</th><th>Paniers</th><th>H sup chantier</th><th>H route</th><th class="money-col">Montant route</th><th>Déductions</th><th>H sup réelles</th><th>HC 10%</th><th class="money-col">Montant 10%</th><th>HC 25%</th><th class="money-col">Montant 25%</th><th class="money-col">Total HC</th><th>ABS</th><th>MAL</th><th>AT</th><th>CGE</th><th>FORM</th></tr></thead><tbody id="recapBody"></tbody></table></div>
+  <div class="recap-toolbar no-print"><button type="button" class="secondary" id="toggleMoneyColumns">Masquer les montants</button></div><div class="table-wrap"><table><thead><tr><th>Salarié</th><th>Taux horaire</th><th>Jours saisis</th><th>Paniers</th><th>H sup chantier</th><th>H route</th><th class="money-col">Montant route</th><th>Déductions</th><th>H sup réelles</th><th id="recapRate1">HS 25%</th><th class="money-col" id="recapAmount1">Montant 25%</th><th id="recapRate2">HS 50%</th><th class="money-col" id="recapAmount2">Montant 50%</th><th class="money-col">Total HS</th><th>ABS</th><th>MAL</th><th>AT</th><th>CGE</th><th>FORM</th></tr></thead><tbody id="recapBody"></tbody></table></div>
 
   <div class="report-card">
    <h2 style="margin-bottom:5px">Report d'heures au mois suivant</h2>
@@ -754,7 +754,7 @@ header .wrap{position:relative;z-index:1}
     <div class="field"><label>Majoration tranche 2 (%)</label><input id="otRate2" type="number" min="0" step="0.1"></div>
     <div class="field"><label>Limite tranche 1 / semaine (h)</label><input id="otThreshold" type="number" min="0" step="0.25"></div>
    </div>
-   <div class="note" style="margin-bottom:14px">Réglage repris de ton tableau : première tranche d'heures complémentaires à 10 %, puis tranche suivante à 25 %. Les pourcentages et la limite hebdomadaire restent modifiables ici.</div>
+   <div class="note" style="margin-bottom:14px">Depuis le 1er novembre 2026 : heures supplémentaires à 25 % pour les 8 premières heures au-delà de 35 h par semaine, puis à 50 %. Les périodes antérieures conservent les anciennes majorations 10 % et 25 %. Les réglages ci-dessus concernent les nouvelles périodes.</div>
    <div class="section-title" style="margin-top:18px">Tolérance autour de l’heure de débauche</div>
    <label style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid #d7deea;border-radius:12px;margin-bottom:8px;background:#f8fafc">
     <input id="otGraceEnabled" type="checkbox" style="width:auto;margin-top:3px">
@@ -802,8 +802,17 @@ const KEY='rml_heures_v1';
 const defaultEmployees=[
  {name:'FOUCHER BAPTISTE',rate:12.50},{name:'JULIEN',rate:15.00},{name:'XAVIER',rate:16.88},{name:'GOIRE SYLVAIN',rate:14.70},{name:'QUENTIN',rate:15.82},{name:'MAXIME B',rate:13.16},{name:'CHRISTOPHER LARROZE-JARDINE',rate:14.70},{name:'THUBIN ALEXIS',rate:12.02},{name:'MAXIME MONCHAUX',rate:30.13}
 ];
-const defaultState={employees:defaultEmployees,settings:{CONT:{start:'07:15',end:'14:15'},CLA:{start:'07:15',end:'15:00',pauseStart:'12:15',pauseEnd:'13:00'},SAM:{start:'07:00',end:'14:00'},overtime:{rate1:10,rate2:25,thresholdHours:4}},entries:[]};
-let state=load();state.settings=normalizeSettings(state.settings);state.settings.overtime=Object.assign({rate1:10,rate2:25,thresholdHours:4},state.settings.overtime||{});let editId=null;
+const defaultState={employees:defaultEmployees,settings:{CONT:{start:'07:15',end:'14:15'},CLA:{start:'07:15',end:'15:00',pauseStart:'12:15',pauseEnd:'13:00'},SAM:{start:'07:00',end:'14:00'},overtime:{rate1:25,rate2:50,thresholdHours:8}},entries:[]};
+let state=load();state.settings=normalizeSettings(state.settings);state.settings.overtime=Object.assign({rate1:25,rate2:50,thresholdHours:8},state.settings.overtime||{});// Migration unique des anciens paramètres, sans supprimer les pointages ni les historiques.
+if(!state.settings.overtime.fullTime2026Migrated){
+ const ot=state.settings.overtime;
+ if(Number(ot.rate1)===10)ot.rate1=25;
+ if(Number(ot.rate2)===25)ot.rate2=50;
+ if(Number(ot.thresholdHours)===4)ot.thresholdHours=8;
+ ot.fullTime2026Migrated=true;
+ persist();
+}
+let editId=null;
 function load(){try{const d=JSON.parse(localStorage.getItem(KEY));return d&&d.entries?d:structuredClone(defaultState)}catch(e){return structuredClone(defaultState)}}
 function persist(){localStorage.setItem(KEY,JSON.stringify(state))}
 
@@ -812,7 +821,7 @@ function normalizeSettings(raw){
    CONT:{start:'07:15',end:'14:15'},
    CLA:{start:'07:15',end:'15:00',pauseStart:'12:15',pauseEnd:'13:00'},
    SAM:{start:'07:00',end:'14:00'},
-   overtime:{rate1:10,rate2:25,thresholdHours:4,grace15Enabled:true},
+   overtime:{rate1:25,rate2:50,thresholdHours:8,grace15Enabled:true},
    teams:[],
    monthlyReports:{},
    paidLeaveRights:{},
@@ -1180,11 +1189,12 @@ function entryReportedMinutes(e,ym,employee){
  return e.date>=cutoff?(Number(e.real)||0):0
 }
 function overtimeAmounts(rows,rate){
- const cfg=state.settings.overtime||{rate1:10,rate2:25,thresholdHours:4};
  const sp=splitOvertime(rows);
- const amount10=(sp.m1/60)*(Number(rate)||0)*(1+Number(cfg.rate1||0)/100);
- const amount25=(sp.m2/60)*(Number(rate)||0)*(1+Number(cfg.rate2||0)/100);
- return {sp,amount10,amount25,total:amount10+amount25}
+ const cfg=state.settings.overtime;
+ const hourly=Number(rate)||0;
+ const amount10=(sp.old1/60)*hourly*1.10+(sp.new1/60)*hourly*(1+Number(cfg.rate1||0)/100);
+ const amount25=(sp.old2/60)*hourly*1.25+(sp.new2/60)*hourly*(1+Number(cfg.rate2||0)/100);
+ return {sp,amount10,amount25,total:amount10+amount25};
 }
 
 function renderMonth(){
@@ -1205,7 +1215,7 @@ function renderMonth(){
  const outgoing=currentReportedRows.reduce((a,e)=>a+(Number(e.real)||0),0);
  const payableRows=[...incomingRows,...currentPayableRows];
  const amounts=overtimeAmounts(payableRows,rate);
- const cfg=state.settings.overtime||{rate1:10,rate2:25,thresholdHours:4};
+ const cfg=state.settings.overtime||{rate1:25,rate2:50,thresholdHours:8};
 
  el('monthKpis').innerHTML=`
   <div class="kpi"><span>Report de ${monthLabelFr(previousMonth(ym))}</span><b>${time(opening)}</b></div>
@@ -1213,8 +1223,8 @@ function renderMonth(){
   <div class="kpi"><span>H du mois payées maintenant</span><b>${time(currentPayable)}</b></div>
   <div class="kpi"><span>Total heures payées ce mois</span><b>${time(opening+currentPayable)}</b></div>
   <div class="kpi"><span>Report vers ${monthLabelFr(nextMonth(ym))}</span><b>${time(outgoing)}</b></div>
-  <div class="kpi"><span>HC ${cfg.rate1}% payées</span><b>${time(amounts.sp.m1)}</b><small>${money(amounts.amount10)}</small></div>
-  <div class="kpi"><span>HC ${cfg.rate2}% payées</span><b>${time(amounts.sp.m2)}</b><small>${money(amounts.amount25)}</small></div>
+  <div class="kpi"><span>${ym<'2026-11'?'HC 10%':'HS ' + cfg.rate1 + '%'} payées</span><b>${time(amounts.sp.m1)}</b><small>${money(amounts.amount10)}</small></div>
+  <div class="kpi"><span>${ym<'2026-11'?'HC 25%':'HS ' + cfg.rate2 + '%'} payées</span><b>${time(amounts.sp.m2)}</b><small>${money(amounts.amount25)}</small></div>
   <div class="kpi"><span>Paniers du mois</span><b>${totals.paniers}</b></div>`;
 
  let reportRow='';
@@ -1247,7 +1257,24 @@ function renderMonth(){
  el('monthBody').innerHTML=(reportRow+normalRows)||`<tr><td colspan="13" class="empty">Aucune journée enregistrée pour ce mois.</td></tr>`;
 }
 function weekKey(date){const d=new Date(date+'T12:00:00');const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day+3);const first=new Date(d.getFullYear(),0,4);const firstDay=(first.getDay()+6)%7;first.setDate(first.getDate()-firstDay+3);const week=1+Math.round((d-first)/604800000);return d.getFullYear()+'-W'+String(week).padStart(2,'0')}
-function splitOvertime(rows){const cfg=state.settings.overtime||{rate1:10,rate2:25,thresholdHours:4};const limit=(Number(cfg.thresholdHours)||0)*60;const byWeek={};rows.forEach(e=>{const k=weekKey(e.date);(byWeek[k]||(byWeek[k]=[])).push(e)});let m1=0,m2=0;Object.values(byWeek).forEach(list=>{const total=list.reduce((a,e)=>a+(e.real||0),0);m1+=Math.min(total,limit);m2+=Math.max(0,total-limit)});return {m1,m2}}
+function splitOvertime(rows){
+ const cfg=state.settings.overtime;
+ const byWeek={};
+ rows.forEach(e=>{
+  const old=String(e.date||'')<'2026-11-01';
+  const k=weekKey(e.date)+(old?'|old':'|new');
+  (byWeek[k]||(byWeek[k]={old,rows:[]})).rows.push(e);
+ });
+ let old1=0,old2=0,new1=0,new2=0;
+ Object.values(byWeek).forEach(group=>{
+  const limit=(group.old?4:Number(cfg.thresholdHours)||8)*60;
+  const total=group.rows.reduce((a,e)=>a+(Number(e.real)||0),0);
+  if(group.old){old1+=Math.min(total,limit);old2+=Math.max(0,total-limit)}
+  else{new1+=Math.min(total,limit);new2+=Math.max(0,total-limit)}
+ });
+ return {old1,old2,new1,new2,m1:old1+new1,m2:old2+new2};
+}
+
 function money(n){return Number(n||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}
 
 function monthLabelFr(ym){
@@ -1655,7 +1682,12 @@ function optimizeRecapColumns(){
 }
 
 function renderRecap(){
- const ym=el('recapMonth').value,cfg=state.settings.overtime||{rate1:10,rate2:25,thresholdHours:4};
+ const ym=el('recapMonth').value,cfg=state.settings.overtime||{rate1:25,rate2:50,thresholdHours:8};
+ const historical=ym<'2026-11';
+ el('recapRate1').textContent=historical?'HC 10%':'HS '+cfg.rate1+'%';
+ el('recapAmount1').textContent=historical?'Montant 10%':'Montant '+cfg.rate1+'%';
+ el('recapRate2').textContent=historical?'HC 25%':'HS '+cfg.rate2+'%';
+ el('recapAmount2').textContent=historical?'Montant 25%':'Montant '+cfg.rate2+'%';
  el('recapBody').innerHTML=state.employees.map(emp=>{
   const r=state.entries.filter(e=>e.employee===emp.name&&e.date.startsWith(ym));
   const ledger=recoveryLedger(emp.name);
