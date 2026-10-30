@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.7</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.8</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -1542,15 +1542,19 @@ async function loadSubcontractorPortal(){
   if(!erpSubcontractors.length){subPortalStatus.className='notice warn';subPortalStatus.innerHTML='Votre compte est bien identifié comme sous-traitant, mais il n’est encore rattaché à aucune fiche sous-traitant. Aucun chantier n’est visible.';return}
   const ids=erpSubcontractors.map(x=>x.id);
   const {data:assign,error:ae}=await sb.from('erp_subcontract_assignments').select('*').in('subcontractor_id',ids).order('created_at',{ascending:false});if(ae)throw ae;
-  erpSubAssignments=(assign||[]).filter(a=>!a.archived_at);
+  erpSubAssignments=assign||[];
   const jobIds=[...new Set(erpSubAssignments.map(x=>x.chantier_id).filter(Boolean))];
   let jobs=[];if(jobIds.length){const {data,error}=await sb.from('erp_chantiers').select('*').in('id',jobIds);if(error)throw error;jobs=data||[]}
   const clientIds=[...new Set(jobs.map(x=>x.client_id).filter(Boolean))];
   let clients=[];if(clientIds.length){const {data,error}=await sb.from('erp_clients').select('id,nom').in('id',clientIds);if(error)throw error;clients=data||[]}
   db.chantiers=jobs;db.clients=clients;
-  subPortalStatus.className='notice';subPortalStatus.textContent=`${erpSubAssignments.length} contrat(s) / chantier(s) attribué(s)`;
+  subPortalStatus.className='notice';subPortalStatus.textContent=`${erpSubAssignments.filter(a=>!a.archived_at).length} contrat(s) actif(s) · ${erpSubAssignments.filter(a=>a.archived_at).length} contrat(s) archivé(s)`;
   if(!erpSubAssignments.length){subPortalList.innerHTML='<div class="empty">Aucun chantier ne vous est actuellement attribué.</div>';return}
-  subPortalList.innerHTML=erpSubAssignments.map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id);return `<div class="sub-card employee-job"><div class="row between"><div><h3>${esc(j?.nom||'Chantier')}</h3><div class="muted">${esc(c?.nom||'')}${j?.adresse?'<br>'+esc(j.adresse):''}</div></div><span class="status ${a.status==='signe'?'actif':'attente'}">${esc(a.status||'brouillon')}</span></div><div style="margin-top:10px"><strong>Travaux confiés</strong><div>${esc(a.work_description||'À compléter').replace(/\n/g,'<br>')}</div>${a.planned_date?'<div><strong>Date prévue :</strong> '+esc(a.planned_date)+'</div>':''}</div><div class="actions" style="margin-top:12px"><button class="btn rml-job-docs" onclick="openSubJobFolder('${a.id}')">Feuille chantier / Documents</button><button class="btn secondary rml-job-history" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat':'Voir / signer le contrat'}</button><button class="btn secondary" onclick="printSubContractById('${a.id}')">${a.signature_data?'Télécharger le contrat signé (PDF)':'Imprimer / PDF'}</button></div></div>`}).join('');
+  subPortalList.innerHTML=erpSubAssignments.filter(a=>!a.archived_at).map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id);return `<div class="sub-card employee-job"><div class="row between"><div><h3>${esc(j?.nom||'Chantier')}</h3><div class="muted">${esc(c?.nom||'')}${j?.adresse?'<br>'+esc(j.adresse):''}</div></div><span class="status ${a.status==='signe'?'actif':'attente'}">${esc(a.status||'brouillon')}</span></div><div style="margin-top:10px"><strong>Travaux confiés</strong><div>${esc(a.work_description||'À compléter').replace(/\n/g,'<br>')}</div>${a.planned_date?'<div><strong>Date prévue :</strong> '+esc(a.planned_date)+'</div>':''}</div><div class="actions" style="margin-top:12px"><button class="btn rml-job-docs" onclick="openSubJobFolder('${a.id}')">Feuille chantier / Documents</button><button class="btn secondary rml-job-history" onclick="openSubContract('${a.id}')">${a.status==='signe'?'Voir le contrat':'Voir / signer le contrat'}</button><button class="btn secondary" onclick="printSubContractById('${a.id}')">${a.signature_data?'Télécharger le contrat signé (PDF)':'Imprimer / PDF'}</button></div></div>`}).join('');
+  let archiveBox=document.getElementById('rml428Archives');
+  if(!archiveBox){archiveBox=document.createElement('section');archiveBox.id='rml428Archives';archiveBox.className='panel';subPortalList.parentNode.insertBefore(archiveBox,subPortalList.nextSibling)}
+  const archived=erpSubAssignments.filter(a=>!!a.archived_at);
+  archiveBox.innerHTML='<details><summary style="cursor:pointer;font-weight:800;font-size:17px;padding:10px">Archives contrats ('+archived.length+')</summary><div style="padding:10px">'+(archived.length?archived.map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id);return '<div class="sub-card" style="margin:8px 0"><strong>'+esc(j?.nom||'Chantier')+'</strong><div>'+esc(c?.nom||'')+'</div><div class="actions"><button class="btn secondary" onclick="openSubContract(\''+a.id+'\')">Consulter</button><button class="btn secondary" onclick="printSubContractById(\''+a.id+'\')">Imprimer / PDF</button></div></div>'}).join(''):'<div class="muted">Aucun contrat archivé.</div>')+'</div></details>';
   if(v401IsStephane()&&!document.getElementById('v40SubMileagePanel')){
    const panel=document.createElement('div');panel.id='v40SubMileagePanel';panel.className='panel';panel.style.margin='12px 0';
    panel.innerHTML='<h3>Relevé kilométrique du fourgon</h3><div class="muted">Kilométrage total affiché au compteur. Mise à jour Maintenance après validation par Supabase.</div><div class="grid2" style="margin-top:10px"><div class="field"><label>Fourgon RML</label><select id="v40SubVehicle"><option>Chargement…</option></select></div><div class="field"><label>Kilométrage compteur</label><input id="v40SubKm" type="number" min="0" step="1"></div></div><button class="btn" onclick="v40SaveSubMileage()">Enregistrer le kilométrage</button><div id="v40SubKmStatus" class="muted" style="margin-top:8px"></div>';
@@ -3720,33 +3724,23 @@ function rmlContractPreviewFrame(){
  if(!overlay){
   overlay=document.createElement('div');overlay.id='rmlContractPreviewOverlay';
   overlay.style.cssText='position:fixed;inset:0;z-index:2147483000;background:#eef2f7;display:flex;flex-direction:column';
-  overlay.innerHTML='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:5px 9px;background:#143d61;color:white;min-height:46px;flex-shrink:0"><strong style="font-size:13px;white-space:nowrap">Aperçu</strong><div style="display:flex;gap:6px;align-items:center;min-width:0"><button type="button" id="rmlPreviewPrint" style="padding:9px 12px;border-radius:7px;background:#f4c430;color:#17212e;border:0;font-size:15px;font-weight:800;line-height:1.2;cursor:pointer;white-space:nowrap">Imprimer / PDF</button><button type="button" id="rmlPreviewClose" style="padding:9px 11px;border-radius:7px;background:#c43d3d;color:white;border:0;font-size:14px;font-weight:700;line-height:1.2;cursor:pointer;white-space:nowrap">✕ Fermer</button></div></div><iframe title="Aperçu du contrat" style="border:0;flex:1;min-height:0;width:100%;background:white"></iframe>';
+  overlay.innerHTML='<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:5px 9px;background:#143d61;color:white;min-height:46px;flex-shrink:0"><strong style="font-size:13px;white-space:nowrap">Aperçu</strong><div style="display:flex;gap:6px;align-items:center;min-width:0"><button type="button" id="rml428Save" style="padding:9px;border-radius:7px;background:#d8ecff;border:0;font-weight:800">Enregistrer le contrat</button><button type="button" id="rmlPreviewPrint" style="padding:9px 12px;border-radius:7px;background:#f4c430;color:#17212e;border:0;font-size:15px;font-weight:800;line-height:1.2;cursor:pointer;white-space:nowrap">Imprimer / PDF</button><button type="button" id="rmlPreviewClose" style="padding:9px 11px;border-radius:7px;background:#c43d3d;color:white;border:0;font-size:14px;font-weight:700;line-height:1.2;cursor:pointer;white-space:nowrap">✕ Fermer</button></div></div><iframe title="Aperçu du contrat" style="border:0;flex:1;min-height:0;width:100%;background:white"></iframe>';
   document.body.appendChild(overlay);
   overlay.querySelector('#rmlPreviewClose').onclick=()=>{overlay.remove()};
+  overlay.querySelector('#rml428Save').onclick=()=>{
+   const doc=overlay.querySelector('iframe').contentDocument;
+   if(!doc?.documentElement){alert('Contrat non chargé');return}
+   const blob=new Blob(['<!doctype html>'+doc.documentElement.outerHTML],{type:'text/html;charset=utf-8'});
+   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Contrat_sous_traitance.html';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
+  };
   overlay.querySelector('#rmlPreviewPrint').onclick=()=>{
    const frame=overlay.querySelector('iframe');
    try{
     const source=frame.contentDocument;
     if(!source||!source.body||!source.body.innerHTML.trim())throw new Error('Contrat non chargé');
-    // Ouvrir immédiatement depuis le clic : nécessaire sur Safari iPhone/iPad.
-    const popup=window.open('','_blank');
-    if(popup){
-     popup.document.open();
-     popup.document.write(source.documentElement.outerHTML);
-     popup.document.close();
-     // Bouton toujours disponible même si Safari bloque l'impression automatique.
-     const bar=popup.document.createElement('div');
-     bar.setAttribute('style','position:sticky;top:0;z-index:99999;padding:12px;background:#143d61;text-align:center');
-     bar.className='rml-print-controls';
-     const btn=popup.document.createElement('button');btn.textContent='Imprimer / Enregistrer en PDF';
-     btn.setAttribute('style','font:bold 16px Arial;padding:12px 20px;border:0;border-radius:6px;background:#f4c430;color:#17212e');
-     btn.onclick=()=>popup.print();bar.appendChild(btn);
-     popup.document.body.insertBefore(bar,popup.document.body.firstChild);
-     const style=popup.document.createElement('style');style.textContent='@media print{.rml-print-controls,.bar,.no-print{display:none!important}}';popup.document.head.appendChild(style);
-     popup.focus();return;
-    }
-    // Mode application installée : Safari peut refuser une nouvelle fenêtre.
-    frame.contentWindow.focus();frame.contentWindow.print();
+    // Impression depuis l'iframe déjà ouverte : évite les pop-up bloquées dans les comptes sous-traitants.
+    frame.contentWindow.focus();
+    frame.contentWindow.print();
    }catch(err){alert('Impossible de préparer le contrat pour impression : '+err.message)}
   };
  }
@@ -5588,7 +5582,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande fournisseurs / Bons de livraison clients · V42.7</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><div id="rmlV42Status" aria-live="polite"></div><button onclick="rmlV42New('BC')">+ Bon de commande</button><button onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande fournisseurs / Bons de livraison clients · V42.8</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><div id="rmlV42Status" aria-live="polite"></div><button onclick="rmlV42New('BC')">+ Bon de commande</button><button onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42History" class="v42box"></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <div class="v42grid">
@@ -5636,7 +5630,7 @@ async function rmlV427Load(){
   rmlV427Suppliers=data||[];
   const sel=v42$('v427SupplierSelect');
   sel.innerHTML='<option value="">— Choisir un fournisseur —</option>'+rmlV427Suppliers.map(x=>`<option value="${v42E(x.id)}">${v42E(x.name)}</option>`).join('');
- }catch(e){rmlV42Msg('Liste des fournisseurs indisponible : exécute le SQL V42.7. '+e.message,true)}
+ }catch(e){rmlV42Msg('Liste des fournisseurs indisponible : exécute le SQL V42.8. '+e.message,true)}
 }
 function rmlV427Pick(){
  const x=rmlV427Suppliers.find(y=>y.id===v42$('v427SupplierSelect').value);
@@ -5695,7 +5689,7 @@ function rmlV421AddCatalogProduct(){
  const color=rmlV424ResolveColor(v42$('v422CatalogColor').value);if(color===null)return;rmlV42Add({name,color,qty,unit:v42$('v421Unit').value,price:0});rmlV42Msg('Produit ajouté au bon.');
 }
 
-/* V42.7 : désignations complètes selon la famille du catalogue RML. */
+/* V42.8 : désignations complètes selon la famille du catalogue RML. */
 function rmlV426Designation(value,family){
  const name=String(value||'').trim();if(!name)return '';
  const f=String(family||'').toLowerCase();
