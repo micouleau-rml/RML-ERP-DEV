@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.9</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.10</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3899,6 +3899,13 @@ function setupSubSignaturePad(){
 }
 function clearSubSignature(){const c=subSignaturePad,ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);subSignatureDirty=false}
 function drawSavedSignature(data){const img=new Image();img.onload=()=>{const c=subSignaturePad,ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height)};img.src=data;subSignatureDirty=false}
+async function rmlV4210Offer(id){
+ const {data:a,error}=await sb.from('erp_subcontract_assignments').select('id,signature_data,rml_signature_data,subcontractor_id').eq('id',id).maybeSingle();
+ if(error||!a?.signature_data||!a?.rml_signature_data)return;
+ const sub=erpSubcontractors.find(x=>x.id===a.subcontractor_id),email=sub?.email;
+ if(!email){alert('Contrat signé : adresse e-mail du sous-traitant manquante.');return}
+ if(!confirm('Les deux parties ont signé.\nEnvoyer le contrat PDF à '+email+' ?'))return;
+ try{const {data,error:e}=await sb.functions.invoke('send-signed-subcontract',{body:{contract_id:id}});if(e||!data?.success)throw new Error(e?.message||data?.error||'Service non configuré');alert('Envoi confirmé par le service e-mail.')}catch(e){alert('Envoi non effectué : '+e.message+'\nConfigurer la fonction Supabase send-signed-subcontract.')}}
 async function signSubContract(){
  const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a||a.status==='signe')return;if(isSubcontractorUser()&&!erpSubcontractors.some(s=>s.id===a.subcontractor_id)){alert('Accès refusé.');return}
  const name=subSignerName.value.trim(),role=subSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire.');return}if(!document.getElementById('subAcceptanceCheck').checked){alert('Veuillez cocher la case « J’ai lu et j’approuve » avant de signer.');return}if(!subSignatureDirty){alert("Veuillez signer dans le cadre avant de valider.");return}
@@ -3921,12 +3928,13 @@ async function signSubContract(){
  if(!data||data.status!=='signe'||!data.signature_data||!subContractAcceptance(data)?.accepted){alert("La signature n'a pas été enregistrée dans Supabase. Vérifiez les droits d'accès du compte sous-traitant.");return}
  closeModal('subContractModal');
  if(isSubcontractorUser()) await loadSubcontractorPortal(); else await loadSubcontractors();
+ await rmlV4210Offer(id);
 }
 let rmlSignatureDrawing=false,rmlSignatureDirty=false;
 function setupRmlSignaturePad(){const c=document.getElementById('rmlSignaturePad');if(!c||c.offsetParent===null)return;const dpr=Math.max(window.devicePixelRatio||1,1),r=c.getBoundingClientRect();c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111827';const point=e=>{const rr=c.getBoundingClientRect(),t=e.touches?.[0]||e;return{x:t.clientX-rr.left,y:t.clientY-rr.top}};c.onpointerdown=e=>{rmlSignatureDrawing=true;rmlSignatureDirty=true;const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y);c.setPointerCapture?.(e.pointerId)};c.onpointermove=e=>{if(!rmlSignatureDrawing)return;const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke()};c.onpointerup=c.onpointercancel=()=>rmlSignatureDrawing=false}
 function clearRmlSignature(){const c=document.getElementById('rmlSignaturePad');if(!c)return;c.getContext('2d').clearRect(0,0,c.width,c.height);rmlSignatureDirty=false}
 function drawSavedRmlSignature(data){const img=new Image();img.onload=()=>{const c=document.getElementById('rmlSignaturePad'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height)};img.src=data;rmlSignatureDirty=false}
-async function signRmlContract(){const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a||!a.signature_data){alert('Le sous-traitant doit signer le contrat avant RML.');return}if(a.rml_signature_data)return;if(isSubcontractorUser()||!['administrateur','direction'].includes(currentAccess?.role)){alert('Signature RML réservée à la direction.');return}const name=rmlSignerName.value.trim(),role=rmlSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire RML.');return}if(!rmlSignatureDirty){alert('Veuillez signer dans le cadre RML avant de valider.');return}if(!confirm('Valider définitivement la signature RML de ce contrat ?'))return;const rml_signature_data=rmlSignaturePad.toDataURL('image/png'),rml_signed_at=new Date().toISOString();const {data,error}=await sb.from('erp_subcontract_assignments').update({rml_signer_name:name,rml_signer_role:role||null,rml_signature_data,rml_signed_at,updated_at:rml_signed_at}).eq('id',id).select('id,rml_signer_name,rml_signer_role,rml_signature_data,rml_signed_at').maybeSingle();if(error){alert('Signature RML non enregistrée : '+error.message);return}if(!data?.rml_signature_data){alert("La signature RML n'a pas été enregistrée dans Supabase.");return}closeModal('subContractModal');await loadSubcontractors();}
+async function signRmlContract(){const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a||!a.signature_data){alert('Le sous-traitant doit signer le contrat avant RML.');return}if(a.rml_signature_data)return;if(isSubcontractorUser()||!['administrateur','direction'].includes(currentAccess?.role)){alert('Signature RML réservée à la direction.');return}const name=rmlSignerName.value.trim(),role=rmlSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire RML.');return}if(!rmlSignatureDirty){alert('Veuillez signer dans le cadre RML avant de valider.');return}if(!confirm('Valider définitivement la signature RML de ce contrat ?'))return;const rml_signature_data=rmlSignaturePad.toDataURL('image/png'),rml_signed_at=new Date().toISOString();const {data,error}=await sb.from('erp_subcontract_assignments').update({rml_signer_name:name,rml_signer_role:role||null,rml_signature_data,rml_signed_at,updated_at:rml_signed_at}).eq('id',id).select('id,rml_signer_name,rml_signer_role,rml_signature_data,rml_signed_at').maybeSingle();if(error){alert('Signature RML non enregistrée : '+error.message);return}if(!data?.rml_signature_data){alert("La signature RML n'a pas été enregistrée dans Supabase.");return}closeModal('subContractModal');await loadSubcontractors();await rmlV4210Offer(id);}
 let erpDocuments=[];
 function clientSorted(){return [...db.clients].filter(c=>c.actif!==false).sort((a,b)=>(a.nom||'').localeCompare(b.nom||'','fr'))}
 function jobsForClient(cid){return db.chantiers.filter(j=>!cid||j.client_id===cid).filter(j=>j.statut!=='archive').sort((a,b)=>(a.nom||'').localeCompare(b.nom||'','fr'))}
@@ -5597,7 +5605,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande fournisseurs / Bons de livraison clients · V42.9</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><div id="rmlV42Status" aria-live="polite"></div><button onclick="rmlV42New('BC')">+ Bon de commande</button><button onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande fournisseurs / Bons de livraison clients · V42.10</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><div id="rmlV42Status" aria-live="polite"></div><button onclick="rmlV42New('BC')">+ Bon de commande</button><button onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42History" class="v42box"></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <div class="v42grid">
@@ -5645,7 +5653,7 @@ async function rmlV427Load(){
   rmlV427Suppliers=data||[];
   const sel=v42$('v427SupplierSelect');
   sel.innerHTML='<option value="">— Choisir un fournisseur —</option>'+rmlV427Suppliers.map(x=>`<option value="${v42E(x.id)}">${v42E(x.name)}</option>`).join('');
- }catch(e){rmlV42Msg('Liste des fournisseurs indisponible : exécute le SQL V42.9. '+e.message,true)}
+ }catch(e){rmlV42Msg('Liste des fournisseurs indisponible : exécute le SQL V42.10. '+e.message,true)}
 }
 function rmlV427Pick(){
  const x=rmlV427Suppliers.find(y=>y.id===v42$('v427SupplierSelect').value);
@@ -5704,7 +5712,7 @@ function rmlV421AddCatalogProduct(){
  const color=rmlV424ResolveColor(v42$('v422CatalogColor').value);if(color===null)return;rmlV42Add({name,color,qty,unit:v42$('v421Unit').value,price:0});rmlV42Msg('Produit ajouté au bon.');
 }
 
-/* V42.9 : désignations complètes selon la famille du catalogue RML. */
+/* V42.10 : désignations complètes selon la famille du catalogue RML. */
 function rmlV426Designation(value,family){
  const name=String(value||'').trim();if(!name)return '';
  const f=String(family||'').toLowerCase();
