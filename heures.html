@@ -492,7 +492,7 @@ header .wrap{position:relative;z-index:1}
 <circle cx="110" cy="65" r="4.5" fill="white"/>
 <text x="110" y="137" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="56" font-weight="900" fill="white">RML</text>
 <text x="110" y="181" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="31" font-weight="900" fill="#ffd400">HEURES</text>
-</svg></div><div><h1>RML HEURES<span class="app-version-top">V47</span></h1><small>Suivi embauche · débauche · heures supplémentaires</small></div></div>
+</svg></div><div><h1>RML HEURES<span class="app-version-top">V48</span></h1><small>Suivi embauche · débauche · heures supplémentaires</small></div></div>
  <nav>
   <button class="tab active" data-view="saisie">Saisie</button>
   <button class="tab" data-view="mois">Mois</button>
@@ -792,7 +792,7 @@ header .wrap{position:relative;z-index:1}
 </div>
 </section>
 </main>
-<footer><div class="footer-inner"><span>RML HEURES — V47</span><span id="syncStatus">Connexion Supabase…</span></div></footer>
+<footer><div class="footer-inner"><span>RML HEURES — V48</span><span id="syncStatus">Connexion Supabase…</span></div></footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL="https://jbtsncvuobptxyzcoqpf.supabase.co";
@@ -826,6 +826,7 @@ function normalizeSettings(raw){
    monthlyReports:{},
    paidLeaveRights:{},
    paidLeaveFractionnement:{},
+   employeeDepartureDates:{},
    employeeHireDates:{},
    paidLeaveAutoRights:true
  };
@@ -841,6 +842,7 @@ function normalizeSettings(raw){
    monthlyReports:(s.monthlyReports&&typeof s.monthlyReports==='object')?s.monthlyReports:{},
    paidLeaveRights:(s.paidLeaveRights&&typeof s.paidLeaveRights==='object')?s.paidLeaveRights:{},
    paidLeaveFractionnement:(s.paidLeaveFractionnement&&typeof s.paidLeaveFractionnement==='object')?s.paidLeaveFractionnement:{},
+   employeeDepartureDates:(s.employeeDepartureDates&&typeof s.employeeDepartureDates==='object')?s.employeeDepartureDates:{},
    employeeHireDates:(s.employeeHireDates&&typeof s.employeeHireDates==='object')?s.employeeHireDates:{},
    paidLeaveAutoRights:s.paidLeaveAutoRights!==false
  };
@@ -853,7 +855,7 @@ function setSyncStatus(msg,ok=true,detail=''){
 function hmFromMinutes(m){m=Math.max(0,Number(m)||0);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(Math.round(m%60)).padStart(2,'0')}
 function entryToRow(e){return {entry_date:e.date,employee_name:e.employee,day_type:e.type||null,shifted_start:e.startOverride||null,chantier_depart:e.depart||null,depot_arrival:e.arrivee||null,deduction_minutes:mins(e.deduction)||0,comment:e.comment||null,overtime_minutes:e.sup||0,road_minutes:e.route||0,real_overtime_minutes:e.real||0,updated_at:new Date().toISOString()}}
 function rowToEntry(r){return {id:String(r.id||`${r.employee_name}|${r.entry_date}`),employee:r.employee_name,date:r.entry_date,type:r.day_type||'CONT',startOverride:r.shifted_start||'',depart:r.chantier_depart||'',arrivee:r.depot_arrival||'',deduction:hmFromMinutes(r.deduction_minutes||0),comment:r.comment||'',sup:Number(r.overtime_minutes)||0,route:Number(r.road_minutes)||0,real:Number(r.real_overtime_minutes)||0,presence:0,week:dayKind(r.entry_date)}}
-async function pushEmployees(){const {error:delErr}=await db.from('rml_heures_employees').delete().gte('id',0);if(delErr)throw delErr;if(state.employees.length){const rows=state.employees.map(e=>({name:e.name,hourly_rate:Number(e.rate)||0,active:true,updated_at:new Date().toISOString()}));const {error}=await db.from('rml_heures_employees').insert(rows);if(error)throw error}}
+async function pushEmployees(){const {error:delErr}=await db.from('rml_heures_employees').delete().gte('id',0);if(delErr)throw delErr;if(state.employees.length){const rows=state.employees.map(e=>({name:e.name,hourly_rate:Number(e.rate)||0,active:e.active!==false,updated_at:new Date().toISOString()}));const {error}=await db.from('rml_heures_employees').insert(rows);if(error)throw error}}
 async function pushSettings(){
  state.settings=normalizeSettings(state.settings);
  const {error}=await db.from('rml_heures_settings').upsert({
@@ -865,7 +867,7 @@ async function pushSettings(){
 }
 async function pushEntry(e){const {error}=await db.from('rml_heures_entries').upsert(entryToRow(e),{onConflict:'entry_date,employee_name'});if(error)throw error}
 async function pushAllEntries(){if(!state.entries.length)return;const {error}=await db.from('rml_heures_entries').upsert(state.entries.map(entryToRow),{onConflict:'entry_date,employee_name'});if(error)throw error}
-async function syncFromCloud(){if(!navigator.onLine){setSyncStatus('Hors ligne — sauvegarde locale',false);return false}setSyncStatus('Synchronisation…');try{const [er,sr,tr]=await Promise.all([db.from('rml_heures_employees').select('*').order('id'),db.from('rml_heures_settings').select('*').eq('setting_key','app_settings').maybeSingle(),db.from('rml_heures_entries').select('*').order('entry_date')]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(er.data&&er.data.length){state.employees=er.data.filter(x=>x.active!==false).map(x=>({name:x.name,rate:Number(x.hourly_rate)||0}))}else{await pushEmployees()}if(sr.data?.setting_value){
+async function syncFromCloud(){if(!navigator.onLine){setSyncStatus('Hors ligne — sauvegarde locale',false);return false}setSyncStatus('Synchronisation…');try{const [er,sr,tr]=await Promise.all([db.from('rml_heures_employees').select('*').order('id'),db.from('rml_heures_settings').select('*').eq('setting_key','app_settings').maybeSingle(),db.from('rml_heures_entries').select('*').order('entry_date')]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(er.data&&er.data.length){state.employees=er.data.map(x=>({name:x.name,rate:Number(x.hourly_rate)||0,active:x.active!==false}))}else{await pushEmployees()}if(sr.data?.setting_value){
   try{
     state.settings=normalizeSettings(JSON.parse(sr.data.setting_value));
     // Réécrit automatiquement le format actuel dans Supabase :
@@ -962,7 +964,14 @@ function updateCalc(){
  el('calcTitle').textContent=el('employee').value||'Résultat';
 }
 function el(id){return document.getElementById(id)}
-function options(){const opts=state.employees.map(e=>`<option>${esc(e.name)}</option>`).join('');el('employee').innerHTML=opts;el('monthEmployee').innerHTML=opts}
+function activeEmployees(){return state.employees.filter(e=>e.active!==false)}
+function options(){
+ const current=el('employee').value,month=el('monthEmployee').value;
+ el('employee').innerHTML='<option value="">Choisir un salarié</option>'+activeEmployees().map(e=>`<option>${esc(e.name)}</option>`).join('');
+ if(activeEmployees().some(e=>e.name===current))el('employee').value=current;
+ el('monthEmployee').innerHTML=state.employees.map(e=>`<option value="${esc(e.name)}">${esc(e.name)}${e.active===false?' (archivé)':''}</option>`).join('');
+ if(state.employees.some(e=>e.name===month))el('monthEmployee').value=month;
+}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function setToday(){const d=new Date();el('date').value=d.toISOString().slice(0,10);const ym=d.toISOString().slice(0,7);el('monthPick').value=ym;el('recapMonth').value=ym}
 function easterSunday(year){
@@ -1056,6 +1065,7 @@ async function saveEntry(){
    ? Array.from(document.querySelectorAll('.teamMemberCheck:checked')).map(x=>x.value)
    : [el('employee').value];
 
+ if(employees.some(name=>state.employees.find(e=>e.name===name)?.active===false))return alert('Ce salarié est archivé. Réactive-le dans Réglages pour une nouvelle saisie.');
  if(!date)return alert('Choisis la date.');
  if(!employees.length||!employees[0])return alert(teamMode?'Sélectionne au moins un salarié dans l’équipe.':'Choisis le salarié.');
 
@@ -2324,28 +2334,44 @@ async function saveLeaveRights(){
 }
 
 function renderSettings(){el('contStart').value=state.settings.CONT.start;el('contEnd').value=state.settings.CONT.end;el('claStart').value=state.settings.CLA.start;el('claEnd').value=state.settings.CLA.end;el('pauseStart').value=state.settings.CLA.pauseStart;el('pauseEnd').value=state.settings.CLA.pauseEnd;el('samStart').value=state.settings.SAM.start;el('otRate1').value=state.settings.overtime.rate1;el('otRate2').value=state.settings.overtime.rate2;el('otThreshold').value=state.settings.overtime.thresholdHours;if(el('otGraceEnabled'))el('otGraceEnabled').checked=state.settings.overtime?.grace15Enabled!==false;renderEmployeeSettings();renderTeamSettings()}
-function renderEmployeeSettings(){el('employeeSettings').innerHTML=state.employees.map((e,i)=>`<div class="employee-row"><div><label>Nom</label><input data-n="${i}" value="${esc(e.name)}"></div><div><label>Taux horaire</label><input data-r="${i}" type="number" step="0.01" value="${e.rate||0}"></div><div><label>Date d’entrée</label><input data-hire="${i}" type="date" value="${esc(employeeHireDate(e.name))}"></div><button class="employee-delete-btn" type="button" onclick="removeEmployee(${i})">Supprimer</button></div>`).join('')}
-function removeEmployee(i){const name=state.employees[i]?.name;if(name&&state.settings.employeeHireDates)delete state.settings.employeeHireDates[name];state.employees.splice(i,1);renderEmployeeSettings()}
+function renderEmployeeSettings(){
+ const row=(e,i)=>`<div class="employee-row"><div><label>Nom</label><input data-n="${i}" value="${esc(e.name)}" ${e.active===false?'readonly':''}></div><div><label>Taux horaire</label><input data-r="${i}" type="number" step="0.01" value="${e.rate||0}"></div><div><label>Date d’entrée</label><input data-hire="${i}" type="date" value="${esc(employeeHireDate(e.name))}"><label>Date de départ</label><input data-departure="${i}" type="date" value="${esc(state.settings.employeeDepartureDates?.[e.name]||'')}"></div><button class="employee-delete-btn" type="button" onclick="setEmployeeArchived(${i},${e.active!==false})">${e.active===false?'Réactiver':'Archiver'}</button></div>`;
+ el('employeeSettings').innerHTML='<p class="muted">Archiver masque le salarié des nouvelles saisies et des équipes. Son historique reste accessible dans Mois, Récapitulatif et Congés payés. Les changements sont validés avec « Enregistrer les salariés ».</p>'+state.employees.map((e,i)=>e.active!==false?row(e,i):'').join('')+'<details><summary>Salariés archivés ('+state.employees.filter(e=>e.active===false).length+')</summary>'+state.employees.map((e,i)=>e.active===false?row(e,i):'').join('')+'</details>';
+}
+function captureEmployeeFields(){
+ document.querySelectorAll('[data-n]').forEach(x=>{
+  const e=state.employees[+x.dataset.n],old=e.name,name=x.value.trim();
+  if(name&&name!==old){
+   for(const key of ['employeeHireDates','employeeDepartureDates']){
+    const map=state.settings[key]||{};
+    if(map[old]){map[name]=map[old];delete map[old]}
+   }
+   e.name=name;
+  }
+ });
+ document.querySelectorAll('[data-r]').forEach(x=>state.employees[+x.dataset.r].rate=Number(x.value)||0);
+ for(const [attr,key] of [['hire','employeeHireDates'],['departure','employeeDepartureDates']]){
+  state.settings[key]=state.settings[key]||{};
+  document.querySelectorAll('[data-'+attr+']').forEach(x=>{
+   const name=state.employees[+x.dataset[attr]].name;
+   if(x.value)state.settings[key][name]=x.value;else delete state.settings[key][name];
+  });
+ }
+}
+function setEmployeeArchived(i,archived){
+ captureEmployeeFields();
+ const e=state.employees[i];if(!e)return;
+ const date=state.settings.employeeDepartureDates?.[e.name];
+ if(archived&&!date)return alert('Renseigne la date de départ avant d’archiver ce salarié.');
+ if(archived&&employeeHireDate(e.name)&&date<employeeHireDate(e.name))return alert('La date de départ doit être postérieure ou égale à la date d’entrée.');
+ e.active=!archived;
+ renderEmployeeSettings();
+}
 function addEmployee(){state.employees.push({name:'NOUVEAU SALARIÉ',rate:0});renderEmployeeSettings()}
 async function saveEmployees(){
- const oldNames=state.employees.map(e=>e.name);
- const newHireDates={...(state.settings.employeeHireDates||{})};
-
- document.querySelectorAll('[data-n]').forEach(x=>state.employees[+x.dataset.n].name=x.value.trim());
- document.querySelectorAll('[data-r]').forEach(x=>state.employees[+x.dataset.r].rate=Number(x.value)||0);
- document.querySelectorAll('[data-hire]').forEach(x=>{
-   const i=+x.dataset.hire;
-   const oldName=oldNames[i];
-   const newName=state.employees[i]?.name;
-   if(oldName && oldName!==newName)delete newHireDates[oldName];
-   if(newName){
-     if(x.value)newHireDates[newName]=x.value;
-     else delete newHireDates[newName];
-   }
- });
- state.settings.employeeHireDates=newHireDates;
+ captureEmployeeFields();
  state.employees=state.employees.filter(e=>e.name);
- persist();options();renderTeamPicker();renderTeamSettings();renderMonth();renderRecap();renderPaidLeave();
+ persist();options();ensureEmployeePlaceholder();renderEmployeeSettings();renderTeamPicker();renderTeamSettings();renderMonth();renderRecap();renderPaidLeave();
  try{
    await pushEmployees();
    await pushSettings();
@@ -2370,7 +2396,7 @@ function selectedTeamMembers(){return Array.from(document.querySelectorAll('.tea
 function updateTeamSummary(){const n=selectedTeamMembers().length;if(el('teamSummary'))el('teamSummary').textContent=n+' salarié'+(n>1?'s':'')+' sélectionné'+(n>1?'s':'')}
 function renderTeamPicker(){
  if(!el('teamMembers'))return;
- el('teamMembers').innerHTML=state.employees.map(e=>`<label class="team-check"><input class="teamMemberCheck" type="checkbox" value="${esc(e.name)}"><span>${esc(e.name)}</span></label>`).join('');
+ el('teamMembers').innerHTML=activeEmployees().map(e=>`<label class="team-check"><input class="teamMemberCheck" type="checkbox" value="${esc(e.name)}"><span>${esc(e.name)}</span></label>`).join('');
  document.querySelectorAll('.teamMemberCheck').forEach(x=>x.onchange=updateTeamSummary);
  if(el('teamPreset'))el('teamPreset').innerHTML='<option value="">— Sélection libre —</option>'+(Array.isArray(state.settings.teams)?state.settings.teams:[]).map((t,i)=>`<option value="${i}">${esc(t.name||('Équipe '+(i+1)))}</option>`).join('');
  updateTeamSummary();
@@ -2384,7 +2410,7 @@ function renderTeamSettings(){
  if(!el('teamSettingsList'))return;
  el('teamSettingsList').innerHTML=(Array.isArray(state.settings.teams)?state.settings.teams:[]).map((t,i)=>`<div class="team-setting-row" data-team="${i}">
   <div class="team-setting-head"><input class="teamName" value="${esc(t.name||'')}" placeholder="Nom de l’équipe"><button type="button" onclick="removeTeam(${i})">Supprimer</button></div>
-  <div class="team-setting-members">${state.employees.map(e=>`<label><input type="checkbox" class="teamCfgMember" value="${esc(e.name)}" ${(t.members||[]).includes(e.name)?'checked':''}> ${esc(e.name)}</label>`).join('')}</div>
+  <div class="team-setting-members">${activeEmployees().map(e=>`<label><input type="checkbox" class="teamCfgMember" value="${esc(e.name)}" ${(t.members||[]).includes(e.name)?'checked':''}> ${esc(e.name)}</label>`).join('')}</div>
  </div>`).join('');
 }
 function addTeam(){state.settings.teams.push({name:'Nouvelle équipe',members:[]});renderTeamSettings()}
@@ -2482,7 +2508,7 @@ async function restoreFullBackup(file){
     const empRows=state.employees.map(e=>({
      name:e.name,
      hourly_rate:Number(e.rate)||0,
-     active:true,
+     active:e.active!==false,
      updated_at:new Date().toISOString()
     }));
     const er=await db.from('rml_heures_employees').insert(empRows);
