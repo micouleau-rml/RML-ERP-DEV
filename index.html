@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.12</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.13</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -2772,7 +2772,7 @@ function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))ret
 
 
 
-/* V42.12 : alertes de contrats à signer, isolées du processus de connexion. */
+/* V42.13 : alertes de contrats à signer, isolées du processus de connexion. */
 async function rmlV4212LoadSignatures(){
  const panel=document.getElementById('rmlV4212SignaturePanel');
  const list=document.getElementById('rmlV4212SignatureList');
@@ -5703,7 +5703,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande fournisseurs / Bons de livraison clients · V42.12</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><div id="rmlV42Status" aria-live="polite"></div><button onclick="rmlV42New('BC')">+ Bon de commande</button><button onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande fournisseurs / Bons de livraison clients · V42.13</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><div id="rmlV42Status" aria-live="polite"></div><button onclick="rmlV42New('BC')">+ Bon de commande</button><button onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42History" class="v42box"></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <div class="v42grid">
@@ -5741,7 +5741,20 @@ function rmlV42Msg(msg,bad=false){const e=v42$('rmlV42Status');e.textContent=msg
 async function rmlV42Open(){if(!rmlV42Allowed()){alert('Accès réservé à la direction.');return}v42$('rmlV42Layer').style.display='block';rmlV42Jobs();rmlV421Clients();await rmlV42List()}
 function rmlV42Close(){v42$('rmlV42Layer').style.display='none'}
 function rmlV42Jobs(){const s=v42$('v42Job'),old=s.value;s.innerHTML='<option value="">Sans chantier</option>'+(db.chantiers||[]).map(j=>`<option value="${v42E(j.id)}">${v42E(j.nom||j.name||j.id)} — ${v42E(clientName(j.client_id))}</option>`).join('');s.value=old||''}
-function rmlV42New(type='BC'){rmlBLDeliveryAuto='';v42Current=null;v42Lines=[];v42SignatureData='';v42ChangedSignature=false;v42$('rmlV42Editor').style.display='block';v42$('v42Type').value=type;v42$('v42Date').value=new Date().toLocaleDateString('en-CA');['v42Party','v42Address','v42Delivery','v42Receiver','v42Notes'].forEach(id=>v42$(id).value='');v42$('v42Job').value='';v42$('v42State').value='brouillon';rmlV42TypeChanged();rmlV427Load();rmlV421Clients();rmlV42Rows();rmlV42ClearSignature();v42$('rmlV42Editor').scrollIntoView({behavior:'smooth',block:'start'})}
+function rmlV42New(type='BC'){
+ rmlBLDeliveryAuto='';v42Current=null;v42Lines=[];v42SignatureData='';v42ChangedSignature=false;
+ v42$('rmlV42Editor').style.display='block';v42$('v42Type').value=type;
+ v42$('v42Date').value=new Date().toLocaleDateString('en-CA');
+ ['v42Party','v42Address','v42Delivery','v42Receiver','v42Notes','v421ClientSearch','v421ClientSelect','v427SupplierSelect','v42Job'].forEach(id=>{if(v42$(id))v42$(id).value=''});
+ v42$('v42State').value='brouillon';
+ v42$('v421CatalogBox').style.display='none';
+ ['v421Family','v421Product','v422CatalogColor'].forEach(id=>{v42$(id).innerHTML=''});
+ v42$('v421Qty').value=type==='BL'?'0':'1';v42$('v421Unit').selectedIndex=0;
+ if(v42$('rmlV425Preview'))v42$('rmlV425Preview').style.display='none';
+ rmlV42Msg('');rmlV42TypeChanged();rmlV427Load();rmlV421Clients();
+ v42$('v421ClientSelect').value='';rmlV42Rows();rmlV42ClearSignature();
+ v42$('rmlV42Editor').scrollIntoView({behavior:'smooth',block:'start'});
+}
 function rmlV42TypeChanged(){const bl=v42$('v42Type').value==='BL';v42$('v42PartyLabel').textContent=bl?'Client':'Fournisseur';v42$('v421ClientBox').style.display=bl?'':'none';v42$('v427SupplierBox').style.display=bl?'none':'';v42$('v42SignatureBox').style.display=bl?'':'none';document.querySelectorAll('#rmlV42Editor .v42Price').forEach(el=>el.style.display=bl?'none':'');rmlV42Total()}
 let rmlV427Suppliers=[];
 async function rmlV427Load(){
@@ -5786,14 +5799,14 @@ function rmlBLDetails(d){
  const job=(db.chantiers||[]).find(j=>String(j.id)===String(d.job_id));
  const candidates=(db.clients||[]).filter(c=>String(c.nom||'').trim().toLocaleLowerCase('fr')===String(d.party||'').trim().toLocaleLowerCase('fr'));
  const client=job?(db.clients||[]).find(c=>String(c.id)===String(job.client_id)):(candidates.length===1?candidates[0]:null);
- return {...d,address:d.address.trim()||(client?rmlV421Address(client):''),delivery_address:d.delivery_address.trim()||rmlBLJobAddress(job)};
+ return {...d,address:d.address.trim()||(client?rmlV421Address(client):''),delivery_address:d.delivery_address.trim()||rmlBLJobAddress(job)||(client?rmlBLClientDelivery(client):'')};
 }
 function rmlV42JobChanged(){
  const j=(db.chantiers||[]).find(x=>String(x.id)===v42$('v42Job').value);
- if(!j){rmlBLDelivery('');return}
+ if(!j){const c=(db.clients||[]).find(x=>String(x.id)===v42$('v421ClientSelect').value);rmlBLDelivery(c?rmlBLClientDelivery(c):'');return}
  const c=(db.clients||[]).find(x=>String(x.id)===String(j.client_id));
  if(v42$('v42Type').value==='BL'&&c){v42$('v42Party').value=c.nom||'';v42$('v42Address').value=rmlV421Address(c);v42$('v421ClientSelect').value=String(c.id)}
- rmlBLDelivery(rmlBLJobAddress(j));
+ rmlBLDelivery(rmlBLJobAddress(j)||(c?rmlBLClientDelivery(c):''));
 }
 
 /* V42.1 — Choix des clients et catalogue partagé avec la préparation chantier. */
@@ -5805,12 +5818,18 @@ function rmlV421Clients(){
  sel.innerHTML='<option value="">— Choisir un client existant —</option>'+clients.map(c=>`<option value="${v42E(c.id)}">${v42E(c.nom)} — ${v42E(rmlV421Address(c))}</option>`).join('');
  if(clients.some(c=>String(c.id)===old))sel.value=old;
 }
+function rmlBLClientDelivery(c){
+ const address=[c?.adresse_livraison,c?.delivery_address,c?.adresseLivraison].find(v=>typeof v==='string'&&v.trim());
+ return address?address.trim():rmlV421Address(c||{});
+}
 function rmlV421PickClient(){
- const c=(db.clients||[]).find(x=>String(x.id)===v42$('v421ClientSelect').value);if(!c)return;
- v42$('v42Party').value=c.nom||'';v42$('v42Address').value=rmlV421Address(c);
- const job=(db.chantiers||[]).find(j=>String(j.id)===v42$('v42Job').value);
- if(job&&String(job.client_id)!==String(c.id))v42$('v42Job').value='';
- rmlBLDelivery(job&&String(job.client_id)===String(c.id)?rmlBLJobAddress(job):'');
+ const c=(db.clients||[]).find(x=>String(x.id)===v42$('v421ClientSelect').value);
+ v42$('v42Party').value=c?.nom||'';
+ v42$('v42Address').value=c?rmlV421Address(c):'';
+ // Une sélection de client repart des adresses de sa fiche, sans ancien chantier.
+ v42$('v42Job').value='';
+ v42$('v42Delivery').value=c?rmlBLClientDelivery(c):'';
+ rmlBLDeliveryAuto=v42$('v42Delivery').value;
 }
 function rmlV421Catalog(){
  if(typeof PREP_CATALOG==='undefined'){rmlV42Msg('Catalogue de préparation indisponible.',true);return}
@@ -5850,7 +5869,7 @@ function rmlV425Designation(name,row={}){
  const section=row.section||row.family||row.famille||row.category||row.categorie||'';
  return rmlV426Designation(name,section);
 }
-function rmlV42Add(line){v42Lines.push(line||{name:'',qty:1,unit:'u',price:0});rmlV42Rows()}
+function rmlV42Add(line){v42Lines.push(line||{name:'',qty:v42$('v42Type').value==='BL'?0:1,unit:'u',price:0});rmlV42Rows()}
 function rmlV42Rows(){v42$('v42Rows').innerHTML=v42Lines.map((r,i)=>`<tr class="v42line"><td><input aria-label="Désignation" value="${v42E(r.name)}" oninput="rmlV42Set(${i},'name',this.value)"></td><td><select aria-label="Couleur" onchange="rmlV424SetColor(${i},this)"><option value="" ${!r.color?'selected':''}>Sans couleur</option>${(r.color&&!PREP_COLORS.includes(r.color)?[r.color,...PREP_COLORS]:PREP_COLORS).map(c=>`<option value="${v42E(c)}" ${c===r.color?'selected':''}>${v42E(c)}</option>`).join('')}<option value="__special__">+ Couleur spéciale…</option></select></td><td><input type="number" min="0" step="any" value="${v42E(r.qty)}" oninput="rmlV42Set(${i},'qty',this.value)"></td><td><select onchange="rmlV42Set(${i},'unit',this.value)">${['ml','m²','u','forfait','jour','heure'].map(u=>`<option ${u===r.unit?'selected':''}>${u}</option>`).join('')}</select></td><td class="v42Price"><input type="number" min="0" step="0.01" value="${v42E(r.price||0)}" oninput="rmlV42Set(${i},'price',this.value)"></td><td><button class="v42red" onclick="rmlV42Remove(${i})">Retirer</button></td></tr>`).join('');rmlV42TypeChanged()}
 function rmlV424ResolveColor(value){
  if(value!=='__special__')return value;
