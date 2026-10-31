@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.23</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.24</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -2793,7 +2793,7 @@ function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))ret
 
 
 
-/* V42.23 : alertes de contrats à signer, isolées du processus de connexion. */
+/* V42.24 : alertes de contrats à signer, isolées du processus de connexion. */
 async function rmlV4212LoadSignatures(){
  const panel=document.getElementById('rmlV4212SignaturePanel');
  const list=document.getElementById('rmlV4212SignatureList');
@@ -5724,7 +5724,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <style>
-/* V42.23 — éditeur des bons et retour depuis la fiche client. */
+/* V42.24 — éditeur des bons et retour depuis la fiche client. */
 #rmlV42Layer .v42box{border-radius:18px;box-shadow:0 4px 18px #1639540b}
 #rmlV42Layer .v42hero{background:linear-gradient(120deg,#123b5a,#176584);color:white;border:0;padding:22px}
 #rmlV42Layer .v42hero h2{color:white;margin:0 0 8px;font-size:24px}
@@ -5753,7 +5753,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media(max-width:700px){#rmlV42Layer .v42section{padding:12px}#rmlV42Layer .v42hero{padding:16px}#rmlV42Layer .v42hero h2{font-size:20px}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.23</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.24</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <input id="v42Type" type="hidden" value="BC">
 <div class="v42editor-title"><h3 id="rmlTradeTitle">Bon de commande fournisseur</h3><span id="rmlTradeMode">Nouveau bon</span></div>
@@ -6061,7 +6061,31 @@ async function rmlV42Import(){const job=v42$('v42Job').value;if(!job){rmlV42Msg(
 function rmlV42Read(){return rmlBLDetails({kind:v42$('v42Type').value,date:v42$('v42Date').value,party:v42$('v42Party').value.trim(),address:v42$('v42Address').value,delivery_address:v42$('v42Delivery').value,job_id:v42$('v42Job').value||null,receiver:v42$('v42Receiver').value,doc_status:v42$('v42State').value,notes:v42$('v42Notes').value,lines:v42Lines.map(r=>({...r})),signature:v42$('v42Type').value==='BL'?(v42ChangedSignature?v42$('v42Signature').toDataURL('image/png'):v42SignatureData):null})}
 async function rmlV42Save(){if(!rmlV42Allowed())return;const d=rmlV42Read();if(!d.party||!d.date){rmlV42Msg('Renseigne le destinataire et la date.',true);return}if(d.lines.some(x=>!x.name.trim()||x.qty<0)){rmlV42Msg('Vérifie les désignations et quantités.',true);return}try{const payload={kind:d.kind,date:d.date,party:d.party,address:d.address,delivery_address:d.delivery_address,job_id:d.job_id,receiver:d.receiver,doc_status:d.doc_status,notes:d.notes,lines:d.lines,signature:d.signature};const query=v42Current?sb.from('erp_trade_documents').update(payload).eq('id',v42Current.id):sb.from('erp_trade_documents').insert(payload);const {data,error}=await query.select('*').single();if(error)throw error;v42Current=data;v42SignatureData=data.signature||'';v42ChangedSignature=false;rmlV42Msg('Enregistrement confirmé dans Supabase : '+rmlV42Number(data));await rmlV42List()}catch(e){rmlV42Msg('Échec de sauvegarde : '+e.message+'. Vérifie que le script SQL V42 a été exécuté.',true)}}
 function rmlV42Number(d){return d.kind+'-'+String(d.date||'').slice(0,4)+'-'+String(d.serial||0).padStart(4,'0')}
-async function rmlV42List(){try{const {data,error}=await sb.from('erp_trade_documents').select('id,serial,kind,date,party,doc_status,job_id').order('created_at',{ascending:false}).limit(200);if(error)throw error;v42$('rmlV42History').innerHTML='<h3>Historique des bons</h3>'+(data?.length?'<div class="v42scroll"><table><thead><tr><th>Numéro</th><th>Date</th><th>Destinataire</th><th>Statut</th><th></th></tr></thead><tbody>'+data.map(d=>`<tr><td>${v42E(rmlV42Number(d))}</td><td>${v42E(d.date)}</td><td>${v42E(d.party)}</td><td>${v42E(d.doc_status)}</td><td><button onclick="rmlV42Edit('${v42E(d.id)}')">Ouvrir</button></td></tr>`).join('')+'</tbody></table></div>':'<p>Aucun bon enregistré.</p>')}catch(e){rmlV42Msg('Lecture des bons impossible : '+e.message,true);v42$('rmlV42History').innerHTML='<p>Exécute d’abord le script SQL V42 dans Supabase.</p>'}}
+function rmlTradeHistoryHtml(documents){
+ const rows=[...documents].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||Number(b.serial||0)-Number(a.serial||0));
+ if(!rows.length)return '<h3>Historique des bons</h3><p>Aucun bon enregistré.</p>';
+ const years=new Map();
+ for(const d of rows){
+  const match=/^(\d{4})-(0[1-9]|1[0-2])-\d{2}$/.exec(String(d.date||''));
+  const year=match?match[1]:'Sans date',month=match?match[2]:'';
+  if(!years.has(year))years.set(year,new Map());
+  const months=years.get(year);if(!months.has(month))months.set(month,[]);months.get(month).push(d);
+ }
+ const monthNames=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+ const statuses={brouillon:'Brouillon',emis:'Émis',livre:'Livré'};
+ return '<h3>Historique des bons</h3>'+[...years].map(([year,months])=>`<section class="rml-history-year"><h3 style="background:#163e5c;color:white;padding:12px 16px;border-radius:9px">${v42E(year)}</h3>${[...months].map(([month,docs])=>`<details open class="rml-history-month" style="margin:14px 0;border:1px solid #cad9e5;border-radius:10px;background:white;padding:12px"><summary style="cursor:pointer;font-size:17px;font-weight:750;color:#155e7c">${v42E(month?monthNames[Number(month)-1]+' '+year:'Date non renseignée')} · ${docs.length} bon${docs.length>1?'s':''}</summary><div class="v42scroll"><table><thead><tr><th>Client / Fournisseur</th><th>Numéro</th><th>Date</th><th>Statut</th><th></th></tr></thead><tbody>${docs.map(d=>`<tr><td><strong>${v42E(d.party||'Destinataire non renseigné')}</strong><div class="v42hint">${d.kind==='BL'?'Client · Bon de livraison':'Fournisseur · Bon de commande'}</div></td><td>${v42E(rmlV42Number(d))}</td><td>${v42E(/^\d{4}-\d{2}-\d{2}$/.test(d.date||'')?d.date.split('-').reverse().join('/'):d.date||'—')}</td><td>${v42E(statuses[d.doc_status]||d.doc_status||'—')}</td><td><button onclick="rmlV42Edit('${v42E(d.id)}')">Ouvrir</button></td></tr>`).join('')}</tbody></table></div></details>`).join('')}</section>`).join('');
+}
+async function rmlV42List(){
+ try{
+  const all=[];const size=500;
+  for(let start=0;;start+=size){
+   const {data,error}=await sb.from('erp_trade_documents').select('id,serial,kind,date,party,doc_status,job_id').order('date',{ascending:false}).order('id').range(start,start+size-1);
+   if(error)throw error;all.push(...(data||[]));if(!data||data.length<size)break;
+  }
+  v42$('rmlV42History').innerHTML=rmlTradeHistoryHtml(all);
+ }catch(e){rmlV42Msg('Lecture des bons impossible : '+e.message,true);v42$('rmlV42History').innerHTML='<p>Impossible de charger l’historique. Cliquez sur « Actualiser les bons » pour réessayer.</p>'}
+}
+
 async function rmlV42Edit(id){try{const {data,error}=await sb.from('erp_trade_documents').select('*').eq('id',id).single();if(error)throw error;rmlV42New(data.kind);v42Current=data;v42$('v42Date').value=data.date;v42$('v42Party').value=data.party||'';v42$('v42Address').value=data.address||'';v42$('v42Delivery').value=data.delivery_address||'';v42$('v42Job').value=data.job_id||'';v42$('v42Receiver').value=data.receiver||'';v42$('v42State').value=data.doc_status||'brouillon';v42$('v42Notes').value=data.notes||'';v42Lines=Array.isArray(data.lines)?data.lines:[];v42SignatureData=data.signature||'';v42ChangedSignature=false;rmlV42Rows();rmlV42RestoreSignature()}catch(e){rmlV42Msg('Ouverture impossible : '+e.message,true)}}
 async function rmlV42Delete(){if(!v42Current){rmlV42New(v42$('v42Type').value);return}if(!confirm('Supprimer définitivement ce bon ?'))return;try{const {error}=await sb.from('erp_trade_documents').delete().eq('id',v42Current.id);if(error)throw error;v42Current=null;v42$('rmlV42Editor').style.display='none';rmlV42Msg('Bon supprimé.');await rmlV42List()}catch(e){rmlV42Msg('Suppression impossible : '+e.message,true)}}
 function rmlV42ClearSignature(){const c=v42$('v42Signature');c.getContext('2d').clearRect(0,0,c.width,c.height);v42ChangedSignature=true;v42SignatureData=''}
