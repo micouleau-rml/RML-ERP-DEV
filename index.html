@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.25</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.26</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -2793,7 +2793,7 @@ function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))ret
 
 
 
-/* V42.25 : alertes de contrats à signer, isolées du processus de connexion. */
+/* V42.26 : alertes de contrats à signer, isolées du processus de connexion. */
 async function rmlV4212LoadSignatures(){
  const panel=document.getElementById('rmlV4212SignaturePanel');
  const list=document.getElementById('rmlV4212SignatureList');
@@ -5724,7 +5724,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <style>
-/* V42.25 — éditeur des bons et retour depuis la fiche client. */
+/* V42.26 — éditeur des bons et retour depuis la fiche client. */
 #rmlV42Layer .v42box{border-radius:18px;box-shadow:0 4px 18px #1639540b}
 #rmlV42Layer .v42hero{background:linear-gradient(120deg,#123b5a,#176584);color:white;border:0;padding:22px}
 #rmlV42Layer .v42hero h2{color:white;margin:0 0 8px;font-size:24px}
@@ -5753,7 +5753,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media(max-width:700px){#rmlV42Layer .v42section{padding:12px}#rmlV42Layer .v42hero{padding:16px}#rmlV42Layer .v42hero h2{font-size:20px}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.25</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.26</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <input id="v42Type" type="hidden" value="BC">
 <div class="v42editor-title"><h3 id="rmlTradeTitle">Bon de commande fournisseur</h3><span id="rmlTradeMode">Nouveau bon</span></div>
@@ -5824,8 +5824,19 @@ function rmlTradeClientCreated(client){
 function rmlV42Allowed(){return !!currentAccess?.active&&['administrateur','direction'].includes(currentAccess.role)}
 function rmlV42Nav(){const b=v42$('rmlV42Nav');if(b)b.style.display=rmlV42Allowed()?'':'none'}
 function rmlV42Msg(msg,bad=false){const e=v42$('rmlV42Status');e.textContent=msg;e.style.color=bad?'#b42330':'#116b4d'}
-async function rmlV42Open(){if(!rmlV42Allowed()){alert('Accès réservé à la direction.');return}v42$('rmlV42Layer').style.display='block';rmlV42Jobs();rmlV421Clients();await rmlV42List()}
-function rmlV42Close(){v42$('rmlV42Layer').style.display='none'}
+async function rmlV42Open(){if(!rmlV42Allowed()){alert('Accès réservé à la direction.');return}if(v42$('rmlV42Layer').style.display!=='block')rmlTradeResetEditor();v42$('rmlV42Layer').style.display='block';rmlV42Jobs();rmlV421Clients();await rmlV42List()}
+function rmlTradeResetEditor(){
+ ++rmlTradeCatalogRequest;rmlTradeCatalogData=null;
+ rmlBLDeliveryAuto='';v42Current=null;v42Lines=[];v42SignatureData='';v42Drawing=false;
+ ['v42Party','v42Address','v42Delivery','v42Receiver','v42Notes','v421ClientSearch','v421ClientSelect','v427SupplierSelect','v42Job','v42Date'].forEach(id=>{if(v42$(id))v42$(id).value=''});
+ v42$('v42State').value='brouillon';v42$('v421Qty').value='0';v42$('v421Unit').selectedIndex=0;
+ ['v421Family','v421Product','v422CatalogColor','v42Rows'].forEach(id=>{v42$(id).innerHTML=''});
+ v42$('v421CatalogBox').style.display='none';v42$('rmlV42Editor').style.display='none';
+ if(v42$('rmlV425Preview'))v42$('rmlV425Preview').style.display='none';
+ ['rmlTradeNewBL','rmlTradeNewBC'].forEach(id=>v42$(id).classList.remove('v42active'));
+ rmlV42ClearSignature();rmlV42Msg('');
+}
+function rmlV42Close(){v42$('rmlV42Layer').style.display='none';rmlTradeResetEditor()}
 function rmlV42Jobs(){const s=v42$('v42Job'),old=s.value;s.innerHTML='<option value="">Sans chantier</option>'+(db.chantiers||[]).map(j=>`<option value="${v42E(j.id)}">${v42E(j.nom||j.name||j.id)} — ${v42E(clientName(j.client_id))}</option>`).join('');s.value=old||''}
 function rmlV42New(type='BC'){
  ++rmlTradeCatalogRequest;rmlTradeCatalogData=null;
@@ -5894,8 +5905,9 @@ function rmlBLDetails(d){
  if(d.kind!=='BL')return d;
  const job=(db.chantiers||[]).find(j=>String(j.id)===String(d.job_id));
  const candidates=(db.clients||[]).filter(c=>String(c.nom||'').trim().toLocaleLowerCase('fr')===String(d.party||'').trim().toLocaleLowerCase('fr'));
- const client=job?(db.clients||[]).find(c=>String(c.id)===String(job.client_id)):(candidates.length===1?candidates[0]:null);
- return {...d,address:d.address.trim()||(client?rmlV421Address(client):''),delivery_address:d.delivery_address.trim()||rmlBLJobAddress(job)||(client?rmlBLClientDelivery(client):'')};
+ const selected=v42$('v421ClientSelect')?.value;
+ const client=(db.clients||[]).find(c=>selected&&String(c.id)===selected&&String(c.nom||'').trim()===String(d.party||'').trim())||(job?(db.clients||[]).find(c=>String(c.id)===String(job.client_id)):null)||(candidates.length===1?candidates[0]:null);
+ return {...d,client_phone:client?.telephone||'',client_email:client?.email||'',address:d.address.trim()||(client?rmlV421Address(client):''),delivery_address:d.delivery_address.trim()||rmlBLJobAddress(job)||(client?rmlBLClientDelivery(client):'')};
 }
 function rmlV42JobChanged(){
  const j=(db.chantiers||[]).find(x=>String(x.id)===v42$('v42Job').value);
@@ -6132,7 +6144,7 @@ function rmlV42Print(noSignature=false){
  <div class="rmlhead"><div class="rmlcompanyname">SARL RML GOUTTIÈRE ALU</div><div><img class="rmllogo" id="rmlPrintLogo" src="${v42E(logoUrl)}" alt="Logo RML Gouttière Alu" onerror="this.style.display='none';document.getElementById('rmlLogoFallback').style.display='block'"><strong id="rmlLogoFallback" style="display:none;color:#12658d;font-size:20px">RML GOUTTIÈRE ALU</strong></div>
  <div class="rmlcoords">14 ZA de Calens<br>33640 BEAUTIRAN<br>SIRET : 109 223 727 00016<br>Tél. : 05 56 67 33 89<br>contact.rml@orange.fr</div></div>
  <h1>${bl?'BON DE LIVRAISON':'BON DE COMMANDE'} — ${v42E(number)}</h1><p>Date : ${v42E(d.date)}</p>
- <div class="row"><div><strong>${bl?'Client':'Fournisseur'}</strong><p>${v42E(d.party)}</p><p style="white-space:pre-line">${v42E(d.address||'Adresse non renseignée')}</p></div><div><strong>Lieu de livraison</strong><p>${v42E((db.chantiers||[]).find(j=>String(j.id)===String(d.job_id))?.nom||'')}</p><p style="white-space:pre-line">${v42E(d.delivery_address||'Lieu de livraison à renseigner')}</p></div></div>
+ <div class="row"><div><strong>${bl?'Client':'Fournisseur'}</strong><p>${v42E(d.party)}</p><p style="white-space:pre-line">${v42E(d.address||'Adresse non renseignée')}</p>${bl&&d.client_phone?`<p style="white-space:pre-line"><strong>Tél. :</strong> ${v42E(d.client_phone)}</p>`:''}${bl&&d.client_email?`<p style="white-space:pre-line;overflow-wrap:anywhere"><strong>Email :</strong> ${v42E(d.client_email)}</p>`:''}</div><div><strong>Lieu de livraison</strong><p>${v42E((db.chantiers||[]).find(j=>String(j.id)===String(d.job_id))?.nom||'')}</p><p style="white-space:pre-line">${v42E(d.delivery_address||'Lieu de livraison à renseigner')}</p></div></div>
  <table><thead><tr><th>Désignation</th><th>Couleur</th><th>Qté</th><th>Unité</th>${bl?'':'<th>Prix HT</th><th>Total HT</th>'}</tr></thead><tbody>${d.lines.map(r=>`<tr><td>${v42E(r.name)}</td><td>${v42E(r.color||'')}</td><td>${v42E(r.qty)}</td><td>${v42E(r.unit)}</td>${bl?'':`<td>${money(v42N(r.price))} €</td><td>${money(v42N(r.qty)*v42N(r.price))} €</td>`}</tr>`).join('')}</tbody></table>
  ${bl?'':`<div class="tot">TOTAL HT : ${money(d.lines.reduce((a,r)=>a+v42N(r.qty)*v42N(r.price),0))} €</div>`}
  <p><strong>Observations :</strong> ${v42E(d.notes)}</p>
