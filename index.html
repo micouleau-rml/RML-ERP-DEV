@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.15</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.16</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -2778,7 +2778,7 @@ function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))ret
 
 
 
-/* V42.15 : alertes de contrats à signer, isolées du processus de connexion. */
+/* V42.16 : alertes de contrats à signer, isolées du processus de connexion. */
 async function rmlV4212LoadSignatures(){
  const panel=document.getElementById('rmlV4212SignaturePanel');
  const list=document.getElementById('rmlV4212SignatureList');
@@ -5709,7 +5709,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <style>
-/* V42.15 — éditeur des bons et retour depuis la fiche client. */
+/* V42.16 — éditeur des bons et retour depuis la fiche client. */
 #rmlV42Layer .v42box{border-radius:18px;box-shadow:0 4px 18px #1639540b}
 #rmlV42Layer .v42hero{background:linear-gradient(120deg,#123b5a,#176584);color:white;border:0;padding:22px}
 #rmlV42Layer .v42hero h2{color:white;margin:0 0 8px;font-size:24px}
@@ -5738,7 +5738,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media(max-width:700px){#rmlV42Layer .v42section{padding:12px}#rmlV42Layer .v42hero{padding:16px}#rmlV42Layer .v42hero h2{font-size:20px}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.15</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Créez un bon, choisissez son destinataire, puis ajoutez les produits.</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.16</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Créez un bon, choisissez son destinataire, puis ajoutez les produits.</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <input id="v42Type" type="hidden" value="BC">
 <div class="v42editor-title"><h3 id="rmlTradeTitle">Bon de commande fournisseur</h3><span id="rmlTradeMode">Nouveau bon</span></div>
@@ -5758,7 +5758,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 <div><label>Nom du réceptionnaire (BL)</label><input id="v42Receiver"></div>
 
 </div>
-</section><section class="v42section v42products"><h3>2 · Produits et quantités</h3><div style="margin:10px 0"><button onclick="rmlV42Import()">Récupérer les produits du chantier</button><button onclick="rmlV421Catalog()">Choisir dans le catalogue de la fiche chantier</button><button onclick="rmlV42Add()">+ Produit libre</button></div><div id="v421CatalogBox" class="v42box" style="display:none"><div class="v42grid"><div><label>Famille de produits</label><select id="v421Family" onchange="rmlV421CatalogProducts()"></select></div><div><label>Produit</label><select id="v421Product"></select></div><div><label>Couleur</label><select id="v422CatalogColor"></select></div><div><label>Quantité</label><input id="v421Qty" type="number" min="0" step="any" value="1"></div><div><label>Unité</label><select id="v421Unit"><option>ml</option><option>u</option><option>m²</option><option>forfait</option></select></div></div><button onclick="rmlV421AddCatalogProduct()">Ajouter ce produit au bon</button><button class="v42gray" onclick="v42$('v421CatalogBox').style.display='none'">Fermer le catalogue</button></div>
+</section><section class="v42section v42products"><h3>2 · Produits et quantités</h3><div style="margin:10px 0"><button onclick="rmlV42Import()">Récupérer les produits du chantier</button><button onclick="rmlV421Catalog()">Choisir dans le catalogue Produits</button><button onclick="rmlV42Add()">+ Produit libre</button></div><div id="v421CatalogBox" class="v42box" style="display:none"><p id="rmlTradeCatalogStatus" role="status" class="v42hint"></p><div class="v42grid"><div><label>Famille de produits</label><select id="v421Family" onchange="rmlV421CatalogProducts()"></select></div><div><label>Produit</label><select id="v421Product"></select></div><div><label>Couleur</label><select id="v422CatalogColor"></select></div><div><label>Quantité</label><input id="v421Qty" type="number" min="0" step="any" value="1"></div><div><label>Unité</label><select id="v421Unit"><option>ml</option><option>u</option><option>m²</option><option>forfait</option></select></div></div><button onclick="rmlV421AddCatalogProduct()">Ajouter ce produit au bon</button><button class="v42gray" onclick="v42$('v421CatalogBox').style.display='none'">Fermer le catalogue</button></div>
 <div class="v42scroll"><table><thead><tr><th>Désignation</th><th>Couleur</th><th>Quantité</th><th>Unité</th><th class="v42Price">Prix HT (facultatif)</th><th></th></tr></thead><tbody id="v42Rows"></tbody></table></div>
 </section><section class="v42section v42notes"><h3>3 · Observations et validation</h3><div class="v42grid" style="margin-top:12px"><div><label>Observations</label><textarea id="v42Notes" rows="3"></textarea></div><div><label>Total HT (bon de commande uniquement)</label><div id="v42Total" style="font-size:22px;font-weight:750">—</div></div></div>
 <div id="v42SignatureBox" class="v42box"><label>Signature du client (bon de livraison)</label><canvas id="v42Signature" width="900" height="240"></canvas><div><button class="v42gray" onclick="rmlV42ClearSignature()">Effacer la signature</button></div><p style="font-size:12px">La signature est enregistrée avec le bon. Une nouvelle signature remplace l'ancienne.</p></div>
@@ -5813,6 +5813,8 @@ async function rmlV42Open(){if(!rmlV42Allowed()){alert('Accès réservé à la d
 function rmlV42Close(){v42$('rmlV42Layer').style.display='none'}
 function rmlV42Jobs(){const s=v42$('v42Job'),old=s.value;s.innerHTML='<option value="">Sans chantier</option>'+(db.chantiers||[]).map(j=>`<option value="${v42E(j.id)}">${v42E(j.nom||j.name||j.id)} — ${v42E(clientName(j.client_id))}</option>`).join('');s.value=old||''}
 function rmlV42New(type='BC'){
+ ++rmlTradeCatalogRequest;
+ v42$('v421CatalogBox').querySelectorAll('select,input,button').forEach(x=>x.disabled=false);
  rmlBLDeliveryAuto='';v42Current=null;v42Lines=[];v42SignatureData='';v42ChangedSignature=false;
  v42$('rmlV42Editor').style.display='block';v42$('v42Type').value=type;
  v42$('v42Date').value=new Date().toLocaleDateString('en-CA');
@@ -5909,13 +5911,29 @@ function rmlV421PickClient(){
  v42$('v42Delivery').value=c?rmlBLClientDelivery(c):'';
  rmlBLDeliveryAuto=v42$('v42Delivery').value;
 }
-function rmlV421Catalog(){
- if(typeof PREP_CATALOG==='undefined'){rmlV42Msg('Catalogue de préparation indisponible.',true);return}
- v42$('v421CatalogBox').style.display='block';
- v42$('v421Family').innerHTML=Object.keys(PREP_CATALOG).filter(k=>Array.isArray(PREP_CATALOG[k])&&PREP_CATALOG[k].length).map(k=>`<option value="${v42E(k)}">${v42E((typeof RML351_CATS!=='undefined'&&RML351_CATS[k])||k)}</option>`).join('');
+let rmlTradeCatalogRequest=0;
+async function rmlV421Catalog(){
+ if(typeof PREP_CATALOG==='undefined'){rmlV42Msg('Catalogue Produits indisponible.',true);return}
+ const request=++rmlTradeCatalogRequest;
+ const box=v42$('v421CatalogBox'),status=v42$('rmlTradeCatalogStatus');
+ const family=v42$('v421Family').value;
+ box.style.display='block';status.textContent='Actualisation du catalogue Produits…';
+ box.querySelectorAll('select,input,button').forEach(x=>x.disabled=true);
+ let ok=false;
+ try{ok=await rmlLoadCatalog()}catch(e){console.warn('Chargement du catalogue des bons',e)}
+ if(request!==rmlTradeCatalogRequest)return;
+ box.querySelectorAll('select,input,button').forEach(x=>x.disabled=false);
+ if(box.style.display==='none')return;
+ const families=Object.keys(PREP_CATALOG).filter(k=>Array.isArray(PREP_CATALOG[k])&&PREP_CATALOG[k].length);
+ v42$('v421Family').innerHTML=families.map(k=>`<option value="${v42E(k)}">${v42E((typeof RML_CATALOG_LABELS!=='undefined'&&RML_CATALOG_LABELS[k])||(typeof RML351_CATS!=='undefined'&&RML351_CATS[k])||k)}</option>`).join('');
+ if(families.includes(family))v42$('v421Family').value=family;
  v42$('v422CatalogColor').innerHTML='<option value="">Sans couleur</option>'+PREP_COLORS.map(c=>`<option value="${v42E(c)}">${v42E(c)}</option>`).join('')+'<option value="__special__">+ Couleur spéciale…</option>';
  rmlV421CatalogProducts();
+ const count=families.reduce((n,k)=>n+PREP_CATALOG[k].length,0);
+ status.textContent=ok?'Catalogue Produits actualisé · '+count+' références dans '+families.length+' familles.':'Actualisation impossible : catalogue en mémoire affiché. Les derniers ajouts peuvent manquer. Fermez puis rouvrez le catalogue pour réessayer.';
+ status.style.color=ok?'#15634f':'#a04b12';
 }
+
 function rmlV421CatalogProducts(){
  const family=v42$('v421Family').value;
  v42$('v421Product').innerHTML=(PREP_CATALOG[family]||[]).filter(Boolean).map(name=>`<option value="${v42E(name)}">${v42E(name)}</option>`).join('');
