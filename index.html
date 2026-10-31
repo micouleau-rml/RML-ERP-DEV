@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.16</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.18</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -838,7 +838,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 <div class="actions"><button class="btn" type="submit">Valider le mouvement</button><button class="btn secondary" type="button" data-close="stockMoveModal">Annuler</button></div></form></div></div>
 
 <div class="modal" id="stockHistoryModal"><div class="modal-card"><div class="modal-head"><h2 id="stockHistoryTitle">Historique du stock</h2><button class="btn secondary" data-close="stockHistoryModal">Fermer</button></div><div id="stockHistoryList"></div></div></div>
-<div class="modal" id="clientModal"><div class="modal-card"><div class="modal-head"><h3 id="clientModalTitle">Nouveau client</h3><div class="client-edit-nav" id="clientEditNav" style="display:none"><button class="btn secondary" type="button" id="clientPrevBtn">← Précédent</button><span class="client-edit-position" id="clientEditPosition"></span><button class="btn secondary" type="button" id="clientNextBtn">Suivant →</button></div><button class="close" data-close="clientModal">Fermer</button></div><div class="client-edit-tools" id="clientEditTools" style="display:none"><button class="btn portal-direct" type="button" id="clientPortalBtn">⌕ Portail des entreprises</button><span class="client-edit-dirty clean" id="clientDraftStatus">Aucune modification en attente</span><button class="btn save-batch" type="button" id="clientSaveBatchBtn" disabled>Enregistrer les modifications</button><button class="btn danger" type="button" id="clientDeleteFromEditBtn" style="margin-left:auto">Supprimer le client</button></div><form id="clientForm" class="grid2" style="margin-top:14px"><input type="hidden" id="clientId"><div class="field"><label>Nom du client *</label><input id="clientNom" required></div><div class="field"><label>Code client (automatique)</label><input id="clientCode" readonly placeholder="Attribué automatiquement"></div><div class="field"><label>Responsable / Contact principal</label><input id="clientResponsable"></div><div class="field"><label>Profession / Catégorie</label><div style="display:flex;gap:8px;align-items:center"><select id="clientCategorie" style="flex:1"></select><button class="btn secondary" type="button" id="addProfessionBtn">+ Ajouter</button></div></div><div class="field"><label>SIREN</label><input id="clientSiren" inputmode="numeric" maxlength="9" placeholder="Prévu pour le rapprochement Pennylane"></div><div class="field"><label>SIRET du siège</label><input id="clientSiret" inputmode="numeric" maxlength="14" placeholder="Renseigné automatiquement"></div><div class="field full"><label>Contacts et téléphones</label><textarea id="clientTel" hidden></textarea><div id="rmlClientContacts"></div><button class="btn secondary" type="button" id="rmlAddClientContact" style="margin-top:8px">+ Ajouter un contact</button><div class="muted">Nom, fonction et téléphone pour chaque contact. Les anciens numéros sont conservés.</div></div><div class="field"><label>E-mail</label><textarea id="clientEmail" rows="2" placeholder="Une adresse e-mail par ligne (plusieurs responsables possibles)"></textarea><div class="muted">Saisissez une adresse par ligne. Vous pourrez choisir le destinataire depuis le chantier.</div></div><div class="field full"><label>Adresse</label><input id="clientAdresse" autocomplete="off" list="rmlClientAddressSuggestions" placeholder="Commencez à saisir une rue, un numéro, une ville…"><datalist id="rmlClientAddressSuggestions"></datalist><div class="muted" id="rmlClientAddressHint">Suggestions d’adresses françaises pendant la saisie (connexion Internet requise).</div></div><div class="field full"><label>Notes</label><textarea id="clientNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer et fermer</button><button class="btn secondary" type="button" data-close="clientModal">Fermer</button></div></form></div></div>
+<div class="modal" id="clientModal"><div class="modal-card"><div class="modal-head"><h3 id="clientModalTitle">Nouveau client</h3><div class="client-edit-nav" id="clientEditNav" style="display:none"><button class="btn secondary" type="button" id="clientPrevBtn">← Précédent</button><span class="client-edit-position" id="clientEditPosition"></span><button class="btn secondary" type="button" id="clientNextBtn">Suivant →</button></div><button class="close" data-close="clientModal">Fermer</button></div><div class="client-edit-tools" id="clientEditTools" style="display:none"><button class="btn portal-direct" type="button" id="clientPortalBtn">⌕ Portail des entreprises</button><span class="client-edit-dirty clean" id="clientDraftStatus">Aucune modification en attente</span><button class="btn save-batch" type="button" id="clientSaveBatchBtn" disabled>Enregistrer les modifications</button><button class="btn danger" type="button" id="clientDeleteFromEditBtn" style="margin-left:auto">Supprimer le client</button></div><form id="clientForm" class="grid2" style="margin-top:14px"><input type="hidden" id="clientId"><div class="field"><label>Nom du client *</label><input id="clientNom" required></div><div class="field"><label>Code client (automatique)</label><input id="clientCode" readonly placeholder="Attribué automatiquement"></div><div class="field"><label>Responsable / Contact principal</label><input id="clientResponsable"></div><div class="field"><label>Profession / Catégorie</label><div style="display:flex;gap:8px;align-items:center"><select id="clientCategorie" style="flex:1"></select><button class="btn secondary" type="button" id="addProfessionBtn">+ Ajouter</button></div></div><div class="field"><label>SIREN</label><input id="clientSiren" inputmode="numeric" maxlength="9" placeholder="Prévu pour le rapprochement Pennylane"></div><div class="field"><label>SIRET du siège</label><input id="clientSiret" inputmode="numeric" maxlength="14" placeholder="Renseigné automatiquement"></div><div class="field full"><label>Contacts et téléphones</label><textarea id="clientTel" hidden></textarea><div id="rmlClientContacts"></div><button class="btn secondary" type="button" id="rmlAddClientContact" style="margin-top:8px">+ Ajouter un contact</button><div class="muted">Nom, fonction et téléphone pour chaque contact. Les anciens numéros sont conservés.</div></div><div class="field"><label>E-mail</label><textarea id="clientEmail" rows="2" placeholder="Une adresse e-mail par ligne (plusieurs responsables possibles)"></textarea><div class="muted">Saisissez une adresse par ligne. Vous pourrez choisir le destinataire depuis le chantier.</div></div><div class="field full"><label>Adresse postale / siège social</label><input id="clientAdresse" autocomplete="off" list="rmlClientAddressSuggestions" placeholder="Commencez à saisir une rue, un numéro, une ville…"><datalist id="rmlClientAddressSuggestions"></datalist><div class="muted" id="rmlClientAddressHint">Suggestions d’adresses françaises pendant la saisie (connexion Internet requise).</div></div><div class="field full" style="background:#eef8f3;border:1px solid #b8dccc;border-radius:12px;padding:14px"><label for="rmlClientDeliveryAddress">Adresse de livraison (si différente du siège social)</label><textarea id="rmlClientDeliveryAddress" rows="3" placeholder="Nom du dépôt ou du site, rue, code postal et ville"></textarea><div class="muted">Facultatif. Si ce champ est vide, les bons de livraison utilisent l’adresse postale du client.</div></div><div class="field full"><label>Notes</label><textarea id="clientNotes"></textarea></div><div class="full actions"><button class="btn" type="submit">Enregistrer et fermer</button><button class="btn secondary" type="button" data-close="clientModal">Fermer</button></div></form></div></div>
 <div class="modal" id="professionModal"><div class="modal-card" style="max-width:620px"><div class="modal-head"><h3>Ajouter une profession</h3><button class="close" data-close="professionModal">Fermer</button></div><div class="field" style="margin-top:14px"><label>Nouvelle profession</label><input id="newProfessionName" placeholder="Ex. Façadier"></div><div class="actions"><button class="btn" type="button" id="saveProfessionBtn">Ajouter à la liste</button><button class="btn secondary" type="button" data-close="professionModal">Annuler</button></div><div class="muted" style="margin-top:12px">Cette profession sera enregistrée dans Supabase ERP DEV et disponible sur vos autres appareils.</div></div></div>
 <div class="modal" id="subAssignModal"><div class="modal-card" style="max-width:820px">
  <div class="modal-head"><h3>Affecter un chantier / créer le contrat</h3><button class="close" data-close="subAssignModal">Fermer</button></div>
@@ -1836,6 +1836,21 @@ function rmlContactHtml(raw){return rmlContactParse(raw).map(c=>{const label=[c.
 const clientDrafts=new Map();
 let clientFormLoading=false;
 
+// Adresse de livraison synchronisée avec la fiche, compatible avec le schéma existant.
+function rmlClientDeliveryFields(raw){
+ const notes=String(raw||'');
+ const match=notes.match(/\n?\[RML_LIVRAISON_V1:([^\]\r\n]*)\]\s*$/);
+ if(!match)return {notes,address:''};
+ try{return {notes:notes.slice(0,match.index),address:decodeURIComponent(match[1])}}catch(e){return {notes,address:''}}
+}
+function rmlClientDeliveryNotes(notes,address){
+ const clean=rmlClientDeliveryFields(notes).notes.trim(),value=String(address||'').trim();
+ return (clean+(value?'\n[RML_LIVRAISON_V1:'+encodeURIComponent(value)+']':'')).trim()||null;
+}
+function rmlClientDeliveryAddress(c){
+ return rmlClientDeliveryFields(c?.notes).address||[c?.adresse_livraison,c?.delivery_address,c?.adresseLivraison].find(x=>typeof x==='string'&&x.trim())||'';
+}
+
 function readClientForm(){
   return {
     nom:clientNom.value.trim(),
@@ -1845,7 +1860,7 @@ function readClientForm(){
     telephone:clientTel.value.trim()||null,
     email:clientEmail.value.trim()||null,
     adresse:clientAdresse.value.trim()||null,
-    notes:clientNotes.value.trim()||null,
+    notes:rmlClientDeliveryNotes(clientNotes.value,document.getElementById('rmlClientDeliveryAddress').value),
     siren:(window.clientSiren?.value||'').replace(/\D/g,'').slice(0,9)||null,
     siret:(window.clientSiret?.value||'').replace(/\D/g,'').slice(0,14)||null
   };
@@ -1944,7 +1959,7 @@ function updateClientEditNav(){if(!window.clientEditNav)return;const id=clientId
 function loadClientIntoEdit(c){
   clientFormLoading=true;
   const d=clientDrafts.get(c.id)||c;
-  clientId.value=c.id;clientNom.value=d.nom||'';clientCode.value=d.code||c.code||'';clientResponsable.value=d.responsable||'';clientCategorie.value=d.categorie||'';if(window.clientSiren)clientSiren.value=d.siren||'';if(window.clientSiret)clientSiret.value=d.siret||'';clientTel.value=d.telephone||'';rmlContactLoad(d.telephone||'');clientEmail.value=d.email||'';clientAdresse.value=d.adresse||'';clientNotes.value=d.notes||'';clientModalTitle.textContent='Modifier le client';
+  clientId.value=c.id;clientNom.value=d.nom||'';clientCode.value=d.code||c.code||'';clientResponsable.value=d.responsable||'';clientCategorie.value=d.categorie||'';if(window.clientSiren)clientSiren.value=d.siren||'';if(window.clientSiret)clientSiret.value=d.siret||'';clientTel.value=d.telephone||'';rmlContactLoad(d.telephone||'');clientEmail.value=d.email||'';clientAdresse.value=d.adresse||'';clientNotes.value=rmlClientDeliveryFields(d.notes).notes;document.getElementById('rmlClientDeliveryAddress').value=rmlClientDeliveryAddress(d);clientModalTitle.textContent='Modifier le client';
   clientFormLoading=false;if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Enregistrer et fermer';updateClientEditNav();
 }
 function navigateClientEdit(delta){storeCurrentClientDraft();const rows=getVisibleClientRows(),i=rows.findIndex(c=>c.id===clientId.value),target=rows[i+delta];if(!target)return;loadClientIntoEdit(target)}
@@ -2778,7 +2793,7 @@ function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))ret
 
 
 
-/* V42.16 : alertes de contrats à signer, isolées du processus de connexion. */
+/* V42.18 : alertes de contrats à signer, isolées du processus de connexion. */
 async function rmlV4212LoadSignatures(){
  const panel=document.getElementById('rmlV4212SignaturePanel');
  const list=document.getElementById('rmlV4212SignatureList');
@@ -5709,7 +5724,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <style>
-/* V42.16 — éditeur des bons et retour depuis la fiche client. */
+/* V42.18 — éditeur des bons et retour depuis la fiche client. */
 #rmlV42Layer .v42box{border-radius:18px;box-shadow:0 4px 18px #1639540b}
 #rmlV42Layer .v42hero{background:linear-gradient(120deg,#123b5a,#176584);color:white;border:0;padding:22px}
 #rmlV42Layer .v42hero h2{color:white;margin:0 0 8px;font-size:24px}
@@ -5738,20 +5753,20 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media(max-width:700px){#rmlV42Layer .v42section{padding:12px}#rmlV42Layer .v42hero{padding:16px}#rmlV42Layer .v42hero h2{font-size:20px}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.16</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Créez un bon, choisissez son destinataire, puis ajoutez les produits.</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.18</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <input id="v42Type" type="hidden" value="BC">
 <div class="v42editor-title"><h3 id="rmlTradeTitle">Bon de commande fournisseur</h3><span id="rmlTradeMode">Nouveau bon</span></div>
 <section class="v42section v42addresses"><h3>1 · Destinataire et livraison</h3><div class="v42grid">
 <div><label>Date</label><input type="date" id="v42Date"></div><div><label>Statut</label><select id="v42State"><option value="brouillon">Brouillon</option><option value="emis">Émis</option><option value="livre">Livré</option></select></div>
-<div><div id="rmlTradeCreateClient" class="v42client-create"><strong>Créer une fiche client</strong><button type="button" onclick="rmlTradeNewClient()">+ Créer un nouveau client</button></div><label id="v42PartyLabel">Fournisseur</label><input id="v42Party" placeholder="Nom du destinataire"><div id="v427SupplierBox" style="margin-top:8px">
+<div><div id="rmlTradeCreateClient" class="v42client-create"><strong>Client absent du répertoire ?</strong><button type="button" onclick="rmlTradeNewClient()">+ Créer un nouveau client</button></div><label id="v42PartyLabel">Fournisseur</label><input id="v42Party" placeholder="Nom du destinataire"><div id="v427SupplierBox" style="margin-top:8px">
 <label>Fournisseurs enregistrés</label>
 <select id="v427SupplierSelect" onchange="rmlV427Pick()"><option value="">— Choisir un fournisseur —</option></select>
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
 <button type="button" onclick="rmlV427Save()">+ Enregistrer ce fournisseur</button>
 <button type="button" class="v42gray" onclick="rmlV427Remove()">Supprimer le fournisseur sélectionné</button>
 </div><small>Renseigne le nom et l'adresse ci-dessous, puis enregistre le fournisseur pour les prochains bons.</small>
-</div><div id="v421ClientBox" style="display:none;margin-top:7px"><label>Rechercher un client existant</label><input id="v421ClientSearch" placeholder="Nom, adresse, code postal…" oninput="rmlV421Clients()"><select id="v421ClientSelect" onchange="rmlV421PickClient()"><option value="">— Choisir un client —</option></select></div></div>
+</div><div id="v421ClientBox" style="display:none;margin-top:7px"><label>Choisir dans les fiches clients enregistrées</label><p id="rmlTradeClientsStatus" role="status" class="v42hint"></p><button type="button" class="v42gray" onclick="rmlTradeLoadClients()">Actualiser les clients</button><input id="v421ClientSearch" placeholder="Nom, adresse, code postal…" oninput="rmlV421Clients()"><select id="v421ClientSelect" onchange="rmlV421PickClient()"><option value="">— Choisir un client —</option></select></div></div>
 <div><label>Adresse postale du destinataire</label><textarea id="v42Address" rows="2"></textarea></div>
 <div><label>Chantier (facultatif)</label><select id="v42Job" onchange="rmlV42JobChanged()"></select></div>
 <div><label>Adresse de livraison</label><p class="v42hint">Adresse de livraison du client, ou son adresse postale par défaut. Vous pouvez la modifier pour ce bon.</p><textarea id="v42Delivery" rows="2"></textarea></div>
@@ -5825,7 +5840,7 @@ function rmlV42New(type='BC'){
  v42$('v421Qty').value=type==='BL'?'0':'1';v42$('v421Unit').selectedIndex=0;
  if(v42$('rmlV425Preview'))v42$('rmlV425Preview').style.display='none';
  rmlV42Msg('');rmlV42TypeChanged();rmlV427Load();rmlV421Clients();
- v42$('v421ClientSelect').value='';rmlV42Rows();rmlV42ClearSignature();
+ v42$('v421ClientSelect').value='';if(type==='BL')rmlTradeLoadClients();rmlV42Rows();rmlV42ClearSignature();
  v42$('rmlV42Editor').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function rmlV42TypeChanged(){const bl=v42$('v42Type').value==='BL';
@@ -5891,15 +5906,40 @@ function rmlV42JobChanged(){
 
 /* V42.1 — Choix des clients et catalogue partagé avec la préparation chantier. */
 function rmlV421Address(c){return [c.adresse||c.address,c.code_postal||c.codePostal||c.cp,c.ville].filter(Boolean).join(', ')}
+let rmlTradeClientsLoading=false;
+async function rmlTradeLoadClients(){
+ if(rmlTradeClientsLoading)return;
+ rmlTradeClientsLoading=true;
+ const status=v42$('rmlTradeClientsStatus');status.textContent='Chargement des fiches clients…';
+ try{
+  const clients=[];const size=500;
+  for(let start=0;;start+=size){
+   const {data,error}=await sb.from('erp_clients').select('*').order('nom').order('id').range(start,start+size-1);
+   if(error)throw error;
+   clients.push(...(data||[]));
+   if(!data||data.length<size)break;
+  }
+  // Mise à jour seulement après un chargement complet, sans modifier le bon.
+  const known=new Set(clients.map(c=>String(c.id)));
+  db.clients=[...clients,...(db.clients||[]).filter(c=>!known.has(String(c.id)))];
+  rmlV421Clients();
+  status.textContent=clients.length?clients.length+' fiche(s) client disponibles. Choisissez un client ci-dessous ou créez une nouvelle fiche.':'Aucune fiche client trouvée. Utilisez « Créer un nouveau client ».';
+  status.style.color='#15634f';
+ }catch(e){
+  rmlV421Clients();
+  status.textContent='Impossible de charger les fiches clients : '+(e.message||String(e))+'. Vous pouvez réessayer avec « Actualiser les clients ».';
+  status.style.color='#b42330';
+ }finally{rmlTradeClientsLoading=false}
+}
 function rmlV421Clients(){
  const sel=v42$('v421ClientSelect');if(!sel)return;
  const old=sel.value,q=String(v42$('v421ClientSearch')?.value||'').toLocaleLowerCase('fr');
- const clients=(db.clients||[]).filter(c=>[c.nom,c.adresse,c.code_postal,c.ville,c.code].join(' ').toLocaleLowerCase('fr').includes(q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr')).slice(0,300);
+ const clients=(db.clients||[]).filter(c=>[c.nom,c.adresse,c.code_postal,c.ville,c.code].join(' ').toLocaleLowerCase('fr').includes(q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr'));
  sel.innerHTML='<option value="">— Choisir un client existant —</option>'+clients.map(c=>`<option value="${v42E(c.id)}">${v42E(c.nom)} — ${v42E(rmlV421Address(c))}</option>`).join('');
  if(clients.some(c=>String(c.id)===old))sel.value=old;
 }
 function rmlBLClientDelivery(c){
- const address=[c?.adresse_livraison,c?.delivery_address,c?.adresseLivraison].find(v=>typeof v==='string'&&v.trim());
+ const address=rmlClientDeliveryAddress(c);
  return address?address.trim():rmlV421Address(c||{});
 }
 function rmlV421PickClient(){
