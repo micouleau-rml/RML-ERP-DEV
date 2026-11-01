@@ -644,7 +644,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.53</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.54</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -868,7 +868,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 
 <div class="modal" id="stockHistoryModal"><div class="modal-card"><div class="modal-head"><h2 id="stockHistoryTitle">Historique du stock</h2><button class="btn secondary" data-close="stockHistoryModal">Fermer</button></div><div id="stockHistoryList"></div></div></div>
 <style>
-/* V42.53 — fiche client en blocs colorés. */
+/* V42.54 — fiche client en blocs colorés. */
 #clientModal .modal-card{background:#f6f8fc;border-color:#c8d8e6;border-radius:20px}
 #clientModal .modal-head{background:linear-gradient(120deg,#123b5a,#176584);color:white;border-bottom:0;padding:22px 20px}
 #clientModal .modal-head h3{color:white;font-size:25px}
@@ -2851,7 +2851,7 @@ function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))ret
 
 
 
-/* V42.53 : alertes de contrats à signer, isolées du processus de connexion. */
+/* V42.54 : alertes de contrats à signer, isolées du processus de connexion. */
 async function rmlV4212LoadSignatures(){
  const panel=document.getElementById('rmlV4212SignaturePanel');
  const list=document.getElementById('rmlV4212SignatureList');
@@ -5942,7 +5942,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <style>
-/* V42.53 — éditeur des bons et retour depuis la fiche client. */
+/* V42.54 — éditeur des bons et retour depuis la fiche client. */
 #rmlV42Layer .v42box{border-radius:18px;box-shadow:0 4px 18px #1639540b}
 #rmlV42Layer .v42hero{background:linear-gradient(120deg,#123b5a,#176584);color:white;border:0;padding:22px}
 #rmlV42Layer .v42hero h2{color:white;margin:0 0 8px;font-size:24px}
@@ -5963,6 +5963,13 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 #rmlV42Layer .v42client-create{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 #rmlV42Layer .v42client-create button{background:#087f70}
 #rmlV42Layer .v42hint{font-size:12px;color:#50667c;margin:5px 0 12px}
+#rmlV42Layer #rmlTradeClientSuggestions{max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid #9ec9bb;border-radius:9px;background:white;margin:4px 0 10px}
+#rmlV42Layer #rmlTradeClientSuggestions[hidden]{display:none}
+#rmlV42Layer .rml-client-proposal{display:block;width:100%;max-width:100%;margin:0;padding:12px;min-height:52px;text-align:left;background:white;color:#173a52;border-radius:0;border-bottom:1px solid #dbeae5;white-space:normal;overflow-wrap:anywhere}
+#rmlV42Layer .rml-client-proposal:last-child{border-bottom:0}
+#rmlV42Layer .rml-client-proposal:hover,#rmlV42Layer .rml-client-proposal[aria-selected="true"]{background:#e5f5ee}
+#rmlV42Layer .rml-client-proposal span{display:block;font-size:12px;font-weight:400;color:#526778;margin-top:4px}
+
 #rmlV42Layer input:focus,#rmlV42Layer select:focus,#rmlV42Layer textarea:focus{outline:3px solid #b3d7fa;border-color:#287ab5}
 #rmlV42Layer .v42footer{display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid #d7e2ee}
 #rmlV42Layer .v42footer button:first-child{background:#087f70}
@@ -5971,7 +5978,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media(max-width:700px){#rmlV42Layer .v42section{padding:12px}#rmlV42Layer .v42hero{padding:16px}#rmlV42Layer .v42hero h2{font-size:20px}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.53</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.54</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <input id="v42Type" type="hidden" value="BC">
 <div class="v42editor-title"><h3 id="rmlTradeTitle">Bon de commande fournisseur</h3><span id="rmlTradeMode">Nouveau bon</span></div>
@@ -5984,7 +5991,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 <button type="button" onclick="rmlV427Save()">+ Enregistrer ce fournisseur</button>
 <button type="button" class="v42gray" onclick="rmlV427Remove()">Supprimer le fournisseur sélectionné</button>
 </div><small>Renseigne le nom et l'adresse ci-dessous, puis enregistre le fournisseur pour les prochains bons.</small>
-</div><div id="v421ClientBox" style="display:none;margin-top:7px"><label>Choisir dans les fiches clients enregistrées</label><p id="rmlTradeClientsStatus" role="status" class="v42hint"></p><button type="button" class="v42gray" onclick="rmlTradeLoadClients()">Actualiser les clients</button><input id="v421ClientSearch" placeholder="Nom, adresse, code postal…" oninput="rmlV421Clients()"><select id="v421ClientSelect" onchange="rmlV421PickClient()"><option value="">— Choisir un client —</option></select></div></div>
+</div><div id="v421ClientBox" style="display:none;margin-top:7px"><label>Choisir dans les fiches clients enregistrées</label><p id="rmlTradeClientsStatus" role="status" class="v42hint"></p><button type="button" class="v42gray" onclick="rmlTradeLoadClients()">Actualiser les clients</button><label for="v421ClientSearch">Rechercher un client</label><input id="v421ClientSearch" placeholder="Commencez à taper le nom du client…" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="rmlTradeClientSuggestions" aria-expanded="false" oninput="rmlV421Clients()" onfocus="rmlV421Clients()" onkeydown="rmlTradeClientSearchKey(event)"><div id="rmlTradeClientMatchesHint" class="v42hint" role="status" aria-live="polite">Tapez le nom du client pour afficher les propositions.</div><div id="rmlTradeClientSuggestions" role="listbox" aria-label="Clients proposés" hidden></div><select id="v421ClientSelect" hidden onchange="rmlV421PickClient()"><option value="">— Choisir un client —</option></select></div></div>
 <div><label>Adresse postale du destinataire</label><textarea id="v42Address" rows="2"></textarea></div>
 <div><label>Chantier (facultatif)</label><select id="v42Job" onchange="rmlV42JobChanged()"></select></div>
 <div><label>Adresse de livraison</label><p class="v42hint">Adresse de livraison du client, ou son adresse postale par défaut. Vous pouvez la modifier pour ce bon.</p><textarea id="v42Delivery" rows="2"></textarea></div>
@@ -6065,6 +6072,7 @@ function rmlTradeCanLeave(){
 })();
 function rmlTradeResetEditor(){
  rmlTradeSavedForm=null;
+ rmlTradeHideClientSuggestions();
  ++rmlTradeCatalogRequest;rmlTradeCatalogData=null;
  rmlBLDeliveryAuto='';v42Current=null;v42Lines=[];v42SignatureData='';v42Drawing=false;
  ['v42Party','v42Address','v42Delivery','v42Receiver','v42Notes','v421ClientSearch','v421ClientSelect','v427SupplierSelect','v42Job','v42Date'].forEach(id=>{if(v42$(id))v42$(id).value=''});
@@ -6191,19 +6199,67 @@ async function rmlTradeLoadClients(){
   status.style.color='#b42330';
  }finally{rmlTradeClientsLoading=false}
 }
+let rmlTradeSuggestionClients=[],rmlTradeSuggestionIndex=-1;
+function rmlTradeSearchText(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('fr').trim()}
+function rmlTradeClientMatches(client,query){
+ const text=rmlTradeSearchText([client.nom,client.adresse,client.code_postal,client.ville,client.code,client.responsable,client.email,client.telephone].filter(Boolean).join(' '));
+ return rmlTradeSearchText(query).split(/\s+/).filter(Boolean).every(word=>text.includes(word));
+}
+function rmlTradeHideClientSuggestions(){
+ const input=v42$('v421ClientSearch'),list=v42$('rmlTradeClientSuggestions');
+ if(list)list.hidden=true;
+ if(input){input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant')}
+ rmlTradeSuggestionIndex=-1;
+}
+function rmlTradeChooseClient(id){
+ const client=(db.clients||[]).find(c=>String(c.id)===String(id));if(!client)return;
+ v42$('v421ClientSearch').value=client.nom||'';
+ rmlV421Clients();v42$('v421ClientSelect').value=String(client.id);rmlV421PickClient();
+}
+function rmlTradeShowClientSuggestions(clients){
+ const input=v42$('v421ClientSearch'),list=v42$('rmlTradeClientSuggestions'),hint=v42$('rmlTradeClientMatchesHint');if(!input||!list||!hint)return;
+ list.replaceChildren();rmlTradeSuggestionClients=clients.slice(0,20);rmlTradeSuggestionIndex=-1;input.removeAttribute('aria-activedescendant');
+ if(!input.value.trim()){hint.textContent='Tapez le nom du client pour afficher les propositions.';rmlTradeHideClientSuggestions();return}
+ hint.textContent=clients.length?(clients.length>20?'20 propositions sur '+clients.length+' clients. Précisez le nom pour affiner la recherche.':clients.length+' client'+(clients.length>1?'s':'')+' correspondant'+(clients.length>1?'s':'')+'. Touchez une proposition pour la sélectionner.'):'Aucun client ne correspond à cette recherche.';
+ rmlTradeSuggestionClients.forEach((client,index)=>{
+  const button=document.createElement('button');button.type='button';button.className='rml-client-proposal';button.id='rmlClientSuggestion-'+index;button.setAttribute('role','option');button.setAttribute('aria-selected','false');button.tabIndex=-1;
+  const name=document.createElement('strong');name.textContent=client.nom||'Client sans nom';
+  const details=document.createElement('span');details.textContent=[client.code,rmlV421Address(client)].filter(Boolean).join(' · ');
+  button.append(name,details);button.onclick=()=>rmlTradeChooseClient(client.id);list.append(button);
+ });
+ list.hidden=!clients.length;input.setAttribute('aria-expanded',clients.length?'true':'false');
+}
+function rmlTradeClientSearchKey(event){
+ if(event.key==='Escape'||event.key==='Tab'){rmlTradeHideClientSuggestions();return}
+ if(!['ArrowDown','ArrowUp','Enter'].includes(event.key))return;
+ const list=v42$('rmlTradeClientSuggestions');
+ if(event.key==='Enter'){
+  if(list.hidden)return;
+  event.preventDefault();const index=rmlTradeSuggestionIndex>=0?rmlTradeSuggestionIndex:rmlTradeSuggestionClients.length===1?0:-1;
+  if(index>=0)rmlTradeChooseClient(rmlTradeSuggestionClients[index].id);return;
+ }
+ event.preventDefault();if(list.hidden)rmlV421Clients();if(list.hidden||!rmlTradeSuggestionClients.length)return;
+ rmlTradeSuggestionIndex=event.key==='ArrowDown'?Math.min(rmlTradeSuggestionIndex+1,rmlTradeSuggestionClients.length-1):Math.max(0,rmlTradeSuggestionIndex-1);
+ [...list.children].forEach((button,index)=>button.setAttribute('aria-selected',index===rmlTradeSuggestionIndex?'true':'false'));
+ const active=list.children[rmlTradeSuggestionIndex];if(active){v42$('v421ClientSearch').setAttribute('aria-activedescendant',active.id);active.scrollIntoView({block:'nearest'})}
+}
 function rmlV421Clients(){
  const sel=v42$('v421ClientSelect');if(!sel)return;
- const old=sel.value,q=String(v42$('v421ClientSearch')?.value||'').toLocaleLowerCase('fr');
- const clients=(db.clients||[]).filter(c=>[c.nom,c.adresse,c.code_postal,c.ville,c.code].join(' ').toLocaleLowerCase('fr').includes(q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr'));
+ const old=sel.value,q=v42$('v421ClientSearch')?.value||'';
+ const clients=(db.clients||[]).filter(c=>rmlTradeClientMatches(c,q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr'));
  sel.innerHTML='<option value="">— Choisir un client existant —</option>'+clients.map(c=>`<option value="${v42E(c.id)}">${v42E(c.nom)} — ${v42E(rmlV421Address(c))}</option>`).join('');
  if(clients.some(c=>String(c.id)===old))sel.value=old;
+ rmlTradeShowClientSuggestions(clients);
 }
+
 function rmlBLClientDelivery(c){
  const address=rmlClientDeliveryAddress(c);
  return address?address.trim():rmlV421Address(c||{});
 }
 function rmlV421PickClient(){
  const c=(db.clients||[]).find(x=>String(x.id)===v42$('v421ClientSelect').value);
+ if(c)v42$('v421ClientSearch').value=c.nom||'';
+ rmlTradeHideClientSuggestions();
  v42$('v42Party').value=c?.nom||'';
  v42$('v42Address').value=c?rmlV421Address(c):'';
  // Une sélection de client repart des adresses de sa fiche, sans ancien chantier.
