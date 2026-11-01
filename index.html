@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.48</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.49</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -759,12 +759,20 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
  <div class="panel">
   <div class="toolbar"><div style="flex:1"><h2 style="margin:0">Sous-traitants</h2><div class="muted">Affectation aux chantiers, contrats et signature manuscrite directement sur téléphone.</div></div><button class="btn secondary" onclick="loadSubcontractors()">Actualiser</button></div>
   <div class="field" style="margin:12px 0"><label>Rechercher un sous-traitant</label><input id="subSearch" type="search" placeholder="Entreprise, contact, e-mail ou téléphone…" oninput="renderSubcontractors()"></div>
+  <div style="margin:12px 0;padding:16px;border:1px solid #8dcbbb;border-radius:12px;background:#eefaf5">
+   <h3 style="margin:0 0 10px;color:#16634b">Reprendre les coordonnées d’une fiche client</h3>
+   <div class="grid2"><div class="field"><label for="rmlSubClientSearch">Rechercher le client</label><input id="rmlSubClientSearch" type="search" placeholder="Ex. POUJOS, nom, adresse ou téléphone…" oninput="rmlSubClientChoices()"></div>
+   <div class="field"><label for="rmlSubClientSelect">Fiche client à reprendre</label><select id="rmlSubClientSelect" onchange="document.getElementById('rmlSubClientCopy').disabled=!this.value"><option value="">— Choisir une fiche client —</option></select></div></div>
+   <div class="actions" style="margin-top:10px"><button id="rmlSubClientCopy" type="button" class="btn" style="background:#087f70;color:white" onclick="rmlSubCopyClient()" disabled>Reprendre les coordonnées du client</button><button id="rmlSubClientRefresh" type="button" class="btn secondary" onclick="rmlSubRefreshClientChoices()">Actualiser les fiches clients</button></div>
+   <p class="muted" style="margin:10px 0 0">Le nom, les contacts, l’adresse du siège, les téléphones et les e-mails remplaceront ceux affichés dans la fiche sous-traitant. Cliquez ensuite sur Enregistrer.</p>
+   <div id="rmlSubClientImportStatus" role="status" aria-live="polite" style="margin-top:8px"></div>
+  </div>
   <div class="sub-toolbar">
    <input id="subEditId" type="hidden">
    <div class="field"><label>Entreprise</label><input id="subCompany" placeholder="Nom du sous-traitant"></div>
    <div class="field"><label>Contact</label><input id="subContact" placeholder="Nom du responsable"></div>
    <div class="field"><label>Adresse du siège social</label><input id="subHeadOfficeAddress" list="subHeadOfficeAddressList" autocomplete="street-address" placeholder="N° et rue, code postal, ville"><datalist id="subHeadOfficeAddressList"></datalist><div class="muted">Enregistrée une fois dans la fiche et reprise automatiquement sur les contrats. Suggestions issues des adresses déjà enregistrées.</div></div>
-   <div class="field"><label>E-mail</label><input id="subEmail" type="email"></div>
+   <div class="field"><label>E-mail(s)</label><input id="subEmail" type="text" inputmode="email" placeholder="Une ou plusieurs adresses e-mail"></div>
    <div class="field"><label>Téléphone</label><input id="subPhone"></div>
    <div class="field"><label>Compte d’accès ERP</label><select id="subAuthUser"><option value="">Aucun compte rattaché</option></select><div class="muted" style="font-size:11px;margin-top:4px">Utilisateurs ayant le rôle Sous-traitant</div></div>
    <button id="subStephaneFillBtn" class="btn secondary" type="button" onclick="rmlFillStephaneSubcontractor()" style="display:none">Renseigner les coordonnées de MICOULEAU Stéphane</button>
@@ -839,7 +847,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 
 <div class="modal" id="stockHistoryModal"><div class="modal-card"><div class="modal-head"><h2 id="stockHistoryTitle">Historique du stock</h2><button class="btn secondary" data-close="stockHistoryModal">Fermer</button></div><div id="stockHistoryList"></div></div></div>
 <style>
-/* V42.48 — fiche client en blocs colorés. */
+/* V42.49 — fiche client en blocs colorés. */
 #clientModal .modal-card{background:#f6f8fc;border-color:#c8d8e6;border-radius:20px}
 #clientModal .modal-head{background:linear-gradient(120deg,#123b5a,#176584);color:white;border-bottom:0;padding:22px 20px}
 #clientModal .modal-head h3{color:white;font-size:25px}
@@ -2822,7 +2830,7 @@ function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))ret
 
 
 
-/* V42.48 : alertes de contrats à signer, isolées du processus de connexion. */
+/* V42.49 : alertes de contrats à signer, isolées du processus de connexion. */
 async function rmlV4212LoadSignatures(){
  const panel=document.getElementById('rmlV4212SignaturePanel');
  const list=document.getElementById('rmlV4212SignatureList');
@@ -3288,6 +3296,49 @@ function subClausesFromAssignment(a){if(Array.isArray(a?.contract_clauses)&&a.co
 let erpSubcontractors=[],erpSubAssignments=[],erpSubAccessUsers=[],subSignatureDirty=false,subSignatureDrawing=false;
 let rmlShowArchivedSubContracts=false;
 
+function rmlSubClientKey(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('fr').trim()}
+function rmlSubClientFields(client){
+ const contacts=rmlContactParse(client.telephone||'');
+ const unique=values=>[...new Set(values.map(x=>String(x||'').trim()).filter(Boolean))];
+ return {
+  subCompany:String(client.nom||''),
+  subContact:unique([client.responsable,...contacts.map(c=>[c.name,c.role].filter(Boolean).join(' — '))]).join(' / '),
+  subEmail:unique(String(client.email||'').split(/[\r\n;]+/)).join('; '),
+  subPhone:unique(contacts.map(c=>c.phone)).join(' / '),
+  subHeadOfficeAddress:[client.adresse||client.address,client.code_postal||client.codePostal||client.cp,client.ville].filter(Boolean).join(', ')
+ };
+}
+function rmlSubClientChoices(){
+ const search=document.getElementById('rmlSubClientSearch'),select=document.getElementById('rmlSubClientSelect');if(!search||!select)return;
+ const current=select.value,q=rmlSubClientKey(search.value);
+ const clients=(db.clients||[]).filter(c=>rmlSubClientKey([c.nom,c.code,c.responsable,c.adresse,c.telephone,c.email].join(' ')).includes(q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr'));
+ select.innerHTML='<option value="">— Choisir la fiche client à reprendre —</option>'+clients.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.nom||'Client')+' — '+esc(c.adresse||c.code||'')+'</option>').join('');
+ if(clients.some(c=>String(c.id)===current))select.value=current;else if(clients.length===1)select.value=String(clients[0].id);
+ document.getElementById('rmlSubClientCopy').disabled=!select.value;
+ document.getElementById('rmlSubClientImportStatus').textContent=clients.length+' fiche(s) client correspondent à la recherche.';
+}
+async function rmlSubRefreshClientChoices(){
+ if(!hasPerm('sous_traitants'))return;
+ const status=document.getElementById('rmlSubClientImportStatus'),button=document.getElementById('rmlSubClientRefresh');button.disabled=true;status.textContent='Chargement des fiches clients…';
+ try{db.clients=await fetchAllRows('erp_clients','nom',true);rmlSubClientChoices()}
+ catch(error){status.textContent='Lecture des fiches clients impossible : '+(error.message||error)}
+ finally{button.disabled=false}
+}
+function rmlSubCopyClient(){
+ if(!hasPerm('sous_traitants'))return;
+ const client=(db.clients||[]).find(c=>String(c.id)===document.getElementById('rmlSubClientSelect').value);if(!client)return;
+ // Une fiche déjà existante reste une modification et ne crée pas de doublon.
+ if(!subEditId.value){const matches=erpSubcontractors.filter(s=>rmlSubClientKey(s.company)===rmlSubClientKey(client.nom));if(matches.length===1)editSubcontractor(matches[0].id)}
+ const fields=rmlSubClientFields(client);
+ Object.entries(fields).forEach(([id,value])=>{document.getElementById(id).value=value});
+ document.getElementById('rmlSubClientImportStatus').textContent='Coordonnées de « '+client.nom+' » reprises. Cliquez sur « '+subSaveBtn.textContent+' » pour sauvegarder la fiche sous-traitant.';
+ subCompany.focus();
+}
+function rmlSubClientEditChoice(company=''){
+ const search=document.getElementById('rmlSubClientSearch'),select=document.getElementById('rmlSubClientSelect');if(!search||!select)return;
+ search.value=company;select.value='';rmlSubClientChoices();
+}
+
 function openSubcontractors(jobId=''){go('sous-traitants');setTimeout(()=>{loadSubcontractors(jobId)},0)}
 async function loadSubcontractors(focusJob=''){
  if(!hasPerm('sous_traitants'))return;
@@ -3303,6 +3354,7 @@ async function loadSubcontractors(focusJob=''){
  subStatus.className='notice';subStatus.textContent=`${erpSubcontractors.length} sous-traitant(s) · ${erpSubAssignments.filter(a=>!a.archived_at).length} contrat(s) actif(s) · ${erpSubAssignments.filter(a=>!!a.archived_at).length} archivé(s)`;
  if(window.subHeadOfficeAddressList)subHeadOfficeAddressList.innerHTML=[...new Set(erpSubcontractors.map(x=>x.head_office_address).filter(Boolean))].map(a=>'<option value="'+esc(a)+'"></option>').join('');
  if(currentAccess?.role==='administrateur'){subStatus.innerHTML+=' <button type="button" class="btn secondary" style="margin-left:12px;padding:5px 10px" onclick="rmlToggleSubArchives()">'+(rmlShowArchivedSubContracts?'Masquer les archives':'Contrats archivés')+'</button>';} 
+ rmlSubClientChoices();
  renderSubcontractors(focusJob);
 }
 function renderSubcontractors(focusJob=''){
@@ -3327,12 +3379,14 @@ function rmlFillStephaneSubcontractor(){
 function editSubcontractor(id){
  const x=erpSubcontractors.find(v=>v.id===id);if(!x)return;
  subEditId.value=x.id;subCompany.value=x.company||'';subContact.value=x.contact_name||'';subEmail.value=x.email||'';subPhone.value=x.phone||'';subHeadOfficeAddress.value=x.head_office_address||'';if(window.subAuthUser)subAuthUser.value=x.auth_user_id||'';
+ rmlSubClientEditChoice(x.company||'');
  subSaveBtn.textContent='Enregistrer les modifications';subCancelEditBtn.style.display='';subStephaneFillBtn.style.display=rmlIsStephaneSubcontractor(x)?'':'none';
  subCompany.scrollIntoView({behavior:'smooth',block:'center'});subCompany.focus();
 }
 function cancelSubcontractorEdit(){
  subEditId.value='';subCompany.value=subContact.value=subEmail.value=subPhone.value='';subHeadOfficeAddress.value='';if(window.subAuthUser)subAuthUser.value='';
  subSaveBtn.textContent='Enregistrer';subCancelEditBtn.style.display='none';subStephaneFillBtn.style.display='none';
+ rmlSubClientEditChoice();
 }
 async function saveSubcontractor(){
  const company=subCompany.value.trim();if(!company){alert("Renseignez le nom de l'entreprise.");return}
@@ -5836,7 +5890,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <style>
-/* V42.48 — éditeur des bons et retour depuis la fiche client. */
+/* V42.49 — éditeur des bons et retour depuis la fiche client. */
 #rmlV42Layer .v42box{border-radius:18px;box-shadow:0 4px 18px #1639540b}
 #rmlV42Layer .v42hero{background:linear-gradient(120deg,#123b5a,#176584);color:white;border:0;padding:22px}
 #rmlV42Layer .v42hero h2{color:white;margin:0 0 8px;font-size:24px}
@@ -5865,7 +5919,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media(max-width:700px){#rmlV42Layer .v42section{padding:12px}#rmlV42Layer .v42hero{padding:16px}#rmlV42Layer .v42hero h2{font-size:20px}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.48</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.49</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <input id="v42Type" type="hidden" value="BC">
 <div class="v42editor-title"><h3 id="rmlTradeTitle">Bon de commande fournisseur</h3><span id="rmlTradeMode">Nouveau bon</span></div>
