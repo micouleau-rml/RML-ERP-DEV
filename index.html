@@ -635,7 +635,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.46</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.47</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -839,7 +839,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 
 <div class="modal" id="stockHistoryModal"><div class="modal-card"><div class="modal-head"><h2 id="stockHistoryTitle">Historique du stock</h2><button class="btn secondary" data-close="stockHistoryModal">Fermer</button></div><div id="stockHistoryList"></div></div></div>
 <style>
-/* V42.46 — fiche client en blocs colorés. */
+/* V42.47 — fiche client en blocs colorés. */
 #clientModal .modal-card{background:#f6f8fc;border-color:#c8d8e6;border-radius:20px}
 #clientModal .modal-head{background:linear-gradient(120deg,#123b5a,#176584);color:white;border-bottom:0;padding:22px 20px}
 #clientModal .modal-head h3{color:white;font-size:25px}
@@ -2822,7 +2822,7 @@ function choosePlanningJob(jobId){if(!planningEnsureEdit(planningPickerDate))ret
 
 
 
-/* V42.46 : alertes de contrats à signer, isolées du processus de connexion. */
+/* V42.47 : alertes de contrats à signer, isolées du processus de connexion. */
 async function rmlV4212LoadSignatures(){
  const panel=document.getElementById('rmlV4212SignaturePanel');
  const list=document.getElementById('rmlV4212SignatureList');
@@ -4880,11 +4880,74 @@ async function rmlSubmitDocumentOrder(e){
  finally{btn.disabled=false}
 }
 /* V19.20.1 — Aperçu intégré : aucun window.open asynchrone (Safari iPad / PWA). */
+// Aperçu PDF paginé : une seule page rendue à la fois pour limiter la mémoire sur iPad.
+let rmlAtelierPdfJsPromise=null;
+function rmlLoadAtelierPdfJs(){
+ if(!rmlAtelierPdfJsPromise){
+  const base='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/';
+  rmlAtelierPdfJsPromise=import(base+'legacy/build/pdf.min.mjs').then(lib=>{
+   lib.GlobalWorkerOptions.workerSrc=base+'legacy/build/pdf.worker.min.mjs';
+   return lib;
+  }).catch(error=>{rmlAtelierPdfJsPromise=null;throw error});
+ }
+ return rmlAtelierPdfJsPromise;
+}
+async function rmlShowAtelierPdf(panel,status,url,name){
+ const lib=await rmlLoadAtelierPdfJs();if(!panel.isConnected)return;
+ const base='https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/';
+ const loading=lib.getDocument({url,cMapUrl:base+'cmaps/',cMapPacked:true,standardFontDataUrl:base+'standard_fonts/',wasmUrl:base+'wasm/',iccUrl:base+'iccs/'});
+ panel.rmlPdfLoading=loading;
+ const pdf=await loading.promise;if(!panel.isConnected)return;
+ const shell=document.createElement('div');shell.style.cssText='flex:1;min-height:0;display:flex;flex-direction:column;';
+ const controls=document.createElement('div');controls.style.cssText='display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px;background:white;border-bottom:1px solid #cbd5e1;flex-shrink:0;';
+ const previous=document.createElement('button');previous.type='button';previous.className='btn secondary';previous.textContent='← Page précédente';
+ const next=document.createElement('button');next.type='button';next.className='btn secondary';next.textContent='Page suivante →';
+ const choose=document.createElement('select');choose.setAttribute('aria-label','Aller à la page');choose.style.cssText='width:auto;min-width:140px;min-height:44px;';
+ for(let n=1;n<=pdf.numPages;n++){const option=document.createElement('option');option.value=String(n);option.textContent='Page '+n+' / '+pdf.numPages;choose.append(option)}
+ const zoom=document.createElement('select');zoom.setAttribute('aria-label','Zoom du document');zoom.style.cssText='width:auto;min-height:44px;';
+ for(const [value,label] of [['1','Largeur écran'],['1.5','Zoom 150 %'],['2','Zoom 200 %']]){const option=document.createElement('option');option.value=value;option.textContent=label;zoom.append(option)}
+ zoom.value='1';
+ status.style.cssText='padding:4px;font-size:13px;color:#334155;';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+ const area=document.createElement('div');area.style.cssText='flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;text-align:center;padding:12px;box-sizing:border-box;touch-action:pan-x pan-y pinch-zoom;';
+ const canvas=document.createElement('canvas');canvas.style.cssText='display:inline-block;background:white;box-shadow:0 2px 8px #0002;max-width:none;';canvas.setAttribute('role','img');area.append(canvas);
+ panel.rmlPdfCanvas=canvas;
+ status.replaceWith(shell);controls.append(previous,choose,next,zoom,status);shell.append(controls,area);
+ let current=1,busy=false,resizeAgain=false;
+ const update=()=>{previous.disabled=busy||current<=1;next.disabled=busy||current>=pdf.numPages;choose.disabled=busy;zoom.disabled=busy;choose.value=String(current)};
+ const draw=async(number)=>{
+  if(busy||!panel.isConnected||number<1||number>pdf.numPages)return;
+  busy=true;update();status.textContent='Chargement de la page '+number+' / '+pdf.numPages+'…';let page=null;
+  try{
+   page=await pdf.getPage(number);if(!panel.isConnected)return;
+   const natural=page.getViewport({scale:1});
+   const width=Math.max(200,area.clientWidth-24)*Number(zoom.value||1);
+   const viewport=page.getViewport({scale:width/natural.width});
+   const ratio=Math.min(window.devicePixelRatio||1,2,Math.sqrt(3000000/(viewport.width*viewport.height)));
+   canvas.width=Math.max(1,Math.floor(viewport.width*ratio));canvas.height=Math.max(1,Math.floor(viewport.height*ratio));
+   canvas.style.width=Math.floor(viewport.width)+'px';canvas.style.height=Math.floor(viewport.height)+'px';
+   canvas.setAttribute('aria-label',name+' — page '+number+' sur '+pdf.numPages);
+   const render=page.render({canvasContext:canvas.getContext('2d'),viewport,transform:ratio===1?null:[ratio,0,0,ratio,0,0]});panel.rmlPdfRender=render;
+   await render.promise;if(!panel.isConnected)return;
+   current=number;area.scrollTop=0;area.scrollLeft=0;status.textContent=pdf.numPages+' page'+(pdf.numPages>1?'s':'')+' dans ce document';
+  }catch(error){if(panel.isConnected&&error?.name!=='RenderingCancelledException')status.textContent='Aperçu indisponible : '+(error.message||error)+'. Utilisez « Ouvrir dans Safari ».'}
+  finally{if(page)page.cleanup();panel.rmlPdfRender=null;busy=false;if(panel.isConnected){update();if(resizeAgain){resizeAgain=false;void draw(current)}}}
+ };
+ previous.onclick=()=>draw(current-1);next.onclick=()=>draw(current+1);choose.onchange=()=>draw(Number(choose.value));zoom.onchange=()=>draw(current);
+ panel.rmlPdfResize=()=>{clearTimeout(panel.rmlPdfResizeTimer);panel.rmlPdfResizeTimer=setTimeout(()=>{if(busy)resizeAgain=true;else void draw(current)},180)};
+ window.addEventListener('resize',panel.rmlPdfResize);
+ await draw(1);
+}
+
 function rmlCloseAtelierDocument(){
  const panel=document.getElementById('rmlAtelierDocumentViewer');
  if(!panel)return;
  const frame=panel.querySelector('iframe');if(frame)frame.removeAttribute('src');
+ if(panel.rmlPdfResize)window.removeEventListener('resize',panel.rmlPdfResize);
+ clearTimeout(panel.rmlPdfResizeTimer);
  panel.remove();document.body.style.overflow=panel.dataset.previousOverflow||'';
+ try{panel.rmlPdfRender?.cancel()}catch(e){}
+ if(panel.rmlPdfLoading)Promise.resolve(panel.rmlPdfLoading.destroy()).catch(()=>{});
+ if(panel.rmlPdfCanvas){panel.rmlPdfCanvas.width=0;panel.rmlPdfCanvas.height=0;}
 }
 async function rmlOpenAtelierDocument(orderId,index){
  const o=rmlAtelier8Rows.find(x=>String(x.id)===String(orderId));
@@ -4909,8 +4972,7 @@ async function rmlOpenAtelierDocument(orderId,index){
   const url=data.signedUrl;link.href=url;download.href=url;link.style.display='inline-flex';download.style.display='inline-flex';
   const name=String(doc.name||doc.path).toLowerCase();
   if(/\.(pdf)(?:$|\?)/i.test(name)){
-   const frame=document.createElement('iframe');frame.title='Aperçu PDF — '+(doc.name||'document');frame.src=url;frame.style.cssText='width:100%;flex:1;min-height:0;border:0;background:#fff;touch-action:pan-x pan-y;';
-   status.replaceWith(frame);
+   await rmlShowAtelierPdf(panel,status,url,doc.name||'Document atelier');
   }else if(/\.(png|jpe?g|webp|gif)(?:$|\?)/i.test(name)){
    const area=document.createElement('div');area.style.cssText='flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;text-align:center;padding:12px;';
    const img=document.createElement('img');img.src=url;img.alt=doc.name||'Document';img.style.cssText='max-width:100%;height:auto;';area.append(img);status.replaceWith(area);
@@ -5768,7 +5830,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media print{body>*:not(#rmlV42Print){display:none!important}#rmlV42Print{display:block!important;position:static!important}#rmlV42Layer{display:none!important}}
 </style>
 <style>
-/* V42.46 — éditeur des bons et retour depuis la fiche client. */
+/* V42.47 — éditeur des bons et retour depuis la fiche client. */
 #rmlV42Layer .v42box{border-radius:18px;box-shadow:0 4px 18px #1639540b}
 #rmlV42Layer .v42hero{background:linear-gradient(120deg,#123b5a,#176584);color:white;border:0;padding:22px}
 #rmlV42Layer .v42hero h2{color:white;margin:0 0 8px;font-size:24px}
@@ -5797,7 +5859,7 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 @media(max-width:700px){#rmlV42Layer .v42section{padding:12px}#rmlV42Layer .v42hero{padding:16px}#rmlV42Layer .v42hero h2{font-size:20px}}
 </style>
 <div id="rmlV42Layer" style="display:none"><div class="v42wrap">
-<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.46</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
+<div class="v42box v42hero"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Bons de commande & livraison · V42.47</h2><button class="v42gray" onclick="rmlV42Close()">Fermer</button></div><p>Pour un client : cliquez sur « + Bon de livraison ». Pour un fournisseur : « + Bon de commande ».</p><div id="rmlV42Status" aria-live="polite"></div><button class="v42bc" id="rmlTradeNewBC" onclick="rmlV42New('BC')">+ Bon de commande</button><button class="v42bl" id="rmlTradeNewBL" onclick="rmlV42New('BL')">+ Bon de livraison</button><button class="v42gray" onclick="rmlV42List()">Actualiser les bons</button></div>
 <div id="rmlV42Editor" class="v42box" style="display:none">
 <input id="v42Type" type="hidden" value="BC">
 <div class="v42editor-title"><h3 id="rmlTradeTitle">Bon de commande fournisseur</h3><span id="rmlTradeMode">Nouveau bon</span></div>
