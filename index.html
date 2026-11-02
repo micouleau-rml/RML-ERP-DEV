@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V42.59</title>
+<title>RML ERP — V42.60</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -647,7 +647,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.59</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.60</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -1542,20 +1542,15 @@ header .wrap{position:relative;z-index:1}
 &lt;footer&gt;&lt;div class=&quot;footer-inner&quot;&gt;&lt;span&gt;RML HEURES — V48&lt;/span&gt;&lt;span id=&quot;syncStatus&quot;&gt;Connexion Supabase…&lt;/span&gt;&lt;/div&gt;&lt;/footer&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2&quot;&gt;&lt;/script&gt;
 &lt;script&gt;
-const SUPABASE_URL=&quot;https://jbtsncvuobptxyzcoqpf.supabase.co&quot;;
-const SUPABASE_KEY=&quot;sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr&quot;;
-// V42.59 : le module utilise exactement le client et la session de l’ERP.
+const SUPABASE_URL=&quot;https://dbsibzcqhtecknpkkuxa.supabase.co&quot;;
+const SUPABASE_KEY=&quot;sb_publishable_WE_zFh9O23cF7zEDie4L3w_JUsSb9ao&quot;;
+// V42.60 : le module utilise le client dédié à la base HEURES.
 const rmlSharedClientReady=parent.rmlHeuresClientReady;
 const db={from(...args){
  const client=parent.rmlHeuresSupabaseClient;
  if(!client)throw new Error(&#x27;Connexion ERP en cours de démarrage&#x27;);
  return client.from(...args);
 }};
-if(rmlSharedClientReady)rmlSharedClientReady.then(client=&gt;{
- client.auth.onAuthStateChange(event=&gt;{
-  if(event===&#x27;SIGNED_IN&#x27;)setTimeout(()=&gt;syncFromCloud(),0);
- });
-});
 const KEY=&#x27;rml_heures_v1&#x27;;
 const defaultEmployees=[
  {name:&#x27;FOUCHER BAPTISTE&#x27;,rate:12.50},{name:&#x27;JULIEN&#x27;,rate:15.00},{name:&#x27;XAVIER&#x27;,rate:16.88},{name:&#x27;GOIRE SYLVAIN&#x27;,rate:14.70},{name:&#x27;QUENTIN&#x27;,rate:15.82},{name:&#x27;MAXIME B&#x27;,rate:13.16},{name:&#x27;CHRISTOPHER LARROZE-JARDINE&#x27;,rate:14.70},{name:&#x27;THUBIN ALEXIS&#x27;,rate:12.02},{name:&#x27;MAXIME MONCHAUX&#x27;,rate:30.13}
@@ -3832,12 +3827,12 @@ const PREPARATION_APP_URL='https://micouleau-rml.github.io/RML-PR-PA-CHANTIER/';
 const SUPABASE_URL='https://jbtsncvuobptxyzcoqpf.supabase.co';
 const SUPABASE_KEY='sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-// V42.58 — même projet et même session que RML HEURES V48.
-const HEURES_SUPABASE_URL=SUPABASE_URL;
-const HEURES_SUPABASE_KEY=SUPABASE_KEY;
-const heuresSb=sb;
-window.rmlHeuresSupabaseClient=sb;
-window.rmlResolveHeuresClient(sb);
+// V42.60 — connexion dédiée à la base HEURES, distincte de la base ERP.
+const HEURES_SUPABASE_URL='https://dbsibzcqhtecknpkkuxa.supabase.co';
+const HEURES_SUPABASE_KEY='sb_publishable_WE_zFh9O23cF7zEDie4L3w_JUsSb9ao';
+const heuresSb=window.supabase.createClient(HEURES_SUPABASE_URL,HEURES_SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+window.rmlHeuresSupabaseClient=heuresSb;
+window.rmlResolveHeuresClient(heuresSb);
 let db={clients:[],chantiers:[],users:[]};
 const DEFAULT_PROFESSIONS=['Architecte','Maître d’œuvre','Charpentier','Maçon','Constructeur maison','Constructeur métallique','Professionnel divers','Particulier','Étancheur','Plombier','Zingueur','Couvreur','Menuisier','Plieur','Poseur gouttière alu','Revendeur','Fournisseur MP','SAV'];
 let clientProfessions=[...DEFAULT_PROFESSIONS];
