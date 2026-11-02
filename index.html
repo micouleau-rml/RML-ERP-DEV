@@ -14,7 +14,10 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V42.58</title>
+<title>RML ERP — V42.59</title>
+<script>
+window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -1541,7 +1544,18 @@ header .wrap{position:relative;z-index:1}
 &lt;script&gt;
 const SUPABASE_URL=&quot;https://jbtsncvuobptxyzcoqpf.supabase.co&quot;;
 const SUPABASE_KEY=&quot;sb_publishable_Cef7tlefoqP-rNh-akbcUw_OnYxbAQr&quot;;
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+// V42.59 : le module utilise exactement le client et la session de l’ERP.
+const rmlSharedClientReady=parent.rmlHeuresClientReady;
+const db={from(...args){
+ const client=parent.rmlHeuresSupabaseClient;
+ if(!client)throw new Error(&#x27;Connexion ERP en cours de démarrage&#x27;);
+ return client.from(...args);
+}};
+if(rmlSharedClientReady)rmlSharedClientReady.then(client=&gt;{
+ client.auth.onAuthStateChange(event=&gt;{
+  if(event===&#x27;SIGNED_IN&#x27;)setTimeout(()=&gt;syncFromCloud(),0);
+ });
+});
 const KEY=&#x27;rml_heures_v1&#x27;;
 const defaultEmployees=[
  {name:&#x27;FOUCHER BAPTISTE&#x27;,rate:12.50},{name:&#x27;JULIEN&#x27;,rate:15.00},{name:&#x27;XAVIER&#x27;,rate:16.88},{name:&#x27;GOIRE SYLVAIN&#x27;,rate:14.70},{name:&#x27;QUENTIN&#x27;,rate:15.82},{name:&#x27;MAXIME B&#x27;,rate:13.16},{name:&#x27;CHRISTOPHER LARROZE-JARDINE&#x27;,rate:14.70},{name:&#x27;THUBIN ALEXIS&#x27;,rate:12.02},{name:&#x27;MAXIME MONCHAUX&#x27;,rate:30.13}
@@ -1611,7 +1625,7 @@ async function pushSettings(){
 }
 async function pushEntry(e){const {error}=await db.from(&#x27;rml_heures_entries&#x27;).upsert(entryToRow(e),{onConflict:&#x27;entry_date,employee_name&#x27;});if(error)throw error}
 async function pushAllEntries(){if(!state.entries.length)return;const {error}=await db.from(&#x27;rml_heures_entries&#x27;).upsert(state.entries.map(entryToRow),{onConflict:&#x27;entry_date,employee_name&#x27;});if(error)throw error}
-async function syncFromCloud(){if(!navigator.onLine){setSyncStatus(&#x27;Hors ligne — sauvegarde locale&#x27;,false);return false}setSyncStatus(&#x27;Synchronisation…&#x27;);try{const [er,sr,tr]=await Promise.all([db.from(&#x27;rml_heures_employees&#x27;).select(&#x27;*&#x27;).order(&#x27;id&#x27;),db.from(&#x27;rml_heures_settings&#x27;).select(&#x27;*&#x27;).eq(&#x27;setting_key&#x27;,&#x27;app_settings&#x27;).maybeSingle(),db.from(&#x27;rml_heures_entries&#x27;).select(&#x27;*&#x27;).order(&#x27;entry_date&#x27;)]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(er.data&amp;&amp;er.data.length){state.employees=er.data.map(x=&gt;({name:x.name,rate:Number(x.hourly_rate)||0,active:x.active!==false}))}else{await pushEmployees()}if(sr.data?.setting_value){
+async function syncFromCloud(){if(rmlSharedClientReady)await rmlSharedClientReady;if(!navigator.onLine){setSyncStatus(&#x27;Hors ligne — sauvegarde locale&#x27;,false);return false}setSyncStatus(&#x27;Synchronisation…&#x27;);try{const [er,sr,tr]=await Promise.all([db.from(&#x27;rml_heures_employees&#x27;).select(&#x27;*&#x27;).order(&#x27;id&#x27;),db.from(&#x27;rml_heures_settings&#x27;).select(&#x27;*&#x27;).eq(&#x27;setting_key&#x27;,&#x27;app_settings&#x27;).maybeSingle(),db.from(&#x27;rml_heures_entries&#x27;).select(&#x27;*&#x27;).order(&#x27;entry_date&#x27;)]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(er.data&amp;&amp;er.data.length){state.employees=er.data.map(x=&gt;({name:x.name,rate:Number(x.hourly_rate)||0,active:x.active!==false}))}else{await pushEmployees()}if(sr.data?.setting_value){
   try{
     state.settings=normalizeSettings(JSON.parse(sr.data.setting_value));
     // Réécrit automatiquement le format actuel dans Supabase :
@@ -3822,6 +3836,8 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSe
 const HEURES_SUPABASE_URL=SUPABASE_URL;
 const HEURES_SUPABASE_KEY=SUPABASE_KEY;
 const heuresSb=sb;
+window.rmlHeuresSupabaseClient=sb;
+window.rmlResolveHeuresClient(sb);
 let db={clients:[],chantiers:[],users:[]};
 const DEFAULT_PROFESSIONS=['Architecte','Maître d’œuvre','Charpentier','Maçon','Constructeur maison','Constructeur métallique','Professionnel divers','Particulier','Étancheur','Plombier','Zingueur','Couvreur','Menuisier','Plieur','Poseur gouttière alu','Revendeur','Fournisseur MP','SAV'];
 let clientProfessions=[...DEFAULT_PROFESSIONS];
