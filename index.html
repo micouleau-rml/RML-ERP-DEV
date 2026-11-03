@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V42.63</title>
+<title>RML ERP — V42.64</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -624,6 +624,29 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 #v40SubMileagePanel button[onclick="v40SaveSubMileage()"]{background:#147a3a!important;color:#fff!important;font-weight:800!important;border:2px solid #0b5527!important;text-shadow:0 1px 1px rgba(0,0,0,.28);box-shadow:0 3px 7px rgba(0,0,0,.18)}
 @media(max-width:850px){#subPortalList button.rml-job-docs,#subPortalList button.rml-job-history{min-height:42px;white-space:normal;line-height:1.25;text-align:center}}
 </style>
+<style>
+#teamsList { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
+#teamsList .sub-card {
+  min-width: 0;
+  border: 2px solid #4679ad;
+  border-left: 5px solid #24568a;
+  background: #f5f9ff;
+  overflow-wrap: anywhere;
+}
+#teamsList .field, #teamsList select { min-width: 0; max-width: 100%; }
+#teamsList select { width: 100%; }
+#teamsList .actions { flex-wrap: wrap; }
+#teamsList .actions .team-save {
+  background: #164e89;
+  color: #fff;
+  min-height: 44px;
+  font-weight: 800;
+}
+@media (max-width: 640px) {
+  #teamsList { grid-template-columns: minmax(0, 1fr); }
+  #teamsList .actions .team-save { width: 100%; }
+}
+</style>
 </head>
 <body>
 <div id="erpSaveToast" class="erp-save-toast" role="status" aria-live="polite"></div>
@@ -647,7 +670,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.63</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.64</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -5851,7 +5874,7 @@ function renderTeamsAdmin(){
   const linkedUser=link?users.find(u=>u.user_id===link.auth_user_id):null;
   const usedIds=new Set(erpTeamLinks.filter(x=>Number(x.team_number)!==n).map(x=>x.auth_user_id));
   const options=users.filter(u=>!usedIds.has(u.user_id)||u.user_id===link?.auth_user_id).map(u=>`<option value="${esc(u.user_id)}" ${u.user_id===link?.auth_user_id?'selected':''}>${esc(u.nom||u.email||'Utilisateur')} — ${esc(u.email||'')} (${esc(roleLabel(u.role))})</option>`).join('');
-  return `<div class="sub-card"><div class="row between"><div><h3 style="margin-bottom:4px">${rmlTeamLabel(n)}</h3><div class="sub-meta">Compte permanent de l’équipe</div></div>${linkedUser?'<span class="status actif">Compte actif</span>':'<span class="status attente">Non rattaché</span>'}</div><div class="field" style="margin-top:12px"><label>Compte d’accès ERP</label><select id="teamAccount_${n}"><option value="">Aucun compte rattaché</option>${options}</select></div>${linkedUser?`<div class="sub-meta" style="margin-top:8px"><strong>${esc(linkedUser.nom||linkedUser.email||'Utilisateur')}</strong><br>${esc(linkedUser.email||'')} · ${esc(roleLabel(linkedUser.role))}</div>`:''}<div class="actions" style="margin-top:12px"><button class="btn" type="button" onclick="saveTeamAccount(${n})">Enregistrer</button>${linkedUser?`<button class="btn secondary" type="button" onclick="editAccess('${linkedUser.user_id}')">Modifier les droits</button><button class="btn danger" type="button" onclick="unlinkTeamAccount(${n},'${linkedUser.user_id}')">Détacher</button>`:''}</div></div>`;
+  return `<div class="sub-card"><div class="row between"><div><h3 style="margin-bottom:4px">${rmlTeamLabel(n)}</h3><div class="sub-meta">Compte permanent de l’équipe</div></div>${linkedUser?'<span class="status actif">Compte actif</span>':'<span class="status attente">Non rattaché</span>'}</div><div class="field" style="margin-top:12px"><label>Compte d’accès ERP</label><select id="teamAccount_${n}"><option value="">Aucun compte rattaché</option>${options}</select></div>${linkedUser?`<div class="sub-meta" style="margin-top:8px"><strong>${esc(linkedUser.nom||linkedUser.email||'Utilisateur')}</strong><br>${esc(linkedUser.email||'')} · ${esc(roleLabel(linkedUser.role))}</div>`:''}<div class="actions" style="margin-top:12px"><button class="btn team-save" type="button" onclick="saveTeamAccount(${n})">Enregistrer</button>${linkedUser?`<button class="btn secondary" type="button" onclick="editAccess('${linkedUser.user_id}')">Modifier les droits</button><button class="btn danger" type="button" onclick="unlinkTeamAccount(${n},'${linkedUser.user_id}')">Détacher</button>`:''}</div></div>`;
  }).join('');
 }
 async function saveTeamAccount(teamNumber){
