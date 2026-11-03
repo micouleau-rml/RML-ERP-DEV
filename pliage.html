@@ -2009,6 +2009,11 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
       <div class="field col-12">
   <label for="settingsClientSelect">Client à modifier</label>
   <select id="settingsClientSelect"></select>
+  <div id="erpPliageDirectory" hidden>
+    <label for="erpPliageClient">Client du fichier ERP</label>
+    <select id="erpPliageClient"></select>
+    <small>Choisis un client ERP, renseigne ses tarifs puis enregistre pour l’ajouter à la liste du devis.</small>
+  </div>
 </div>
 
 <div class="field col-12">
@@ -4629,7 +4634,41 @@ const closeSettingsBtn=document.getElementById("closeSettingsBtn");
   });
 }
 const mobileSettingsBtn=document.getElementById("mobileSettingsBtn");
-function openSettings(){settingsModal.classList.add("open");}
+const erpPliageClient = document.getElementById("erpPliageClient");
+const erpPliageClientKey = name => name.trim().normalize("NFC").toLocaleLowerCase("fr");
+
+function openSettings(){
+  const directory = document.getElementById("erpPliageDirectory");
+  let names = [];
+  try {
+    if (parent !== window) names = parent.getPliageDirectoryClients?.() || [];
+  } catch {
+    // L’application autonome reste utilisable sans accès à l’ERP.
+  }
+  directory.hidden = names.length === 0;
+  erpPliageClient.replaceChildren(new Option("Choisir un client ERP", ""));
+  for (const name of [...new Set(names)].sort((a,b) => a.localeCompare(b,"fr"))) {
+    erpPliageClient.add(new Option(name,name));
+  }
+  settingsModal.classList.add("open");
+}
+
+erpPliageClient.addEventListener("change", () => {
+  const name = erpPliageClient.value;
+  if (!name) return;
+  const existing = clients.find(client => erpPliageClientKey(client.name) === erpPliageClientKey(name));
+  if (existing) {
+    selectedClient.value = existing.id;
+    renderClientForm();
+    updatePriceDisplay();
+  } else {
+    newClientForm();
+    settingsClientSelect.selectedIndex = -1;
+    clientName.value = name;
+  }
+  erpPliageClient.value = "";
+});
+
 function closeSettings(){settingsModal.classList.remove("open");}
 openSettingsBtn.addEventListener("click",openSettings);
 if(mobileSettingsBtn){mobileSettingsBtn.addEventListener("click",openSettings);}
