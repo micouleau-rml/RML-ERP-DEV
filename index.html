@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V42.71</title>
+<title>RML ERP — V42.73</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -44,6 +44,7 @@ nav{display:flex;gap:8px;flex-wrap:wrap;background:white;border:1px solid var(--
 #mainNav button:nth-child(11){background:#fceef5;border-color:#e1aac5}
 #mainNav button:nth-child(12){background:#f2f2f2;border-color:#bfc4c8}
 #mainNav button:nth-child(13){background:#fff0f0;border-color:#e2aaaa}
+#mainNav button[data-view="rmlTour"]{background:#e9f5f4;border-color:#79b9b2;color:#164e49}
 #mainNav button[data-view="planning"]{background:#e8f4ff;border-color:#7fb6e5}
 #mainNav button[data-view="equipes"]{background:#eaf8ef;border-color:#7bc49a}
 #mainNav button.active{background:var(--navy)!important;border-color:var(--navy)!important;color:#fff!important;box-shadow:0 3px 8px rgba(17,58,93,.25)}
@@ -696,10 +697,58 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.71</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.73</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
-<nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button data-view="tourneeGps" data-perm-nav="planning" style="display:none">GPS / Tournée</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
+<nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
+<section id="rmlTour" class="view">
+<style>
+#rmlTour .tour-layout{display:grid;grid-template-columns:minmax(280px,1fr) minmax(0,1.6fr);gap:18px}
+#rmlTour .tour-stop{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:end;margin-bottom:10px}
+#rmlTour .tour-stop input{width:100%}
+#rmlTour .tour-stop label{margin:0}
+#rmlTour .tour-actions{display:flex;flex-wrap:wrap;gap:6px;margin-block:12px}
+#rmlTourMap{height:clamp(320px,55vh,620px);border-radius:12px;background:#e9eff4;z-index:0}
+#rmlTour .tour-map-toolbar{display:flex;justify-content:flex-end;margin-bottom:8px}
+#rmlTourMapDialog{position:fixed;inset:0;transform:none;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:12px;padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom));border:0;background:#fff;color:inherit}
+#rmlTourMapDialog[open]{display:flex;flex-direction:column}
+#rmlTourMapDialog .tour-map-toolbar{align-items:center;justify-content:space-between;gap:8px}
+#rmlTourMapDialog #rmlTourMap{height:auto;min-height:0;flex:1}
+#rmlTourMap .tour-pin{display:grid;place-items:center;border:2px solid white;border-radius:50%;background:#075caa;color:white;font-weight:bold;box-shadow:0 1px 4px #0008}
+@media(max-width:800px){#rmlTour .tour-layout{grid-template-columns:1fr}}
+</style>
+<div class="panel">
+<h2>Carte de tournée</h2>
+<p class="muted">Indiquez le départ puis les adresses dans votre ordre de passage. Les durées sont estimées sans trafic en direct.</p>
+<div class="tour-layout">
+<div>
+<form id="rmlTourForm">
+<div id="rmlTourStops"></div>
+<div class="tour-actions">
+<button type="button" class="btn secondary" id="rmlTourAdd">+ Ajouter un arrêt</button>
+<button type="submit" class="btn" id="rmlTourCalculate">Afficher ma tournée</button>
+</div>
+</form>
+<p id="rmlTourStatus" role="status"></p>
+<div id="rmlTourResult" hidden>
+<strong id="rmlTourTotal"></strong>
+<ul id="rmlTourLegs"></ul>
+</div>
+</div>
+<div>
+<div class="tour-map-toolbar"><button type="button" class="btn secondary" id="rmlTourExpand" aria-haspopup="dialog">Agrandir la carte</button></div>
+<div id="rmlTourMapHome"><div id="rmlTourMap" aria-label="Carte du parcours"></div></div>
+</div>
+<dialog id="rmlTourMapDialog" aria-labelledby="rmlTourMapTitle">
+<div class="tour-map-toolbar">
+<strong id="rmlTourMapTitle">Carte de tournée</strong>
+<button type="button" class="btn secondary" id="rmlTourCollapse" autofocus>Réduire la carte</button>
+</div>
+</dialog>
+</div>
+</div>
+</section>
+
 <section id="dashboard" class="view active">
   <div class="cards"><div class="metric"><strong id="mClients">0</strong><span>clients actifs</span></div><div class="metric"><strong id="mChantiers">0</strong><span>chantiers actifs</span></div><div class="metric"><strong id="mArchives">0</strong><span>chantiers archivés/terminés</span></div><div class="metric"><strong>7/9</strong><span>modules opérationnels</span></div></div>
   <div class="panel" id="rmlV1920FinishedPanel" style="display:none;margin-top:15px"><div class="planning-head"><div><h2>Travaux terminés à traiter</h2><div class="muted">Fabrications et chantiers terminés. Chaque utilisateur valide ses propres alertes.</div></div><button class="btn secondary" type="button" onclick="rmlV1920LoadFinished()">Actualiser</button></div><div id="rmlV1920FinishedList" class="muted">Chargement…</div></div>
@@ -3687,45 +3736,6 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
 </section>
 
 <section id="maintenance" class="view"><div class="panel"><div class="planning-head"><div><h2>Maintenance machines & véhicules</h2><div class="muted">Parc, entretiens périodiques, réparations, échéances et coûts. Données enregistrées dans ERP DEV.</div></div><div class="planning-actions"><button class="btn" onclick="newAsset()">+ Matériel / véhicule</button><button class="btn secondary" onclick="loadMaintenance()">Actualiser</button></div></div><div id="maintenanceStatus" class="notice" style="margin:12px 0">Chargement…</div><div id="maintenanceStats" class="maintenance-cards"></div><div class="maint-grid"><div><div class="field"><label>Rechercher dans le parc</label><input id="assetSearch" placeholder="Nom, immatriculation, marque…" oninput="renderAssets()"></div><div id="assetList" style="margin-top:10px"></div></div><div id="assetDetail"><div class="empty">Sélectionnez un véhicule ou une machine.</div></div></div></div></section>
-<section id="tourneeGps" class="view">
-<style>
-#tourneeGps label:not(.gps-check){display:grid;gap:4px}
-#tourneeGps .gps-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px;margin:12px 0}
-#tourneeGps .gps-row{border:1px solid var(--line,#ccd5df);border-radius:8px;margin:12px 0;padding:10px;min-width:0}
-#tourneeGps input:not([type=checkbox]),#tourneeGps select{width:100%;min-width:0}
-#gpsMap{height:380px;margin-top:12px;border-radius:8px}
-#gpsStops li{margin:.65em 0;overflow-wrap:anywhere}
-</style>
-<div class="panel">
-<h2>GPS / Tournée du jour</h2>
-<p class="muted">Préparez vos rendez-vous et calculez le parcours avec la circulation prévue. Les heures suivent le fuseau de votre appareil.</p>
-<form id="gpsForm">
-<div class="gps-fields">
-<label>Date <input name="date" type="date" required></label>
-<label>Heure de départ <input name="departure" type="time" required></label>
-<div><button type="button" id="gpsNow">Partir maintenant</button></div>
-<label>Fin de journée au plus tard <input name="finish" type="time" value="19:00" required></label>
-<label>Adresse du dépôt <input name="depot" maxlength="240" value="14 ZA de Calens, 33640 Beautiran"></label>
-<label>Point de départ <select name="origin"><option value="depot">Dépôt de Beautiran</option><option value="address">Autre adresse</option><option value="position">Ma position actuelle</option></select></label>
-<label id="gpsOriginAddress" hidden>Adresse de départ <input name="address" maxlength="240"></label>
-</div>
-<label class="gps-check"><input name="roundtrip" type="checkbox"> Retour au dépôt</label>
-<div id="gpsVisits"></div>
-<div class="toolbar">
-<button type="button" id="gpsAdd">Ajouter un rendez-vous</button>
-<button type="submit" id="gpsCalculate">Optimiser avec la circulation</button>
-</div>
-</form>
-<p id="gpsStatus" role="status" aria-live="polite"></p>
-<div id="gpsResult" hidden>
-<p id="gpsTotals"></p>
-<ol id="gpsStops"></ol>
-<p id="gpsSkipped"></p>
-<div id="gpsMap" role="region" aria-label="Carte Google Maps de la tournée"></div>
-<p id="gpsMapStatus" role="status"></p>
-</div>
-</div>
-</section>
 </main>
 
 <div class="modal" id="jobUnsavedModal" style="z-index:10000;position:fixed;inset:0;align-items:center;justify-content:center"><div class="modal-card" style="max-width:560px;margin:auto;position:relative;max-height:90vh;overflow:auto"><div class="modal-head"><h3>Modifications non enregistrées</h3></div><div style="padding:8px 0 4px">Voulez-vous enregistrer les modifications apportées au chantier ?</div><div class="actions" style="margin-top:18px"><button class="btn ok" type="button" id="jobUnsavedSave">Enregistrer</button><button class="btn secondary" type="button" id="jobUnsavedDiscard">Ne pas enregistrer</button><button class="btn secondary" type="button" id="jobUnsavedCancel">Annuler</button></div></div></div> <div class="modal" id="atelierModal"><div class="modal-card"><div class="modal-head"><h3 id="atelierModalTitle">Travail atelier</h3><button class="close" data-close="atelierModal">Fermer</button></div><form id="atelierForm" class="entry-grid" style="margin-top:14px"><input type="hidden" id="atelierEntityId"><div class="field wide"><label>Chantier *</label><select id="atelierJob" required></select></div><div class="field"><label>Statut</label><select id="atelierStatus"><option>À faire</option><option>En cours</option><option>Terminé</option></select></div><div class="field"><label>Priorité</label><select id="atelierPriority"><option>Normale</option><option>Haute</option><option>Urgente</option></select></div><div class="field wide"><label>Pièce / Travail *</label><input id="atelierPiece" required></div><div class="field"><label>Matière</label><input id="atelierMatiere" placeholder="Aluminium"></div><div class="field"><label>Épaisseur</label><input id="atelierEpaisseur" placeholder="7/10"></div><div class="field"><label>Couleur</label><input id="atelierCouleur"></div><div class="field"><label>Développé (mm)</label><input id="atelierDev" type="number" min="0" step="0.1"></div><div class="field"><label>Longueur (m)</label><input id="atelierLong" type="number" min="0" step="0.01"></div><div class="field"><label>Quantité</label><input id="atelierQty" type="number" min="0" step="1" value="1"></div><div class="field"><label>Date prévue</label><input id="atelierDate" type="date"></div><div class="field wide"><label>Notes</label><textarea id="atelierNotes" rows="3"></textarea></div><div class="wide actions"><button class="btn" type="submit">Enregistrer</button><button class="btn secondary" type="button" data-close="atelierModal">Annuler</button></div></form></div></div>
@@ -4432,8 +4442,8 @@ function go(view){
 if(document.getElementById('rmlCatalogView')?.classList.contains('active')&&view!=='rmlCatalogView'&&rmlCatalogHasChanges()){rmlNavigateFromCatalog(view);return;}
 
 if(isSubcontractorUser()){view='subPortal'}else if(isEmployeeUser() && view!=='atelierPliage8' && !(view==='clients'&&hasPerm('clients')) && !(currentAccess?.role==='chef_equipe'&&view==='suivi')){view='employeePortal'}
-if(view==='tourneeGps'&&!hasPerm('planning'))view='dashboard';
-if(view==='tourneeGps')window.rmlGpsOpen();
+if(view==='rmlTour'&&!hasPerm('chantiers'))view='dashboard';
+if(view==='rmlTour')requestAnimationFrame(()=>window.rmlOpenTourMap?.());
 if(view==='atelierPliage8'&&!rmlCanAtelier8())view=isEmployeeUser()?'employeePortal':'dashboard';
 if(view==='atelierPliage8')setTimeout(rmlLoadAtelier8,0);if(view==='preparation')setTimeout(()=>{loadPreparationApp();if(currentPrepJobId)loadJobDocumentsPanel(currentPrepJobId);},0);if(view==='stock'&&!hasPerm('stock'))view='dashboard';if(view==='equipes'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='stock')loadStock();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='equipes')loadTeamsAdmin();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security'){renderResetStats();rmlMonitorRefresh();setTimeout(v37Init,0);}if(view==='page-forecast')renderMonthlyForecast();
 // V27 mobile : afficher immédiatement le module sélectionné sous l'en-tête.
@@ -4738,7 +4748,7 @@ async function onSignedIn(){
   await refreshData();
   return true;
 }
-logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;window.rmlGpsReset();db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
+logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
 async function resetClientForm({deferCode=false}={}){clientForm.reset();rmlContactLoad('');clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';if(!deferCode){try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)}};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools){clientEditTools.style.display='flex';}if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='none';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='none';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Créer le client';window.rmlClientNewSnapshot=JSON.stringify(readClientForm());updateClientDraftStatus()}
 newClientBtn.onclick=async()=>{if(!hasPerm('clients'))return;await resetClientForm();openModal('clientModal')}
 async function generateClientCodes(count=1){
@@ -9453,6 +9463,228 @@ function rmlV42Print(noSignature=false){
 }
 const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allowed())clearInterval(v42NavTimer)},1500);
 </script>
-<script src="./tournee-gps.js"></script>
+<script>
+(() => {
+  const byId = id => document.getElementById(id);
+  const form = byId('rmlTourForm');
+  const stops = byId('rmlTourStops');
+  const status = byId('rmlTourStatus');
+  const result = byId('rmlTourResult');
+  const calculate = byId('rmlTourCalculate');
+  const origin = 'https://data.geopf.fr';
+  const addresses = new Map();
+  const routes = new Map();
+  let library, map, drawing, request, hasResult = false;
+
+  function loadMapLibrary() {
+    if (library) return library;
+    const root = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet';
+    const css = Object.assign(document.createElement('link'), {rel:'stylesheet', href:root+'.css'});
+    const script = Object.assign(document.createElement('script'), {src:root+'.js'});
+    library = Promise.all([css, script].map(element => new Promise((resolve, reject) => {
+      element.onload = resolve;
+      element.onerror = () => reject(new Error('La carte ne se charge pas. Réessayez.'));
+      document.head.append(element);
+    }))).catch(error => {
+      css.remove();
+      script.remove();
+      library = null;
+      throw error;
+    });
+    return library;
+  }
+
+  async function initializeMap() {
+    await loadMapLibrary();
+    if (map) return;
+    map = L.map('rmlTourMap', {scrollWheelZoom:false}).setView([46.6, 2.5], 6);
+    const tiles = L.tileLayer(origin+'/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png', {
+      attribution:'© IGN – Géoplateforme', maxNativeZoom:19, maxZoom:19
+    }).addTo(map);
+    tiles.on('tileerror', () => {
+      if (!request && !status.textContent) status.textContent = 'Le fond de carte IGN est temporairement indisponible.';
+    });
+    drawing = L.layerGroup().addTo(map);
+  }
+
+  function renumber() {
+    const rows = [...stops.children];
+    rows.forEach((row, index) => {
+      row.querySelector('span').textContent = index ? 'Arrêt '+index : 'Départ';
+      const [up, down, remove] = row.querySelectorAll('button');
+      up.disabled = index < 2;
+      down.disabled = index === 0 || index === rows.length - 1;
+      remove.disabled = index === 0 || rows.length < 3;
+    });
+  }
+
+  function invalidate() {
+    request?.abort();
+    request = null;
+    calculate.disabled = false;
+    drawing?.clearLayers();
+    result.hidden = true;
+    status.textContent = '';
+    hasResult = false;
+  }
+
+  function addStop() {
+    const row = document.createElement('div');
+    row.className = 'tour-stop';
+    row.innerHTML = '<label><span></span><input required maxlength="200" placeholder="Rue, code postal et ville"></label><div><button type="button" class="btn secondary" aria-label="Monter cet arrêt">↑</button> <button type="button" class="btn secondary" aria-label="Descendre cet arrêt">↓</button> <button type="button" class="btn secondary" aria-label="Retirer cet arrêt">×</button></div>';
+    const [up, down, remove] = row.querySelectorAll('button');
+    if (!stops.children.length) up.parentElement.hidden = true;
+    up.onclick = () => reorder(row, row.previousElementSibling);
+    down.onclick = () => reorder(row.nextElementSibling, row);
+    remove.onclick = () => {
+      row.remove();
+      renumber();
+      invalidate();
+    };
+    stops.append(row);
+    renumber();
+    return row.querySelector('input');
+  }
+
+  function reorder(row, before) {
+    const refresh = hasResult || !!request;
+    stops.insertBefore(row, before);
+    renumber();
+    invalidate();
+    if (refresh) form.requestSubmit();
+  }
+
+  async function getJson(path, parameters, signal) {
+    const response = await fetch(origin+path+'?'+new URLSearchParams(parameters), {signal});
+    if (!response.ok) throw new Error('Le service IGN est indisponible. Réessayez dans un instant.');
+    return response.json();
+  }
+
+  async function locate(address, signal) {
+    if (addresses.has(address)) return addresses.get(address);
+    const data = await getJson('/geocodage/search', {q:address, index:'address', limit:'1'}, signal);
+    const match = data.features?.[0];
+    if (!match?.geometry?.coordinates?.every(Number.isFinite) || match.properties.score < 0.55) {
+      throw new Error('Adresse à préciser : '+address+'. Ajoutez le numéro, la rue et le code postal.');
+    }
+    const stop = {point:match.geometry.coordinates.join(','), label:match.properties.label};
+    addresses.set(address, stop);
+    return stop;
+  }
+
+  async function drive(from, to, signal) {
+    const key = from+'|'+to;
+    if (routes.has(key)) return routes.get(key);
+    if (from === to) return {duration:0, geometry:null};
+    const data = await getJson('/navigation/itineraire', {
+      resource:'bdtopo-osrm', start:from, end:to, profile:'car', optimization:'fastest',
+      geometryFormat:'geojson', timeUnit:'second', crs:'EPSG:4326'
+    }, signal);
+    if (!data.geometry?.coordinates?.length || data.duration == null || !Number.isFinite(Number(data.duration))) {
+      throw new Error('L’IGN n’a pas renvoyé de trajet pour cette étape.');
+    }
+    routes.set(key, data);
+    return data;
+  }
+
+  function duration(seconds) {
+    const minutes = Math.round(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    return hours ? hours+' h '+String(minutes % 60).padStart(2,'0') : minutes+' min';
+  }
+
+  function showTour(points, legs) {
+    const list = byId('rmlTourLegs');
+    list.replaceChildren();
+    drawing.clearLayers();
+    legs.forEach((leg, index) => {
+      if (leg.geometry) L.geoJSON(leg.geometry, {style:{color:'#075caa', weight:5}}).addTo(drawing);
+      const item = document.createElement('li');
+      item.textContent = (index ? 'Arrêt '+index : 'Départ')+' → arrêt '+(index+1)+' · '+duration(Number(leg.duration))+' · '+points[index+1].label;
+      list.append(item);
+    });
+    const bounds = L.featureGroup();
+    points.forEach(({point, label}, index) => {
+      const [lng, lat] = point.split(',').map(Number);
+      const popup = document.createElement('span');
+      popup.textContent = (index ? 'Arrêt '+index : 'Départ')+' · '+label;
+      const icon = L.divIcon({className:'tour-pin', html:index || 'D', iconSize:[27,27]});
+      const marker = L.marker([lat,lng], {icon, title:popup.textContent}).bindPopup(popup);
+      marker.addTo(drawing);
+      bounds.addLayer(marker);
+    });
+    drawing.eachLayer(layer => { if (layer.getBounds) bounds.addLayer(layer); });
+    map.invalidateSize();
+    map.fitBounds(bounds.getBounds(), {padding:[26,26], maxZoom:16});
+    byId('rmlTourTotal').textContent = 'Temps total de route : '+duration(legs.reduce((sum, leg) => sum+Number(leg.duration), 0));
+    status.textContent = 'Départ : '+points[0].label;
+    result.hidden = false;
+    hasResult = true;
+  }
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    invalidate();
+    const values = [...stops.querySelectorAll('input')].map(input => input.value.trim());
+    if (values.some(value => !value)) {
+      status.textContent = 'Renseignez toutes les adresses de la tournée.';
+      return;
+    }
+    const controller = new AbortController();
+    request = controller;
+    calculate.disabled = true;
+    status.textContent = 'Calcul de la tournée…';
+    const timeout = setTimeout(() => controller.abort(), 60000);
+    try {
+      await initializeMap();
+      const points = await Promise.all(values.map(value => locate(value, controller.signal)));
+      const legs = [];
+      for (let index = 1; index < points.length; index++) {
+        if (index > 1) await new Promise(resolve => setTimeout(resolve, 250));
+        legs.push(await drive(points[index-1].point, points[index].point, controller.signal));
+      }
+      if (request === controller && !controller.signal.aborted) showTour(points, legs);
+    } catch (error) {
+      if (request === controller) status.textContent = error.name === 'AbortError' ? 'Le calcul a pris trop de temps. Réessayez.' : error.message;
+    } finally {
+      clearTimeout(timeout);
+      if (request === controller) {
+        request = null;
+        calculate.disabled = false;
+      }
+    }
+  });
+
+  addStop();
+  addStop();
+  byId('rmlTourAdd').onclick = () => { invalidate(); addStop().focus(); };
+  stops.addEventListener('input', invalidate);
+  window.rmlOpenTourMap = () => initializeMap().then(() => map.invalidateSize()).catch(error => { status.textContent = error.message; });
+  const mapDialog = byId('rmlTourMapDialog');
+  const mapContainer = byId('rmlTourMap');
+  const expand = byId('rmlTourExpand');
+  const resizeMap = () => requestAnimationFrame(() => map?.invalidateSize());
+  expand.onclick = () => {
+    mapDialog.showModal();
+    mapDialog.append(mapContainer);
+    resizeMap();
+  };
+  byId('rmlTourCollapse').onclick = () => mapDialog.close();
+  mapDialog.addEventListener('close', () => {
+    byId('rmlTourMapHome').append(mapContainer);
+    resizeMap();
+    if (byId('rmlTour').classList.contains('active')) expand.focus();
+  });
+  byId('logoutBtn').addEventListener('click', () => {
+    if (mapDialog.open) mapDialog.close();
+    invalidate();
+    addresses.clear();
+    routes.clear();
+    stops.replaceChildren();
+    addStop();
+    addStop();
+  });
+})();
+</script>
 </body>
 </html>
