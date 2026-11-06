@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V42.73</title>
+<title>RML ERP — V42.74</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -697,7 +697,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.73</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.74</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -709,7 +709,10 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 #rmlTour .tour-stop label{margin:0}
 #rmlTour .tour-actions{display:flex;flex-wrap:wrap;gap:6px;margin-block:12px}
 #rmlTourMap{height:clamp(320px,55vh,620px);border-radius:12px;background:#e9eff4;z-index:0}
-#rmlTour .tour-map-toolbar{display:flex;justify-content:flex-end;margin-bottom:8px}
+#rmlTour .tour-map-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-bottom:8px}
+#rmlTour .tour-links{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0}
+#rmlTour .tour-links[hidden]{display:none}
+#rmlTour .tour-links a{text-decoration:underline}
 #rmlTourMapDialog{position:fixed;inset:0;transform:none;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:12px;padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom));border:0;background:#fff;color:inherit}
 #rmlTourMapDialog[open]{display:flex;flex-direction:column}
 #rmlTourMapDialog .tour-map-toolbar{align-items:center;justify-content:space-between;gap:8px}
@@ -737,6 +740,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 </div>
 <div>
 <div class="tour-map-toolbar"><button type="button" class="btn secondary" id="rmlTourExpand" aria-haspopup="dialog">Agrandir la carte</button></div>
+<div id="rmlTourExternal" class="tour-links" hidden></div>
 <div id="rmlTourMapHome"><div id="rmlTourMap" aria-label="Carte du parcours"></div></div>
 </div>
 <dialog id="rmlTourMapDialog" aria-labelledby="rmlTourMapTitle">
@@ -9470,6 +9474,7 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
   const stops = byId('rmlTourStops');
   const status = byId('rmlTourStatus');
   const result = byId('rmlTourResult');
+  const external = byId('rmlTourExternal');
   const calculate = byId('rmlTourCalculate');
   const origin = 'https://data.geopf.fr';
   const addresses = new Map();
@@ -9497,7 +9502,7 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
   async function initializeMap() {
     await loadMapLibrary();
     if (map) return;
-    map = L.map('rmlTourMap', {scrollWheelZoom:false}).setView([46.6, 2.5], 6);
+    map = L.map('rmlTourMap').setView([46.6, 2.5], 6);
     const tiles = L.tileLayer(origin+'/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png', {
       attribution:'© IGN – Géoplateforme', maxNativeZoom:19, maxZoom:19
     }).addTo(map);
@@ -9524,6 +9529,8 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
     calculate.disabled = false;
     drawing?.clearLayers();
     result.hidden = true;
+    external.hidden = true;
+    external.replaceChildren();
     status.textContent = '';
     hasResult = false;
   }
@@ -9593,7 +9600,44 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
     return hours ? hours+' h '+String(minutes % 60).padStart(2,'0') : minutes+' min';
   }
 
+  function navigationLinks(container, points, wholeTour = false) {
+    const coordinates = points.map(({point}) => point.split(',').reverse().join(','));
+    const destination = coordinates.at(-1);
+    const start = wholeTour ? coordinates[0] : '';
+    const waypoints = wholeTour ? coordinates.slice(1,-1) : [];
+    const apple = new URL('https://maps.apple.com/directions');
+    apple.searchParams.set('destination', destination);
+    apple.searchParams.set('mode', 'driving');
+    if (start) apple.searchParams.set('source', start);
+    waypoints.forEach(point => apple.searchParams.append('waypoint', point));
+
+    const google = new URL('https://www.google.com/maps/dir/');
+    google.searchParams.set('api', '1');
+    google.searchParams.set('destination', destination);
+    google.searchParams.set('travelmode', 'driving');
+    if (start) google.searchParams.set('origin', start);
+    if (waypoints.length) google.searchParams.set('waypoints', waypoints.join('|'));
+
+    const links = [['Plans', apple]];
+    if (waypoints.length <= 3) links.push(['Google Maps', google]);
+    for (const [name, url] of links) {
+      const link = document.createElement('a');
+      link.href = url.href;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'Ouvrir dans '+name;
+      container.append(link);
+    }
+    if (waypoints.length > 3) {
+      const note = document.createElement('small');
+      note.textContent = 'Tournée longue : Google Maps est disponible par arrêt.';
+      container.append(note);
+    }
+  }
+
   function showTour(points, legs) {
+    navigationLinks(external, points, true);
+    external.hidden = false;
     const list = byId('rmlTourLegs');
     list.replaceChildren();
     drawing.clearLayers();
@@ -9601,6 +9645,10 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
       if (leg.geometry) L.geoJSON(leg.geometry, {style:{color:'#075caa', weight:5}}).addTo(drawing);
       const item = document.createElement('li');
       item.textContent = (index ? 'Arrêt '+index : 'Départ')+' → arrêt '+(index+1)+' · '+duration(Number(leg.duration))+' · '+points[index+1].label;
+      const links = document.createElement('div');
+      links.className = 'tour-links';
+      navigationLinks(links, [points[index+1]]);
+      item.append(links);
       list.append(item);
     });
     const bounds = L.featureGroup();
