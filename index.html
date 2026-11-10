@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V42.76</title>
+<title>RML ERP — V42.77</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -670,7 +670,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 .assigned-files .jobpick-btn { min-width: 0; max-width: 100%; white-space: normal; }
 </style>
 <style id="rml-nav-tiles">
-/* V42.76 — Menu principal en tuiles. */
+/* V42.77 — Menu principal en tuiles. */
 #mainNav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:10px}
 nav#mainNav > button:not(.active){background:var(--tile-bg)!important;border-color:var(--tile-border)!important;color:var(--navy)!important}
 #mainNav > button{
@@ -715,6 +715,13 @@ nav#mainNav > button:not(.active){background:var(--tile-bg)!important;border-col
 #mainNav > button[data-view="security"]{--tile-bg:#fbeaf0;--tile-border:#e7a9c1;--tile-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M12%202l8%204v5c0%205-3%208-8%2011-5-3-8-6-8-11V6z%20M9%2010h6v5H9z%20M10%2010V8a2%202%200%200%201%204%200v2%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
 #mainNav > button[data-view="rmlTour"]{--tile-bg:#e4f6ee;--tile-border:#9bd4b7;--tile-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M11%208c0%203-4%207-4%207S3%2011%203%208a4%204%200%200%201%208%200zm10%206c0%203-4%207-4%207s-4-4-4-7a4%204%200%200%201%208%200z%20M7%208h.01m10%206h.01M7%2017h3%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E")}
 </style>
+<style id="rml-commandes-workspace">
+body.rml-commandes-workspace #mainNav{display:none!important}
+body.rml-commandes-workspace #commandes{height:auto!important;min-height:0!important;overflow:visible!important}
+body.rml-commandes-workspace #commandes>.panel{height:auto!important;min-height:0!important}
+body.rml-commandes-workspace #commandes>.panel>.toolbar{flex-wrap:wrap}
+body.rml-commandes-workspace #commandesFrame{height:auto;min-height:520px!important}
+</style>
 </head>
 <body>
 <div id="erpSaveToast" class="erp-save-toast" role="status" aria-live="polite"></div>
@@ -738,7 +745,7 @@ nav#mainNav > button:not(.active){background:var(--tile-bg)!important;border-col
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.76</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.77</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3694,7 +3701,7 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
   <div class="panel" style="padding:10px">
     <div class="toolbar" style="margin-bottom:10px">
       <div style="flex:1"><h2 style="margin:0">Commandes fournisseurs</h2><div id="commandesContext" class="muted" style="margin-top:4px">Application Commandes V18 intégrée dans RML ERP DEV.</div></div>
-      <button class="btn secondary" type="button" onclick="closeCommandes()">← Retour</button>
+      <button class="btn secondary" type="button" onclick="go('dashboard')">← Retour accueil</button>
     </div>
     
     <iframe id="commandesFrame" title="RML Commandes fournisseurs" src="commandes.html?v=18.20261008"></iframe>
@@ -4490,7 +4497,7 @@ if(isSubcontractorUser()){view='subPortal'}else if(isEmployeeUser() && view!=='a
 if(view==='rmlTour'&&!hasPerm('chantiers'))view='dashboard';
 if(view==='rmlTour')requestAnimationFrame(()=>window.rmlOpenTourMap?.());
 if(view==='atelierPliage8'&&!rmlCanAtelier8())view=isEmployeeUser()?'employeePortal':'dashboard';
-if(view==='atelierPliage8')setTimeout(rmlLoadAtelier8,0);if(view==='preparation')setTimeout(()=>{loadPreparationApp();if(currentPrepJobId)loadJobDocumentsPanel(currentPrepJobId);},0);if(view==='stock'&&!hasPerm('stock'))view='dashboard';if(view==='equipes'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='stock')loadStock();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='equipes')loadTeamsAdmin();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security'){renderResetStats();rmlMonitorRefresh();setTimeout(v37Init,0);}if(view==='page-forecast')renderMonthlyForecast();
+if(view==='atelierPliage8')setTimeout(rmlLoadAtelier8,0);if(view==='preparation')setTimeout(()=>{loadPreparationApp();if(currentPrepJobId)loadJobDocumentsPanel(currentPrepJobId);},0);if(view==='stock'&&!hasPerm('stock'))view='dashboard';if(view==='equipes'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.body.classList.toggle('rml-commandes-workspace',view==='commandes');document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='stock')loadStock();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='equipes')loadTeamsAdmin();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security'){renderResetStats();rmlMonitorRefresh();setTimeout(v37Init,0);}if(view==='page-forecast')renderMonthlyForecast();
 // V27 mobile : afficher immédiatement le module sélectionné sous l'en-tête.
 // Aucun changement de navigation ou de données sur ordinateur.
 if(window.matchMedia('(max-width: 760px)').matches){
