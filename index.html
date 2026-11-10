@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V42.78</title>
+<title>RML ERP — V42.79</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -670,7 +670,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 .assigned-files .jobpick-btn { min-width: 0; max-width: 100%; white-space: normal; }
 </style>
 <style id="rml-nav-tiles">
-/* V42.78 — Menu principal en tuiles. */
+/* V42.79 — Menu principal en tuiles. */
 #mainNav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:10px}
 nav#mainNav > button:not(.active){background:var(--tile-bg)!important;border-color:var(--tile-border)!important;color:var(--navy)!important}
 #mainNav > button{
@@ -760,7 +760,7 @@ body.rml-module-workspace #commandes>.panel>.toolbar>button{display:none}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.78</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.79</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3719,7 +3719,7 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
       <button class="btn secondary" type="button" onclick="go('dashboard')">← Retour accueil</button>
     </div>
     
-    <iframe id="commandesFrame" title="RML Commandes fournisseurs" src="commandes.html?v=18.20261008"></iframe>
+    <iframe id="commandesFrame" title="RML Commandes fournisseurs" src="commandes.html?v=42.79"></iframe>
   </div>
 </section>
 <section id="documents" class="view"><div class="panel"><div class="docs-head"><div><h2>Documents</h2><div class="muted">Documents classés par client et chantier. Fichiers stockés dans Supabase Storage ERP DEV.</div></div><button class="btn secondary" onclick="loadDocuments()">Actualiser</button></div><div class="upload-box"><strong>Ajouter un document</strong><div class="field" style="margin-top:10px"><label>Rechercher un client ou un chantier</label><input id="docAddContextSearch" type="search" placeholder="Nom du client, chantier ou adresse…" oninput="searchAddDocumentContext()"></div><div class="upload-grid" style="margin-top:10px"><div class="field"><label>Client</label><select id="docClient"></select></div><div class="field"><label>Chantier</label><select id="docJob"></select></div><div class="field"><label>Catégorie</label><select id="docCategory"><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div></div><div class="field"><label>Fichier</label><input id="docFile" type="file"></div><div class="field"><label>Note</label><input id="docNote" placeholder="Description facultative"></div><div class="field"><label><input id="docEmployeeVisible" type="checkbox"> Mettre également ce document à disposition des salariés affectés au chantier</label></div><div class="field"><label>Mettre ce document à disposition de</label><div id="docSubRecipients" class="sub-contract" style="padding:10px;margin-top:4px"><span class="muted">Sélectionnez d’abord un chantier.</span></div></div><button class="btn" onclick="uploadDocument()">Ajouter le document</button></div><div class="docs-filters" style="margin-top:16px"><select id="docFilterClient" onchange="docFilterClientChanged()"></select><select id="docFilterJob" onchange="renderDocuments()"></select><select id="docFilterCategory" onchange="renderDocuments()"><option value="">Toutes les catégories</option><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div><div id="documentsStatus" class="notice">Chargement…</div><div id="documentsList" class="doc-list" style="margin-top:12px"></div></div></section>
@@ -4506,6 +4506,10 @@ async function rmlNavigateFromCatalog(view){
 }
 window.addEventListener('beforeunload',e=>{if(document.getElementById('rmlCatalogView')?.classList.contains('active')&&rmlCatalogHasChanges()){e.preventDefault();e.returnValue='';}});
 function go(view){
+if(view!=='commandes'&&document.getElementById('commandes')?.classList.contains('active')){
+ document.getElementById('commandesFrame')?.contentWindow?.postMessage({type:'RML_ERP_SAVE_ORDER_DRAFT'},window.location.origin);
+}
+
 if(document.getElementById('rmlCatalogView')?.classList.contains('active')&&view!=='rmlCatalogView'&&rmlCatalogHasChanges()){rmlNavigateFromCatalog(view);return;}
 
 if(isSubcontractorUser()){view='subPortal'}else if(isEmployeeUser() && view!=='atelierPliage8' && !(view==='clients'&&hasPerm('clients')) && !(currentAccess?.role==='chef_equipe'&&view==='suivi')){view='employeePortal'}
