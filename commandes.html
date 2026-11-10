@@ -1048,9 +1048,15 @@ save();
     return;
   }
   const orders = getValidatedSupplierOrders();
+  const previousOrder=orders[supplierName];
+  const sameOrder=previousOrder && previousOrder.orderNumber &&
+    JSON.stringify(previousOrder.groups||[])===JSON.stringify(groups);
+  const number=sameOrder ? previousOrder.orderNumber : reserveOrderNumber();
+  if(!number)return;
   const validatedOrder = {
+    orderNumber:number,
     supplier: supplierName,
-    validatedAt: new Date().toISOString(),
+    validatedAt: sameOrder ? previousOrder.validatedAt : new Date().toISOString(),
     groups: groups
   };
   // V66.14 : protège cette nouvelle commande jusqu'à confirmation de son envoi.
@@ -1239,12 +1245,38 @@ async function reloadDropbox(){
 function getTodayFR(){
   return new Date().toLocaleDateString("fr-FR");
 }
+function orderDayPrefix(date=new Date()){
+  const parts=new Intl.DateTimeFormat('fr-FR',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);
+  const value=type=>parts.find(part=>part.type===type).value;
+  return 'CMD-'+value('year')+value('month')+value('day');
+}
+function reserveOrderNumber(){
+  const prefix=orderDayPrefix();
+  const key='rml_order_sequence_'+prefix;
+  let max=Number(localStorage.getItem(key)||0);
+  if(!Number.isSafeInteger(max)||max<0)max=0;
+  const orders=[...Object.values(getValidatedSupplierOrders()),...getHistory(),...getPdfHistory()];
+  for(const order of orders){
+    const number=String(order?.orderNumber||'');
+    if(number===prefix)max=Math.max(max,1);
+    if(number.startsWith(prefix+'-')){
+      const suffix=Number(number.slice(prefix.length+1));
+      if(Number.isSafeInteger(suffix)&&suffix>0)max=Math.max(max,suffix);
+    }
+  }
+  try{localStorage.setItem(key,String(max+1))}
+  catch(error){alert('Impossible de conserver le numéro de commande. Libérez du stockage puis réessayez.');return null}
+  return prefix+'-'+(max+1);
+}
 function getOrderNumber(){
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,"0");
-  const day = String(d.getDate()).padStart(2,"0");
-  return `CMD-${y}${m}${day}`;
+  const supplier=String(window.__rmlSupplierName||currentSupplierName||'').trim();
+  const order=getValidatedOrderBySupplierName(supplier);
+  if(order?.orderNumber)return order.orderNumber;
+  if(order?.validatedAt){
+    const date=new Date(order.validatedAt);
+    if(!Number.isNaN(date.getTime()))return orderDayPrefix(date);
+  }
+  return orderDayPrefix();
 }
 
 function saveMetaBackup(){
@@ -3211,7 +3243,7 @@ function saveValidatedOrderToHistory(supplierName){
     let entry = null;
     withPreviewGroups(order.groups, function(){
       entry = {
-        orderNumber:getOrderNumber(), date:now.toLocaleDateString("fr-FR"), createdAt:when, monthKey,
+        orderNumber:order.orderNumber||getOrderNumber(), date:now.toLocaleDateString("fr-FR"), createdAt:when, monthKey,
         supplier:String(supplierName||"").trim(), orderUser:String(orderUser||""), orderMessage:String(orderMessage||""),
         text:recapText(), groups:JSON.parse(JSON.stringify(order.groups||[])), state:JSON.parse(JSON.stringify(state||{}))
       };
@@ -3872,7 +3904,7 @@ async function recoverValidatedOrdersToHistory(){
     const y=validDate.getFullYear(), m=String(validDate.getMonth()+1).padStart(2,"0"), day=String(validDate.getDate()).padStart(2,"0");
     history.push({
       historyId,
-      orderNumber:`CMD-${y}${m}${day}`,
+      orderNumber:order.orderNumber||`CMD-${y}${m}${day}`,
       date:validDate.toLocaleDateString("fr-FR"),
       createdAt:validDate.toISOString(),
       monthKey:`${y}-${m}`,
@@ -4336,7 +4368,7 @@ function goRecap(){
 
   const cards = validatedOrders.length ? validatedOrders.map(order => {
     const supplierName = order.supplier || "";
-    const validatedDate = order.validatedAt ? new Date(order.validatedAt).toLocaleString("fr-FR") : "";
+    const validatedDate = (order.orderNumber ? order.orderNumber+" · " : "") + (order.validatedAt ? new Date(order.validatedAt).toLocaleString("fr-FR") : "");
     const groups = Array.isArray(order.groups) ? order.groups : [];
     const totalLines = groups.reduce((n, g) => n + ((g.lines || []).length), 0);
     const totalQtyValue = groups.reduce((n, g) => n + (g.lines || []).reduce((a, line) => a + Number(line.qty || 0), 0), 0);
@@ -4462,7 +4494,7 @@ function buildCurrentOrderTransferPayload(supplierName){
     version: 2,
     exportedAt: new Date().toISOString(),
     supplier: cleanSupplier,
-    orderNumber: getOrderNumber(),
+    orderNumber: allOrders[cleanSupplier]?.orderNumber || getOrderNumber(),
     orderUser: orderUser || "",
     orderMessage: orderMessage || "",
     state: selectedState,
@@ -6261,7 +6293,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
         String(h.createdAt||'')===when && JSON.stringify(h.groups||[])===JSON.stringify(order.groups||[]));
       if(exists) continue;
       const d=new Date(when); const monthKey=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      hist.push({orderNumber:"",date:d.toLocaleDateString('fr-FR'),createdAt:when,monthKey,
+      hist.push({orderNumber:order.orderNumber||"",date:d.toLocaleDateString('fr-FR'),createdAt:when,monthKey,
         supplier:String(supplier||'').trim(),orderUser:String(orderUser||''),orderMessage:String(orderMessage||''),
         text:"Commande restaurée automatiquement depuis le récapitulatif V66.6",groups:order.groups,state:{}});
       added++;
