@@ -6172,6 +6172,37 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
   function v6613ProtectedOrderKey(key){
     return key===VALIDATED_SUPPLIER_ORDERS_KEY || key===STORAGE_KEY || key===STATE_BACKUP_KEY;
   }
+  // V42.79 : conserver la version de chaque donnée de commande sur cet appareil.
+  const orderVersionsKey = 'v61_order_versions_4279';
+  function orderVersions(){
+    try{return JSON.parse(localStorage.getItem(orderVersionsKey)||'{}')||{}}catch(e){return {}}
+  }
+  function markOrderVersion(key, timestamp){
+    if(!v6613ProtectedOrderKey(key))return;
+    try{
+      const versions=orderVersions();
+      versions[key]=Math.max(Number(versions[key]||0),Number(timestamp)||0);
+      nativeSetItem.call(localStorage,orderVersionsKey,JSON.stringify(versions));
+    }catch(e){console.warn('Conservation de la version de commande impossible',e)}
+  }
+  function keepLocalOrder(key, packet){
+    if(!v6613ProtectedOrderKey(key))return false;
+    if(localStorage.getItem('v63_history_restore_mode')==='1')return false;
+    if(V66_CHANGED_KEYS.has(key))return true;
+    const localTime=Number(orderVersions()[key]||0);
+    const remoteTime=Date.parse(packet?.savedAt||'')||0;
+    return localTime>0 && remoteTime<=localTime;
+  }
+  // Migration des commandes existantes, sans reconstituer de commande supprimée.
+  if(!localStorage.getItem(orderVersionsKey)){
+    const lastSave=Number(localStorage.getItem(LAST_SAVE_AT_KEY)||0);
+    for(const key of [STORAGE_KEY,STATE_BACKUP_KEY]){
+      if(localStorage.getItem(key))markOrderVersion(key,lastSave);
+    }
+    const orders=getValidatedSupplierOrders();
+    const lastValidation=Math.max(0,...Object.values(orders).map(order=>Date.parse(order.validatedAt||'')||0));
+    if(Object.keys(orders).length)markOrderVersion(VALIDATED_SUPPLIER_ORDERS_KEY,lastValidation);
+  }
   function v6613ClearOrderLock(){
     try{ nativeRemoveItem.call(localStorage,V6613_ORDER_LOCK_KEY); }catch(e){ try{localStorage.removeItem(V6613_ORDER_LOCK_KEY);}catch(x){} }
   }
@@ -6279,6 +6310,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
       const {error}=await supabaseCloud.from(CLOUD_TABLE).insert([{data:packet,updated_at:packet.savedAt}]);
       if(error) throw error;
     }
+    return Date.parse(packet.savedAt);
   }
 
   async function v66PushChangedKeys(){
@@ -6293,8 +6325,17 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
         let n=0; try{const a=JSON.parse(localStorage.getItem(CUSTOM_PRODUCTS_KEY)||"[]"); n=Array.isArray(a)?a.length:0;}catch(e){}
         if(n<20) throw new Error("catalogue local incomplet : envoi bloqué");
       }
-      for(const key of keys){ await v66WriteDelta(key); V66_CHANGED_KEYS.delete(key); }
-      localStorage.setItem(V61_PENDING_KEY,"0");
+      for(const key of keys){
+        const before=localStorage.getItem(key);
+        const version=Number(orderVersions()[key]||0);
+        const sentAt=await v66WriteDelta(key);
+        if(localStorage.getItem(key)===before && Number(orderVersions()[key]||0)===version){
+          markOrderVersion(key,sentAt);
+          V66_CHANGED_KEYS.delete(key);
+        }
+      }
+      localStorage.setItem(V61_PENDING_KEY,V66_CHANGED_KEYS.size ? "1" : "0");
+      if(V66_CHANGED_KEYS.size)v61SchedulePush();
       if(keys.includes(VALIDATED_SUPPLIER_ORDERS_KEY)) v6613ClearOrderLock();
       v61SetIndicator("ok","à jour • temps réel");
     }catch(e){
@@ -6352,6 +6393,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
     if(v61ApplyingRemote) return;
     v66QueueKey(key);
     const now = Date.now();
+    markOrderVersion(key,now);
     try{
       if(localStorage.getItem(V61_PENDING_KEY)!=="1"){
         localStorage.setItem(V63_BASE_REV_KEY,String(Number(localStorage.getItem(V63_REV_KEY)||0)));
@@ -6530,7 +6572,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
           const k=localStorage.key(i);
           if(k && v61IsAppDataKey(k)) localKeys.push(k);
         }
-        localKeys.forEach(k=>{ try{ nativeRemoveItem.call(localStorage,k); }catch(e){} });
+        localKeys.forEach(k=>{ if(keepLocalOrder(k,payload))return; try{ nativeRemoveItem.call(localStorage,k); }catch(e){} });
       }
       // V64.7 : écrit le catalogue EN PREMIER, puis le reste. Une erreur d'écriture
       // du catalogue n'est plus masquée : tant qu'il n'est pas installé, le bootstrap
@@ -6541,6 +6583,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
         return 0;
       });
       orderedKeys.forEach(k=>{
+        if(keepLocalOrder(k,payload))return;
         if(v61IsAppDataKey(k)){
           if(storage[k] === null){
             nativeRemoveItem.call(localStorage,k);
@@ -6548,6 +6591,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
           }else if(k===CUSTOM_PRODUCTS_KEY){
             v65StoreProducts(storage[k]);
           }else nativeSetItem.call(localStorage,k,storage[k]);
+          markOrderVersion(k,Date.parse(payload.savedAt||""));
         }
       });
       if(incomingProductsCount >= 100){
@@ -6863,12 +6907,13 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
           if(remote.v66Type===V66_DELTA_TAG && remote.sharedKey===CLOUD_SHARED_KEY && remote.v66Key){
             try{
               const k=String(remote.v66Key), v=remote.v66Value;
-              if(v6613OrderLocked() && v6613ProtectedOrderKey(k)) return;
+              if((v6613OrderLocked() && v6613ProtectedOrderKey(k)) || keepLocalOrder(k,remote)) return;
               v61ApplyingRemote=true;
               if(k===CUSTOM_PRODUCTS_KEY){ if(v===null) v65StoreProducts("[]"); else v65StoreProducts(String(v)); }
               else if(k===RML_HISTORY_TOMBSTONES_KEY){ if(v===null) nativeSetItem.call(localStorage,k,"[]"); else nativeSetItem.call(localStorage,k,String(v)); rmlFilterDeletedHistoryNow(); }
               else if(k===HISTORY_KEY){ nativeSetItem.call(localStorage,HISTORY_KEY,v665MergeHistoryRaw(nativeGetItem.call(localStorage,HISTORY_KEY),v)); rmlFilterDeletedHistoryNow(); }
               else if(v===null) nativeRemoveItem.call(localStorage,k); else nativeSetItem.call(localStorage,k,String(v));
+              markOrderVersion(k,Date.parse(remote.savedAt||""));
             }catch(e){ console.error("[V66.6] réception temps réel",e); }
             finally{ v61ApplyingRemote=false; }
             v61SetIndicator("ok","mise à jour reçue • temps réel");
@@ -6900,7 +6945,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
         const d=row&&row.data;
         if(!d || d.v66Type!==V66_DELTA_TAG || d.sharedKey!==CLOUD_SHARED_KEY || !d.v66Key) continue;
         const k=String(d.v66Key), v=d.v66Value;
-        if(v6613OrderLocked() && v6613ProtectedOrderKey(k)) continue;
+        if((v6613OrderLocked() && v6613ProtectedOrderKey(k)) || keepLocalOrder(k,d)) continue;
         if(k===CUSTOM_PRODUCTS_KEY){ if(v===null) v65StoreProducts("[]"); else v65StoreProducts(String(v)); }
         else if(k===RML_HISTORY_TOMBSTONES_KEY){
           if(v===null) nativeSetItem.call(localStorage,k,"[]"); else nativeSetItem.call(localStorage,k,String(v));
@@ -6911,6 +6956,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
           rmlFilterDeletedHistoryNow();
         }
         else if(v===null) nativeRemoveItem.call(localStorage,k); else nativeSetItem.call(localStorage,k,String(v));
+        markOrderVersion(k,Date.parse(d.savedAt||""));
         n++;
       }
     }finally{ v61ApplyingRemote=false; }
@@ -8063,6 +8109,12 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
     if(document.body)document.body.classList.add('erp-embedded');
   }
 })();
+</script>
+<script>
+window.addEventListener('message',event=>{
+  if(event.source!==parent || event.data?.type!=='RML_ERP_SAVE_ORDER_DRAFT')return;
+  try{syncVisibleInputs();syncOrderMetaInputs();save()}catch(error){console.error('Enregistrement de la commande en cours',error)}
+});
 </script>
 </body>
 </html>
