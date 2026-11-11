@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V42.85</title>
+<title>RML ERP — V42.86</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -670,7 +670,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 .assigned-files .jobpick-btn { min-width: 0; max-width: 100%; white-space: normal; }
 </style>
 <style id="rml-nav-tiles">
-/* V42.85 — Menu principal en tuiles. */
+/* V42.86 — Menu principal en tuiles. */
 #mainNav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:10px}
 nav#mainNav > button:not(.active){background:var(--tile-bg)!important;border-color:var(--tile-border)!important;color:var(--navy)!important}
 #mainNav > button{
@@ -776,7 +776,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.85</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V42.86</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">Bons BC / BL</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -5503,6 +5503,12 @@ function openCompanySearch(id,returnToEdit=false){
   openModal('companySearchModal');
   setTimeout(()=>companySearchInput.focus(),50);
 }
+function companyVatSuggestion(siren){
+  const digits=String(siren??'').trim();
+  if(!/^\d{9}$/.test(digits))return '';
+  const key=(12+3*(Number(digits)%97))%97;
+  return 'FR'+String(key).padStart(2,'0')+digits;
+}
 async function runCompanySearch(){
   const q=(companySearchInput.value||'').trim();if(!q)return;
   companySearchResults.innerHTML='<div class="empty">Recherche en cours…</div>';
@@ -5511,7 +5517,7 @@ async function runCompanySearch(){
     if(!r.ok)throw new Error('HTTP '+r.status);
     const data=await r.json(), rows=data.results||[];
     if(!rows.length){companySearchResults.innerHTML='<div class="empty">Aucune entreprise trouvée.</div>';return}
-    companySearchResults.innerHTML='<div class="tablewrap"><table class="table"><thead><tr><th>Entreprise</th><th>SIREN / SIRET siège</th><th>Adresse officielle</th><th></th></tr></thead><tbody>'+rows.map((x,i)=>{const sg=x.siege||{};const addr=sg.adresse||[sg.numero_voie,sg.type_voie,sg.libelle_voie,sg.code_postal,sg.libelle_commune].filter(Boolean).join(' ');return `<tr><td><strong>${esc(x.nom_complet||x.nom_raison_sociale||'')}</strong></td><td>${esc(x.siren||'')}<br><span class="muted">${esc(sg.siret||'')}</span></td><td>${esc(addr||'')}</td><td><button class="btn ok" type="button" onclick="applyCompanySearchResult(${i})">Utiliser</button></td></tr>`}).join('')+'</tbody></table></div>';
+    companySearchResults.innerHTML='<div class="tablewrap"><table class="table"><thead><tr><th>Entreprise</th><th>SIREN / SIRET siège</th><th>TVA intracommunautaire</th><th>Adresse officielle</th><th></th></tr></thead><tbody>'+rows.map((x,i)=>{const sg=x.siege||{};const vat=companyVatSuggestion(x.siren);const addr=sg.adresse||[sg.numero_voie,sg.type_voie,sg.libelle_voie,sg.code_postal,sg.libelle_commune].filter(Boolean).join(' ');return `<tr><td><strong>${esc(x.nom_complet||x.nom_raison_sociale||'')}</strong></td><td>${esc(x.siren||'')}<br><span class="muted">${esc(sg.siret||'')}</span></td><td>${vat?'<strong>'+esc(vat)+'</strong><br><a href="https://ec.europa.eu/taxation_customs/vies/" target="_blank" rel="noopener noreferrer">Calculé · vérifier dans VIES</a>':'—'}</td><td>${esc(addr||'')}</td><td><button class="btn ok" type="button" onclick="applyCompanySearchResult(${i})">Utiliser</button></td></tr>`}).join('')+'</tbody></table></div>';
     window._companySearchRows=rows;
   }catch(err){console.error(err);companySearchResults.innerHTML='<div class="empty">Impossible d’interroger l’Annuaire des Entreprises pour le moment.</div>'}
 }
@@ -5520,11 +5526,14 @@ async function applyCompanySearchResult(i){
   const c=companySearchClientId?db.clients.find(z=>z.id===companySearchClientId):null;
   const sg=x.siege||{};const addr=sg.adresse||[sg.numero_voie,sg.type_voie,sg.libelle_voie,sg.code_postal,sg.libelle_commune].filter(Boolean).join(' ');
   const patch={siren:x.siren||null,siret:sg.siret||null,adresse:addr||(c?.adresse)||null};
+  const vat=companyVatSuggestion(x.siren);
+  const vatField=document.getElementById('clientTvaIntracom');
   // Création d'un nouveau client (y compris depuis Nouveau chantier) :
   // on remplit directement la fiche sans écrire un client incomplet en base.
   if(!companySearchClientId){
     if(window.clientSiren)clientSiren.value=patch.siren||'';
     if(window.clientSiret)clientSiret.value=patch.siret||'';
+    if(vat&&!vatField.value.trim())vatField.value=vat;
     clientAdresse.value=patch.adresse||'';
     if(!clientNom.value.trim())clientNom.value=x.nom_complet||x.nom_raison_sociale||'';
     closeModal('companySearchModal');
@@ -5535,12 +5544,14 @@ async function applyCompanySearchResult(i){
   if(companySearchReturnToEdit&&clientId.value===c.id){
     if(window.clientSiren)clientSiren.value=patch.siren||'';
     if(window.clientSiret)clientSiret.value=patch.siret||'';
+    if(vat&&!vatField.value.trim())vatField.value=vat;
     clientAdresse.value=patch.adresse||'';
     storeCurrentClientDraft();
     closeModal('companySearchModal');
     openModal('clientModal');
     return;
   }
+  if(vat&&Object.hasOwn(c,'tva_intracommunautaire')&&!c.tva_intracommunautaire)patch.tva_intracommunautaire=vat;
   const res=await sb.from('erp_clients').update(patch).eq('id',c.id);
   if(res.error){alert('Erreur Supabase : '+res.error.message+'\nVérifie que le SQL V0.10.1 a bien été exécuté.');return}
   closeModal('companySearchModal');await refreshData();openClientFolder(c.id);
