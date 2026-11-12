@@ -8938,20 +8938,20 @@ if(quotePdfBtn){
       req.onerror=()=>reject(req.error);
     });
   }
-  async function baselineDbGet(){
+  async function syncSnapshotGet(key){
     const db=await openBaselineDB();
     try{return await new Promise((resolve,reject)=>{
       const tx=db.transaction("snapshots","readonly");
-      const req=tx.objectStore("snapshots").get("baselines");
+      const req=tx.objectStore("snapshots").get(key);
       req.onsuccess=()=>resolve(req.result);
       req.onerror=()=>reject(req.error);
     });}finally{db.close();}
   }
-  async function baselineDbPut(value){
+  async function syncSnapshotPut(key,value){
     const db=await openBaselineDB();
     try{await new Promise((resolve,reject)=>{
       const tx=db.transaction("snapshots","readwrite");
-      tx.objectStore("snapshots").put(value,"baselines");
+      tx.objectStore("snapshots").put(value,key);
       tx.oncomplete=resolve;
       tx.onerror=()=>reject(tx.error);
       tx.onabort=()=>reject(tx.error);
@@ -8960,16 +8960,34 @@ if(quotePdfBtn){
   const loadBaselines=async()=>{
     // Tant que l'ancienne archive existe, elle reste la référence si la migration
     // n'a pas encore réussi. Après migration, IndexedDB devient la référence.
-    try{const stored=await baselineDbGet();if(stored!==undefined)return stored;}
+    try{const stored=await syncSnapshotGet("baselines");if(stored!==undefined)return stored;}
     catch(e){console.warn("Lecture IndexedDB impossible : lecture locale conservée",e);}
     return parse(localStorage.getItem(BASELINE_KEY),{});
   };
   const saveBaselines=async value=>{
-    await baselineDbPut(value); // Ne rien effacer si l'écriture échoue.
+    await syncSnapshotPut("baselines",value); // Ne rien effacer si l'écriture échoue.
     // L'ancienne copie n'est supprimée qu'après validation de la transaction.
     if(localStorage.getItem(BASELINE_KEY)!==null)
       nativeRemoveItem.call(localStorage,BASELINE_KEY);
   };
+  const SYNC_BACKUP_KEY="rml_sync_backup_v121_latest";
+  async function storeVerifiedSyncBackup(raw){
+    await syncSnapshotPut(SYNC_BACKUP_KEY,raw);
+    if(await syncSnapshotGet(SYNC_BACKUP_KEY)!==raw)
+      throw new Error("La sauvegarde Pliage n’a pas pu être vérifiée.");
+  }
+  async function migrateSyncBackup(){
+    const raw=nativeGetItem.call(localStorage,SYNC_BACKUP_KEY);
+    if(raw===null)return;
+    await storeVerifiedSyncBackup(raw);
+    if(nativeGetItem.call(localStorage,SYNC_BACKUP_KEY)!==raw)
+      throw new Error("La sauvegarde Pliage a changé pendant la migration. Réessayez.");
+    nativeRemoveItem.call(localStorage,SYNC_BACKUP_KEY);
+  }
+  const initialBackupMigration=migrateSyncBackup().catch(error=>{
+    console.warn("Migration Pliage différée. La sauvegarde locale est conservée.",error);
+  });
+
   const now=()=>new Date().toISOString();
   const parse=(raw,fallback)=>{try{return raw?JSON.parse(raw):fallback}catch{return fallback}};
   const loadConfig=()=>{
@@ -9321,7 +9339,9 @@ if(quotePdfBtn){
       // Ne supprime pas les anciennes sauvegardes déjà présentes.
       if(incoming.length){
         const backup={at:now(),clients:localStorage.getItem(STORAGE_KEY_CLIENTS),projects:localStorage.getItem(PROJECTS_KEY),folders:localStorage.getItem(PROJECT_FOLDERS_KEY),settings:localStorage.getItem(STORAGE_KEY_BEND_LIBRARY),pending:loadPending()};
-        safeDiagnosticWrite("rml_sync_backup_v121_latest",backup);
+        await initialBackupMigration;
+        await migrateSyncBackup();
+        await storeVerifiedSyncBackup(JSON.stringify(backup));
       }
       let received=0,sent=0;
       if(incoming.length){
