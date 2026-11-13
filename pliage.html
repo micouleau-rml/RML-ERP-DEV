@@ -8977,10 +8977,10 @@ if(quotePdfBtn){
       throw new Error("La sauvegarde Pliage n’a pas pu être vérifiée.");
   }
   async function migrateSyncBackup(){
-    const raw=nativeGetItem.call(localStorage,SYNC_BACKUP_KEY);
+    const raw=localStorage.getItem(SYNC_BACKUP_KEY);
     if(raw===null)return;
     await storeVerifiedSyncBackup(raw);
-    if(nativeGetItem.call(localStorage,SYNC_BACKUP_KEY)!==raw)
+    if(localStorage.getItem(SYNC_BACKUP_KEY)!==raw)
       throw new Error("La sauvegarde Pliage a changé pendant la migration. Réessayez.");
     nativeRemoveItem.call(localStorage,SYNC_BACKUP_KEY);
   }
