@@ -3879,7 +3879,10 @@ function rmlFilterDeletedHistoryNow(){
     const deletedAt=logicalDeletedAt.get(logical)||0;
     return !!entryAt && entryAt>deletedAt;
   });
-  if(after.length!==before.length){localStorage.setItem(HISTORY_KEY,JSON.stringify(after));return before.length-after.length;}
+  if(after.length!==before.length){
+    if(!window.rmlFilterConfirmedHistory?.())localStorage.setItem(HISTORY_KEY,JSON.stringify(after));
+    return before.length-after.length;
+  }
   return 0;
 }
 
@@ -3964,6 +3967,10 @@ function showHistory(){
   const backup = getHistoryDeleteBackup();
 
   let content = '<div class="empty">Aucune commande enregistrée. Utilise Partager / enregistrer le PDF ou Préparer le mail depuis le récapitulatif.</div>';
+
+  if(!history.length && !window.rmlCloudHistoryLoaded?.()){
+    content = '<div class="empty">Historique Supabase en attente de chargement. Vérifiez la connexion.</div>';
+  }
 
   if(history.length){
     const years = {};
@@ -5269,6 +5276,8 @@ async function restoreCloudHistoryOrdersOnly(id){
     const merged=Object.assign({},master,{app:"RML GOUTTIERE ALU",sharedKey:CLOUD_SHARED_KEY,version:"V64.5-auto-reparation",schemaVersion:644,fullSnapshot:true,revision:nextRev,previousRevision:Number(master.revision||0),savedAt:new Date().toISOString(),storage:mergedStorage});
     const {error:updateErr}=await supabaseCloud.from(CLOUD_TABLE).update({data:merged,updated_at:merged.savedAt}).eq("id",rowId); if(updateErr) throw updateErr;
     try{ applyCloudPayload(merged); }catch(e){ console.warn(e); }
+    saveHistory([...restoredHistory,...getHistory()]);
+    await window.rmlConfirmRestoredHistory();
     try{ await saveCloudHistoryEntry(merged,"Historique commandes restauré V64.4"); }catch(e){}
     setSyncStatus("Historique restauré : "+restoredHistory.length+" commandes.");
     alert("✅ "+restoredHistory.length+" commandes restaurées.\n\nLe catalogue produits cloud a été conservé à l’identique.");
@@ -6279,7 +6288,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
       seen.add(fp); out.push(o);
     }
     out.sort((a,b)=>new Date(b.createdAt||b.validatedAt||0)-new Date(a.createdAt||a.validatedAt||0));
-    return JSON.stringify(out.slice(0,250));
+    return JSON.stringify(out);
   }
   function v665RepairHistoryFromValidated(){
     let orders={}; try{orders=getValidatedSupplierOrders()||{};}catch(e){return 0;}
@@ -6306,8 +6315,34 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
     return added;
   }
 
+  // L'historique confirmé reste dans Supabase. On ne garde sur disque que
+  // la copie locale qui contient encore des entrées non confirmées.
+  let cloudHistoryRaw=null;
+  window.rmlCloudHistoryLoaded=()=>cloudHistoryRaw!==null;
+  window.rmlFilterConfirmedHistory=()=>{
+    if(!v61ApplyingRemote)return false;
+    cloudHistoryRaw=v665MergeHistoryRaw(null,cloudHistoryRaw);
+    return true;
+  };
+  function receiveCloudHistory(raw){
+    if(typeof raw!=="string")return;
+    let confirmed;
+    try{confirmed=JSON.parse(raw);}catch(e){return;}
+    if(!Array.isArray(confirmed))return;
+    const local=nativeGetItem.call(localStorage,HISTORY_KEY);
+    cloudHistoryRaw=v665MergeHistoryRaw(null,raw);
+    if(local===null)return;
+    let saved;
+    try{saved=JSON.parse(local);}catch(e){return;}
+    if(!Array.isArray(saved))return;
+    const entries=new Set(confirmed.map(entry=>JSON.stringify(entry)));
+    if(saved.every(entry=>entries.has(JSON.stringify(entry)))){
+      nativeRemoveItem.call(localStorage,HISTORY_KEY);
+    }
+  }
+
   async function v66WriteDelta(key){
-    let value = key===CUSTOM_PRODUCTS_KEY ? localStorage.getItem(key) : nativeGetItem.call(localStorage,key);
+    let value = localStorage.getItem(key);
     const old=await v66FindDeltaRow(key);
     if(key===RML_HISTORY_TOMBSTONES_KEY && old && old.data){
       if(window.V668_TOMBSTONES_REPLACE_ONCE){
@@ -6329,21 +6364,34 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
       value=JSON.stringify(merged.slice(-2000));
       localStorage.setItem(key,value);
     }
-    if(key===HISTORY_KEY && old && old.data){
-      value=v665MergeHistoryRaw(value,old.data.v66Value);
-      localStorage.setItem(HISTORY_KEY,value);
+    if(key===HISTORY_KEY){
+      value=v665MergeHistoryRaw(localStorage.getItem(HISTORY_KEY),old?.data?.v66Value);
     }
     const packet={app:"RML GOUTTIERE ALU",version:"V66.18",sharedKey:CLOUD_SHARED_KEY,v66Type:V66_DELTA_TAG,
       v66Key:String(key),v66Value:value===null?null:String(value),savedAt:new Date().toISOString(),deviceId:v61DeviceId()};
-    if(old&&old.id){
+    if(old&&old.id && key===HISTORY_KEY){
+      const {data,error}=await supabaseCloud.from(CLOUD_TABLE)
+        .update({data:packet,updated_at:packet.savedAt})
+        .eq("id",old.id).eq("updated_at",old.updated_at).select("id");
+      if(error)throw error;
+      if(!data?.length)throw new Error("Historique modifié sur un autre appareil. Réessayez la synchronisation.");
+    }else if(old&&old.id){
       const {error}=await supabaseCloud.from(CLOUD_TABLE).update({data:packet,updated_at:packet.savedAt}).eq("id",old.id);
       if(error) throw error;
     }else{
       const {error}=await supabaseCloud.from(CLOUD_TABLE).insert([{data:packet,updated_at:packet.savedAt}]);
       if(error) throw error;
     }
+    if(key===HISTORY_KEY){
+      const confirmed=await v66FindDeltaRow(key);
+      if(confirmed?.data?.v66Value!==value)
+        throw new Error("Historique envoyé, confirmation Supabase indisponible.");
+      receiveCloudHistory(value);
+    }
     return Date.parse(packet.savedAt);
   }
+
+  window.rmlConfirmRestoredHistory=()=>v66WriteDelta(HISTORY_KEY);
 
   async function v66PushChangedKeys(){
     if(v66DeltaRunning||v61ApplyingRemote||!v64BootstrapComplete) return;
@@ -6512,6 +6560,12 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
   }).catch(()=>{});
 
   Storage.prototype.getItem = function(key){
+    if(this===localStorage && key===HISTORY_KEY){
+      const saved=nativeGetItem.call(this,key);
+      return saved!==null && cloudHistoryRaw!==null
+        ? v665MergeHistoryRaw(saved,cloudHistoryRaw)
+        : saved ?? cloudHistoryRaw;
+    }
     if(this===localStorage && key===CUSTOM_PRODUCTS_KEY){
       if(v65ProductsMemory!==null) return v65ProductsMemory;
       const old=nativeGetItem.call(this,key);
@@ -6526,7 +6580,12 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
     let previous = null;
     try{ previous = this === localStorage ? localStorage.getItem(key) : null; }catch(e){}
     let result;
-    if(this===localStorage && key===CUSTOM_PRODUCTS_KEY){
+    if(this===localStorage && key===HISTORY_KEY && cloudHistoryRaw!==null){
+      const confirmed=new Set(v665HistoryArray(cloudHistoryRaw).map(entry=>JSON.stringify(entry)));
+      const pending=JSON.parse(String(value)).filter(entry=>!confirmed.has(JSON.stringify(entry)));
+      nativeSetItem.call(this,key,JSON.stringify(pending));
+      cloudHistoryRaw=v665MergeHistoryRaw(null,cloudHistoryRaw);
+    }else if(this===localStorage && key===CUSTOM_PRODUCTS_KEY){
       v65StoreProducts(String(value));
       result = undefined;
     }else{
@@ -6604,7 +6663,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
           const k=localStorage.key(i);
           if(k && v61IsAppDataKey(k)) localKeys.push(k);
         }
-        localKeys.forEach(k=>{ if(keepLocalOrder(k,payload))return; try{ nativeRemoveItem.call(localStorage,k); }catch(e){} });
+        localKeys.forEach(k=>{ if(k===HISTORY_KEY || keepLocalOrder(k,payload))return; try{ nativeRemoveItem.call(localStorage,k); }catch(e){} });
       }
       // V64.7 : écrit le catalogue EN PREMIER, puis le reste. Une erreur d'écriture
       // du catalogue n'est plus masquée : tant qu'il n'est pas installé, le bootstrap
@@ -6616,6 +6675,11 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
       });
       orderedKeys.forEach(k=>{
         if(keepLocalOrder(k,payload))return;
+        if(k===HISTORY_KEY){
+          if(typeof storage[k]==="string" && cloudHistoryRaw===null && nativeGetItem.call(localStorage,k)===null)
+            nativeSetItem.call(localStorage,k,storage[k]);
+          return;
+        }
         if(v61IsAppDataKey(k)){
           if(storage[k] === null){
             nativeRemoveItem.call(localStorage,k);
@@ -6943,7 +7007,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
               v61ApplyingRemote=true;
               if(k===CUSTOM_PRODUCTS_KEY){ if(v===null) v65StoreProducts("[]"); else v65StoreProducts(String(v)); }
               else if(k===RML_HISTORY_TOMBSTONES_KEY){ if(v===null) nativeSetItem.call(localStorage,k,"[]"); else nativeSetItem.call(localStorage,k,String(v)); rmlFilterDeletedHistoryNow(); }
-              else if(k===HISTORY_KEY){ nativeSetItem.call(localStorage,HISTORY_KEY,v665MergeHistoryRaw(nativeGetItem.call(localStorage,HISTORY_KEY),v)); rmlFilterDeletedHistoryNow(); }
+              else if(k===HISTORY_KEY){ receiveCloudHistory(v); }
               else if(v===null) nativeRemoveItem.call(localStorage,k); else nativeSetItem.call(localStorage,k,String(v));
               markOrderVersion(k,Date.parse(remote.savedAt||""));
             }catch(e){ console.error("[V66.6] réception temps réel",e); }
@@ -6984,15 +7048,14 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
           rmlFilterDeletedHistoryNow();
         }
         else if(k===HISTORY_KEY){
-          nativeSetItem.call(localStorage,HISTORY_KEY,v665MergeHistoryRaw(nativeGetItem.call(localStorage,HISTORY_KEY),v));
-          rmlFilterDeletedHistoryNow();
+          receiveCloudHistory(v);
         }
         else if(v===null) nativeRemoveItem.call(localStorage,k); else nativeSetItem.call(localStorage,k,String(v));
         markOrderVersion(k,Date.parse(d.savedAt||""));
         n++;
       }
     }finally{ v61ApplyingRemote=false; }
-    try{rmlFilterDeletedHistoryNow();}catch(e){}
+    cloudHistoryRaw=v665MergeHistoryRaw(null,cloudHistoryRaw);
     return n;
   }
 
