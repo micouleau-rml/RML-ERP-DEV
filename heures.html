@@ -867,20 +867,11 @@ async function pushSettings(){
 }
 async function pushEntry(e){const {error}=await db.from('rml_heures_entries').upsert(entryToRow(e),{onConflict:'entry_date,employee_name'});if(error)throw error}
 async function pushAllEntries(){if(!state.entries.length)return;const {error}=await db.from('rml_heures_entries').upsert(state.entries.map(entryToRow),{onConflict:'entry_date,employee_name'});if(error)throw error}
-async function syncFromCloud(){if(!navigator.onLine){setSyncStatus('Hors ligne — sauvegarde locale',false);return false}setSyncStatus('Synchronisation…');try{const [er,sr,tr]=await Promise.all([db.from('rml_heures_employees').select('*').order('id'),db.from('rml_heures_settings').select('*').eq('setting_key','app_settings').maybeSingle(),db.from('rml_heures_entries').select('*').order('entry_date')]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(er.data&&er.data.length){state.employees=er.data.map(x=>({name:x.name,rate:Number(x.hourly_rate)||0,active:x.active!==false}))}else{await pushEmployees()}if(sr.data?.setting_value){
-  try{
-    state.settings=normalizeSettings(JSON.parse(sr.data.setting_value));
-    // Réécrit automatiquement le format actuel dans Supabase :
-    // cela migre les anciens réglages et ajoute teams/overtime manquants.
-    await pushSettings();
-  }catch(e){
-    console.warn('Réglages Supabase invalides, utilisation des valeurs sûres',e);
-    state.settings=normalizeSettings(state.settings);
-    await pushSettings();
-  }
-}else{
-  state.settings=normalizeSettings(state.settings);
-  await pushSettings();
+async function syncFromCloud(){if(!navigator.onLine){setSyncStatus('Hors ligne — sauvegarde locale',false);return false}setSyncStatus('Synchronisation…');try{const [er,sr,tr]=await Promise.all([db.from('rml_heures_employees').select('*').order('id'),db.from('rml_heures_settings').select('*').eq('setting_key','app_settings').maybeSingle(),db.from('rml_heures_entries').select('*').order('entry_date')]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(!employeeSettingsPending() && !employeeSettingsSaving && er.data?.length){
+  state.employees=employeesFromRows(er.data);
+}if(!employeeSettingsPending() && !employeeSettingsSaving){
+  if(sr.data?.setting_value)state.settings=normalizeSettings(JSON.parse(sr.data.setting_value));
+  else await pushSettings();
 }if(tr.data&&tr.data.length){state.entries=tr.data.map(rowToEntry)}else if(state.entries.length){await pushAllEntries()}persist();options();ensureEmployeePlaceholder();renderSettings();updateCalc();renderMonth();renderRecap();renderPaidLeave();setSyncStatus('Supabase synchronisé ✓');return true}catch(err){
  console.error('Erreur synchronisation Supabase :',err);
  setSyncStatus('Erreur synchro — données locales conservées',false,err?.message||String(err));
@@ -2368,19 +2359,58 @@ function setEmployeeArchived(i,archived){
  renderEmployeeSettings();
 }
 function addEmployee(){state.employees.push({name:'NOUVEAU SALARIÉ',rate:0});renderEmployeeSettings()}
-async function saveEmployees(){
- captureEmployeeFields();
- state.employees=state.employees.filter(e=>e.name);
- persist();options();ensureEmployeePlaceholder();renderEmployeeSettings();renderTeamPicker();renderTeamSettings();renderMonth();renderRecap();renderPaidLeave();
+const EMPLOYEE_SETTINGS_PENDING_KEY=KEY+'_employee_settings_pending';
+let employeeSettingsSaving=false;
+let employeeSettingsVersion=0;
+el('employeeSettings').addEventListener('input',()=>{++employeeSettingsVersion});
+el('employeeSettings').addEventListener('click',event=>{
+ if(event.target.closest('.employee-delete-btn'))++employeeSettingsVersion;
+});
+function employeeSettingsPending(){return localStorage.getItem(EMPLOYEE_SETTINGS_PENDING_KEY)==='1'}
+function employeesFromRows(rows){
+ return rows.map(row=>({name:row.name,rate:Number(row.hourly_rate)||0,active:row.active!==false}));
+}
+async function refreshEmployeeSettings(){
+ if(!navigator.onLine || employeeSettingsSaving || employeeSettingsPending())return;
+ const version=++employeeSettingsVersion;
  try{
+   const [employees,settings]=await Promise.all([
+     db.from('rml_heures_employees').select('name,hourly_rate,active').order('id'),
+     db.from('rml_heures_settings').select('setting_value').eq('setting_key','app_settings').maybeSingle()
+   ]);
+   if(employees.error)throw employees.error;
+   if(settings.error)throw settings.error;
+   if(version!==employeeSettingsVersion || employeeSettingsSaving || employeeSettingsPending())return;
+   const container=el('employeeSettings');
+   if(!el('reglages')?.classList.contains('active') || container?.contains(document.activeElement))return;
+   if(employees.data?.length)state.employees=employeesFromRows(employees.data);
+   if(settings.data?.setting_value){
+     const remote=normalizeSettings(JSON.parse(settings.data.setting_value));
+     for(const key of ['employeeHireDates','employeeDepartureDates'])state.settings[key]=remote[key];
+   }
+   persist();options();ensureEmployeePlaceholder();renderEmployeeSettings();renderTeamPicker();renderTeamSettings();
+ }catch(err){setSyncStatus('Lecture des salariés Supabase impossible',false,err?.message||String(err))}
+}
+async function saveEmployees(){
+ if(employeeSettingsSaving)return;
+ employeeSettingsSaving=true;
+ ++employeeSettingsVersion;
+ try{
+   captureEmployeeFields();
+   state.employees=state.employees.filter(e=>e.name);
+   localStorage.setItem(EMPLOYEE_SETTINGS_PENDING_KEY,'1');
+   persist();options();ensureEmployeePlaceholder();renderEmployeeSettings();renderTeamPicker();renderTeamSettings();renderMonth();renderRecap();renderPaidLeave();
    await pushEmployees();
    await pushSettings();
+   localStorage.removeItem(EMPLOYEE_SETTINGS_PENDING_KEY);
    setSyncStatus('Supabase synchronisé ✓');
-   alert('Salariés, taux horaires et dates d’entrée enregistrés et synchronisés.');
+   alert('Réglages salariés enregistrés dans Supabase.');
  }catch(err){
-   console.error(err);setSyncStatus('Salariés sauvegardés localement',false);
-   alert('Salariés et dates d’entrée enregistrés localement.');
- }
+   const detail=err?.message||String(err);
+   console.error(err);
+   setSyncStatus('Réglages salariés en attente de synchronisation',false,detail);
+   alert('La synchronisation des salariés a échoué. Réessayez avec « Enregistrer les salariés ».\n'+detail);
+ }finally{employeeSettingsSaving=false}
 }
 async function saveSettings(){state.settings.CONT={start:el('contStart').value,end:el('contEnd').value};state.settings.CLA={start:el('claStart').value,end:el('claEnd').value,pauseStart:el('pauseStart').value,pauseEnd:el('pauseEnd').value};state.settings.SAM={start:el('samStart').value,end:state.settings.SAM.end||'14:00'};state.settings.overtime={rate1:Number(el('otRate1').value)||0,rate2:Number(el('otRate2').value)||0,thresholdHours:Number(el('otThreshold').value)||0,grace15Enabled:!!el('otGraceEnabled')?.checked};persist();updateCalc();renderRecap();try{await pushSettings();setSyncStatus('Supabase synchronisé ✓');alert('Réglages enregistrés et synchronisés.')}catch(err){console.error(err);setSyncStatus('Réglages sauvegardés localement',false);alert('Réglages enregistrés localement.')}}
 
@@ -2737,7 +2767,7 @@ function printAnalysis(){
  setTimeout(()=>document.body.classList.remove('analysis-print'),500);
 }
 
-function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===id));if(id==='mois')renderMonth();if(id==='recap')renderRecap();if(id==='conges')renderPaidLeave();if(id==='analyse')renderAnalysis();if(id==='reglages')renderSettings()}
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.view===id));if(id==='mois')renderMonth();if(id==='recap')renderRecap();if(id==='conges')renderPaidLeave();if(id==='analyse')renderAnalysis();if(id==='reglages'){renderSettings();refreshEmployeeSettings()}}
 function exportCsv(){const emp=el('monthEmployee').value,ym=el('monthPick').value;const rows=state.entries.filter(e=>e.employee===emp&&e.date.startsWith(ym)).sort((a,b)=>a.date.localeCompare(b.date));const data=[['Date','Salarié','Type','Embauche','Départ chantier ou atelier','Arrivée dépôt','H sup min','H route min','Déduction','H sup réelles min','Commentaire'],...rows.map(e=>[e.date,e.employee,e.type,e.startOverride||'',e.depart||'',e.arrivee||'',e.sup||0,e.route||0,e.deduction||'00:00',e.real||0,e.comment||''])];const csv=data.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download=`RML_HEURES_${emp}_${ym}.csv`;a.click();URL.revokeObjectURL(a.href)}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>show(b.dataset.view));['employee','date','startOverride','depart','arrivee','deduction','absenceEnd'].forEach(id=>el(id)?.addEventListener('input',updateCalc));
 el('type')?.addEventListener('input',updateCalc);

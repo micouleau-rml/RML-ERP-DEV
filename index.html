@@ -1801,20 +1801,11 @@ async function pushSettings(){
 }
 async function pushEntry(e){const {error}=await db.from(&#x27;rml_heures_entries&#x27;).upsert(entryToRow(e),{onConflict:&#x27;entry_date,employee_name&#x27;});if(error)throw error}
 async function pushAllEntries(){if(!state.entries.length)return;const {error}=await db.from(&#x27;rml_heures_entries&#x27;).upsert(state.entries.map(entryToRow),{onConflict:&#x27;entry_date,employee_name&#x27;});if(error)throw error}
-async function syncFromCloud(){if(rmlSharedClientReady)await rmlSharedClientReady;if(!navigator.onLine){setSyncStatus(&#x27;Hors ligne — sauvegarde locale&#x27;,false);return false}setSyncStatus(&#x27;Synchronisation…&#x27;);try{const [er,sr,tr]=await Promise.all([db.from(&#x27;rml_heures_employees&#x27;).select(&#x27;*&#x27;).order(&#x27;id&#x27;),db.from(&#x27;rml_heures_settings&#x27;).select(&#x27;*&#x27;).eq(&#x27;setting_key&#x27;,&#x27;app_settings&#x27;).maybeSingle(),db.from(&#x27;rml_heures_entries&#x27;).select(&#x27;*&#x27;).order(&#x27;entry_date&#x27;)]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(er.data&amp;&amp;er.data.length){state.employees=er.data.map(x=&gt;({name:x.name,rate:Number(x.hourly_rate)||0,active:x.active!==false}))}else{await pushEmployees()}if(sr.data?.setting_value){
-  try{
-    state.settings=normalizeSettings(JSON.parse(sr.data.setting_value));
-    // Réécrit automatiquement le format actuel dans Supabase :
-    // cela migre les anciens réglages et ajoute teams/overtime manquants.
-    await pushSettings();
-  }catch(e){
-    console.warn(&#x27;Réglages Supabase invalides, utilisation des valeurs sûres&#x27;,e);
-    state.settings=normalizeSettings(state.settings);
-    await pushSettings();
-  }
-}else{
-  state.settings=normalizeSettings(state.settings);
-  await pushSettings();
+async function syncFromCloud(){if(rmlSharedClientReady)await rmlSharedClientReady;if(!navigator.onLine){setSyncStatus(&#x27;Hors ligne — sauvegarde locale&#x27;,false);return false}setSyncStatus(&#x27;Synchronisation…&#x27;);try{const [er,sr,tr]=await Promise.all([db.from(&#x27;rml_heures_employees&#x27;).select(&#x27;*&#x27;).order(&#x27;id&#x27;),db.from(&#x27;rml_heures_settings&#x27;).select(&#x27;*&#x27;).eq(&#x27;setting_key&#x27;,&#x27;app_settings&#x27;).maybeSingle(),db.from(&#x27;rml_heures_entries&#x27;).select(&#x27;*&#x27;).order(&#x27;entry_date&#x27;)]);if(er.error)throw er.error;if(sr.error)throw sr.error;if(tr.error)throw tr.error;if(!employeeSettingsPending() &amp;&amp; !employeeSettingsSaving &amp;&amp; er.data?.length){
+  state.employees=employeesFromRows(er.data);
+}if(!employeeSettingsPending() &amp;&amp; !employeeSettingsSaving){
+  if(sr.data?.setting_value)state.settings=normalizeSettings(JSON.parse(sr.data.setting_value));
+  else await pushSettings();
 }if(tr.data&amp;&amp;tr.data.length){state.entries=tr.data.map(rowToEntry)}else if(state.entries.length){await pushAllEntries()}persist();options();ensureEmployeePlaceholder();renderSettings();updateCalc();renderMonth();renderRecap();renderPaidLeave();setSyncStatus(&#x27;Supabase synchronisé ✓&#x27;);return true}catch(err){
  console.error(&#x27;Erreur synchronisation Supabase :&#x27;,err);
  setSyncStatus(&#x27;Erreur synchro — données locales conservées&#x27;,false,err?.message||String(err));
@@ -3302,19 +3293,58 @@ function setEmployeeArchived(i,archived){
  renderEmployeeSettings();
 }
 function addEmployee(){state.employees.push({name:&#x27;NOUVEAU SALARIÉ&#x27;,rate:0});renderEmployeeSettings()}
-async function saveEmployees(){
- captureEmployeeFields();
- state.employees=state.employees.filter(e=&gt;e.name);
- persist();options();ensureEmployeePlaceholder();renderEmployeeSettings();renderTeamPicker();renderTeamSettings();renderMonth();renderRecap();renderPaidLeave();
+const EMPLOYEE_SETTINGS_PENDING_KEY=KEY+&#x27;_employee_settings_pending&#x27;;
+let employeeSettingsSaving=false;
+let employeeSettingsVersion=0;
+el(&#x27;employeeSettings&#x27;).addEventListener(&#x27;input&#x27;,()=&gt;{++employeeSettingsVersion});
+el(&#x27;employeeSettings&#x27;).addEventListener(&#x27;click&#x27;,event=&gt;{
+ if(event.target.closest(&#x27;.employee-delete-btn&#x27;))++employeeSettingsVersion;
+});
+function employeeSettingsPending(){return localStorage.getItem(EMPLOYEE_SETTINGS_PENDING_KEY)===&#x27;1&#x27;}
+function employeesFromRows(rows){
+ return rows.map(row=&gt;({name:row.name,rate:Number(row.hourly_rate)||0,active:row.active!==false}));
+}
+async function refreshEmployeeSettings(){
+ if(!navigator.onLine || employeeSettingsSaving || employeeSettingsPending())return;
+ const version=++employeeSettingsVersion;
  try{
+   const [employees,settings]=await Promise.all([
+     db.from(&#x27;rml_heures_employees&#x27;).select(&#x27;name,hourly_rate,active&#x27;).order(&#x27;id&#x27;),
+     db.from(&#x27;rml_heures_settings&#x27;).select(&#x27;setting_value&#x27;).eq(&#x27;setting_key&#x27;,&#x27;app_settings&#x27;).maybeSingle()
+   ]);
+   if(employees.error)throw employees.error;
+   if(settings.error)throw settings.error;
+   if(version!==employeeSettingsVersion || employeeSettingsSaving || employeeSettingsPending())return;
+   const container=el(&#x27;employeeSettings&#x27;);
+   if(!el(&#x27;reglages&#x27;)?.classList.contains(&#x27;active&#x27;) || container?.contains(document.activeElement))return;
+   if(employees.data?.length)state.employees=employeesFromRows(employees.data);
+   if(settings.data?.setting_value){
+     const remote=normalizeSettings(JSON.parse(settings.data.setting_value));
+     for(const key of [&#x27;employeeHireDates&#x27;,&#x27;employeeDepartureDates&#x27;])state.settings[key]=remote[key];
+   }
+   persist();options();ensureEmployeePlaceholder();renderEmployeeSettings();renderTeamPicker();renderTeamSettings();
+ }catch(err){setSyncStatus(&#x27;Lecture des salariés Supabase impossible&#x27;,false,err?.message||String(err))}
+}
+async function saveEmployees(){
+ if(employeeSettingsSaving)return;
+ employeeSettingsSaving=true;
+ ++employeeSettingsVersion;
+ try{
+   captureEmployeeFields();
+   state.employees=state.employees.filter(e=&gt;e.name);
+   localStorage.setItem(EMPLOYEE_SETTINGS_PENDING_KEY,&#x27;1&#x27;);
+   persist();options();ensureEmployeePlaceholder();renderEmployeeSettings();renderTeamPicker();renderTeamSettings();renderMonth();renderRecap();renderPaidLeave();
    await pushEmployees();
    await pushSettings();
+   localStorage.removeItem(EMPLOYEE_SETTINGS_PENDING_KEY);
    setSyncStatus(&#x27;Supabase synchronisé ✓&#x27;);
-   alert(&#x27;Salariés, taux horaires et dates d’entrée enregistrés et synchronisés.&#x27;);
+   alert(&#x27;Réglages salariés enregistrés dans Supabase.&#x27;);
  }catch(err){
-   console.error(err);setSyncStatus(&#x27;Salariés sauvegardés localement&#x27;,false);
-   alert(&#x27;Salariés et dates d’entrée enregistrés localement.&#x27;);
- }
+   const detail=err?.message||String(err);
+   console.error(err);
+   setSyncStatus(&#x27;Réglages salariés en attente de synchronisation&#x27;,false,detail);
+   alert(&#x27;La synchronisation des salariés a échoué. Réessayez avec « Enregistrer les salariés ».\n&#x27;+detail);
+ }finally{employeeSettingsSaving=false}
 }
 async function saveSettings(){state.settings.CONT={start:el(&#x27;contStart&#x27;).value,end:el(&#x27;contEnd&#x27;).value};state.settings.CLA={start:el(&#x27;claStart&#x27;).value,end:el(&#x27;claEnd&#x27;).value,pauseStart:el(&#x27;pauseStart&#x27;).value,pauseEnd:el(&#x27;pauseEnd&#x27;).value};state.settings.SAM={start:el(&#x27;samStart&#x27;).value,end:state.settings.SAM.end||&#x27;14:00&#x27;};state.settings.overtime={rate1:Number(el(&#x27;otRate1&#x27;).value)||0,rate2:Number(el(&#x27;otRate2&#x27;).value)||0,thresholdHours:Number(el(&#x27;otThreshold&#x27;).value)||0,grace15Enabled:!!el(&#x27;otGraceEnabled&#x27;)?.checked};persist();updateCalc();renderRecap();try{await pushSettings();setSyncStatus(&#x27;Supabase synchronisé ✓&#x27;);alert(&#x27;Réglages enregistrés et synchronisés.&#x27;)}catch(err){console.error(err);setSyncStatus(&#x27;Réglages sauvegardés localement&#x27;,false);alert(&#x27;Réglages enregistrés localement.&#x27;)}}
 
@@ -3671,7 +3701,7 @@ function printAnalysis(){
  setTimeout(()=&gt;document.body.classList.remove(&#x27;analysis-print&#x27;),500);
 }
 
-function show(id){document.querySelectorAll(&#x27;.view&#x27;).forEach(v=&gt;v.classList.toggle(&#x27;active&#x27;,v.id===id));document.querySelectorAll(&#x27;.tab&#x27;).forEach(t=&gt;t.classList.toggle(&#x27;active&#x27;,t.dataset.view===id));if(id===&#x27;mois&#x27;)renderMonth();if(id===&#x27;recap&#x27;)renderRecap();if(id===&#x27;conges&#x27;)renderPaidLeave();if(id===&#x27;analyse&#x27;)renderAnalysis();if(id===&#x27;reglages&#x27;)renderSettings()}
+function show(id){document.querySelectorAll(&#x27;.view&#x27;).forEach(v=&gt;v.classList.toggle(&#x27;active&#x27;,v.id===id));document.querySelectorAll(&#x27;.tab&#x27;).forEach(t=&gt;t.classList.toggle(&#x27;active&#x27;,t.dataset.view===id));if(id===&#x27;mois&#x27;)renderMonth();if(id===&#x27;recap&#x27;)renderRecap();if(id===&#x27;conges&#x27;)renderPaidLeave();if(id===&#x27;analyse&#x27;)renderAnalysis();if(id===&#x27;reglages&#x27;){renderSettings();refreshEmployeeSettings()}}
 function exportCsv(){const emp=el(&#x27;monthEmployee&#x27;).value,ym=el(&#x27;monthPick&#x27;).value;const rows=state.entries.filter(e=&gt;e.employee===emp&amp;&amp;e.date.startsWith(ym)).sort((a,b)=&gt;a.date.localeCompare(b.date));const data=[[&#x27;Date&#x27;,&#x27;Salarié&#x27;,&#x27;Type&#x27;,&#x27;Embauche&#x27;,&#x27;Départ chantier ou atelier&#x27;,&#x27;Arrivée dépôt&#x27;,&#x27;H sup min&#x27;,&#x27;H route min&#x27;,&#x27;Déduction&#x27;,&#x27;H sup réelles min&#x27;,&#x27;Commentaire&#x27;],...rows.map(e=&gt;[e.date,e.employee,e.type,e.startOverride||&#x27;&#x27;,e.depart||&#x27;&#x27;,e.arrivee||&#x27;&#x27;,e.sup||0,e.route||0,e.deduction||&#x27;00:00&#x27;,e.real||0,e.comment||&#x27;&#x27;])];const csv=data.map(r=&gt;r.map(v=&gt;&#x27;&quot;&#x27;+String(v).replaceAll(&#x27;&quot;&#x27;,&#x27;&quot;&quot;&#x27;)+&#x27;&quot;&#x27;).join(&#x27;;&#x27;)).join(&#x27;\n&#x27;);const a=document.createElement(&#x27;a&#x27;);a.href=URL.createObjectURL(new Blob([&#x27;\ufeff&#x27;+csv],{type:&#x27;text/csv&#x27;}));a.download=`RML_HEURES_${emp}_${ym}.csv`;a.click();URL.revokeObjectURL(a.href)}
 document.querySelectorAll(&#x27;.tab&#x27;).forEach(b=&gt;b.onclick=()=&gt;show(b.dataset.view));[&#x27;employee&#x27;,&#x27;date&#x27;,&#x27;startOverride&#x27;,&#x27;depart&#x27;,&#x27;arrivee&#x27;,&#x27;deduction&#x27;,&#x27;absenceEnd&#x27;].forEach(id=&gt;el(id)?.addEventListener(&#x27;input&#x27;,updateCalc));
 el(&#x27;type&#x27;)?.addEventListener(&#x27;input&#x27;,updateCalc);
