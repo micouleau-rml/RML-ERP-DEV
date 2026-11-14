@@ -1867,6 +1867,10 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <label for="projectName">Nom du projet / chantier</label>
         <input id="projectName" type="text" placeholder="Ex. Villa Dupont Bordeaux" />
       </div>
+      <div class="field col-6">
+        <label for="projectTransport">Transport du devis HT (€) · facultatif</label>
+        <input id="projectTransport" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" />
+      </div>
     </div>
 
         <div class="row">       
@@ -2253,6 +2257,7 @@ const selectedThickness=document.getElementById("selectedThickness");
 const globalPriceDisplay=document.getElementById("globalPriceDisplay");
 const projectName=document.getElementById("projectName");
 const projectColor=document.getElementById("projectColor");
+const projectTransport=document.getElementById("projectTransport");
 const piecesEl=document.getElementById("pieces");
 const resultTableBody=document.getElementById("resultTableBody");
 const statusEl=document.getElementById("status");
@@ -2425,6 +2430,7 @@ function saveCurrentProjectState(){
   const state={
     projectId:typeof currentLoadedProjectId!=="undefined" ? currentLoadedProjectId : "",
     clientId:selectedClient.value || "",
+    transportHt:projectTransport.value,
     projectColor:document.getElementById("projectColor")?.value || "",
     projectName:document.getElementById("projectName")?.value || "",
     thickness:selectedThickness.value || "7/10",
@@ -2478,6 +2484,7 @@ function restoreCurrentProjectState(){
     const projectColorField=document.getElementById("projectColor");
     if(projectColorField){
       projectColorField.value=state.projectColor || "";
+    projectTransport.value=state.transportHt??"";
     }
 
   }catch(error){
@@ -2712,6 +2719,7 @@ function exportFullBackup(){
 
     projectName:document.getElementById("projectName")?.value || "",
 
+    transportHt:projectTransport.value,
     projectColor:document.getElementById("projectColor")?.value || ""
   };
 
@@ -2734,6 +2742,7 @@ function exportProjectBackup(){
     version:8,
     exportedAt:new Date().toISOString(),
     projectName:project,
+    transportHt:projectTransport.value,
     projectColor: projectColor ? projectColor.value : "",
     client,
     selectedClientId:selectedClient.value,
@@ -2804,6 +2813,7 @@ updatePriceDisplay();
 /* Restaurer la couleur après tous les rendus */
 if(typeof projectColor!=="undefined" && projectColor){
   projectColor.value=parsed.projectColor || parsed.color || "";
+    projectTransport.value=parsed.transportHt??"";
   projectColor.dispatchEvent(new Event("input",{bubbles:true}));
   projectColor.dispatchEvent(new Event("change",{bubbles:true}));
 }
@@ -2817,7 +2827,13 @@ async function openPliageQuote(client,project,lines){
   const escape=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
   const subtotal=lines.reduce((sum,line)=>sum+line.cents,0);
   const minimumAdjustment=Math.max(0,PLIAGE_MINIMUM_HT*100-subtotal);
-  const ht=subtotal+minimumAdjustment;
+  const transportCents=Math.round(Number(projectTransport.value)*100);
+  if(!projectTransport.validity.valid||!Number.isSafeInteger(transportCents)||transportCents<0){
+    alert("Renseigne un montant de transport HT valide.");
+    projectTransport.focus();
+    return;
+  }
+  const ht=subtotal+minimumAdjustment+transportCents;
   const vat=Math.round(ht*20/100);
   const thickness=selectedThickness.value;
   const color=(projectColor?.value||"").trim();
@@ -2830,7 +2846,8 @@ async function openPliageQuote(client,project,lines){
     }
     issued=await parent.rmlIssuePliageQuote({
       client:client.name,clientId:client.id||null,project,
-      projectId:currentLoadedProjectId||null,thickness,lines,ht,vat
+      projectId:currentLoadedProjectId||null,thickness,lines,ht,vat,
+      ...(transportCents?{transportCents}:{})
     });
     if(!issued?.number||!issued?.date)throw new Error("Numéro de devis indisponible.");
   }catch(error){
@@ -2848,7 +2865,7 @@ async function openPliageQuote(client,project,lines){
     columns:['Désignation','Couleur','Dév. (mm)','Long. (m)','Qté','Total HT'],
     rows:`${lines.map(line=>`<tr><td>Pièce pliée n° ${line.number}</td><td>${escape(color||"—")}</td><td>${fmtNumber(line.dev)}</td><td>${fmtNumber(line.long)}</td><td>${escape(line.qty)}</td><td>${fmtEuro(line.cents/100)}</td></tr>`).join("")}
   ${minimumAdjustment?`<tr><td colspan="5">Complément au minimum de commande</td><td>${fmtEuro(minimumAdjustment/100)}</td></tr>`:""}`,
-    totals:`Total HT : ${fmtEuro(ht/100)}<br>TVA 20 % : ${fmtEuro(vat/100)}<br><strong>Total TTC : ${fmtEuro((ht+vat)/100)}</strong>`,
+    totals:`${transportCents?`Transport HT : ${fmtEuro(transportCents/100)}<br>`:""}Total HT : ${fmtEuro(ht/100)}<br>TVA 20 % : ${fmtEuro(vat/100)}<br><strong>Total TTC : ${fmtEuro((ht+vat)/100)}</strong>`,
     standalone:true,shortQuote:lines.length<=5
   });
   win.document.open();
@@ -4168,6 +4185,7 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
 
       if(projectColor){
         projectColor.value=data.projectColor || data.color || "";
+    projectTransport.value=data.transportHt??"";
       }
 
       currentLoadedProjectId="";
@@ -4213,6 +4231,7 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
         id:data.id || crypto.randomUUID(),
         name:data.name || data.projectName || "Projet importé",
         color:data.projectColor || data.color || "",
+        transportHt:data.transportHt??"",
         clientId:data.clientId || data.selectedClientId || data.client?.id || "",
         thickness:data.thickness || data.selectedThickness || "7/10",
         sheetFormat:data.sheetFormat || data.selectedSheetFormat || "1500x3000",
@@ -4242,6 +4261,7 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
       applyStoredMaterialFormat(importedProject);
       projectNameInput.value=importedProject.name;
       if(projectColor) projectColor.value=importedProject.color;
+    projectTransport.value=importedProject.transportHt??"";
 
       pieces=importedProject.pieces.length
         ? importedProject.pieces
@@ -4428,6 +4448,7 @@ function persistCurrentProjectRecord({createIfMissing=true}={}){
     ...(existing||{}),
     id:existing?.id || currentLoadedProjectId || crypto.randomUUID(),
     name,
+    transportHt:projectTransport.value,
     color:projectColor ? projectColor.value : "",
     clientId:selectedClient.value,
     thickness:selectedThickness.value,
@@ -4471,6 +4492,7 @@ function newProject(){
 
   if(typeof projectColor!=="undefined" && projectColor){
     projectColor.value="";
+    projectTransport.value="";
   }
 
   // Aucun client sélectionné
@@ -4589,6 +4611,7 @@ function loadProjects(){
     window.RML_ACTIVE_BEND_PIECE_INDEX=(Number.isInteger(restoredBendIndex)&&restoredBendIndex>=0&&restoredBendIndex<pieces.length)?restoredBendIndex:Math.max(0,pieces.findIndex(piece=>piece?.bendProfile));
     const colorField=document.getElementById("projectColor");
     if(colorField)colorField.value=selected.color||selected.projectColor||"";
+    projectTransport.value=selected.transportHt??"";
     saveCurrentProjectState();modal.remove();alert("Projet chargé : "+projectReference);
   };
 
@@ -4745,6 +4768,7 @@ if(projectNameField){
 
 if(projectColorField){
   projectColorField.addEventListener("input",saveCurrentProjectState);
+  projectTransport.addEventListener("input",saveCurrentProjectState);
 }
 
 if(selectedClient){
