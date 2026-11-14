@@ -2843,7 +2843,7 @@ async function openPliageQuote(client,project,lines){
 
   const html=parent.rmlQuotePrintHtml({
     subtitle:"PLIAGE ALUMINIUM SUR MESURE",title:"DEVIS PLIAGE",number:issued.number,date,
-    client:'<strong>Client</strong><br>'+escape(client.name),
+    client:parent.rmlPliageQuoteClientHtml?.(client.name) ?? ('<strong>Client</strong><br>'+escape(client.name)),
     site:'<strong>Projet / chantier</strong><br>'+escape(project)+'<br>Épaisseur : '+escape(thickness),
     columns:['Désignation','Couleur','Dév. (mm)','Long. (m)','Qté','Total HT'],
     rows:`${lines.map(line=>`<tr><td>Pièce pliée n° ${line.number}</td><td>${escape(color||"—")}</td><td>${fmtNumber(line.dev)}</td><td>${fmtNumber(line.long)}</td><td>${escape(line.qty)}</td><td>${fmtEuro(line.cents/100)}</td></tr>`).join("")}
