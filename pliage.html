@@ -2820,6 +2820,7 @@ async function openPliageQuote(client,project,lines){
   const ht=subtotal+minimumAdjustment;
   const vat=Math.round(ht*20/100);
   const thickness=selectedThickness.value;
+  const color=(projectColor?.value||"").trim();
   const win=window.open("","_blank");
   if(!win){alert("Autorise les fenêtres surgissantes pour afficher le devis.");return;}
   let issued;
@@ -2844,9 +2845,9 @@ async function openPliageQuote(client,project,lines){
     subtitle:"PLIAGE ALUMINIUM SUR MESURE",title:"DEVIS PLIAGE",number:issued.number,date,
     client:'<strong>Client</strong><br>'+escape(client.name),
     site:'<strong>Projet / chantier</strong><br>'+escape(project)+'<br>Épaisseur : '+escape(thickness),
-    columns:['Désignation','Dév. (mm)','Long. (m)','Qté','Total HT'],
-    rows:`${lines.map(line=>`<tr><td>Pièce pliée n° ${line.number}</td><td>${fmtNumber(line.dev)}</td><td>${fmtNumber(line.long)}</td><td>${escape(line.qty)}</td><td>${fmtEuro(line.cents/100)}</td></tr>`).join("")}
-  ${minimumAdjustment?`<tr><td colspan="4">Complément au minimum de commande</td><td>${fmtEuro(minimumAdjustment/100)}</td></tr>`:""}`,
+    columns:['Désignation','Couleur','Dév. (mm)','Long. (m)','Qté','Total HT'],
+    rows:`${lines.map(line=>`<tr><td>Pièce pliée n° ${line.number}</td><td>${escape(color||"—")}</td><td>${fmtNumber(line.dev)}</td><td>${fmtNumber(line.long)}</td><td>${escape(line.qty)}</td><td>${fmtEuro(line.cents/100)}</td></tr>`).join("")}
+  ${minimumAdjustment?`<tr><td colspan="5">Complément au minimum de commande</td><td>${fmtEuro(minimumAdjustment/100)}</td></tr>`:""}`,
     totals:`Total HT : ${fmtEuro(ht/100)}<br>TVA 20 % : ${fmtEuro(vat/100)}<br><strong>Total TTC : ${fmtEuro((ht+vat)/100)}</strong>`,
     standalone:true,shortQuote:lines.length<=5
   });
