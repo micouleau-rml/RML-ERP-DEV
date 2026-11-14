@@ -104,7 +104,7 @@ tr:last-child td{border-bottom:none}.note{font-size:.86rem;color:var(--muted);ma
 .modal-close{background:#f3f5f7;color:#233241}
 @media (max-width:700px){.modal-card{padding:14px;max-height:92vh}}
 
-  /* ===== FENÊTRE MES PROJETS ===== */
+  /* ===== FENÊTRE MES DEVIS ===== */
 
 .projects-modal{
   position:fixed;
@@ -1961,7 +1961,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <div class="project-action-grid">
           <button class="btn-primary" id="saveProjectBtn">Enregistrer projet</button>
           <button type="button" class="btn-primary" id="rmlSendAtelierBtn" style="background:#176b48">Envoyer Atelier</button>
-          <button class="btn-secondary" id="loadProjectBtn">Mes projets</button>
+          <button class="btn-secondary" id="loadProjectBtn">Mes devis</button>
         </div>
         <div class="manual-backup-wrap">
           <button type="button" class="btn-light manual-backup-toggle" id="manualBackupToggle" aria-expanded="false" aria-controls="manualBackupPanel">
@@ -4555,7 +4555,7 @@ function loadProjects(){
     return client?.name||project.client?.name||project.clientName||"Client non renseigné";
   };
 
-  // V100 : chaque client possède automatiquement son dossier dans « Mes projets ».
+  // V100 : chaque client possède automatiquement son dossier dans « Mes devis ».
   let foldersChanged=false;
   clients.forEach(client=>{
     const name=String(client?.name||"").trim();
@@ -4591,7 +4591,7 @@ function loadProjects(){
   modal.id="projectsModal";modal.className="projects-modal";
   const box=document.createElement("div");box.className="projects-box";
   const header=document.createElement("div");header.className="projects-title";
-  const title=document.createElement("h2");title.textContent="Mes projets";
+  const title=document.createElement("h2");title.textContent="Mes devis";
   const closeTop=document.createElement("button");closeTop.type="button";closeTop.className="projects-close-top";closeTop.textContent="Fermer";closeTop.addEventListener("click",()=>modal.remove());
   header.append(title,closeTop);box.appendChild(header);
 
