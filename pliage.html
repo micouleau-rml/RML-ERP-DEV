@@ -1871,6 +1871,10 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <label for="projectTransport">Transport du devis HT (€) · facultatif</label>
         <input id="projectTransport" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" />
       </div>
+      <div class="field col-6">
+        <label for="projectDiscount">Remise du devis HT (€) · facultatif</label>
+        <input id="projectDiscount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" />
+      </div>
     </div>
 
         <div class="row">       
@@ -2258,6 +2262,7 @@ const globalPriceDisplay=document.getElementById("globalPriceDisplay");
 const projectName=document.getElementById("projectName");
 const projectColor=document.getElementById("projectColor");
 const projectTransport=document.getElementById("projectTransport");
+const projectDiscount=document.getElementById("projectDiscount");
 const piecesEl=document.getElementById("pieces");
 const resultTableBody=document.getElementById("resultTableBody");
 const statusEl=document.getElementById("status");
@@ -2431,6 +2436,7 @@ function saveCurrentProjectState(){
     projectId:typeof currentLoadedProjectId!=="undefined" ? currentLoadedProjectId : "",
     clientId:selectedClient.value || "",
     transportHt:projectTransport.value,
+    discountHt:projectDiscount.value,
     projectColor:document.getElementById("projectColor")?.value || "",
     projectName:document.getElementById("projectName")?.value || "",
     thickness:selectedThickness.value || "7/10",
@@ -2485,6 +2491,7 @@ function restoreCurrentProjectState(){
     if(projectColorField){
       projectColorField.value=state.projectColor || "";
     projectTransport.value=state.transportHt??"";
+    projectDiscount.value=state.discountHt??"";
     }
 
   }catch(error){
@@ -2720,6 +2727,7 @@ function exportFullBackup(){
     projectName:document.getElementById("projectName")?.value || "",
 
     transportHt:projectTransport.value,
+    discountHt:projectDiscount.value,
     projectColor:document.getElementById("projectColor")?.value || ""
   };
 
@@ -2743,6 +2751,7 @@ function exportProjectBackup(){
     exportedAt:new Date().toISOString(),
     projectName:project,
     transportHt:projectTransport.value,
+    discountHt:projectDiscount.value,
     projectColor: projectColor ? projectColor.value : "",
     client,
     selectedClientId:selectedClient.value,
@@ -2814,6 +2823,7 @@ updatePriceDisplay();
 if(typeof projectColor!=="undefined" && projectColor){
   projectColor.value=parsed.projectColor || parsed.color || "";
     projectTransport.value=parsed.transportHt??"";
+    projectDiscount.value=parsed.discountHt??"";
   projectColor.dispatchEvent(new Event("input",{bubbles:true}));
   projectColor.dispatchEvent(new Event("change",{bubbles:true}));
 }
@@ -2833,7 +2843,14 @@ async function openPliageQuote(client,project,lines){
     projectTransport.focus();
     return;
   }
-  const ht=subtotal+minimumAdjustment+transportCents;
+  const baseHt=subtotal+minimumAdjustment;
+  const discountCents=Math.round(Number(projectDiscount.value)*100);
+  if(!projectDiscount.validity.valid||!Number.isSafeInteger(discountCents)||discountCents<0||discountCents>baseHt){
+    alert("La remise doit être comprise entre zéro et le montant HT des pièces.");
+    projectDiscount.focus();
+    return;
+  }
+  const ht=baseHt-discountCents+transportCents;
   const vat=Math.round(ht*20/100);
   const thickness=selectedThickness.value;
   const color=(projectColor?.value||"").trim();
@@ -2847,7 +2864,8 @@ async function openPliageQuote(client,project,lines){
     issued=await parent.rmlIssuePliageQuote({
       client:client.name,clientId:client.id||null,project,
       projectId:currentLoadedProjectId||null,thickness,lines,ht,vat,
-      ...(transportCents?{transportCents}:{})
+      ...(transportCents?{transportCents}:{}),
+      ...(discountCents?{discountCents}:{})
     });
     if(!issued?.number||!issued?.date)throw new Error("Numéro de devis indisponible.");
   }catch(error){
@@ -2865,7 +2883,7 @@ async function openPliageQuote(client,project,lines){
     columns:['Désignation','Couleur','Dév. (mm)','Long. (m)','Qté','Total HT'],
     rows:`${lines.map(line=>`<tr><td>Pièce pliée n° ${line.number}</td><td>${escape(color||"—")}</td><td>${fmtNumber(line.dev)}</td><td>${fmtNumber(line.long)}</td><td>${escape(line.qty)}</td><td>${fmtEuro(line.cents/100)}</td></tr>`).join("")}
   ${minimumAdjustment?`<tr><td colspan="5">Complément au minimum de commande</td><td>${fmtEuro(minimumAdjustment/100)}</td></tr>`:""}`,
-    totals:`${transportCents?`Transport HT : ${fmtEuro(transportCents/100)}<br>`:""}Total HT : ${fmtEuro(ht/100)}<br>TVA 20 % : ${fmtEuro(vat/100)}<br><strong>Total TTC : ${fmtEuro((ht+vat)/100)}</strong>`,
+    totals:`Montant HT : ${fmtEuro(baseHt/100)}<br>${discountCents?`Remise HT : − ${fmtEuro(discountCents/100)}<br>`:""}${transportCents?`Transport HT : ${fmtEuro(transportCents/100)}<br>`:""}TVA 20 % : ${fmtEuro(vat/100)}<br><strong>Total TTC : ${fmtEuro((ht+vat)/100)}</strong>`,
     standalone:true,shortQuote:lines.length<=5
   });
   win.document.open();
@@ -4186,6 +4204,7 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
       if(projectColor){
         projectColor.value=data.projectColor || data.color || "";
     projectTransport.value=data.transportHt??"";
+    projectDiscount.value=data.discountHt??"";
       }
 
       currentLoadedProjectId="";
@@ -4232,6 +4251,7 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
         name:data.name || data.projectName || "Projet importé",
         color:data.projectColor || data.color || "",
         transportHt:data.transportHt??"",
+        discountHt:data.discountHt??"",
         clientId:data.clientId || data.selectedClientId || data.client?.id || "",
         thickness:data.thickness || data.selectedThickness || "7/10",
         sheetFormat:data.sheetFormat || data.selectedSheetFormat || "1500x3000",
@@ -4262,6 +4282,7 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
       projectNameInput.value=importedProject.name;
       if(projectColor) projectColor.value=importedProject.color;
     projectTransport.value=importedProject.transportHt??"";
+    projectDiscount.value=importedProject.discountHt??"";
 
       pieces=importedProject.pieces.length
         ? importedProject.pieces
@@ -4449,6 +4470,7 @@ function persistCurrentProjectRecord({createIfMissing=true}={}){
     id:existing?.id || currentLoadedProjectId || crypto.randomUUID(),
     name,
     transportHt:projectTransport.value,
+    discountHt:projectDiscount.value,
     color:projectColor ? projectColor.value : "",
     clientId:selectedClient.value,
     thickness:selectedThickness.value,
@@ -4493,6 +4515,7 @@ function newProject(){
   if(typeof projectColor!=="undefined" && projectColor){
     projectColor.value="";
     projectTransport.value="";
+    projectDiscount.value="";
   }
 
   // Aucun client sélectionné
@@ -4612,6 +4635,7 @@ function loadProjects(){
     const colorField=document.getElementById("projectColor");
     if(colorField)colorField.value=selected.color||selected.projectColor||"";
     projectTransport.value=selected.transportHt??"";
+    projectDiscount.value=selected.discountHt??"";
     saveCurrentProjectState();modal.remove();alert("Projet chargé : "+projectReference);
   };
 
@@ -4769,6 +4793,7 @@ if(projectNameField){
 if(projectColorField){
   projectColorField.addEventListener("input",saveCurrentProjectState);
   projectTransport.addEventListener("input",saveCurrentProjectState);
+  projectDiscount.addEventListener("input",saveCurrentProjectState);
 }
 
 if(selectedClient){
