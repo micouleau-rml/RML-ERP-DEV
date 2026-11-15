@@ -2068,13 +2068,15 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
   <label for="settingsClientSelect">Client à modifier</label>
   <select id="settingsClientSelect"></select>
   <div id="erpPliageDirectory" hidden>
+    <label for="erpPliageSearch">Rechercher un client ERP</label>
+    <input id="erpPliageSearch" type="search" placeholder="Nom ou code client" autocomplete="off" aria-controls="erpPliageClient">
     <label for="erpPliageClient">Client du fichier ERP</label>
     <select id="erpPliageClient"></select>
-    <small><div class="actions">
+    <div class="actions">
     <button type="button" class="btn-secondary" id="linkPliageErpClient">Rattacher le profil sélectionné</button>
     <button type="button" class="btn-light" id="usePliageErpClient">Utiliser ce client ERP</button>
   </div>
-  <div id="rmlPliageLinkStatus" role="status"></div></small>
+  <div id="rmlPliageLinkStatus" role="status"></div>
   </div>
 </div>
 
@@ -4845,21 +4847,36 @@ function selectSuggestedErpClient(){
   document.getElementById("rmlPliageLinkStatus").textContent=current?.erpClientId?"Profil déjà rattaché à une fiche ERP.":"";
 }
 
+const erpPliageSearch=document.getElementById("erpPliageSearch");
+function renderPliageErpMatches(){
+  const key=value=>erpPliageClientKey(value).normalize("NFD").replace(/\p{M}/gu,"");
+  const query=key(erpPliageSearch.value);
+  const previous=erpPliageClient.value;
+  const matches=pliageErpDirectory.filter(client=>key(client.name+" "+client.code).includes(query));
+  matches.sort((a,b)=>a.name.localeCompare(b.name,"fr"));
+  erpPliageClient.replaceChildren(new Option(matches.length?"Choisir un client ERP":"Aucun client trouvé",""));
+  for(const client of matches){
+    erpPliageClient.add(new Option(client.code?client.name+" · "+client.code:client.name,client.id));
+  }
+  if(matches.some(client=>client.id===previous))erpPliageClient.value=previous;
+}
+erpPliageSearch.addEventListener("input",renderPliageErpMatches);
+
 function openSettings(){
   pendingErpClientId="";
   renderClientForm();
   pliageErpDirectory=parent!==window?(parent.getPliageDirectoryClients?.()||[]):[];
   document.getElementById("erpPliageDirectory").hidden=pliageErpDirectory.length===0;
-  erpPliageClient.replaceChildren(new Option("Choisir un client ERP",""));
-  for(const client of [...pliageErpDirectory].sort((a,b)=>a.name.localeCompare(b.name,"fr"))){
-    erpPliageClient.add(new Option(client.code?client.name+" · "+client.code:client.name,client.id));
-  }
+  erpPliageSearch.value="";
+  renderPliageErpMatches();
   selectSuggestedErpClient();
   settingsModal.classList.add("open");
 }
 
 settingsClientSelect.addEventListener("change",()=>{
   pendingErpClientId="";
+  erpPliageSearch.value="";
+  renderPliageErpMatches();
   selectSuggestedErpClient();
 });
 
