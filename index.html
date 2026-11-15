@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V43.6</title>
+<title>RML ERP — V43.7</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -670,7 +670,7 @@ button.btn.ok *, .btn.ok * {color:#ffffff!important;-webkit-text-fill-color:#fff
 .assigned-files .jobpick-btn { min-width: 0; max-width: 100%; white-space: normal; }
 </style>
 <style id="rml-nav-tiles">
-/* V43.6 — Menu principal en tuiles. */
+/* V43.7 — Menu principal en tuiles. */
 #mainNav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;padding:10px}
 nav#mainNav > button:not(.active){background:var(--tile-bg)!important;border-color:var(--tile-border)!important;color:var(--navy)!important}
 #mainNav > button{
@@ -776,7 +776,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V43.6</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V43.7</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -924,7 +924,7 @@ body.rml-preparation-preview-open{overflow:hidden}
   </div>
 </section>
 
-<section id="atelier" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Devis pliage</h2><div class="muted">Application RML Pliage ALU complète intégrée à l’ERP DEV.</div></div></div><iframe id="pliageAppFrame" class="full-module-frame" src="pliage.html?v=43.6" title="RML Pliage ALU" onload="epurePliageHeader()"></iframe></div></section>
+<section id="atelier" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Devis pliage</h2><div class="muted">Application RML Pliage ALU complète intégrée à l’ERP DEV.</div></div></div><iframe id="pliageAppFrame" class="full-module-frame" src="pliage.html?v=43.7" title="RML Pliage ALU" onload="epurePliageHeader()"></iframe></div></section>
 <section id="atelierPliage8" class="view"><div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><h2>Fabrication pliage — ATELIER RML</h2><p class="muted">Commandes envoyées depuis RML Pliage · fabrication et suivi des quantités.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" onclick="rmlShowDocumentOrder()">+ Nouvelle commande sur document</button><button class="btn secondary" type="button" onclick="rmlLoadAtelier8()">Actualiser</button></div></div><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0"><label><input type="checkbox" id="rmlAtelier8Archives" onchange="rmlLoadAtelier8()"> Afficher les fabrications terminées</label><input id="rmlAtelier8Search" placeholder="Rechercher client, référence, pièce…" oninput="rmlRenderAtelier8()" style="flex:1;min-width:220px;padding:10px;border:1px solid #cbd5e1;border-radius:9px"></div><label style="display:inline-flex;gap:8px;align-items:center;margin-bottom:10px">Trier par <select id="rmlAtelier8Sort" onchange="rmlRenderAtelier8()"><option value="publication">Publication (récentes d’abord)</option><option value="disponibilite">Mise à disposition (plus proche)</option><option value="modification">Dernière modification</option></select></label><div id="rmlAtelier8Status" class="notice">Chargement…</div><div id="rmlAtelier8List"></div></div></section>
 <section id="heures" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Heures & Absences</h2><div class="muted">Application RML Heures de référence ouverte directement dans l’ERP DEV.</div></div></div><iframe class="full-module-frame" srcdoc="&lt;!doctype html&gt;
 &lt;html lang=&quot;fr&quot;&gt;
@@ -9215,6 +9215,8 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 </section><section class="v42section v42notes"><h3>3 · Observations et validation</h3><div class="v42grid" style="margin-top:12px"><div><label>Observations</label><textarea id="v42Notes" rows="3"></textarea></div><div><label>Total HT</label><div id="v42Total" style="font-size:22px;font-weight:750">—</div></div></div>
 <div id="rmlTradeVatBox" style="display:none;margin:12px 0">
 <button type="button" class="v42gray" onclick="rmlEditQuoteTerms()">IBAN et mentions des devis</button>
+<label for="rmlTradeDiscount">Remise HT (€) · facultative</label>
+<input id="rmlTradeDiscount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" oninput="rmlV42Total()">
 <label for="rmlTradeVat">TVA du devis</label>
 <select id="rmlTradeVat" onchange="rmlV42Total()"><option value="20">20 %</option><option value="10">10 %</option><option value="autoliquidation">Autoliquidation</option></select>
 <div id="rmlTradeVatTotals" aria-live="polite" style="margin-top:8px"></div>
@@ -9326,6 +9328,7 @@ function rmlV42New(type='BC'){
  v42$('v42State').value='brouillon';
  v42$('rmlBLPriced').checked=false;
  v42$('rmlBLTransport').value='';
+ v42$('rmlTradeDiscount').value='';
  v42$('v421CatalogBox').style.display='none';
  ['v421Family','v421Product','v422CatalogColor'].forEach(id=>{v42$(id).innerHTML=''});
  v42$('v421Qty').value=type==='BL'?'0':'1';v42$('v421Unit').selectedIndex=0;
@@ -9621,13 +9624,29 @@ function rmlV424SetColor(i,select){
 }
 function rmlV42Set(i,key,val){v42Lines[i][key]=['qty','price'].includes(key)?v42N(val):val;rmlV42Total()}
 function rmlV42Remove(i){v42Lines.splice(i,1);rmlV42Rows()}
-function rmlQuoteTotals(lines,vatMode){
- const htCents=lines.reduce((sum,line)=>sum+Math.round((v42N(line.qty)*v42N(line.price)+Number.EPSILON)*100),0);
+function rmlQuoteTotals(lines,vatMode,discountCents=0){
+ const baseCents=lines.reduce((sum,line)=>sum+Math.round((v42N(line.qty)*v42N(line.price)+Number.EPSILON)*100),0);
+ const htCents=baseCents-discountCents;
  const vatCents=vatMode==='autoliquidation'?0:Math.round(htCents*Number(vatMode)/100);
- return {ht:htCents/100,vat:vatCents/100,total:(htCents+vatCents)/100};
+ return {base:baseCents/100,ht:htCents/100,vat:vatCents/100,total:(htCents+vatCents)/100};
 }
 function rmlBLTotals(lines,transport){
  return rmlQuoteTotals([...lines,{qty:1,price:transport}],'20');
+}
+function rmlTradeDiscountCents(){
+ const field=v42$('rmlTradeDiscount');
+ const cents=Math.round(Number(field.value)*100);
+ return field.validity.valid&&Number.isSafeInteger(cents)&&cents>=0?cents:null;
+}
+function rmlTradeDiscountValid(cents,lines){
+ return cents!==null&&(cents===0||cents<=Math.round(rmlQuoteTotals(lines,'20').base*100));
+}
+function rmlTradeDiscountFields(value){
+ const notes=String(value||'');
+ const match=notes.match(/\n\[RML_QUOTE_DISCOUNT_V1:(\d+)\]$/);
+ return match&&Number.isSafeInteger(Number(match[1]))
+  ?{notes:notes.slice(0,match.index),cents:Number(match[1])}
+  :{notes,cents:0};
 }
 function rmlV42Total(){
  const type=v42$('v42Type').value;
@@ -9639,7 +9658,13 @@ function rmlV42Total(){
  }
  if(type==='DEVIS'){
   const mode=v42$('rmlTradeVat').value;
-  const totals=rmlQuoteTotals(v42Lines,mode);
+  const cents=rmlTradeDiscountCents();
+  if(!rmlTradeDiscountValid(cents,v42Lines)){
+   v42$('v42Total').textContent='—';
+   v42$('rmlTradeVatTotals').textContent='La remise doit être comprise entre zéro et le montant HT.';
+   return;
+  }
+  const totals=rmlQuoteTotals(v42Lines,mode,cents);
   v42$('v42Total').textContent=format(totals.ht);
   v42$('rmlTradeVatTotals').textContent=mode==='autoliquidation'
    ?'Autoliquidation · TVA due par le preneur · Total à payer HT '+format(totals.ht)
@@ -9669,9 +9694,9 @@ function rmlBLPricingFields(value){
   ?{notes:notes.slice(0,match.index),priced:true,transport:cents/100}
   :{notes,priced:false,transport:0};
 }
-function rmlV42Read(){const priced=v42$('v42Type').value==='BL'&&v42$('rmlBLPriced').checked;return rmlBLDetails({priced,transport:priced?v42N(v42$('rmlBLTransport').value):0,kind:v42$('v42Type').value,vat_mode:v42$('v42Type').value==='DEVIS'?v42$('rmlTradeVat').value:null,date:v42$('v42Date').value,party:v42$('v42Party').value.trim(),address:v42$('v42Address').value,delivery_address:v42$('v42Delivery').value,job_id:v42$('v42Job').value||null,receiver:v42$('v42Receiver').value,doc_status:v42$('v42State').value,notes:v42$('v42Notes').value,reference:v42$('v42References').value.trim(),lines:v42Lines.map(r=>({...r})),signature:v42$('v42Type').value==='BL'?(v42ChangedSignature?v42$('v42Signature').toDataURL('image/png'):v42SignatureData):null})}
+function rmlV42Read(){const priced=v42$('v42Type').value==='BL'&&v42$('rmlBLPriced').checked;return rmlBLDetails({discountCents:v42$('v42Type').value==='DEVIS'?rmlTradeDiscountCents():0,priced,transport:priced?v42N(v42$('rmlBLTransport').value):0,kind:v42$('v42Type').value,vat_mode:v42$('v42Type').value==='DEVIS'?v42$('rmlTradeVat').value:null,date:v42$('v42Date').value,party:v42$('v42Party').value.trim(),address:v42$('v42Address').value,delivery_address:v42$('v42Delivery').value,job_id:v42$('v42Job').value||null,receiver:v42$('v42Receiver').value,doc_status:v42$('v42State').value,notes:v42$('v42Notes').value,reference:v42$('v42References').value.trim(),lines:v42Lines.map(r=>({...r})),signature:v42$('v42Type').value==='BL'?(v42ChangedSignature?v42$('v42Signature').toDataURL('image/png'):v42SignatureData):null})}
 let rmlTradeSaving=false;
-async function rmlV42Save(){if(rmlTradeSaving||!rmlTradeAllowedKind(v42$('v42Type').value))return;const d=rmlV42Read();if(!d.party||!d.date){rmlV42Msg('Renseigne le destinataire et la date.',true);return}if(d.lines.some(x=>!x.name.trim()||x.qty<0)){rmlV42Msg('Vérifie les désignations et quantités.',true);return}if(d.priced&&(!v42$('rmlBLTransport').validity.valid||!Number.isSafeInteger(Math.round(d.transport*100))||d.lines.some(line=>line.price<0))){rmlV42Msg('Vérifie les prix et le montant du transport.',true);return}rmlTradeSaving=true;try{const payload={kind:d.kind,date:d.date,party:d.party,address:d.address,delivery_address:d.delivery_address,job_id:d.job_id,receiver:d.receiver,doc_status:d.doc_status,notes:rmlTradeReferenceNotes(d.notes,d.reference)+(d.priced?'\n[RML_BL_PRICING_V1:'+Math.round(d.transport*100)+']':''),lines:d.lines,signature:d.signature};if(d.kind==='DEVIS')payload.vat_mode=d.vat_mode;const query=v42Current?sb.from('erp_trade_documents').update(payload).eq('id',v42Current.id):sb.from('erp_trade_documents').insert(payload);const {data,error}=await query.select('id,serial,kind,date,party,address,delivery_address,job_id,receiver,doc_status,notes,lines,signature,vat_mode,document_number').single();if(error)throw error;v42Current=data;v42SignatureData=data.signature||'';v42ChangedSignature=false;rmlTradeSavedForm=rmlTradeFormSnapshot();rmlV42Msg('ENREGISTREMENT OK — '+rmlV42Number(data));alert('ENREGISTREMENT OK');await rmlV42List()}catch(e){rmlV42Msg('Échec de sauvegarde : '+e.message+'. Vérifie que le script numerotation-annuelle.sql a été exécuté.',true)}finally{rmlTradeSaving=false}}
+async function rmlV42Save(){if(rmlTradeSaving||!rmlTradeAllowedKind(v42$('v42Type').value))return;const d=rmlV42Read();if(!d.party||!d.date){rmlV42Msg('Renseigne le destinataire et la date.',true);return}if(d.lines.some(x=>!x.name.trim()||x.qty<0)){rmlV42Msg('Vérifie les désignations et quantités.',true);return}if(d.priced&&(!v42$('rmlBLTransport').validity.valid||!Number.isSafeInteger(Math.round(d.transport*100))||d.lines.some(line=>line.price<0))){rmlV42Msg('Vérifie les prix et le montant du transport.',true);return}if(d.kind==='DEVIS'&&!rmlTradeDiscountValid(d.discountCents,d.lines)){rmlV42Msg('Vérifie le montant de la remise HT.',true);return}rmlTradeSaving=true;try{const payload={kind:d.kind,date:d.date,party:d.party,address:d.address,delivery_address:d.delivery_address,job_id:d.job_id,receiver:d.receiver,doc_status:d.doc_status,notes:rmlTradeReferenceNotes(d.notes,d.reference)+(d.priced?'\n[RML_BL_PRICING_V1:'+Math.round(d.transport*100)+']':'')+(d.discountCents?'\n[RML_QUOTE_DISCOUNT_V1:'+d.discountCents+']':''),lines:d.lines,signature:d.signature};if(d.kind==='DEVIS')payload.vat_mode=d.vat_mode;const query=v42Current?sb.from('erp_trade_documents').update(payload).eq('id',v42Current.id):sb.from('erp_trade_documents').insert(payload);const {data,error}=await query.select('id,serial,kind,date,party,address,delivery_address,job_id,receiver,doc_status,notes,lines,signature,vat_mode,document_number').single();if(error)throw error;v42Current=data;v42SignatureData=data.signature||'';v42ChangedSignature=false;rmlTradeSavedForm=rmlTradeFormSnapshot();rmlV42Msg('ENREGISTREMENT OK — '+rmlV42Number(data));alert('ENREGISTREMENT OK');await rmlV42List()}catch(e){rmlV42Msg('Échec de sauvegarde : '+e.message+'. Vérifie que le script numerotation-annuelle.sql a été exécuté.',true)}finally{rmlTradeSaving=false}}
 function rmlV42Number(d){return d.document_number||d.kind+'-'+String(d.date||'').slice(0,4)+'-'+String(d.serial||0).padStart(4,'0')}
 function rmlTradeHistoryHtml(documents){
  const rows=[...documents].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||Number(b.serial||0)-Number(a.serial||0));
@@ -9700,7 +9725,7 @@ async function rmlV42List(){
  }catch(e){rmlV42Msg('Lecture des bons impossible : '+e.message,true);v42$('rmlV42History').innerHTML='<p>Impossible de charger l’historique. Cliquez sur « Actualiser les bons » pour réessayer.</p>'}
 }
 
-async function rmlV42Edit(id){try{const {data,error}=await sb.from('erp_trade_documents').select('*').eq('id',id).single();if(error)throw error;if(rmlV42New(data.kind)===false)return;v42Current=data;v42$('rmlTradeVat').value=data.vat_mode||'20';v42$('v42Date').value=data.date;v42$('v42Party').value=data.party||'';v42$('v42Address').value=data.address||'';v42$('v42Delivery').value=data.delivery_address||'';v42$('v42Job').value=data.job_id||'';v42$('v42Receiver').value=data.receiver||'';v42$('v42State').value=data.doc_status||'brouillon';const pricing=data.kind==='BL'?rmlBLPricingFields(data.notes):{notes:data.notes,priced:false,transport:0};v42$('rmlBLPriced').checked=pricing.priced;v42$('rmlBLTransport').value=pricing.transport||'';const refFields=rmlTradeReferenceFields(pricing.notes);v42$('v42Notes').value=refFields.notes;v42$('v42References').value=refFields.reference;v42Lines=Array.isArray(data.lines)?data.lines:[];v42SignatureData=data.signature||'';v42ChangedSignature=false;rmlV42Rows();rmlV42RestoreSignature();rmlTradeSavedForm=rmlTradeFormSnapshot()}catch(e){rmlV42Msg('Ouverture impossible : '+e.message,true)}}
+async function rmlV42Edit(id){try{const {data,error}=await sb.from('erp_trade_documents').select('*').eq('id',id).single();if(error)throw error;if(rmlV42New(data.kind)===false)return;v42Current=data;v42$('rmlTradeVat').value=data.vat_mode||'20';v42$('v42Date').value=data.date;v42$('v42Party').value=data.party||'';v42$('v42Address').value=data.address||'';v42$('v42Delivery').value=data.delivery_address||'';v42$('v42Job').value=data.job_id||'';v42$('v42Receiver').value=data.receiver||'';v42$('v42State').value=data.doc_status||'brouillon';const pricing=data.kind==='BL'?rmlBLPricingFields(data.notes):{notes:data.notes,priced:false,transport:0};v42$('rmlBLPriced').checked=pricing.priced;v42$('rmlBLTransport').value=pricing.transport||'';const discount=data.kind==='DEVIS'?rmlTradeDiscountFields(pricing.notes):{notes:pricing.notes,cents:0};v42$('rmlTradeDiscount').value=discount.cents?discount.cents/100:'';const refFields=rmlTradeReferenceFields(discount.notes);v42$('v42Notes').value=refFields.notes;v42$('v42References').value=refFields.reference;v42Lines=Array.isArray(data.lines)?data.lines:[];v42SignatureData=data.signature||'';v42ChangedSignature=false;rmlV42Rows();rmlV42RestoreSignature();rmlTradeSavedForm=rmlTradeFormSnapshot()}catch(e){rmlV42Msg('Ouverture impossible : '+e.message,true)}}
 async function rmlV42Delete(){if(!v42Current){rmlV42New(v42$('v42Type').value);return}if(!confirm('Supprimer définitivement ce bon ?'))return;try{const {error}=await sb.from('erp_trade_documents').delete().eq('id',v42Current.id);if(error)throw error;v42Current=null;v42$('rmlV42Editor').style.display='none';rmlV42Msg('Bon supprimé.');await rmlV42List()}catch(e){rmlV42Msg('Suppression impossible : '+e.message,true)}}
 function rmlV42ClearSignature(){const c=v42$('v42Signature');c.getContext('2d').clearRect(0,0,c.width,c.height);v42ChangedSignature=true;v42SignatureData=''}
 function rmlV42RestoreSignature(){if(!v42SignatureData)return;const im=new Image();im.onload=()=>{const c=v42$('v42Signature');c.getContext('2d').drawImage(im,0,0,c.width,c.height)};im.src=v42SignatureData}
@@ -9878,7 +9903,8 @@ function rmlV42Print(noSignature=false){
  const d=rmlV42Read();
  const number=v42Current?rmlV42Number(v42Current):'BROUILLON NON ENREGISTRÉ';
  const bl=d.kind==='BL',quote=d.kind==='DEVIS';
- const totals=quote?rmlQuoteTotals(d.lines,d.vat_mode):d.priced?rmlBLTotals(d.lines,d.transport):null;
+ if(quote&&!rmlTradeDiscountValid(d.discountCents,d.lines)){rmlV42Msg('Vérifie le montant de la remise HT.',true);return;}
+ const totals=quote?rmlQuoteTotals(d.lines,d.vat_mode,d.discountCents):d.priced?rmlBLTotals(d.lines,d.transport):null;
  const showPrices=!bl||d.priced;
  if(d.priced&&(!v42$('rmlBLTransport').validity.valid||!Number.isSafeInteger(Math.round(d.transport*100))||d.lines.some(line=>line.price<0))){
   rmlV42Msg('Vérifie les prix et le montant du transport.',true);
@@ -9895,7 +9921,7 @@ function rmlV42Print(noSignature=false){
    site:`<strong>Lieu des travaux</strong><div>${v42E((db.chantiers||[]).find(j=>String(j.id)===String(d.job_id))?.nom||'')}</div><div class="address">${v42E(rmlPrintAddress(d.delivery_address)||'Lieu des travaux à renseigner')}</div>`,
    columns:['Désignation','Couleur','Qté','Unité','Prix HT','Total HT'],
    rows:d.lines.map(r=>`<tr><td>${v42E(r.name)}</td><td>${v42E(r.color||'')}</td><td>${v42E(r.qty)}</td><td>${v42E(r.unit)}</td><td>${money(v42N(r.price))} €</td><td>${money(rmlQuoteTotals([r],d.vat_mode).ht)} €</td></tr>`).join(''),
-   totals:`Total HT : ${money(totals.ht)} €<br>${d.vat_mode==='autoliquidation'?'<strong>Autoliquidation</strong> — TVA due par le preneur.':`TVA ${v42E(d.vat_mode)} % : ${money(totals.vat)} €<br><strong>Total TTC : ${money(totals.total)} €</strong>`}`,
+   totals:`Montant HT : ${money(totals.base)} €<br>${d.discountCents?`Remise HT : − ${money(d.discountCents/100)} €<br>Net HT : ${money(totals.ht)} €<br>`:''}${d.vat_mode==='autoliquidation'?'<strong>Autoliquidation</strong> — TVA due par le preneur.':`TVA ${v42E(d.vat_mode)} % : ${money(totals.vat)} €<br><strong>Total TTC : ${money(totals.total)} €</strong>`}`,
    notes:d.notes,
    reverseCharge:d.vat_mode==='autoliquidation',
    agreementNote:d.vat_mode==='10'?'Le client certifie que les travaux concernent des locaux à usage d’habitation achevés depuis plus de deux ans et qu’ils ne concourent pas, sur une période de deux ans au plus, à la production d’un immeuble neuf ni à une augmentation de la surface de plancher supérieure à 10 %.':'',
