@@ -2070,7 +2070,11 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
   <div id="erpPliageDirectory" hidden>
     <label for="erpPliageClient">Client du fichier ERP</label>
     <select id="erpPliageClient"></select>
-    <small>Choisis un client ERP, renseigne ses tarifs puis enregistre pour l’ajouter à la liste du devis.</small>
+    <small><div class="actions">
+    <button type="button" class="btn-secondary" id="linkPliageErpClient">Rattacher le profil sélectionné</button>
+    <button type="button" class="btn-light" id="usePliageErpClient">Utiliser ce client ERP</button>
+  </div>
+  <div id="rmlPliageLinkStatus" role="status"></div></small>
   </div>
 </div>
 
@@ -2347,6 +2351,7 @@ function normalizeClient(c){
     name:c.name||"Client sans nom",
     prices:{"7/10":Number(c.prices?.["7/10"]||0),"10/10":Number(c.prices?.["10/10"]||0),"15/10":Number(c.prices?.["15/10"]||0)},
     costs:{fold:Number(c.costs?.fold ?? 1.70),cut:Number(c.costs?.cut ?? 1.00),hourly:Number(c.costs?.hourly ?? 48.00),defaultWaste:Number(c.costs?.defaultWaste ?? 0)},
+    erpClientId:String(c.erpClientId||""),
     note:c.note||""
   };
 }
@@ -2729,23 +2734,36 @@ function saveOrUpdateClient(){
   if(!name){setStatus("Le nom du client est obligatoire.",false);return;}
   const currentId=selectedClient.value;
   const existing=clients.find(c=>c.id===currentId);
+  const erpClientId=pendingErpClientId||existing?.erpClientId||"";
+  if(pendingErpClientId&&(![price710,price1010,price1510].every(field=>field.value!==""&&field.validity.valid))){
+    setStatus("Renseigne les trois tarifs matière pour enregistrer ce client ERP.",false);
+    return;
+  }
   const payload=normalizeClient({
     id:existing?.id||crypto.randomUUID(),
+    erpClientId,
     name,
     prices:{"7/10":Number(price710.value||0),"10/10":Number(price1010.value||0),"15/10":Number(price1510.value||0)},
     costs:{fold:Number(costFold.value||0),cut:Number(costCut.value||0),hourly:Number(hourlyRate.value||0),defaultWaste:Number(defaultWaste.value||0)},
     note:clientNote.value.trim()
   });
   if(existing) Object.assign(existing,payload); else clients.push(payload);
+  pendingErpClientId="";
   saveClients(); renderClientSelect(); selectedClient.value=payload.id; renderClientForm(); updatePriceDisplay(); setStatus("Client enregistré.");
 }
 function deleteCurrentClient(){
   if(clients.length===1){setStatus("Impossible de supprimer le dernier client.",false);return;}
   const current=getCurrentClient(); if(!current) return;
+  const projects=JSON.parse(localStorage.getItem(PROJECTS_KEY)||"[]");
+  if(current.erpClientId||projects.some(p=>String(p.clientId||p.selectedClientId||p.client?.id||"")===String(current.id))){
+    alert("Ce profil tarifaire est rattaché à l’ERP ou utilisé par un projet.");
+    return;
+  }
   if(!confirm(`Supprimer le client "${current.name}" ?`)) return;
   clients=clients.filter(c=>c.id!==current.id); saveClients(); renderClientSelect(); updatePriceDisplay(); setStatus("Client supprimé.");
 }
 function newClientForm(){
+  pendingErpClientId="";
   selectedClient.value=""; clientName.value=""; price710.value=""; price1010.value=""; price1510.value="";
   costFold.value="1.70"; costCut.value="1.00"; hourlyRate.value="48.00"; defaultWaste.value="0"; clientNote.value="";
   setStatus("Formulaire prêt pour un nouveau client.");
@@ -2946,7 +2964,7 @@ async function openPliageQuote(client,project,lines){
 
   const html=parent.rmlQuotePrintHtml({
     subtitle:"PLIAGE ALUMINIUM SUR MESURE",title:"DEVIS PLIAGE",number:issued.number,date,
-    client:parent.rmlPliageQuoteClientHtml?.(client.name) ?? ('<strong>Client</strong><br>'+escape(client.name)),
+    client:parent.rmlPliageQuoteClientHtml?.(client.name,client.erpClientId) ?? ('<strong>Client</strong><br>'+escape(client.name)),
     site:'<strong>Projet / chantier</strong><br>'+escape(project)+'<br>Épaisseur : '+escape(thickness),
     columns:['Désignation','Couleur','Dév. (mm)','Long. (m)','Qté','Total HT'],
     rows:`${lines.map(line=>`<tr><td>Pièce pliée n° ${line.number}</td><td>${escape(color||"—")}</td><td>${fmtNumber(line.dev)}</td><td>${fmtNumber(line.long)}</td><td>${escape(line.qty)}</td><td>${fmtEuro(line.cents/100)}</td></tr>`).join("")}
@@ -4817,38 +4835,65 @@ const closeSettingsBtn=document.getElementById("closeSettingsBtn");
 const mobileSettingsBtn=document.getElementById("mobileSettingsBtn");
 const erpPliageClient = document.getElementById("erpPliageClient");
 const erpPliageClientKey = name => name.trim().normalize("NFC").toLocaleLowerCase("fr");
+let pendingErpClientId="";
+let pliageErpDirectory=[];
+
+function selectSuggestedErpClient(){
+  const current=getCurrentClient();
+  const matches=current?pliageErpDirectory.filter(c=>erpPliageClientKey(c.name)===erpPliageClientKey(current.name)):[];
+  erpPliageClient.value=current?.erpClientId||(matches.length===1?matches[0].id:"");
+  document.getElementById("rmlPliageLinkStatus").textContent=current?.erpClientId?"Profil déjà rattaché à une fiche ERP.":"";
+}
 
 function openSettings(){
-  const directory = document.getElementById("erpPliageDirectory");
-  let names = [];
-  try {
-    if (parent !== window) names = parent.getPliageDirectoryClients?.() || [];
-  } catch {
-    // L’application autonome reste utilisable sans accès à l’ERP.
+  pendingErpClientId="";
+  renderClientForm();
+  pliageErpDirectory=parent!==window?(parent.getPliageDirectoryClients?.()||[]):[];
+  document.getElementById("erpPliageDirectory").hidden=pliageErpDirectory.length===0;
+  erpPliageClient.replaceChildren(new Option("Choisir un client ERP",""));
+  for(const client of [...pliageErpDirectory].sort((a,b)=>a.name.localeCompare(b.name,"fr"))){
+    erpPliageClient.add(new Option(client.code?client.name+" · "+client.code:client.name,client.id));
   }
-  directory.hidden = names.length === 0;
-  erpPliageClient.replaceChildren(new Option("Choisir un client ERP", ""));
-  for (const name of [...new Set(names)].sort((a,b) => a.localeCompare(b,"fr"))) {
-    erpPliageClient.add(new Option(name,name));
-  }
+  selectSuggestedErpClient();
   settingsModal.classList.add("open");
 }
 
-erpPliageClient.addEventListener("change", () => {
-  const name = erpPliageClient.value;
-  if (!name) return;
-  const existing = clients.find(client => erpPliageClientKey(client.name) === erpPliageClientKey(name));
-  if (existing) {
-    selectedClient.value = existing.id;
+settingsClientSelect.addEventListener("change",()=>{
+  pendingErpClientId="";
+  selectSuggestedErpClient();
+});
+
+document.getElementById("linkPliageErpClient").onclick=()=>{
+  const current=getCurrentClient();
+  const target=pliageErpDirectory.find(c=>c.id===erpPliageClient.value);
+  if(!current||!target){alert("Sélectionne un profil Pliage et une fiche ERP.");return;}
+  if(current.erpClientId===target.id)return;
+  if(!confirm(`Rattacher les projets de « ${current.name} » à « ${target.name} » en conservant leurs tarifs Pliage ?`))return;
+  current.erpClientId=target.id;
+  saveClients();
+  renderClientSelect();
+  selectSuggestedErpClient();
+};
+
+document.getElementById("usePliageErpClient").onclick=()=>{
+  const target=pliageErpDirectory.find(c=>c.id===erpPliageClient.value);
+  if(!target){alert("Sélectionne une fiche ERP.");return;}
+  const profiles=clients.filter(c=>c.erpClientId===target.id);
+  if(profiles.length===1){
+    selectedClient.value=profiles[0].id;
     renderClientForm();
     updatePriceDisplay();
-  } else {
-    newClientForm();
-    settingsClientSelect.selectedIndex = -1;
-    clientName.value = name;
+    saveCurrentProjectState();
+    closeSettings();
+    return;
   }
-  erpPliageClient.value = "";
-});
+  if(profiles.length>1){alert("Plusieurs profils tarifaires sont liés à cette fiche. Choisis le profil dans « Client à modifier ».");return;}
+  newClientForm();
+  pendingErpClientId=target.id;
+  settingsClientSelect.selectedIndex=-1;
+  clientName.value=target.name;
+  document.getElementById("rmlPliageLinkStatus").textContent="Renseigne les tarifs puis clique sur « Enregistrer / mettre à jour ».";
+};
 
 function closeSettings(){settingsModal.classList.remove("open");}
 openSettingsBtn.addEventListener("click",openSettings);
