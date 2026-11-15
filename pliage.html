@@ -1875,6 +1875,19 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <label for="projectDiscount">Remise du devis HT (€) · facultatif</label>
         <input id="projectDiscount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00" />
       </div>
+      <div class="field col-6">
+        <label for="projectPayment">Moyen de paiement</label>
+        <select id="projectPayment">
+          <option value="">Non renseigné</option>
+          <option>Virement</option>
+          <option>Chèque</option>
+          <option>Espèces</option>
+        </select>
+      </div>
+      <div class="field col-6">
+        <label for="projectPaymentReference">Référence du virement (facultative)</label>
+        <input id="projectPaymentReference" type="text" placeholder="Par défaut : numéro du devis" />
+      </div>
     </div>
 
         <div class="row">       
@@ -2263,6 +2276,8 @@ const projectName=document.getElementById("projectName");
 const projectColor=document.getElementById("projectColor");
 const projectTransport=document.getElementById("projectTransport");
 const projectDiscount=document.getElementById("projectDiscount");
+const projectPayment=document.getElementById("projectPayment");
+const projectPaymentReference=document.getElementById("projectPaymentReference");
 const piecesEl=document.getElementById("pieces");
 const resultTableBody=document.getElementById("resultTableBody");
 const statusEl=document.getElementById("status");
@@ -2437,6 +2452,8 @@ function saveCurrentProjectState(){
     clientId:selectedClient.value || "",
     transportHt:projectTransport.value,
     discountHt:projectDiscount.value,
+    paymentMethod:projectPayment.value,
+    paymentReference:projectPaymentReference.value,
     projectColor:document.getElementById("projectColor")?.value || "",
     projectName:document.getElementById("projectName")?.value || "",
     thickness:selectedThickness.value || "7/10",
@@ -2492,6 +2509,8 @@ function restoreCurrentProjectState(){
       projectColorField.value=state.projectColor || "";
     projectTransport.value=state.transportHt??"";
     projectDiscount.value=state.discountHt??"";
+    projectPayment.value=state.paymentMethod??"";
+    projectPaymentReference.value=state.paymentReference??"";
     }
 
   }catch(error){
@@ -2728,6 +2747,8 @@ function exportFullBackup(){
 
     transportHt:projectTransport.value,
     discountHt:projectDiscount.value,
+    paymentMethod:projectPayment.value,
+    paymentReference:projectPaymentReference.value,
     projectColor:document.getElementById("projectColor")?.value || ""
   };
 
@@ -2752,6 +2773,8 @@ function exportProjectBackup(){
     projectName:project,
     transportHt:projectTransport.value,
     discountHt:projectDiscount.value,
+    paymentMethod:projectPayment.value,
+    paymentReference:projectPaymentReference.value,
     projectColor: projectColor ? projectColor.value : "",
     client,
     selectedClientId:selectedClient.value,
@@ -2824,6 +2847,8 @@ if(typeof projectColor!=="undefined" && projectColor){
   projectColor.value=parsed.projectColor || parsed.color || "";
     projectTransport.value=parsed.transportHt??"";
     projectDiscount.value=parsed.discountHt??"";
+    projectPayment.value=parsed.paymentMethod??"";
+    projectPaymentReference.value=parsed.paymentReference??"";
   projectColor.dispatchEvent(new Event("input",{bubbles:true}));
   projectColor.dispatchEvent(new Event("change",{bubbles:true}));
 }
@@ -2848,6 +2873,13 @@ async function openPliageQuote(client,project,lines){
   if(!projectDiscount.validity.valid||!Number.isSafeInteger(discountCents)||discountCents<0||discountCents>baseHt){
     alert("La remise doit être comprise entre zéro et le montant HT des pièces.");
     projectDiscount.focus();
+    return;
+  }
+  const payment=projectPayment.value;
+  const paymentReference=payment==="Virement"?projectPaymentReference.value.trim():"";
+  if(payment==="Virement"&&parent!==window&&!parent.rmlQuoteTerms?.().iban?.trim()){
+    alert("Renseigne l’IBAN dans « IBAN et mentions des devis » avant de générer un devis par virement.");
+    parent.rmlEditQuoteTerms?.();
     return;
   }
   const ht=baseHt-discountCents+transportCents;
@@ -2884,7 +2916,7 @@ async function openPliageQuote(client,project,lines){
     rows:`${lines.map(line=>`<tr><td>Pièce pliée n° ${line.number}</td><td>${escape(color||"—")}</td><td>${fmtNumber(line.dev)}</td><td>${fmtNumber(line.long)}</td><td>${escape(line.qty)}</td><td>${fmtEuro(line.cents/100)}</td></tr>`).join("")}
   ${minimumAdjustment?`<tr><td colspan="5">Complément au minimum de commande</td><td>${fmtEuro(minimumAdjustment/100)}</td></tr>`:""}`,
     totals:`Montant HT : ${fmtEuro(baseHt/100)}<br>${discountCents?`Remise HT : − ${fmtEuro(discountCents/100)}<br>`:""}${transportCents?`Transport HT : ${fmtEuro(transportCents/100)}<br>`:""}TVA 20 % : ${fmtEuro(vat/100)}<br><strong>Total TTC : ${fmtEuro((ht+vat)/100)}</strong>`,
-    standalone:true,shortQuote:lines.length<=5
+    payment,paymentReference,standalone:true,shortQuote:lines.length<=5
   });
   win.document.open();
   win.document.write(html);
@@ -4205,6 +4237,8 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
         projectColor.value=data.projectColor || data.color || "";
     projectTransport.value=data.transportHt??"";
     projectDiscount.value=data.discountHt??"";
+    projectPayment.value=data.paymentMethod??"";
+    projectPaymentReference.value=data.paymentReference??"";
       }
 
       currentLoadedProjectId="";
@@ -4252,6 +4286,8 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
         color:data.projectColor || data.color || "",
         transportHt:data.transportHt??"",
         discountHt:data.discountHt??"",
+        paymentMethod:data.paymentMethod??"",
+        paymentReference:data.paymentReference??"",
         clientId:data.clientId || data.selectedClientId || data.client?.id || "",
         thickness:data.thickness || data.selectedThickness || "7/10",
         sheetFormat:data.sheetFormat || data.selectedSheetFormat || "1500x3000",
@@ -4283,6 +4319,8 @@ document.getElementById("importJsonFile").addEventListener("change",async e=>{
       if(projectColor) projectColor.value=importedProject.color;
     projectTransport.value=importedProject.transportHt??"";
     projectDiscount.value=importedProject.discountHt??"";
+    projectPayment.value=importedProject.paymentMethod??"";
+    projectPaymentReference.value=importedProject.paymentReference??"";
 
       pieces=importedProject.pieces.length
         ? importedProject.pieces
@@ -4471,6 +4509,8 @@ function persistCurrentProjectRecord({createIfMissing=true}={}){
     name,
     transportHt:projectTransport.value,
     discountHt:projectDiscount.value,
+    paymentMethod:projectPayment.value,
+    paymentReference:projectPaymentReference.value,
     color:projectColor ? projectColor.value : "",
     clientId:selectedClient.value,
     thickness:selectedThickness.value,
@@ -4516,6 +4556,8 @@ function newProject(){
     projectColor.value="";
     projectTransport.value="";
     projectDiscount.value="";
+    projectPayment.value="";
+    projectPaymentReference.value="";
   }
 
   // Aucun client sélectionné
@@ -4636,6 +4678,8 @@ function loadProjects(){
     if(colorField)colorField.value=selected.color||selected.projectColor||"";
     projectTransport.value=selected.transportHt??"";
     projectDiscount.value=selected.discountHt??"";
+    projectPayment.value=selected.paymentMethod??"";
+    projectPaymentReference.value=selected.paymentReference??"";
     saveCurrentProjectState();modal.remove();alert("Projet chargé : "+projectReference);
   };
 
@@ -4794,6 +4838,8 @@ if(projectColorField){
   projectColorField.addEventListener("input",saveCurrentProjectState);
   projectTransport.addEventListener("input",saveCurrentProjectState);
   projectDiscount.addEventListener("input",saveCurrentProjectState);
+  projectPayment.addEventListener("input",saveCurrentProjectState);
+  projectPaymentReference.addEventListener("input",saveCurrentProjectState);
 }
 
 if(selectedClient){
