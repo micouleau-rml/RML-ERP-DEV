@@ -1868,7 +1868,6 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
         <h1>RML PLIAGE ALU</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
-        <div class="app-version rml-version-highlight">VERSION 125 ERP · affichage iPhone corrigé</div>
       </div>
     </div>
     <div class="install">
@@ -1879,8 +1878,6 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
   <button class="btn-secondary" id="openBendLibraryBtn">📚 Bibliothèque</button>
   <button class="btn-secondary" id="devisPdfBtn">Devis PDF numéroté</button>
   <button type="button" class="btn-secondary" onclick="parent.rmlEditQuoteTerms?.()">IBAN et mentions des devis</button>
-  <button class="btn-secondary" id="clientPdfBtn">Bon client avec prix</button>
-  <button class="btn-light" id="atelierPdfBtn">Bon atelier sans prix</button>
   </div>
 </div>
 
@@ -4914,8 +4911,6 @@ window.addEventListener("beforeunload",saveCurrentProjectState);
 
 const devisBtn=document.getElementById("devisPdfBtn");
 const sheetFormat=document.getElementById("sheetFormat");
-const clientBtn=document.getElementById("clientPdfBtn");
-const atelierBtn=document.getElementById("atelierPdfBtn");
 const oldPdfBtn=document.getElementById("pdfBtn");
 const quotePdfBtn=document.getElementById("quotePdfBtn");
 const calpinageBtn=document.getElementById("calpinageBtn");
@@ -4925,14 +4920,6 @@ if(calpinageBtn){
 }
 if(devisBtn){
   devisBtn.addEventListener("click",()=>generatePdfDocument("devis"));
-}
-
-if(clientBtn){
-  clientBtn.addEventListener("click",()=>generatePdfDocument("client"));
-}
-
-if(atelierBtn){
-  atelierBtn.addEventListener("click",()=>generatePdfDocument("atelier"));
 }
 
 if(oldPdfBtn){
