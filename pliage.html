@@ -8611,12 +8611,12 @@ if(quotePdfBtn){
     return arrowMarkupFromPlacement(placement,geom,false);
   }
 
-  function svgForPiece(piece,index){
+  function svgForPiece(piece,index,large=false){
     const bp=piece.bendProfile;
     const profile=bp.profile;
     const originalRaw=buildPoints(profile);
 
-    const W=980,H=280;
+    const W=980,H=large?410:280;
     const infoW=198;
     const infoGap=24;
     const drawW=W-infoW-infoGap;
@@ -8715,9 +8715,7 @@ if(quotePdfBtn){
       const isShortDimension=numericLength<=65;
       // Les petites cotes voisines sont placées sur des niveaux différents afin
       // que « 15 mm », « 30 mm », etc. ne se superposent plus dans les angles.
-      const baseOff=isVeryShortDimension
-        ? 38+(i%3)*18
-        : (isShortDimension?42+(i%2)*14:38);
+      const baseOff=isVeryShortDimension ? 29 : (isShortDimension ? 34 : 38);
       const towardCenter=((center.x-mx)*nx+(center.y-my)*ny)>=0?1:-1;
 
       // V68.2 : toutes les cotes sont impérativement extérieures pour la
@@ -8741,7 +8739,11 @@ if(quotePdfBtn){
       // segment affiché. Aucune cote n'a le droit de redresser ou de modifier le
       // segment, y compris à proximité d'un pli écrasé.
       const estimatedRadius=Math.max(35,dimensionValue.length*5.4+22);
-      const candidateOffsets=[baseOff,baseOff+20,baseOff+40,baseOff+62,baseOff+84];
+      const candidateOffsets=[baseOff,baseOff+17,baseOff+34,baseOff+53,baseOff+74];
+      const labelHalfWidth=estimatedRadius;
+      const ux=Math.cos(ang*Math.PI/180),uy=Math.sin(ang*Math.PI/180);
+      const safeX=Math.abs(ux)*labelHalfWidth+Math.abs(uy)*13+8;
+      const safeY=Math.abs(uy)*labelHalfWidth+Math.abs(ux)*13+8;
       // Un seul côté est proposé : l'extérieur. L'anticollision n'est donc plus
       // capable de remettre une cote à l'intérieur du profil.
       const candidateSigns=[preferredSign];
@@ -8749,60 +8751,41 @@ if(quotePdfBtn){
 
       for(const sign of candidateSigns){
         for(const off of candidateOffsets){
-          const x=mx+nx*off*sign;
-          const y=my+ny*off*sign;
-          let penalty=0;
+          const rawX=mx+nx*off*sign;
+          const rawY=my+ny*off*sign;
+          const x=Math.max(safeX,Math.min(drawW-safeX,rawX));
+          const y=Math.max(safeY,Math.min(H-safeY,rawY));
+          let penalty=Math.hypot(x-rawX,y-rawY)*4;
 
-          // Garder le libellé et le numéro dans la zone de dessin.
-          const edgeX=Math.min(x-12,drawW-12-x);
-          const edgeY=Math.min(y-12,H-12-y);
-          if(edgeX<estimatedRadius)penalty+=(estimatedRadius-edgeX)*35;
-          if(edgeY<15)penalty+=(15-edgeY)*45;
-
-          // Une cote reste hors du profil et s'éloigne si elle rencontre un trait.
-          for(let j=0;j<pts.length-1;j++){
-            const distance=distPointSegment(x,y,pts[j],pts[j+1]);
-            const required=j===i?off-2:18;
-            if(distance<required)penalty+=(required-distance)*55;
+          // Vérifier toute la longueur du libellé orienté, y compris son numéro.
+          for(let along=-labelHalfWidth;along<=labelHalfWidth;along+=8){
+            for(let j=0;j<pts.length-1;j++){
+              const distance=distPointSegment(x+ux*along,y+uy*along,pts[j],pts[j+1]);
+              if(distance<16)penalty+=(16-distance)*40;
+            }
           }
-
-          // Les libellés sont séparés en tenant compte de leur longueur.
           for(const previous of dims){
-            const required=estimatedRadius+(previous.labelRadius||31)-8;
-            const distance=Math.hypot(x-previous.x,y-previous.y);
-            if(distance<required)penalty+=(required-distance)*70;
+            const overlapX=safeX+previous.safeX-Math.abs(x-previous.x);
+            const overlapY=safeY+previous.safeY-Math.abs(y-previous.y);
+            if(overlapX>0&&overlapY>0)penalty+=Math.min(overlapX,overlapY)*55;
           }
 
           // À pénalité égale, conserver la cote la plus proche de son segment.
           penalty+=off*.08;
           if(!bestCandidate||penalty<bestCandidate.penalty){
-            bestCandidate={x,y,sign,off,penalty};
+            bestCandidate={x,y,rawX,rawY,sign,off,penalty};
           }
         }
       }
 
-      const {x:rawDimX,y:rawDimY,sign,off}=bestCandidate;
-
-      // Dernière sécurité : le libellé est maintenu entièrement dans le cadre.
-      // S'il doit glisser légèrement le long de la ligne de cote, un trait de
-      // rappel permettra de conserver une association visuelle sans ambiguïté.
-      const verticalText=Math.abs(Math.sin(ang*Math.PI/180))>.7;
-      const safeX=verticalText?26:estimatedRadius+10;
-      const safeY=verticalText?estimatedRadius+10:25;
-      const dimX=Math.max(safeX,Math.min(drawW-safeX,rawDimX));
-      const dimY=Math.max(safeY,Math.min(H-safeY,rawDimY));
-      const labelShift=Math.hypot(dimX-rawDimX,dimY-rawDimY);
+      const {x,y,rawX,rawY,sign,off}=bestCandidate;
 
       dims.push({
-        x:dimX,
-        y:dimY,
-        rawX:rawDimX,
-        rawY:rawDimY,
-        labelShift,
+        x,y,rawX,rawY,safeX,safeY,
+        labelShift:Math.hypot(x-rawX,y-rawY),
         ang,
         num:i+1,
         value:dimensionValue,
-        labelRadius:estimatedRadius,
         a:{x:a.x,y:a.y},
         b:{x:b.x,y:b.y},
         nx,ny,sign,off
@@ -8813,17 +8796,16 @@ if(quotePdfBtn){
 
     // V62 : contrôle de collision des repères d’angles avec les cotes,
     // les segments et les repères déjà placés.
-    const angleMarkerIsFree=(x,y,currentVertex)=>{
+    const angleMarkerIsFree=(x,y)=>{
       if(x<12||x>drawW-12||y<12||y>H-12)return false;
       for(const dim of dims){
-        const required=(dim.labelRadius||34)+11;
-        if(Math.hypot(x-dim.x,y-dim.y)<required)return false;
+        if(Math.abs(x-dim.x)<dim.safeX&&Math.abs(y-dim.y)<dim.safeY)return false;
       }
       for(const bend of bends){
-        if(Math.hypot(x-bend.x,y-bend.y)<20)return false;
+        if(Math.hypot(x-bend.x,y-bend.y)<25)return false;
       }
       for(let j=0;j<pts.length-1;j++){
-        if(j===currentVertex-1||j===currentVertex)continue;
+
         if(distPointSegment(x,y,pts[j],pts[j+1])<11)return false;
       }
       return true;
@@ -8868,16 +8850,18 @@ if(quotePdfBtn){
         addCandidates(outsideVector,[10,14,18,24,30]);
         addCandidates(insideVector,[10,14]);
       }else{
-        addCandidates(insideVector,[10,13,16,20,25]);
+        addCandidates(insideVector,[16,23,31,42,56]);
+        addCandidates(outsideVector,[18,26,36,48,62]);
       }
 
-      let chosen=candidates.find(candidate=>angleMarkerIsFree(candidate.x,candidate.y,i));
+      let chosen=candidates.find(candidate=>angleMarkerIsFree(candidate.x,candidate.y));
       if(!chosen){
         const preferred=hem?outsideVector:insideVector;
         chosen={x:origin.x+preferred.x*12,y:origin.y+preferred.y*12};
       }
 
       bends.push({
+        origin,
         x:chosen.x,
         y:chosen.y,
         letter:String.fromCharCode(64+i)
@@ -8923,8 +8907,14 @@ if(quotePdfBtn){
       const outwardRotated=rotateVector(outwardOriginal);
       const anchor=toScreen(anchorRotated);
 
-      const gap=50;
-      const arrowLength=28;
+      const clearance=distance=>{
+        const x=anchor.x+outwardRotated.x*distance;
+        const y=anchor.y+outwardRotated.y*distance;
+        return x>32&&x<drawW-32&&y>18&&y<H-15&&dims.every(d=>
+          Math.abs(x-d.x)>d.safeX+5||Math.abs(y-d.y)>d.safeY+4);
+      };
+      const gap=[27,20,38].find(distance=>clearance(distance+8)&&clearance(distance-7))||27;
+      const arrowLength=gap-7;
       const sx=anchor.x+outwardRotated.x*gap;
       const sy=anchor.y+outwardRotated.y*gap;
       const ex=anchor.x+outwardRotated.x*(gap-arrowLength);
@@ -8953,11 +8943,14 @@ if(quotePdfBtn){
       const b2={x:d.b.x+ox,y:d.b.y+oy};
       const ux=(d.b.x-d.a.x)/(Math.hypot(d.b.x-d.a.x,d.b.y-d.a.y)||1);
       const uy=(d.b.y-d.a.y)/(Math.hypot(d.b.x-d.a.x,d.b.y-d.a.y)||1);
-      const arrow=6;
+      const length=Math.hypot(b2.x-a2.x,b2.y-a2.y);
+      const arrow=length<16?-5:6;
       const aHead1={x:a2.x+ux*arrow+d.nx*3*d.sign,y:a2.y+uy*arrow+d.ny*3*d.sign};
       const aHead2={x:a2.x+ux*arrow-d.nx*3*d.sign,y:a2.y+uy*arrow-d.ny*3*d.sign};
       const bHead1={x:b2.x-ux*arrow+d.nx*3*d.sign,y:b2.y-uy*arrow+d.ny*3*d.sign};
       const bHead2={x:b2.x-ux*arrow-d.nx*3*d.sign,y:b2.y-uy*arrow-d.ny*3*d.sign};
+      const labelWidth=d.value.length*10.7+27;
+      const badgeX=-labelWidth/2+9;
       return `<g class="dimension-line">
         <line x1="${d.a.x.toFixed(1)}" y1="${d.a.y.toFixed(1)}" x2="${a2.x.toFixed(1)}" y2="${a2.y.toFixed(1)}"/>
         <line x1="${d.b.x.toFixed(1)}" y1="${d.b.y.toFixed(1)}" x2="${b2.x.toFixed(1)}" y2="${b2.y.toFixed(1)}"/>
@@ -8966,12 +8959,12 @@ if(quotePdfBtn){
         <path d="M ${bHead1.x.toFixed(1)} ${bHead1.y.toFixed(1)} L ${b2.x.toFixed(1)} ${b2.y.toFixed(1)} L ${bHead2.x.toFixed(1)} ${bHead2.y.toFixed(1)}"/>
         ${d.labelShift>6?`<line class="dimension-label-leader" x1="${d.rawX.toFixed(1)}" y1="${d.rawY.toFixed(1)}" x2="${d.x.toFixed(1)}" y2="${d.y.toFixed(1)}"/>`:""}
         <g transform="translate(${d.x.toFixed(1)} ${d.y.toFixed(1)}) rotate(${d.ang.toFixed(1)})">
-          <circle cx="-34" cy="0" r="8" fill="#111"/><text x="-34" y="3.2" text-anchor="middle" class="num">${d.num}</text><text x="-21" y="5.5" class="dim">${esc(d.value)}</text>
+          <circle cx="${badgeX}" cy="0" r="9" fill="#111"/><text x="${badgeX}" y="3.7" text-anchor="middle" class="num">${d.num}</text><text x="${badgeX+14}" y="6" class="dim">${esc(d.value)}</text>
         </g>
       </g>`;
     }).join("");
 
-    const bendSvg=bends.map(b=>`<g><circle cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="7.5" fill="#fff" stroke="#0f62fe" stroke-width="2"/><text x="${b.x.toFixed(1)}" y="${(b.y+3.2).toFixed(1)}" text-anchor="middle" class="angle-letter">${b.letter}</text></g>`).join("");
+    const bendSvg=bends.map(b=>`<g><line x1="${b.origin.x}" y1="${b.origin.y}" x2="${b.x}" y2="${b.y}" stroke="#475569" stroke-width="1"/><circle cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="7.5" fill="#fff" stroke="#0f62fe" stroke-width="2"/><text x="${b.x.toFixed(1)}" y="${(b.y+3.2).toFixed(1)}" text-anchor="middle" class="angle-letter">${b.letter}</text></g>`).join("");
 
     const angleLines=(profile.angles||[]).map((a,i)=>{
       const hem=!!profile.hemmed?.[i];
@@ -8997,20 +8990,20 @@ if(quotePdfBtn){
       <div class="plan-head"><strong>${esc(name)}</strong><span>Qté : ${qty}</span></div>
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Plan 2D coté de ${esc(name)}">
         <style>
-          .profile{fill:none;stroke:#17324a;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+          .profile{fill:none;stroke:#17324a;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round}
           .color-arrow line,.color-arrow path{fill:none;stroke:#d62828;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
           .color-arrow text{font:800 10px Arial,sans-serif;fill:#d62828}
-          .dim{font:800 20px Arial,sans-serif;fill:#111;paint-order:stroke;stroke:#fff;stroke-width:6px}
+          .dim{font:800 20px Arial,sans-serif;fill:#111;paint-order:stroke;stroke:#fff;stroke-width:3px}
           .dimension-line line,.dimension-line path{fill:none;stroke:#111;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
           .dimension-line .dimension-label-leader{stroke:#64748b;stroke-width:1;stroke-dasharray:3 3}
-          .num{font:800 9px Arial,sans-serif;fill:#fff}
+          .num{font:800 10px Arial,sans-serif;fill:#fff}
           .angle-letter{font:800 9px Arial,sans-serif;fill:#0f62fe}
           .info{font:700 12px Arial,sans-serif;fill:#17324a}
           .info-title{font:800 13px Arial,sans-serif;fill:#17324a}
         </style>
+        ${dimSvg}
         <path d="${profilePath}" class="profile"/>
-        ${colorArrow}
-        ${dimSvg}${bendSvg}
+        ${bendSvg}${colorArrow}
         <line x1="${drawW+12}" y1="20" x2="${drawW+12}" y2="${H-20}" stroke="#c7d2dc"/>
         <text x="${drawW+30}" y="38" class="info-title">ANGLES</text>
         ${angleLines}
@@ -9034,13 +9027,16 @@ if(quotePdfBtn){
     }
 
     persist();
+    const project=document.getElementById("projectName")?.value.trim()||"";
+    const client=getCurrentClient()?.name||"";
+    const header=`<header class="sheet-head"><span><strong>Client</strong> ${esc(client||"—")}</span><span><strong>Réf. chantier</strong> ${esc(project||"—")}</span></header>`;
     const pages=[];
     for(let i=0;i<selected.length;i+=3){
       const group=selected.slice(i,i+3);
-      pages.push(`<div class="page">${group.map(x=>svgForPiece(x.p,x.i)).join("")}</div>`);
+      const large=group.length===1;
+      pages.push(`<div class="page${large?" single-plan":""}">${header}${group.map(x=>svgForPiece(x.p,x.i,large)).join("")}</div>`);
     }
 
-    const project=(document.getElementById("projectName")?.value||document.getElementById("quoteProject")?.value||"Dossier de fabrication").trim();
     const win=window.open("","_blank");
     if(!win)return alert("Autorisez les fenêtres surgissantes pour visualiser ou imprimer les plans.");
 
@@ -9051,7 +9047,10 @@ if(quotePdfBtn){
         *{box-sizing:border-box}
         html,body{margin:0;padding:0;font-family:Arial,sans-serif;color:#111;background:#eef2f6}
         body{padding:82px 14px 14px 28px}
-        .page{width:196mm;height:283mm;margin:0 auto 14px;background:#fff;display:grid;grid-template-rows:repeat(3,1fr);gap:3mm;page-break-after:always}
+        .page{width:196mm;height:283mm;margin:0 auto 14px;background:#fff;display:grid;grid-template-rows:14mm repeat(3,minmax(0,1fr));gap:3mm;page-break-after:always}
+        .page.single-plan{grid-template-rows:14mm 125mm}
+        .sheet-head{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:4mm;border-bottom:1px solid #8798a8;font-size:11pt;line-height:1.2;overflow-wrap:anywhere}
+        .sheet-head strong{margin-right:1.5mm;color:#17324a}
         .page:last-child{page-break-after:auto}
         .plan{border:1px solid #9eacb8;border-radius:3mm;overflow:hidden;min-height:0;display:flex;flex-direction:column}
         .plan-head{height:9mm;padding:1.8mm 3mm;display:flex;justify-content:space-between;align-items:center;background:#eef3f7;border-bottom:1px solid #c8d3dc;font-size:12pt}
