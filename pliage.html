@@ -8990,33 +8990,59 @@ if(quotePdfBtn){
     const endFoldLines=endReturns.map(({label,height,angle,direction})=>
       `${label} : ${height.toLocaleString("fr-FR")} mm · ${angle.toLocaleString("fr-FR")}° · ${direction}`
     );
-    const sideViewHeight=endReturns.length?130:0;
-    const sideView=endReturns.length?`
-      <g aria-label="Vue longitudinale des retours de bout">
-        <text x="22" y="20" class="info-title">VUE LONGITUDINALE — SCHÉMA NON À L’ÉCHELLE</text>
-        <line x1="105" y1="75" x2="${drawW-105}" y2="75" class="profile"/>
-        ${endReturns.map(({side,label,height,angle,direction})=>{
-          const left=side==="left";
-          const x=left?105:drawW-105;
-          const radians=Math.max(1,Math.min(179,angle))*Math.PI/180;
-          const tipX=x+(left?1:-1)*Math.cos(radians)*32;
-          const tipY=75+(direction==="haut"?-1:1)*Math.sin(radians)*32;
-          const labelY=direction==="haut"?42:113;
-          return `<g>
-            <line x1="${x}" y1="75" x2="${tipX.toFixed(1)}" y2="${tipY.toFixed(1)}" stroke="#0f62fe" stroke-width="4" stroke-linecap="round"/>
-            <text x="${x+(left?43:-43)}" y="${labelY}" text-anchor="${left?"start":"end"}" class="info">${esc(label)} · ${height.toLocaleString("fr-FR")} mm · ${angle.toLocaleString("fr-FR")}° · ${direction}</text>
-          </g>`;
-        }).join("")}
-        <line x1="22" y1="123" x2="${W-22}" y2="123" stroke="#c7d2dc"/>
-      </g>`:"";
+    const sideViewHeight=endReturns.length?170:0;
+    let sideView="";
+    if(endReturns.length){
+      // Projection oblique du profil extrudé. Les retours se replient sur
+      // les deux arêtes du fond, aux extrémités de la longueur finie.
+      const depth=Math.max(1,lengthMm||profileW);
+      const project=(p,z)=>({x:p.x*.56+z,y:p.y+p.x*.21-z*.19});
+      const left=raw.map(p=>project(p,0));
+      const right=raw.map(p=>project(p,depth));
+      const ends=endReturns.map(ret=>{
+        const isLeft=ret.side==="left";
+        const z=isLeft?0:depth;
+        const angle=Math.max(1,Math.min(179,ret.angle))*Math.PI/180;
+        const rise=(ret.direction==="bas"?1:-1)*ret.height*Math.sin(angle);
+        const tipZ=z+(isLeft?1:-1)*ret.height*Math.cos(angle);
+        const a=raw[longestIndex],b=raw[longestIndex+1];
+        return [project(a,z),project(b,z),project({x:b.x,y:b.y+rise},tipZ),project({x:a.x,y:a.y+rise},tipZ)];
+      });
+      const all=[...left,...right,...ends.flat()];
+      const x0=Math.min(...all.map(p=>p.x)),x1=Math.max(...all.map(p=>p.x));
+      const y0=Math.min(...all.map(p=>p.y)),y1=Math.max(...all.map(p=>p.y));
+      const fit=Math.min((W-56)/Math.max(1,x1-x0),108/Math.max(1,y1-y0));
+      const points=vertices=>vertices.map(p=>
+        `${(W/2+(p.x-(x0+x1)/2)*fit).toFixed(1)},${(84+(p.y-(y0+y1)/2)*fit).toFixed(1)}`
+      ).join(" ");
+      const faces=left.slice(1).map((p,i)=>
+        `<polygon points="${points([left[i],p,right[i+1],right[i]])}" fill="${i===longestIndex?"#e5edf4":"#cbd9e5"}" stroke="#17324a" stroke-width="1.4"/>`
+      );
+      const wall=vertices=>`<polygon points="${points(vertices)}" fill="#91b9ff" fill-opacity=".72" stroke="#0b51c5" stroke-width="2"/>`;
+      sideView=`<g aria-label="Vue de la pièce avec ses retours">
+        <text x="22" y="20" class="info-title">VUE DE LA PIÈCE — RETOURS EN BLEU</text>
+        ${endReturns.map((ret,i)=>ret.side==="right"?wall(ends[i]):"").join("")}
+        ${faces.join("")}
+        ${endReturns.map((ret,i)=>ret.side==="left"?wall(ends[i]):"").join("")}
+        ${endFoldLines.map((line,i)=>`<text x="${22+i*W/2}" y="151" class="info">${esc(line)}</text>`).join("")}
+        <line x1="22" y1="162" x2="${W-22}" y2="162" stroke="#c7d2dc"/>
+      </g>`;
+    }
     const endFoldStartY=Math.min(H-110,Math.max(100,76+(profile.angles||[]).length*18+6));
     const blankLengthMm=Math.round(getPieceCalepinageLength(piece).cutLength)||lengthMm;
     const developed=Number(piece.developed||bp.result?.rounded||0);
     const material=bp.settings?.material||"Aluminium";
-    const thickness=bp.settings?.thickness||"—";
+    const color=document.getElementById("projectColor")?.value.trim()||"Non renseignée";
+    const thickness=Number(bp.settings?.thickness);
+    const thicknessLabel=thickness>0?`${thickness.toLocaleString("fr-FR",{maximumFractionDigits:3})} mm`:"Non renseignée";
 
     return `<section class="plan">
-      <div class="plan-head"><strong>${esc(name)}</strong><span>Qté : ${qty}</span></div>
+      <div class="plan-head">
+        <strong>${esc(name)}</strong>
+        <span><strong>Couleur</strong> ${esc(color)}</span>
+        <span><strong>Épaisseur</strong> ${esc(thicknessLabel)}</span>
+        <span>Qté : ${qty}</span>
+      </div>
       <svg viewBox="0 0 ${W} ${H+sideViewHeight}" role="img" aria-label="Plan 2D coté de ${esc(name)}">
         <style>
           .profile{fill:none;stroke:#17324a;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round}
@@ -9042,7 +9068,7 @@ if(quotePdfBtn){
         <text x="${drawW+30}" y="${H-73}" class="info">Longueur finie : ${lengthMm.toLocaleString("fr-FR")} mm</text>
         <text x="${drawW+30}" y="${H-55}" class="info">Longueur débit : ${blankLengthMm.toLocaleString("fr-FR")} mm</text>
         <text x="${drawW+30}" y="${H-37}" class="info">Développé : ${developed.toLocaleString("fr-FR")} mm</text>
-        <text x="${drawW+30}" y="${H-19}" class="info">${esc(material)} · ${esc(thickness)} mm</text>
+        <text x="${drawW+30}" y="${H-19}" class="info">Matière : ${esc(material)}</text>
         </g>
       </svg>
     </section>`;
@@ -9085,8 +9111,8 @@ if(quotePdfBtn){
         .sheet-head strong{margin-right:1.5mm;color:#17324a}
         .page:last-child{page-break-after:auto}
         .plan{border:1px solid #9eacb8;border-radius:3mm;overflow:hidden;min-height:0;display:flex;flex-direction:column}
-        .plan-head{height:9mm;padding:1.8mm 3mm;display:flex;justify-content:space-between;align-items:center;background:#eef3f7;border-bottom:1px solid #c8d3dc;font-size:12pt}
-        .plan svg{display:block;width:100%;height:calc(100% - 9mm)}
+        .plan-head{flex:none;min-height:9mm;padding:1.8mm 3mm;display:flex;flex-wrap:wrap;gap:1mm 3mm;justify-content:space-between;align-items:center;overflow-wrap:anywhere;background:#eef3f7;border-bottom:1px solid #c8d3dc;font-size:11pt}
+        .plan svg{display:block;width:100%;flex:1;min-height:0}
         .screen-actions{position:fixed;right:18px;top:16px;bottom:auto;display:flex;gap:8px;padding:9px;background:rgba(255,255,255,.96);border:1px solid #cbd5df;border-radius:12px;box-shadow:0 8px 24px rgba(15,23,42,.16)}
         .screen-actions button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer}
         .screen-actions button:first-child{background:#0f62fe;color:#fff}.screen-actions button:last-child{background:#e8edf2;color:#17324a}
