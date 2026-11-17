@@ -8974,12 +8974,41 @@ if(quotePdfBtn){
     const name=piece.planName||`Pièce ${index+1}`;
     const qty=Math.max(1,Number(piece.qty)||1);
     const lengthMm=Math.round(Number(piece.length||0)*1000||Number(bp.settings?.length3D||0));
-    const endLeft=Boolean(bp.settings?.endLeftEnabled);
-    const endRight=Boolean(bp.settings?.endRightEnabled);
-    const endFoldLines=[
-      endLeft?`Bout gauche : ${Number(bp.settings?.endLeftHeight||30).toLocaleString("fr-FR")} mm · ${Number(bp.settings?.endLeftAngle||90).toLocaleString("fr-FR")}° · ${bp.settings?.endLeftDirection==="bas"?"bas":"haut"}`:"",
-      endRight?`Bout droit : ${Number(bp.settings?.endRightHeight||30).toLocaleString("fr-FR")} mm · ${Number(bp.settings?.endRightAngle||90).toLocaleString("fr-FR")}° · ${bp.settings?.endRightDirection==="bas"?"bas":"haut"}`:""
-    ].filter(Boolean);
+    const endReturns=["left","right"].flatMap(side=>{
+      const prefix=side==="left"?"endLeft":"endRight";
+      const saved=bp.result?.endFolds?.[side]||{};
+      const settings=bp.settings||{};
+      if(!(settings[prefix+"Enabled"] ?? saved.enabled))return [];
+      return [{
+        side,
+        label:side==="left"?"Bout gauche":"Bout droit",
+        height:Number(settings[prefix+"Height"] ?? saved.height)||30,
+        angle:Number(settings[prefix+"Angle"] ?? saved.angle)||90,
+        direction:(settings[prefix+"Direction"] ?? saved.direction)==="bas"?"bas":"haut"
+      }];
+    });
+    const endFoldLines=endReturns.map(({label,height,angle,direction})=>
+      `${label} : ${height.toLocaleString("fr-FR")} mm · ${angle.toLocaleString("fr-FR")}° · ${direction}`
+    );
+    const sideViewHeight=endReturns.length?130:0;
+    const sideView=endReturns.length?`
+      <g aria-label="Vue longitudinale des retours de bout">
+        <text x="22" y="20" class="info-title">VUE LONGITUDINALE — SCHÉMA NON À L’ÉCHELLE</text>
+        <line x1="105" y1="75" x2="${drawW-105}" y2="75" class="profile"/>
+        ${endReturns.map(({side,label,height,angle,direction})=>{
+          const left=side==="left";
+          const x=left?105:drawW-105;
+          const radians=Math.max(1,Math.min(179,angle))*Math.PI/180;
+          const tipX=x+(left?1:-1)*Math.cos(radians)*32;
+          const tipY=75+(direction==="haut"?-1:1)*Math.sin(radians)*32;
+          const labelY=direction==="haut"?42:113;
+          return `<g>
+            <line x1="${x}" y1="75" x2="${tipX.toFixed(1)}" y2="${tipY.toFixed(1)}" stroke="#0f62fe" stroke-width="4" stroke-linecap="round"/>
+            <text x="${x+(left?43:-43)}" y="${labelY}" text-anchor="${left?"start":"end"}" class="info">${esc(label)} · ${height.toLocaleString("fr-FR")} mm · ${angle.toLocaleString("fr-FR")}° · ${direction}</text>
+          </g>`;
+        }).join("")}
+        <line x1="22" y1="123" x2="${W-22}" y2="123" stroke="#c7d2dc"/>
+      </g>`:"";
     const endFoldStartY=Math.min(H-110,Math.max(100,76+(profile.angles||[]).length*18+6));
     const blankLengthMm=Math.round(getPieceCalepinageLength(piece).cutLength)||lengthMm;
     const developed=Number(piece.developed||bp.result?.rounded||0);
@@ -8988,7 +9017,7 @@ if(quotePdfBtn){
 
     return `<section class="plan">
       <div class="plan-head"><strong>${esc(name)}</strong><span>Qté : ${qty}</span></div>
-      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Plan 2D coté de ${esc(name)}">
+      <svg viewBox="0 0 ${W} ${H+sideViewHeight}" role="img" aria-label="Plan 2D coté de ${esc(name)}">
         <style>
           .profile{fill:none;stroke:#17324a;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round}
           .color-arrow line,.color-arrow path{fill:none;stroke:#d62828;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
@@ -9001,6 +9030,8 @@ if(quotePdfBtn){
           .info{font:700 12px Arial,sans-serif;fill:#17324a}
           .info-title{font:800 13px Arial,sans-serif;fill:#17324a}
         </style>
+        ${sideView}
+        <g transform="translate(0 ${sideViewHeight})">
         ${dimSvg}
         <path d="${profilePath}" class="profile"/>
         ${bendSvg}${colorArrow}
@@ -9012,6 +9043,7 @@ if(quotePdfBtn){
         <text x="${drawW+30}" y="${H-55}" class="info">Longueur débit : ${blankLengthMm.toLocaleString("fr-FR")} mm</text>
         <text x="${drawW+30}" y="${H-37}" class="info">Développé : ${developed.toLocaleString("fr-FR")} mm</text>
         <text x="${drawW+30}" y="${H-19}" class="info">${esc(material)} · ${esc(thickness)} mm</text>
+        </g>
       </svg>
     </section>`;
   }
