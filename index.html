@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V44.9</title>
+<title>RML ERP — V44.10</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -787,7 +787,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V44.9</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V44.10</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -6744,7 +6744,7 @@ function rmlSubApplyAdditionalChoices(clauses){
  return clauses;
 }
 const RML_PRINCIPAL_COMPANIES={
- rml:{name:'RML GOUTTIÈRE ALU',address:'14 ZA de Calens',city:'33640 Beautiran',representative:'MM. Damien MICOULEAU et Thierry LHÉRISSON — Gérants',siret:'',phone:'05 56 67 33 89'},
+ rml:{name:'RML GOUTTIÈRE ALU',address:'14 ZA de Calens',city:'33640 Beautiran',representative:'MM. Damien MICOULEAU et Thierry LHÉRISSON — Gérants',siret:'109 223 727 00016',phone:'05 56 67 33 89'},
  micouleau:{name:'MICOULEAU JC SARL',address:'21 ter route du Courneau',city:'33640 Portets',representative:'M. Damien MICOULEAU — Gérant',siret:'',phone:''}
 };
 function rmlPrincipalKey(clauses){return clauses?.[0]?.principal_company==='micouleau'?'micouleau':'rml'}
@@ -7319,7 +7319,25 @@ async function rmlV4211Pdf(a){
  function page(){const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,W,H);ctx.fillStyle='#163d5b';ctx.font='bold 36px Arial';ctx.fillText('RML — CONTRAT DE SOUS-TRAITANCE',margin,100);ctx.strokeStyle='#12669a';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(margin,128);ctx.lineTo(W-margin,128);ctx.stroke();y=190;pages.push(canvas)}
  function lines(text,font){ctx.font=font;const out=[];for(const paragraph of String(text??'').split(/\r?\n/)){let line='';for(const word of paragraph.split(/\s+/)){if(!word)continue;const t=line?line+' '+word:word;if(ctx.measureText(t).width>usable&&line){out.push(line);line=word}else line=t;if(ctx.measureText(line).width>usable){let part='';for(const ch of line){if(ctx.measureText(part+ch).width>usable&&part){out.push(part);part=ch}else part+=ch}line=part}}out.push(line||' ') }return out}
  function section(title,value){const ls=lines(value,'25px Arial');if(y+90>footer)page();ctx.fillStyle='#163d5b';ctx.font='bold 27px Arial';ctx.fillText(title,margin,y);y+=43;for(const line of ls){if(y+38>footer)page();ctx.fillStyle='#222';ctx.font='25px Arial';ctx.fillText(line,margin,y);y+=37}y+=22}
- page();section('Entreprise principale',rmlPrincipalInfo(rmlPrincipalKey(clauses)).name);section('Sous-traitant',[sub?.company,sub?.contact_name,sub?.head_office_address,sub?.email].filter(Boolean).join(' — '));section('Chantier',[c?.nom,j?.nom,j?.adresse].filter(Boolean).join(' — '));section('Travaux confiés',a.work_description||'À compléter');section('Montant HT',a.amount_ht!=null?Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2})+' €':'À compléter');
+ const principal=rmlPrincipalInfo(rmlPrincipalKey(clauses));
+ const subSnapshot=sub?.client_snapshot||{};
+ const subSiret=subSnapshot.siret||sub?.siret||(rmlIsStephaneSubcontractor(sub)?'441 980 752 00022':'');
+ page();
+ section('Entreprise principale',[
+   principal.name,
+   [principal.address,principal.city].filter(Boolean).join(', '),
+   'SIRET : '+(principal.siret||'À renseigner'),
+   principal.representative,
+   principal.phone?'Tél. : '+principal.phone:''
+ ].filter(Boolean).join('\n'));
+ section('Sous-traitant',[
+   sub?.company,
+   sub?.contact_name,
+   sub?.head_office_address||subSnapshot.adresse,
+   'SIRET : '+(subSiret||'À renseigner'),
+   sub?.email,
+   sub?.phone?'Tél. : '+sub.phone:''
+ ].filter(Boolean).join('\n'));section('Chantier',[c?.nom,j?.nom,j?.adresse].filter(Boolean).join(' — '));section('Travaux confiés',a.work_description||'À compléter');section('Montant HT',a.amount_ht!=null?Number(a.amount_ht).toLocaleString('fr-FR',{minimumFractionDigits:2})+' €':'À compléter');
  for(const clause of clauses){if(String(clause.title||'').trim()===RML41_ANNEX)continue;section(clause.title||'Clause',clause.text||'')}
  async function signature(title,data,name,date){if(y+280>footer)page();section(title,(name||'')+(date?' — '+new Date(date).toLocaleString('fr-FR'):''));if(data){try{const img=new Image();img.src=data;await img.decode();ctx.drawImage(img,margin,y,420,155)}catch(e){ctx.fillText('Signature non lisible',margin,y+40)}}y+=175}
  await signature('Signature RML',a.rml_signature_data,a.rml_signer_name,a.rml_signed_at);
