@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="RML Pliage"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
-<title>RML PLIAGE ERP — V121</title>
+<title>RML PLIAGE ERP — V44.8.4</title>
 <style>
 :root{--card:#ffffff;--text:#17202a;--muted:#687684;--line:#d9e1ea;--accent:#0f62fe;--accent2:#0a4ecc;--danger:#c62828;--ok:#157347;--shadow:0 12px 30px rgba(18,36,56,.08);--radius:18px}
 *{box-sizing:border-box}
@@ -1865,7 +1865,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
     <div class="brand">
       
       <div class="brand-text">
-        <h1>RML PLIAGE ALU</h1>
+        <h1>RML PLIAGE ALU · V44.8.4</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
       </div>
@@ -2262,12 +2262,14 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
               <label>Relevé <input id="bendEndLeftHeight" type="number" min="1" step="1" value="30"> mm</label>
               <label>Angle <input id="bendEndLeftAngle" type="number" min="1" max="179" step="1" value="90"> °</label>
               <label>Sens <select id="bendEndLeftDirection"><option value="haut">Haut</option><option value="bas">Bas</option></select></label>
+              <label><input id="bendEndLeftLip" type="checkbox"> Repli intérieur 12 mm à 55°</label>
             </div>
             <div class="bend-end-fold-row">
               <label class="bend-end-toggle"><input id="bendEndRightEnabled" type="checkbox"> <strong>Bout droit (longueur finie)</strong></label>
               <label>Relevé <input id="bendEndRightHeight" type="number" min="1" step="1" value="30"> mm</label>
               <label>Angle <input id="bendEndRightAngle" type="number" min="1" max="179" step="1" value="90"> °</label>
               <label>Sens <select id="bendEndRightDirection"><option value="haut">Haut</option><option value="bas">Bas</option></select></label>
+              <label><input id="bendEndRightLip" type="checkbox"> Repli intérieur 12 mm à 55°</label>
             </div>
           </div>
           <div class="bend-end-fold-preview" id="bendEndFoldPreview" aria-label="Vue de dessus des plis en bout"></div>
@@ -2388,7 +2390,7 @@ function getPieceEndReturnAllowance(piece){
     if(!enabled)return 0;
     const height=Math.max(0,Number(settings[`${prefix}Height`] ?? saved.height ?? 0));
     const deduction=Math.max(0,Number(saved.deduction||0));
-    return Math.max(0,height-deduction);
+    return Math.max(0,height-deduction+(saved.lipAllowance||0));
   };
   return allowance("left")+allowance("right");
 }
@@ -5021,10 +5023,12 @@ if(quotePdfBtn){
     endLeftEnabled:document.getElementById("bendEndLeftEnabled"),
     endLeftHeight:document.getElementById("bendEndLeftHeight"),
     endLeftAngle:document.getElementById("bendEndLeftAngle"),
+    endLeftLip:document.getElementById("bendEndLeftLip"),
     endLeftDirection:document.getElementById("bendEndLeftDirection"),
     endRightEnabled:document.getElementById("bendEndRightEnabled"),
     endRightHeight:document.getElementById("bendEndRightHeight"),
     endRightAngle:document.getElementById("bendEndRightAngle"),
+    endRightLip:document.getElementById("bendEndRightLip"),
     endRightDirection:document.getElementById("bendEndRightDirection")
   };
 
@@ -5109,7 +5113,7 @@ if(quotePdfBtn){
     libraryList.innerHTML=models.map(model=>{
       const savedProfile=model.bendProfile.profile||{};
       const endSettings=model.bendProfile.settings||{};
-      const endCount=Number(Boolean(endSettings.endLeftEnabled))+Number(Boolean(endSettings.endRightEnabled));
+      const endCount=Number(Boolean(endSettings.endLeftEnabled))+Number(Boolean(endSettings.endRightEnabled))+Number(Boolean(endSettings.endLeftEnabled&&endSettings.endLeftLip))+Number(Boolean(endSettings.endRightEnabled&&endSettings.endRightLip));
       const segmentCount=Array.isArray(savedProfile.lengths)?savedProfile.lengths.length:0;
       const bendCount=Array.isArray(savedProfile.angles)?savedProfile.angles.length:0;
       return `<article class="bend-library-item" data-library-id="${libraryEscape(model.id)}">
@@ -5190,7 +5194,7 @@ if(quotePdfBtn){
       profile,
       roughPoints,
       display:{viewRotation,viewZoom,activeSegment,activeBend,drawingMode:false},
-      settings:{material:fields.material.value,thickness:fields.thickness.value,vee:fields.vee.value,radius:fields.radius.value,k:fields.k.value,cybFactor:fields.cybFactor?.value,calcMode:fields.calcMode?.value,round:fields.round.value,length3D:fields.length3D?.value,endLeftEnabled:fields.endLeftEnabled?.checked,endLeftHeight:fields.endLeftHeight?.value,endLeftAngle:fields.endLeftAngle?.value,endLeftDirection:fields.endLeftDirection?.value,endRightEnabled:fields.endRightEnabled?.checked,endRightHeight:fields.endRightHeight?.value,endRightAngle:fields.endRightAngle?.value,endRightDirection:fields.endRightDirection?.value},
+      settings:{material:fields.material.value,thickness:fields.thickness.value,vee:fields.vee.value,radius:fields.radius.value,k:fields.k.value,cybFactor:fields.cybFactor?.value,calcMode:fields.calcMode?.value,round:fields.round.value,length3D:fields.length3D?.value,endLeftLip:fields.endLeftLip?.checked,endLeftEnabled:fields.endLeftEnabled?.checked,endLeftHeight:fields.endLeftHeight?.value,endLeftAngle:fields.endLeftAngle?.value,endLeftDirection:fields.endLeftDirection?.value,endRightLip:fields.endRightLip?.checked,endRightEnabled:fields.endRightEnabled?.checked,endRightHeight:fields.endRightHeight?.value,endRightAngle:fields.endRightAngle?.value,endRightDirection:fields.endRightDirection?.value},
       result
     });
   }
@@ -5549,11 +5553,13 @@ if(quotePdfBtn){
       const height=Math.max(1,Number(fields[`end${side}Height`]?.value)||30);
       const angle=Math.max(1,Math.min(179,Number(fields[`end${side}Angle`]?.value)||90));
       const direction=fields[`end${side}Direction`]?.value==="bas"?"bas":"haut";
-      return {enabled,height,angle,direction,deduction:enabled?endFoldDeduction(angle):0};
+      const lip=enabled && Boolean(fields[`end${side}Lip`]?.checked);
+      const lipAllowance=lip?Math.max(0,12-endFoldDeduction(55)):0;
+      return {enabled,height,angle,direction,lip,lipAllowance,deduction:enabled?endFoldDeduction(angle):0};
     };
     const left=make("Left"),right=make("Right");
-    const count=Number(left.enabled)+Number(right.enabled);
-    const blankLength=Math.max(0,finishedLength+(left.enabled?left.height-left.deduction:0)+(right.enabled?right.height-right.deduction:0));
+    const count=Number(left.enabled)+Number(right.enabled)+Number(left.lip)+Number(right.lip);
+    const blankLength=Math.max(0,finishedLength+(left.enabled?left.height-left.deduction+left.lipAllowance:0)+(right.enabled?right.height-right.deduction+right.lipAllowance:0));
     const summary=document.getElementById("bendEndFoldSummary");
     if(summary){
       summary.textContent=count
@@ -6163,7 +6169,18 @@ if(quotePdfBtn){
     const endWallModels=[
       endWallModel(endFolds3D.left,0,"PLI BOUT G",-1),
       endWallModel(endFolds3D.right,visualDepth,"PLI BOUT D",1)
-    ].filter(Boolean);
+    ].flatMap(wall=>{
+      if(!wall?.data.lip)return [wall];
+      const data=wall.data;
+      let nx=baseNormal.x,ny=baseNormal.y;
+      const up=data.direction!=="bas";
+      if((up&&ny>0)||(!up&&ny<0)){nx=-nx;ny=-ny;}
+      if(Math.abs(ny)<.001&&((up&&nx>0)||(!up&&nx<0))){nx=-nx;ny=-ny;}
+      const outward=wall.label.endsWith("G")?-1:1;
+      const radians=(180-data.angle+125)*Math.PI/180;
+      const offset=p=>({x:p.x+nx*12*Math.sin(radians),y:p.y+ny*12*Math.sin(radians),z:p.z+outward*12*Math.cos(radians)});
+      return [wall,{...wall,points:[wall.points[3],wall.points[2],offset(wall.points[2]),offset(wall.points[3])]}];
+    }).filter(Boolean);
 
     const rotatedBounds=[];
     roundedModelPoints.forEach(p=>{
@@ -7015,10 +7032,12 @@ if(quotePdfBtn){
       fields.length3D.value=entryLength>0?entryLength:(settings.length3D??1000);
     }
     if(fields.endLeftEnabled)fields.endLeftEnabled.checked=Boolean(settings.endLeftEnabled);
+    fields.endLeftLip.checked=Boolean(settings.endLeftLip);
     if(settings.endLeftHeight!=null && fields.endLeftHeight)fields.endLeftHeight.value=settings.endLeftHeight;
     if(settings.endLeftAngle!=null && fields.endLeftAngle)fields.endLeftAngle.value=settings.endLeftAngle;
     if(settings.endLeftDirection!=null && fields.endLeftDirection)fields.endLeftDirection.value=settings.endLeftDirection;
     if(fields.endRightEnabled)fields.endRightEnabled.checked=Boolean(settings.endRightEnabled);
+    fields.endRightLip.checked=Boolean(settings.endRightLip);
     if(settings.endRightHeight!=null && fields.endRightHeight)fields.endRightHeight.value=settings.endRightHeight;
     if(settings.endRightAngle!=null && fields.endRightAngle)fields.endRightAngle.value=settings.endRightAngle;
     if(settings.endRightDirection!=null && fields.endRightDirection)fields.endRightDirection.value=settings.endRightDirection;
@@ -7239,7 +7258,9 @@ if(quotePdfBtn){
     viewZoom=1;
     profile={lengths:[],angles:[],directions:[],hemmed:[],exactPoints:[]};
     if(fields.endLeftEnabled)fields.endLeftEnabled.checked=false;
+    fields.endLeftLip.checked=false;
     if(fields.endRightEnabled)fields.endRightEnabled.checked=false;
+    fields.endRightLip.checked=false;
     if(fields.endLeftHeight)fields.endLeftHeight.value=30;
     if(fields.endRightHeight)fields.endRightHeight.value=30;
     if(fields.endLeftAngle)fields.endLeftAngle.value=90;
@@ -7568,7 +7589,7 @@ if(quotePdfBtn){
       profile,
       roughPoints,
       display:{viewRotation,viewZoom,activeSegment,activeBend,drawingMode:false},
-      settings:{material:fields.material.value,thickness:fields.thickness.value,vee:fields.vee.value,radius:fields.radius.value,k:fields.k.value,cybFactor:fields.cybFactor?.value,calcMode:fields.calcMode?.value,round:fields.round.value,length3D:fields.length3D?.value,endLeftEnabled:fields.endLeftEnabled?.checked,endLeftHeight:fields.endLeftHeight?.value,endLeftAngle:fields.endLeftAngle?.value,endLeftDirection:fields.endLeftDirection?.value,endRightEnabled:fields.endRightEnabled?.checked,endRightHeight:fields.endRightHeight?.value,endRightAngle:fields.endRightAngle?.value,endRightDirection:fields.endRightDirection?.value},
+      settings:{material:fields.material.value,thickness:fields.thickness.value,vee:fields.vee.value,radius:fields.radius.value,k:fields.k.value,cybFactor:fields.cybFactor?.value,calcMode:fields.calcMode?.value,round:fields.round.value,length3D:fields.length3D?.value,endLeftLip:fields.endLeftLip?.checked,endLeftEnabled:fields.endLeftEnabled?.checked,endLeftHeight:fields.endLeftHeight?.value,endLeftAngle:fields.endLeftAngle?.value,endLeftDirection:fields.endLeftDirection?.value,endRightLip:fields.endRightLip?.checked,endRightEnabled:fields.endRightEnabled?.checked,endRightHeight:fields.endRightHeight?.value,endRightAngle:fields.endRightAngle?.value,endRightDirection:fields.endRightDirection?.value},
       result
     }));
 
@@ -7641,11 +7662,11 @@ if(quotePdfBtn){
         calcMode:fields.calcMode?.value,
         round:fields.round.value,
         length3D:fields.length3D?.value,
-        endLeftEnabled:fields.endLeftEnabled?.checked,
+        endLeftLip:fields.endLeftLip?.checked,endLeftEnabled:fields.endLeftEnabled?.checked,
         endLeftHeight:fields.endLeftHeight?.value,
         endLeftAngle:fields.endLeftAngle?.value,
         endLeftDirection:fields.endLeftDirection?.value,
-        endRightEnabled:fields.endRightEnabled?.checked,
+        endRightLip:fields.endRightLip?.checked,endRightEnabled:fields.endRightEnabled?.checked,
         endRightHeight:fields.endRightHeight?.value,
         endRightAngle:fields.endRightAngle?.value,
         endRightDirection:fields.endRightDirection?.value
@@ -8981,14 +9002,15 @@ if(quotePdfBtn){
       if(!(settings[prefix+"Enabled"] ?? saved.enabled))return [];
       return [{
         side,
+        lip:Boolean(settings[prefix+"Lip"] ?? saved.lip),
         label:side==="left"?"Bout gauche":"Bout droit",
         height:Number(settings[prefix+"Height"] ?? saved.height)||30,
         angle:Number(settings[prefix+"Angle"] ?? saved.angle)||90,
         direction:(settings[prefix+"Direction"] ?? saved.direction)==="bas"?"bas":"haut"
       }];
     });
-    const endFoldLines=endReturns.map(({label,height,angle,direction})=>
-      `${label} : ${height.toLocaleString("fr-FR")} mm · ${angle.toLocaleString("fr-FR")}° · ${direction}`
+    const endFoldLines=endReturns.map(({label,height,angle,direction,lip})=>
+      `${label} : ${height.toLocaleString("fr-FR")} mm · ${angle.toLocaleString("fr-FR")}° · ${direction}${lip?" · repli intérieur 12 mm à 55°":""}`
     );
     const sideViewHeight=endReturns.length?170:0;
     let sideView="";
@@ -9006,9 +9028,16 @@ if(quotePdfBtn){
         const rise=(ret.direction==="bas"?1:-1)*ret.height*Math.sin(angle);
         const tipZ=z+(isLeft?1:-1)*ret.height*Math.cos(angle);
         const a=raw[longestIndex],b=raw[longestIndex+1];
-        return [project(a,z),project(b,z),project({x:b.x,y:b.y+rise},tipZ),project({x:a.x,y:a.y+rise},tipZ)];
+        const vertices=[project(a,z),project(b,z),project({x:b.x,y:b.y+rise},tipZ),project({x:a.x,y:a.y+rise},tipZ)];
+        if(ret.lip){
+          const lipAngle=angle+(Math.PI-55*Math.PI/180);
+          const dz=(isLeft?1:-1)*12*Math.cos(lipAngle);
+          const dy=(ret.direction==="bas"?1:-1)*12*Math.sin(lipAngle);
+          vertices.lip=[vertices[3],vertices[2],project({x:b.x,y:b.y+rise+dy},tipZ+dz),project({x:a.x,y:a.y+rise+dy},tipZ+dz)];
+        }
+        return vertices;
       });
-      const all=[...left,...right,...ends.flat()];
+      const all=[...left,...right,...ends.flat(),...ends.flatMap(vertices=>vertices.lip||[])];
       const x0=Math.min(...all.map(p=>p.x)),x1=Math.max(...all.map(p=>p.x));
       const y0=Math.min(...all.map(p=>p.y)),y1=Math.max(...all.map(p=>p.y));
       const fit=Math.min((W-56)/Math.max(1,x1-x0),108/Math.max(1,y1-y0));
@@ -9018,7 +9047,7 @@ if(quotePdfBtn){
       const faces=left.slice(1).map((p,i)=>
         `<polygon points="${points([left[i],p,right[i+1],right[i]])}" fill="${i===longestIndex?"#e5edf4":"#cbd9e5"}" stroke="#17324a" stroke-width="1.4"/>`
       );
-      const wall=vertices=>`<polygon points="${points(vertices)}" fill="#91b9ff" fill-opacity=".72" stroke="#0b51c5" stroke-width="2"/>`;
+      const wall=vertices=>`<polygon points="${points(vertices)}" fill="#91b9ff" fill-opacity=".72" stroke="#0b51c5" stroke-width="2"/>`+(vertices.lip?`<polygon points="${points(vertices.lip)}" fill="#5387d9" stroke="#0b51c5" stroke-width="1.5"/>`:"");
       sideView=`<g aria-label="Vue de la pièce avec ses retours">
         <text x="22" y="20" class="info-title">VUE DE LA PIÈCE — RETOURS EN BLEU</text>
         ${endReturns.map((ret,i)=>ret.side==="right"?wall(ends[i]):"").join("")}
@@ -9115,13 +9144,13 @@ if(quotePdfBtn){
         .plan svg{display:block;width:100%;flex:1;min-height:0}
         .screen-actions{position:fixed;right:18px;top:16px;bottom:auto;display:flex;gap:8px;padding:9px;background:rgba(255,255,255,.96);border:1px solid #cbd5df;border-radius:12px;box-shadow:0 8px 24px rgba(15,23,42,.16)}
         .screen-actions button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer}
-        .screen-actions button:first-child{background:#0f62fe;color:#fff}.screen-actions button:last-child{background:#e8edf2;color:#17324a}
+        .screen-actions #printPlansAction{background:#0f62fe;color:#fff}.screen-actions button:last-child{background:#e8edf2;color:#17324a}
         @media print{
           html,body{background:#fff;padding:0}
           .page{margin:0;width:196mm;height:283mm}
           .screen-actions{display:none}
         }
-      </style></head><body>${pages.join("")}<div class="screen-actions"><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
+      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.8.4</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
       <script>
         document.getElementById("printPlansAction").addEventListener("click",()=>window.print());
         document.getElementById("closePlansAction").addEventListener("click",()=>window.close());
