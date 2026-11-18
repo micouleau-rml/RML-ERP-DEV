@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V44.10</title>
+<title>RML ERP — V45.1</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -787,10 +787,10 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V44.10</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V45.1</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
-<div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
+<div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
 <section id="rmlTour" class="view">
 <style>
 #rmlTour .tour-layout{display:grid;grid-template-columns:minmax(280px,1fr) minmax(0,1.6fr);gap:18px}
@@ -4286,7 +4286,10 @@ async function openPreparation(jobId){
   updateJobDocumentSourceUI();
  },0);
 }
-function closePreparation(){const id=currentPrepSourceJobId;go('chantiers');if(id)setTimeout(()=>openJob(id),0)}
+function closePreparation(){
+ go('chantiers');
+ window.scrollTo({top:0,behavior:'instant'});
+}
 function buildPrepPayload(){return {version:'ERP-V0.6',saved_at:new Date().toISOString(),info:{date:prepDate.value,horaires:prepHoraires.value,acces:prepAcces.value,chef:prepChef.value,remarques:prepRemarques.value},sections:collectPrepSections()}}
 async function savePreparation(){if(!hasPerm('preparation')||!currentPrepJobId)return;setPrepStatus('Enregistrement…','');const payload=buildPrepPayload();const row={chantier_id:currentPrepJobId,module:'preparation',entity_type:'chantier',entity_id:currentPrepJobId,payload,deleted:false};const {error}=await sb.from('erp_modules_data').upsert(row,{onConflict:'module,entity_type,entity_id'});if(error){setPrepStatus('Erreur Supabase : '+error.message,'danger');alert('Erreur Supabase : '+error.message);return}setPrepStatus('Préparation enregistrée. Mise à jour du Suivi et des besoins Commandes…','');await syncPreparationDestinations(currentPrepJobId,payload);setPrepStatus('Préparation enregistrée · Suivi et besoins Commandes mis à jour.','ok')}
 function openPreparationSelector(){if(!hasPerm('preparation'))return;const rows=db.chantiers.filter(j=>j.statut!=='archive').sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));prepJobSelect.innerHTML='<option value="">Sélectionner un chantier…</option>'+rows.map(j=>`<option value="${j.id}">${esc(clientName(j.client_id))} — ${esc(j.nom)}</option>`).join('');openModal('prepSelectModal')}
@@ -4572,6 +4575,9 @@ async function rmlNavigateFromCatalog(view){
 }
 window.addEventListener('beforeunload',e=>{if(document.getElementById('rmlCatalogView')?.classList.contains('active')&&rmlCatalogHasChanges()){e.preventDefault();e.returnValue='';}});
 function go(view){
+ const closeJobSheet=document.getElementById('rmlCloseJobSheet');
+ if(closeJobSheet)closeJobSheet.hidden=view!=='preparation';
+
 if(view!=='commandes'&&document.getElementById('commandes')?.classList.contains('active')){
  document.getElementById('commandesFrame')?.contentWindow?.postMessage({type:'RML_ERP_SAVE_ORDER_DRAFT'},window.location.origin);
 }
@@ -5844,11 +5850,42 @@ function rmlPrintJobPreview(){
  w.document.open();w.document.write('<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche chantier RML</title><style>body{font-family:Arial,sans-serif;color:#18334b;margin:22px;font-size:13px}h2{font-size:21px}h3{font-size:16px}table{page-break-inside:auto}tr{page-break-inside:avoid}section{break-inside:avoid}@page{size:A4;margin:12mm}</style></head><body>'+rmlJobPreviewPrintable+'</body></html>');w.document.close();w.focus();setTimeout(()=>w.print(),350);
 }
 
+async function rmlChangeJobStatus(select){
+ if(!hasPerm('chantiers'))return;
+ const id=select.dataset.jobStatus;
+ const job=db.chantiers.find(item=>String(item.id)===id);
+ if(!job)return;
+ const previous=job.statut;
+ const desired=select.value;
+ if(desired===previous)return;
+ if(![...jobStatut.options].some(option=>option.value===desired)){
+   select.value=previous;
+   return;
+ }
+ const controls=[...document.querySelectorAll('[data-job-status]')].filter(control=>control.dataset.jobStatus===id);
+ controls.forEach(control=>control.disabled=true);
+ try{
+   const {data,error}=await sb.from('erp_chantiers')
+     .update({statut:desired}).eq('id',id).eq('statut',previous)
+     .select('*').maybeSingle();
+   if(error)throw error;
+   if(!data || data.statut!==desired)
+     throw new Error('Le changement n’a pas été confirmé. Le chantier a peut-être été modifié sur un autre appareil. Actualisez la liste.');
+   Object.assign(job,data);
+   renderAll();
+   setSync(true,'Statut du chantier enregistré dans Supabase');
+ }catch(error){
+   controls.forEach(control=>control.value=previous);
+   alert('Statut non enregistré : '+(error.message||String(error)));
+ }finally{
+   controls.forEach(control=>control.disabled=false);
+ }
+}
 function renderJobs(){
  const q=jobSearch.value.trim().toLowerCase(),f=jobFilter.value,activity=document.getElementById('jobActivityFilter')?.value||'tous';
  const rows=db.chantiers.filter(j=>{const hit=!q||[j.nom,j.adresse,j.contact_nom,j.chef_equipe,clientName(j.client_id)].join(' ').toLowerCase().includes(q);return hit&&(f==='tous'||j.statut===f)&&(activity==='tous'||(activity==='non_classe'?!rmlJobActivities(j).length:rmlJobActivities(j).includes(activity)))}).sort((a,b)=>(b.updated_at||'').localeCompare(a.updated_at||''));
  if(!rows.length){jobsTable.innerHTML='<div class="empty">Aucun chantier correspondant.</div>';return}
- const statuses={actif:'ACTIF',attente:'EN ATTENTE',en_cours:'EN COURS',termine:'TERMINÉ',archive:'ARCHIVÉ',sav:'SAV'};
+ const statuses={actif:'ACTIF',attente:'EN ATTENTE',en_cours:'EN COURS',termine:'TERMINÉ',archive:'ARCHIVÉ',opr:'OPR',sav:'SAV'};
  const selected=f==='tous'?Object.keys(statuses):[f];
  let html='';
  for(const st of selected){const group=rows.filter(j=>j.statut===st);if(!group.length)continue;
@@ -5856,7 +5893,7 @@ function renderJobs(){
  const categories=activity==='tous'?[...Object.keys(RML_ACTIVITIES),'non_classe']:[activity];
  for(const cat of categories){const subset=group.filter(j=>cat==='non_classe'?!rmlJobActivities(j).length:rmlJobActivities(j).includes(cat));if(!subset.length)continue;
  html+='<details open style="margin:7px 0;border:1px solid #e2e8f0;border-radius:9px"><summary style="padding:10px;cursor:pointer;font-weight:800">'+(RML_ACTIVITIES[cat]||'Non classé')+' ('+subset.length+')</summary><div class="tablewrap"><table class="table"><thead><tr><th>Client</th><th>Chantier</th><th>Contact chantier</th><th>Statut</th><th>Activités</th><th>Créé le</th><th>Date programmée</th></tr></thead><tbody>';
- html+=subset.map(j=>`<tr><td><strong>${esc(clientName(j.client_id))}</strong></td><td><strong>${esc(j.nom)}</strong><br><span class="muted">${esc(j.adresse||'')}</span></td><td>${esc(j.contact_nom||'Non renseigné')}</td><td><span class="rml-individual-status rml-status-${esc(j.statut||'attente')}">${esc(statuses[j.statut]||j.statut||'Non défini')}</span></td><td>${rmlActivitiesHtml(j)}</td><td>${formatDateFR(j.created_at)}</td><td>${formatDateFR(j.date_debut)}</td></tr><tr class="rml-job-actions-row"><td colspan="7"><div class="actions"><button class="btn secondary" onclick="rmlPreviewJob('${j.id}')">Visualiser</button><button onclick="openJob('${j.id}')">Ouvrir</button>${hasPerm('suivi')?`<button class="btn secondary" onclick="openSuivi('${j.id}')">Suivi chantier</button>`:''}${j.statut==='sav'?`<button class="btn secondary" onclick="rmlSavOpen('${j.id}')">Dossier SAV / signature</button>`:['archive','termine'].includes(j.statut)?`<button class="btn secondary" onclick="rmlSavOpen('${j.id}')">Créer / ouvrir fiche SAV</button>`:''}<button class="btn secondary" onclick="openJobHistory('${j.id}')">Historique interventions</button><button class="btn secondary" onclick="rmlFinishMail('${j.id}')">✉ Avis fin de travaux</button>${hasPerm('chantiers')?`<button onclick="editJob('${j.id}')">Modifier</button>${hasPerm('analyse')?`<button class="btn secondary" onclick="openAnalyse('${j.id}')">Analyse chantier</button>`:''}<button style="background:#fdecec;color:var(--danger)" onclick="deleteJob('${j.id}')">Supprimer</button>`:''}</div></td></tr>`).join('');
+ html+=subset.map(j=>`<tr><td><strong>${esc(clientName(j.client_id))}</strong></td><td><strong>${esc(j.nom)}</strong><br><span class="muted">${esc(j.adresse||'')}</span></td><td>${esc(j.contact_nom||'Non renseigné')}</td><td>${hasPerm('chantiers')?`<select aria-label="Statut du chantier ${esc(j.nom)}" data-job-status="${esc(j.id)}" class="rml-individual-status rml-status-${esc(j.statut||'attente')}" onchange="rmlChangeJobStatus(this)">${Object.entries(statuses).map(([value,label])=>`<option value="${value}" ${value===j.statut?'selected':''}>${label}</option>`).join('')}</select>`:`<span class="rml-individual-status rml-status-${esc(j.statut||'attente')}">${esc(statuses[j.statut]||j.statut||'Non défini')}</span>`}</td><td>${rmlActivitiesHtml(j)}</td><td>${formatDateFR(j.created_at)}</td><td>${formatDateFR(j.date_debut)}</td></tr><tr class="rml-job-actions-row"><td colspan="7"><div class="actions"><button class="btn secondary" onclick="rmlPreviewJob('${j.id}')">Visualiser</button><button onclick="openJob('${j.id}')">Ouvrir</button>${hasPerm('suivi')?`<button class="btn secondary" onclick="openSuivi('${j.id}')">Suivi chantier</button>`:''}${j.statut==='sav'?`<button class="btn secondary" onclick="rmlSavOpen('${j.id}')">Dossier SAV / signature</button>`:['archive','termine'].includes(j.statut)?`<button class="btn secondary" onclick="rmlSavOpen('${j.id}')">Créer / ouvrir fiche SAV</button>`:''}<button class="btn secondary" onclick="openJobHistory('${j.id}')">Historique interventions</button><button class="btn secondary" onclick="rmlFinishMail('${j.id}')">✉ Avis fin de travaux</button>${hasPerm('chantiers')?`<button onclick="editJob('${j.id}')">Modifier</button>${hasPerm('analyse')?`<button class="btn secondary" onclick="openAnalyse('${j.id}')">Analyse chantier</button>`:''}<button style="background:#fdecec;color:var(--danger)" onclick="deleteJob('${j.id}')">Supprimer</button>`:''}</div></td></tr>`).join('');
  html+='</tbody></table></div></details>';
  }html+='</div></details>';
  }jobsTable.innerHTML=html||'<div class="empty">Aucun chantier correspondant.</div>';
