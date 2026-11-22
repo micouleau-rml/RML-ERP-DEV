@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V45.10</title>
+<title>RML ERP — V46</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -792,7 +792,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V45.10</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -8749,10 +8749,17 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V31.6';
+const RML_ERP_VERSION='V46';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
+// Marque uniquement un taux spécifique explicitement choisi, notamment 0 %.
+// Les anciens zéros non marqués reprennent désormais le paramètre général.
+const rmlFinOverheadMarker='[RML_FIN_OVERHEAD_SPECIFIC_V46]';
+function rmlFinCleanNotes(notes){return String(notes||'').split(rmlFinOverheadMarker).join('');}
+function rmlFinHasSpecificOverhead(data){
+ return data?.overhead_pct!=null && (rmlFinNum(data.overhead_pct)!==0 || String(data.notes||'').includes(rmlFinOverheadMarker));
+}
 function rmlFinField(k,label,unit='€',step='0.01'){
  const v=rmlFinData?.[k]??0;
  return `<label class="field"><span>${esc(label)} (${esc(unit)})</span><input data-fin="${k}" type="number" min="0" step="${step}" value="${esc(v)}" oninput="rmlFinRecalc()"></label>`;
@@ -8778,19 +8785,32 @@ function rmlFinRender(){
  <div class="analysis-grid"><div class="analysis-card"><h3>Chiffre d’affaires HT</h3><div class="grid2">${rmlFinField('ca_devis','Devis initial')}${rmlFinField('ca_avenants','Avenants')}</div></div>
  <div class="analysis-card"><h3>Achats et dépenses HT</h3><div class="grid2">${rmlFinField('materiaux','Matériaux consommés au prix d’achat')}${rmlFinField('sous_traitance','Sous-traitance')}${rmlFinField('autres','Autres dépenses')}</div></div>
  <div class="analysis-card"><h3>Main-d’œuvre</h3><div class="grid2">${rmlFinField('heures_chantier','Heures productives','h')}${rmlFinField('cout_horaire_moyen','Coût horaire chargé moyen','€/h')}</div><div class="analysis-note">Version initiale : coût moyen pondéré à renseigner. La ventilation automatique par salarié sera intégrée après vérification des données RML Heures.</div></div>
- <div class="analysis-card"><h3>Déplacements</h3><div class="grid2">${rmlFinField('heures_trajet','Heures de trajet','h')}${rmlFinField('cout_horaire_trajet','Coût horaire chargé du trajet','€/h')}${rmlFinField('kilometres','Kilomètres','km')}${rmlFinField('km_rate','Coût kilométrique (0 = paramètre général)','€/km')}${rmlFinField('overhead_pct','Frais généraux (0 = 0 %, vide = général)','%')}</div></div></div>
+ <div class="analysis-card"><h3>Déplacements</h3><div class="grid2">${rmlFinField('heures_trajet','Heures de trajet','h')}${rmlFinField('cout_horaire_trajet','Coût horaire chargé du trajet','€/h')}${rmlFinField('kilometres','Kilomètres','km')}${rmlFinField('km_rate','Coût kilométrique (0 = paramètre général)','€/km')}</div></div></div>
+ <div class="analysis-card" style="margin-top:12px;background:#edf5ff"><h3>Frais généraux</h3><p id="rmlFinOverheadApplied" role="status"></p><label style="display:flex;align-items:center;gap:10px"><input id="rmlFinSpecificOverhead" type="checkbox" style="width:auto" ${rmlFinHasSpecificOverhead(rmlFinData)?'checked':''} onchange="rmlFinRecalc()"> Taux spécifique à ce chantier</label><div id="rmlFinSpecificOverheadBox" style="margin-top:10px"><label class="field">Taux spécifique (%)<input data-fin="overhead_pct" type="number" min="0" step="0.01" value="${esc(rmlFinHasSpecificOverhead(rmlFinData)?rmlFinData.overhead_pct:rmlFinNum(rmlFinSettings?.overhead_pct))}" oninput="rmlFinRecalc()"></label><div class="analysis-note">Saisissez 0 pour appliquer explicitement 0 % à ce chantier.</div></div></div>
  <div id="rmlFinTotals" class="analysis-card" style="margin-top:12px"></div>
- <label class="field" style="margin-top:10px">Observations<textarea data-fin="notes" rows="2" oninput="rmlFinRecalc()">${esc(rmlFinData.notes||'')}</textarea></label>
+ <label class="field" style="margin-top:10px">Observations<textarea data-fin="notes" rows="2" oninput="rmlFinRecalc()">${esc(rmlFinCleanNotes(rmlFinData.notes))}</textarea></label>
  <button class="btn ok" onclick="rmlFinSave()">Enregistrer l’analyse dans Supabase</button> <span id="rmlFinStatus" class="muted"></span>
  <div class="analysis-note">Accès : administrateur ou collaborateur autorisé « Analyse chantier ». La base applique également des règles RLS (SQL V23).</div></div>`;
  rmlFinRecalc();
 }
 function rmlFinValues(){
- const o={...rmlFinData};document.querySelectorAll('#financePanel [data-fin]').forEach(e=>{o[e.dataset.fin]=e.dataset.fin==='notes'?e.value:(e.value===''&&e.dataset.fin==='overhead_pct'?null:rmlFinNum(e.value))});return o;
+ const o={...rmlFinData};
+ document.querySelectorAll('#financePanel [data-fin]').forEach(e=>{
+  o[e.dataset.fin]=e.dataset.fin==='notes'?e.value:rmlFinNum(e.value);
+ });
+ const specific=document.getElementById('rmlFinSpecificOverhead')?.checked===true;
+ if(!specific)o.overhead_pct=null;
+ o.notes=rmlFinCleanNotes(o.notes)+(specific?rmlFinOverheadMarker:'');
+ return o;
 }
 function rmlFinRecalc(){
  const d=rmlFinValues(),ca=rmlFinNum(d.ca_devis)+rmlFinNum(d.ca_avenants);
  const taux=d.overhead_pct===null?rmlFinNum(rmlFinSettings?.overhead_pct):rmlFinNum(d.overhead_pct);
+ const specific=document.getElementById('rmlFinSpecificOverhead')?.checked===true;
+ const box=document.getElementById('rmlFinSpecificOverheadBox');
+ if(box){box.hidden=!specific;const input=box.querySelector('input');if(input)input.disabled=!specific;}
+ const applied=document.getElementById('rmlFinOverheadApplied');
+ if(applied)applied.textContent=(specific?'Taux spécifique appliqué : ':'Paramètre général appliqué automatiquement : ')+taux+' % du chiffre d’affaires HT — '+rmlFinEur(ca*taux/100);
  const kmRate=rmlFinNum(d.km_rate)||rmlFinNum(rmlFinSettings?.km_rate);
  const mo=rmlFinNum(d.heures_chantier)*rmlFinNum(d.cout_horaire_moyen);
  const trajet=rmlFinNum(d.heures_trajet)*rmlFinNum(d.cout_horaire_trajet);
