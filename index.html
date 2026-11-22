@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V45.8</title>
+<title>RML ERP — V45.10</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -792,7 +792,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V45.8</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V45.10</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="modules" class="nav-modules-v1920">Modules ERP</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -879,7 +879,7 @@ body.rml-preparation-preview-open{overflow:hidden}
   <div class="panel">
     <div class="employee-hero"><div><h2 style="margin:0">Mon espace salarié</h2><div class="muted">Vos chantiers, feuilles chantier, documents et photos terrain.</div></div><button class="btn secondary" type="button" onclick="loadEmployeePortal()">Actualiser</button></div>
     <div class="panel" id="employeeMileagePanel" style="margin:12px 0;padding:15px"><h3 style="margin:0 0 8px">Kilométrage du fourgon — fin de journée</h3><div class="muted">Saisissez le kilométrage total affiché au compteur, et non les kilomètres parcourus aujourd’hui. La valeur sera transmise à Maintenance.</div><div class="grid2" style="margin-top:12px"><div class="field"><label>Fourgon (nom et immatriculation)</label><select id="employeeMileageVehicle"><option value="">Chargement des fourgons…</option></select></div><div class="field"><label>Kilométrage total au compteur</label><input id="employeeMileageTotal" type="number" min="0" step="1" inputmode="numeric" placeholder="Ex. 125430"></div></div><div class="actions" style="margin-top:10px"><button class="btn ok rml-mileage-save" type="button" onclick="saveEmployeeMileage()">Enregistrer le kilométrage</button></div><div id="employeeMileageStatus" class="muted" style="margin-top:8px"></div></div><div id="employeePortalStatus" class="notice" style="margin-top:12px">Chargement…</div>
-    <div id="employeePortalList" class="employee-grid"></div>
+    <button id="employeeTourMapBtn" class="btn" type="button" hidden style="margin:12px 0;background:#087b72;color:white" onclick="go('rmlTour')">Carte de tournée — mes chantiers</button><div id="employeePortalList" class="employee-grid"></div>
   </div>
 </section>
 <section id="clients" class="view"><div class="panel client-panel">
@@ -4551,10 +4551,51 @@ function rmlTeamLabel(number){return Number(number)===8?'Atelier':'Équipe '+num
 function roleLabel(r){return ({administrateur:'Administrateur',direction:'Direction',collaborateur:'Collaborateur',chef_equipe:'Chef d’équipe',ouvrier:'Ouvrier',atelier:'Atelier',lecture:'Lecture seule',sous_traitant:'Sous-traitant'})[r]||r||'—'}
 function isSubcontractorUser(){return currentAccess?.role==='sous_traitant'}
 function isEmployeeUser(){return ['ouvrier','chef_equipe'].includes(currentAccess?.role)}
+function rmlEmployeeCanTourMap(){
+ const team=Number(employeeAccount?.team_number);
+ return !!currentAccess?.active&&isEmployeeUser()&&employeeAccount?.auth_user_id===currentUser?.id&&employeeAccount?.active===true&&Number.isInteger(team)&&team>=1&&team<=7;
+}
+function rmlCanTourMap(){
+ return isEmployeeUser()?rmlEmployeeCanTourMap():!isSubcontractorUser()&&hasPerm('chantiers');
+}
+function rmlUpdateEmployeeTourAccess(){
+ const visible=rmlEmployeeCanTourMap();
+ const button=document.getElementById('employeeTourMapBtn');
+ if(button)button.hidden=!visible;
+ const nav=document.querySelector('#mainNav [data-view="rmlTour"]');
+ if(nav&&isEmployeeUser())nav.style.display=visible?'':'none';
+}
+async function rmlTourVisibleJobs(){
+ if(!isEmployeeUser())return rmlCanTourMap()?(db.chantiers||[]):[];
+ const userId=currentUser?.id;
+ if(!userId||!currentAccess?.active)return [];
+ const {data:account,error:accountError}=await sb.from('erp_employee_accounts').select('*').eq('auth_user_id',userId).eq('active',true).maybeSingle();
+ if(accountError)throw accountError;
+ if(currentUser?.id!==userId||!isEmployeeUser())return [];
+ employeeAccount=account||null;
+ rmlUpdateEmployeeTourAccess();
+ if(!rmlEmployeeCanTourMap())return [];
+ const start=employeeTodayISO(),end=employeePlusDaysISO(30),team=Number(account.team_number);
+ const {data:rows,error}=await sb.rpc('erp_get_my_team_planning',{p_start:start,p_end:end});
+ if(error)throw error;
+ if(currentUser?.id!==userId||!rmlEmployeeCanTourMap())return [];
+ const jobs=new Map();
+ for(const row of rows||[]){
+  if(Number(row.team_number)!==team||!row.chantier_id||row.assignment_date<start||row.assignment_date>end)continue;
+  if(!jobs.has(row.chantier_id))jobs.set(row.chantier_id,{
+   id:row.chantier_id,client_id:row.client_id,client_nom:row.client_nom,nom:row.chantier_nom,
+   adresse:row.chantier_adresse,contact_nom:row.contact_nom,contact_telephone:row.contact_telephone,
+   notes:row.chantier_notes,statut:row.chantier_statut,assignment_date:row.assignment_date
+  });
+ }
+ return [...jobs.values()];
+}
 function applyAccessUI(){
+  rmlUpdateEmployeeTourAccess();
   if(isSubcontractorUser()||isEmployeeUser()){
     document.querySelectorAll('#mainNav button').forEach(b=>b.style.display='none');
     const homeBtn=document.querySelector('#mainNav [data-view="dashboard"]');if(homeBtn){homeBtn.style.display='';homeBtn.textContent='Mon espace'}
+    rmlUpdateEmployeeTourAccess();
     const a8=document.getElementById('rmlAtelier8Nav');if(a8&&isEmployeeUser()&&Number(employeeAccount?.team_number)===8)a8.style.display='inline-flex';
     const employeeClientsBtn=document.querySelector('#mainNav [data-view="clients"]');if(employeeClientsBtn)employeeClientsBtn.style.display=hasPerm('clients')?'':'none';
     if(typeof window.rmlV42Nav==='function')window.rmlV42Nav();
@@ -4608,8 +4649,8 @@ if(view!=='commandes'&&document.getElementById('commandes')?.classList.contains(
 
 if(document.getElementById('rmlCatalogView')?.classList.contains('active')&&view!=='rmlCatalogView'&&rmlCatalogHasChanges()){rmlNavigateFromCatalog(view);return;}
 
-if(isSubcontractorUser()){view='subPortal'}else if(isEmployeeUser() && view!=='atelierPliage8' && !(view==='clients'&&hasPerm('clients')) && !(currentAccess?.role==='chef_equipe'&&view==='suivi')){view='employeePortal'}
-if(view==='rmlTour'&&!hasPerm('chantiers'))view='dashboard';
+if(isSubcontractorUser()){view='subPortal'}else if(isEmployeeUser() && !(view==='rmlTour'&&rmlEmployeeCanTourMap()) && view!=='atelierPliage8' && !(view==='clients'&&hasPerm('clients')) && !(currentAccess?.role==='chef_equipe'&&view==='suivi')){view='employeePortal'}
+if(view==='rmlTour'&&!rmlCanTourMap())view='dashboard';
 if(view==='rmlTour')requestAnimationFrame(()=>window.rmlOpenTourMap?.());
 if(view==='atelierPliage8'&&!rmlCanAtelier8())view=isEmployeeUser()?'employeePortal':'dashboard';
 if(view==='atelierPliage8')setTimeout(rmlLoadAtelier8,0);if(view==='preparation')setTimeout(()=>{loadPreparationApp();if(currentPrepJobId)loadJobDocumentsPanel(currentPrepJobId);},0);if(view==='stock'&&!hasPerm('stock'))view='dashboard';if(view==='equipes'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='clients'&&!hasPerm('clients'))view='dashboard';if(view==='chantiers'&&!hasPerm('chantiers'))view='dashboard';if(view==='users'&&!hasPerm('utilisateurs'))view='dashboard';if(view==='suivi'&&!hasPerm('suivi'))view='dashboard';if(view==='atelier'&&!hasPerm('pliage'))view='dashboard';if(view==='heures'&&!hasPerm('heures'))view='dashboard';if(view==='planning'&&!hasPerm('planning'))view='dashboard';if(view==='maintenance'&&!hasPerm('materiel'))view='dashboard';if(view==='documents'&&!hasPerm('documents'))view='dashboard';if(view==='analyse'&&!hasPerm('analyse'))view='dashboard';if(view==='sous-traitants'&&!hasPerm('sous_traitants'))view='dashboard';if(view==='security'&&currentAccess?.role!=='administrateur')view='dashboard';document.body.classList.toggle('rml-commandes-workspace',view==='commandes');document.body.classList.toggle('rml-pliage-workspace',view==='atelier');document.body.classList.toggle('rml-module-workspace',!['dashboard','subPortal','employeePortal'].includes(view));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('#mainNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='clients')renderClients();if(view==='stock')loadStock();if(view==='chantiers')renderJobs();if(view==='atelier')loadAtelier();if(view==='heures')loadHours();if(view==='planning')loadPlanning();if(view==='equipes')loadTeamsAdmin();if(view==='maintenance')loadMaintenance();if(view==='documents')loadDocuments();if(view==='analyse')initAnalysis();if(view==='sous-traitants')loadSubcontractors();if(view==='subPortal')loadSubcontractorPortal();if(view==='employeePortal')loadEmployeePortal();if(view==='users')renderUsers();if(view==='security'){renderResetStats();rmlMonitorRefresh();setTimeout(v37Init,0);}if(view==='page-forecast')renderMonthlyForecast();
@@ -4726,7 +4767,7 @@ async function loadEmployeePortal(){
  employeePortalStatus.className='notice';employeePortalStatus.textContent='Chargement de votre planning…';employeePortalList.innerHTML='';
  try{
   const {data:link,error:le}=await sb.from('erp_employee_accounts').select('*').eq('auth_user_id',currentUser.id).eq('active',true).maybeSingle();if(le)throw le;
-  employeeAccount=link||null;const mileagePanel=document.getElementById('employeeMileagePanel');if(mileagePanel)mileagePanel.style.display=Number(employeeAccount?.team_number)===8?'none':'';if(Number(employeeAccount?.team_number)!==8)loadEmployeeMileageVehicles();if(Number(employeeAccount?.team_number)===8){const a8=document.getElementById('rmlAtelier8Nav');if(a8)a8.style.display='inline-flex';}
+  employeeAccount=link||null;rmlUpdateEmployeeTourAccess();const mileagePanel=document.getElementById('employeeMileagePanel');if(mileagePanel)mileagePanel.style.display=Number(employeeAccount?.team_number)===8?'none':'';if(Number(employeeAccount?.team_number)!==8)loadEmployeeMileageVehicles();if(Number(employeeAccount?.team_number)===8){const a8=document.getElementById('rmlAtelier8Nav');if(a8)a8.style.display='inline-flex';}
   if(!employeeAccount){employeePortalStatus.className='notice warn';employeePortalStatus.textContent='Votre compte salarié n’est pas encore rattaché à une équipe permanente. Demandez à un administrateur de choisir votre équipe dans Utilisateurs & accès.';return}
   const start=employeeTodayISO(),end=employeePlusDaysISO(30),teamNumber=Number(employeeAccount.team_number);
   const {data:rows,error:pe}=await sb.rpc('erp_get_my_team_planning',{p_start:start,p_end:end});if(pe)throw pe;
@@ -4738,7 +4779,7 @@ async function loadEmployeePortal(){
   employeePortalStatus.className='notice';employeePortalStatus.textContent=`${employeeAccount.team_number?rmlTeamLabel(employeeAccount.team_number):'Salarié'} · ${employeeAssignments.length} affectation(s) aujourd’hui et dans les 30 prochains jours.`;
   if(!employeeAssignments.length){employeePortalList.innerHTML='<div class="empty">Aucun chantier ne vous est actuellement affecté dans le planning sur les 30 prochains jours.</div>';return}
   const grouped=new Map();employeeAssignments.forEach(a=>{const k=a.date+'|'+a.chantier_id;if(!grouped.has(k))grouped.set(k,a)});
-  employeePortalList.innerHTML=[...grouped.values()].map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id),today=a.date===start,future=a.date>start;return `<div class="employee-job ${today?'today':future?'future':''}"><div class="employee-date">${today?'AUJOURD’HUI · ':future?'À VENIR · ':''}${new Date(a.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long'})}</div><h3 style="margin:0 0 5px">${esc(j?.nom||'Chantier')}</h3><div><strong>${esc(c?.nom||'')}</strong></div>${j?.adresse?`<div class="muted">${esc(j.adresse)}</div>`:''}${j?.contact_nom?`<div style="margin-top:7px"><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j?.notes?`<div class="notice" style="margin-top:9px">${esc(j.notes)}</div>`:''}<div class="actions" style="margin-top:12px"><button class="btn rml-job-docs" onclick="openEmployeeJobFolder('${j?.id||''}','${a.date}')">Feuille chantier / Documents</button>${String(j?.statut||'').toLowerCase()==='sav'?`<button class="btn ok" type="button" onclick="rmlSavOpen('${j?.id||''}')">Fiche SAV / signature client</button>`:''}<button class="btn secondary rml-job-history" onclick="openJobHistory('${j?.id||''}')">Historique interventions</button>${currentAccess?.role==='chef_equipe'?`<button class="btn secondary" onclick="openSuivi('${j?.id||''}')">Suivi chantier</button>`:''}</div></div>`}).join('');
+  employeePortalList.innerHTML=[...grouped.values()].map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id),today=a.date===start,future=a.date>start;return `<div class="employee-job ${today?'today':future?'future':''}"><div class="employee-date">${today?'AUJOURD’HUI · ':future?'À VENIR · ':''}${new Date(a.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long'})}</div><h3 style="margin:0 0 5px">${esc(j?.nom||'Chantier')}</h3><div><strong>${esc(c?.nom||'')}</strong></div>${j?.adresse?`<div class="muted">${esc(j.adresse)}</div>`:''}${j?.contact_nom?`<div style="margin-top:7px"><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j?.notes?`<div class="notice" style="margin-top:9px">${esc(j.notes)}</div>`:''}<div class="actions" style="margin-top:12px">${rmlEmployeeCanTourMap()?`<button class="btn ok" type="button" onclick="rmlDownloadEmployeeJob('${j?.id||''}')">Télécharger hors connexion</button>`:''}<button class="btn rml-job-docs" onclick="openEmployeeJobFolder('${j?.id||''}','${a.date}')">Feuille chantier / Documents</button>${String(j?.statut||'').toLowerCase()==='sav'?`<button class="btn ok" type="button" onclick="rmlSavOpen('${j?.id||''}')">Fiche SAV / signature client</button>`:''}<button class="btn secondary rml-job-history" onclick="openJobHistory('${j?.id||''}')">Historique interventions</button>${currentAccess?.role==='chef_equipe'?`<button class="btn secondary" onclick="openSuivi('${j?.id||''}')">Suivi chantier</button>`:''}</div></div>`}).join('');
  }catch(err){console.error(err);employeePortalStatus.className='notice danger';employeePortalStatus.textContent='Espace salarié indisponible : '+err.message}
 }
 function employeePreparationReadOnlyHtml(payload){const sections=payload?.sections||{};let html='';Object.entries(PREP_SCHEMAS).forEach(([key,schema])=>{const rows=prepFilledRows(sections[key]||[]);if(!rows.length)return;html+=`<div class="readonly-prep-table" style="margin-top:12px"><strong>${esc(schema.label)}</strong><div class="prep-tablewrap" style="margin-top:6px"><table class="prep-table"><thead><tr>${schema.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${schema.fields.map((f,i)=>`<td data-label="${esc(schema.headers[i]||'')}">${esc(r[f[0]]||'')}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>`});return html||'<div class="empty">Aucun quantitatif renseigné dans la préparation chantier.</div>'}
@@ -4756,7 +4797,7 @@ async function openEmployeeJobFolder(jobId,date){
  const dh=employeeFiles.length?`<div class="employee-docs">${employeeFiles.map(d=>`<div class="employee-doc"><div><strong>${esc(d.file_name)}</strong><div class="muted">${esc(d.category||'Document')}${d.note?' · '+esc(d.note):''}</div></div><button class="btn secondary" onclick="openEmployeeDocument('${d.id}','${jobId}')">Ouvrir / imprimer</button></div>`).join('')}</div>`:'<div class="empty">Aucun document visible pour les salariés.</div>';
  const ph=employeePhotos.length?`<div class="employee-docs" style="margin-top:10px">${employeePhotos.map(d=>`<div class="employee-doc"><div><strong>${esc(d.file_name||'Photo')}</strong><div class="muted">${d.note?esc(d.note):'Photo du chantier'}</div></div><button class="btn secondary" onclick="openEmployeeDocument('${d.id}','${jobId}')">Voir la photo</button></div>`).join('')}</div>`:'<div class="empty" style="margin-top:10px">Aucune photo visible pour les salariés sur ce chantier.</div>';
  const qh=employeePreparationReadOnlyHtml(fd.preparation);
- employeeJobBody.innerHTML=`<div class="panel" style="padding:14px"><h3 style="margin-top:0">Informations chantier</h3><div><strong>Date :</strong> ${new Date(date+'T12:00:00').toLocaleDateString('fr-FR').replaceAll('/','-')}</div><div><strong>Client :</strong> ${esc(c?.nom||'')}</div><div><strong>Chantier :</strong> ${esc(j.nom)}</div>${j.adresse?`<div><strong>Adresse :</strong> ${esc(j.adresse)}</div>`:''}${j.contact_nom?`<div><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j.notes?`<div style="margin-top:8px"><strong>Consignes :</strong><br>${esc(j.notes).replace(/\n/g,'<br>')}</div>`:''}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Temps passé par l’équipe</h3><div class="muted">Saisissez la durée réellement passée par l’équipe sur ce chantier pour cette journée.</div><div class="grid2" style="margin-top:10px"><div class="field"><label>Durée (heures)</label><input id="employeeTeamHours" type="number" min="0" max="24" step="0.25" placeholder="Ex. 4,5"></div><div class="field"><label>Observation</label><input id="employeeTeamHoursNote" placeholder="Facultatif"></div></div><div class="actions" style="margin-top:10px"><button class="btn ok" type="button" onclick="saveEmployeeTeamTime('${jobId}','${date}')">Enregistrer le temps passé</button></div><div id="employeeTeamHoursStatus" class="muted" style="margin-top:8px"></div></div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Quantitatifs / travaux à réaliser</h3><div class="muted">Consultation uniquement — les quantités ne peuvent pas être modifiées depuis l’espace salarié.</div>${qh}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Plans, photos et documents</h3>${dh}</div><div class="employee-photo-box"><h3 style="margin-top:0">Photos du chantier</h3>${ph}<div class="muted" style="margin-top:12px">Ajouter une photo directement dans ce chantier.</div><div class="actions" style="margin-top:10px"><button class="btn" type="button" onclick="document.getElementById('employeeCameraInput').click()">Prendre une photo</button><button class="btn secondary" type="button" onclick="document.getElementById('employeePhotoInput').click()">Choisir dans la photothèque</button></div><input id="employeeCameraInput" type="file" accept="image/*" capture="environment" hidden onchange="uploadEmployeePhotos('${jobId}','${date}','employeeCameraInput')"><input id="employeePhotoInput" type="file" accept="image/*" multiple hidden onchange="uploadEmployeePhotos('${jobId}','${date}','employeePhotoInput')"></div>`;
+ employeeJobBody.innerHTML=`${rmlEmployeeCanTourMap()?`<div class="actions" style="margin-bottom:12px"><button class="btn ok" type="button" onclick="rmlDownloadEmployeeJob('${jobId}')">Télécharger le dossier hors connexion</button></div>`:''}<div class="panel" style="padding:14px"><h3 style="margin-top:0">Informations chantier</h3><div><strong>Date :</strong> ${new Date(date+'T12:00:00').toLocaleDateString('fr-FR').replaceAll('/','-')}</div><div><strong>Client :</strong> ${esc(c?.nom||'')}</div><div><strong>Chantier :</strong> ${esc(j.nom)}</div>${j.adresse?`<div><strong>Adresse :</strong> ${esc(j.adresse)}</div>`:''}${j.contact_nom?`<div><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j.notes?`<div style="margin-top:8px"><strong>Consignes :</strong><br>${esc(j.notes).replace(/\n/g,'<br>')}</div>`:''}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Temps passé par l’équipe</h3><div class="muted">Saisissez la durée réellement passée par l’équipe sur ce chantier pour cette journée.</div><div class="grid2" style="margin-top:10px"><div class="field"><label>Durée (heures)</label><input id="employeeTeamHours" type="number" min="0" max="24" step="0.25" placeholder="Ex. 4,5"></div><div class="field"><label>Observation</label><input id="employeeTeamHoursNote" placeholder="Facultatif"></div></div><div class="actions" style="margin-top:10px"><button class="btn ok" type="button" onclick="saveEmployeeTeamTime('${jobId}','${date}')">Enregistrer le temps passé</button></div><div id="employeeTeamHoursStatus" class="muted" style="margin-top:8px"></div></div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Quantitatifs / travaux à réaliser</h3><div class="muted">Consultation uniquement — les quantités ne peuvent pas être modifiées depuis l’espace salarié.</div>${qh}</div><div class="panel" style="padding:14px;margin-top:12px"><h3 style="margin-top:0">Plans, photos et documents</h3>${dh}</div><div class="employee-photo-box"><h3 style="margin-top:0">Photos du chantier</h3>${ph}<div class="muted" style="margin-top:12px">Ajouter une photo directement dans ce chantier.</div><div class="actions" style="margin-top:10px"><button class="btn" type="button" onclick="document.getElementById('employeeCameraInput').click()">Prendre une photo</button><button class="btn secondary" type="button" onclick="document.getElementById('employeePhotoInput').click()">Choisir dans la photothèque</button></div><input id="employeeCameraInput" type="file" accept="image/*" capture="environment" hidden onchange="uploadEmployeePhotos('${jobId}','${date}','employeeCameraInput')"><input id="employeePhotoInput" type="file" accept="image/*" multiple hidden onchange="uploadEmployeePhotos('${jobId}','${date}','employeePhotoInput')"></div>`;
  await v16LoadReport(jobId,date);
  await loadEmployeeTeamTime(jobId,date);
 }
@@ -4915,7 +4956,7 @@ async function onSignedIn(){
   await refreshData();
   return true;
 }
-logoutBtn.onclick=async()=>{await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
+logoutBtn.onclick=async()=>{employeeAccount=null;employeeAssignments=[];rmlUpdateEmployeeTourAccess();await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
 async function resetClientForm({deferCode=false}={}){clientForm.reset();rmlSetClientType('professionnel');rmlContactLoad('');clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';if(!deferCode){try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)}};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools){clientEditTools.style.display='flex';}if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='none';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='none';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Créer le client';window.rmlClientNewSnapshot=JSON.stringify(readClientForm());updateClientDraftStatus()}
 newClientBtn.onclick=async()=>{if(!hasPerm('clients'))return;await resetClientForm();openModal('clientModal')}
 async function generateClientCodes(count=1){
@@ -10500,10 +10541,13 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
     chantierMarkers.length=0;
     let missing=0;
     const bounds=L.latLngBounds([]);
-    const jobs=(db.chantiers||[]).filter(job=>chantierColors[job.statut]);
+    const visibleJobs=await rmlTourVisibleJobs();
+    if(controller.signal.aborted||!rmlCanTourMap())return;
+    const employeeView=isEmployeeUser();
+    const jobs=visibleJobs.filter(job=>chantierColors[job.statut]);
     for(const job of jobs){
       if(controller.signal.aborted)return;
-      const address=rmlBLJobAddress(job)||job.adresse;
+      const address=employeeView?job.adresse:(rmlBLJobAddress(job)||job.adresse);
       if(!address){missing++;continue;}
       try{
         const located=await locate(address,controller.signal);
@@ -10516,12 +10560,22 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
         });
         const content=document.createElement('div');
         const title=document.createElement('strong');
-        title.textContent=clientName(job.client_id)+' — '+job.nom;
+        title.textContent=(employeeView?job.client_nom:clientName(job.client_id))+' — '+job.nom;
         const info=document.createElement('p');
         info.textContent=style.label+' · '+address;
         const open=document.createElement('button');
         open.type='button';open.textContent='Ouvrir le chantier';
         open.onclick=()=>{
+          if(!rmlCanTourMap())return;
+          if(employeeView){
+            // La feuille salarié utilise le même contrôle d'affectation Supabase.
+            if(!db.chantiers.some(item=>item.id===job.id))db.chantiers.push(job);
+            if(!db.clients.some(item=>item.id===job.client_id))db.clients.push({id:job.client_id,nom:job.client_nom});
+            map.closePopup();
+            if(mapDialog.open)mapDialog.close();
+            openEmployeeJobFolder(job.id,job.assignment_date);
+            return;
+          }
           rmlJobOpenedFromMap=true;
           map.closePopup();
           if(mapDialog.open)mapDialog.close();
@@ -10544,12 +10598,20 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
       summary.id='rmlTourJobSummary';
       byId('rmlTourMapHome').prepend(summary);
     }
-    summary.textContent=(jobs.length-missing)+' chantier(s) sur la carte'+(missing?' · '+missing+' adresse(s) à préciser ou indisponibles':'');
+    summary.textContent=(employeeView?rmlTeamLabel(employeeAccount.team_number)+' · Vos chantiers attribués, aujourd’hui et dans les 30 prochains jours · ':'')+(jobs.length-missing)+' chantier(s) sur la carte'+(missing?' · '+missing+' adresse(s) à préciser ou indisponibles':'');
   }
-  window.rmlOpenTourMap = () => initializeMap().then(() => {
+  window.rmlOpenTourMap = () => {
+    chantierLoad?.abort();
+    chantierLayer?.clearLayers();
+    chantierMarkers.length=0;
+    byId('rmlTourJobSummary')?.remove();
+    invalidate();
+    if(!rmlCanTourMap())return Promise.resolve();
+    return initializeMap().then(() => {
     map.invalidateSize();
     return loadChantierMarkers();
-  }).catch(error => { status.textContent = error.message; });
+  }).catch(error => { status.textContent = 'Carte indisponible : '+error.message; });
+  };
   const mapDialog = byId('rmlTourMapDialog');
   const mapContainer = byId('rmlTourMap');
   const expand = byId('rmlTourExpand');
@@ -10570,6 +10632,8 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
     invalidate();
     chantierLoad?.abort();
     chantierLayer?.clearLayers();
+    chantierMarkers.length=0;
+    byId('rmlTourJobSummary')?.remove();
     addresses.clear();
     routes.clear();
     stops.replaceChildren();
@@ -10577,6 +10641,119 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
     addStop();
   });
 })();
+</script>
+<script>
+// Dossier local autonome : données et fichiers autorisés pour l'équipe connectée.
+let rmlEmployeeDownloadTask=null;
+let rmlEmployeeDownloadUrl=null;
+function rmlOfflineFilename(value){
+ return String(value||'chantier').normalize('NFC').replace(/[\x00-\x1f\x7f<>:"/\\|?*]/g,'_').replace(/^\.+|[. ]+$/g,'').slice(0,110)||'chantier';
+}
+function rmlOfflineText(html){
+ const root=document.createElement('div');root.innerHTML=html;
+ root.querySelectorAll('tr').forEach(row=>row.append('\n'));
+ root.querySelectorAll('td,th').forEach(cell=>cell.append(' | '));
+ root.querySelectorAll('p,div,h1,h2,h3,h4,section,li,br').forEach(element=>element.append('\n'));
+ return root.textContent.replace(/\n[ \t]+/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+function rmlOfflineSheet(job,folder,daily,reports,files,team,savedAt){
+ const products=new Map();
+ const follow=(daily?.suivi?.ilots||[]).map(island=>{
+  const lines=(island.produits||[]).map(product=>{
+   products.set(String(product.id),product);
+   return '<tr><td>'+esc(product.nom||'Produit')+'</td><td>'+esc(product.unite||'')+'</td><td>'+esc(product.total??0)+'</td><td>'+esc(product.pose??0)+'</td><td>'+esc(Number(product.total||0)-Number(product.pose||0))+'</td></tr>';
+  }).join('');
+  return lines?'<h3>'+esc(island.nom||'Produits')+'</h3><table><thead><tr><th>Produit</th><th>Unité</th><th>Prévu</th><th>Posé</th><th>Reste</th></tr></thead><tbody>'+lines+'</tbody></table>':'';
+ }).join('');
+ const history=reports.map(report=>{
+  const quantities=Object.entries(report.quantities||{}).map(([id,quantity])=>{
+   const product=products.get(String(id));
+   return '<li>'+esc(product?.nom||('Produit '+id))+' : '+esc(quantity)+' '+esc(product?.unite||'')+'</li>';
+  }).join('');
+  return '<section><h3>'+esc(formatDateFR(report.intervention_date))+'</h3><p>'+esc(report.report_text||'').replace(/\n/g,'<br>')+'</p>'+(quantities?'<ul>'+quantities+'</ul>':'')+'</section>';
+ }).join('');
+ const list=files.map(file=>'<li><a href="'+esc(file.path.split('/').map(encodeURIComponent).join('/'))+'">'+esc(file.document.file_name||'Document')+'</a> — '+esc(file.document.category||'Document')+(file.document.note?' · '+esc(file.document.note):'')+'</li>').join('');
+ return '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(job.nom)+' — Dossier chantier</title><style>body{font:16px Arial,sans-serif;color:#17263c;max-width:1100px;margin:auto;padding:22px;line-height:1.5}h1,h2,h3{color:#16416c}h2{margin-top:28px;border-bottom:1px solid #a9bed0;padding-bottom:7px}table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border:1px solid #a9bed0;padding:8px;text-align:left;overflow-wrap:anywhere}th{background:#edf4fb}.notice{padding:12px;background:#edf4fb}a{color:#075caa}li{margin:10px 0}.prep-tablewrap{overflow:auto}@media print{body{padding:0;font-size:11pt}tr,section{break-inside:avoid}}</style></head><body><h1>'+esc(job.nom)+'</h1><p class="notice">Copie téléchargée le '+esc(savedAt.toLocaleString('fr-FR'))+' · '+esc(rmlTeamLabel(team))+'<br>Consultation hors connexion. Téléchargez à nouveau le dossier pour obtenir les dernières modifications.</p><h2>Informations chantier</h2><p><strong>Client</strong> '+esc(job.client_nom||'')+'<br><strong>Adresse</strong> '+esc(job.adresse||'Non renseignée')+'<br><strong>Intervention prévue</strong> '+esc(formatDateFR(job.assignment_date))+'<br><strong>Contact</strong> '+esc([job.contact_nom,job.contact_telephone].filter(Boolean).join(' — ')||'Non renseigné')+'</p><h2>Consignes</h2><p>'+esc(job.notes||'Aucune consigne renseignée.').replace(/\n/g,'<br>')+'</p><h2>Préparation et travaux à réaliser</h2>'+employeePreparationReadOnlyHtml(folder.preparation)+'<h2>Suivi des quantités</h2>'+(follow||'<p>Aucun produit dans le suivi chantier.</p>')+'<h2>Historique des interventions</h2>'+(history||'<p>Aucune intervention enregistrée.</p>')+'<h2>Plans, photos et documents ('+files.length+')</h2><p>Les fichiers sont également disponibles dans le sous-dossier « Documents ».</p>'+(list?'<ul>'+list+'</ul>':'<p>Aucun document accessible à votre équipe.</p>')+'</body></html>';
+}
+function rmlCloseEmployeeDownload(){
+ rmlEmployeeDownloadTask?.abort();
+ document.getElementById('rmlEmployeeDownloadModal')?.remove();
+ if(rmlEmployeeDownloadUrl){URL.revokeObjectURL(rmlEmployeeDownloadUrl);rmlEmployeeDownloadUrl=null;}
+}
+async function rmlDownloadEmployeeJob(jobId){
+ if(rmlEmployeeDownloadTask){alert('Un dossier est déjà en cours de téléchargement.');return;}
+ if(!rmlEmployeeCanTourMap()){alert('Téléchargement réservé aux équipes 1 à 7.');return;}
+ if(!navigator.onLine){alert('Connectez-vous au réseau pour télécharger le dossier avant votre départ.');return;}
+ if(typeof JSZip==='undefined'){alert('Le téléchargement ZIP ne se charge pas. Actualisez avec une connexion Internet.');return;}
+ rmlCloseEmployeeDownload();
+ const task=new AbortController();rmlEmployeeDownloadTask=task;
+ const userId=currentUser.id,team=Number(employeeAccount.team_number);
+ const modal=document.createElement('div');modal.id='rmlEmployeeDownloadModal';modal.className='modal open';
+ modal.innerHTML='<div class="modal-card" style="max-width:650px"><div class="modal-head"><h3>Dossier chantier hors connexion</h3><button type="button" class="close">Fermer</button></div><p id="rmlEmployeeDownloadStatus" role="status" aria-live="polite">Vérification des affectations…</p><div id="rmlEmployeeDownloadResult"></div></div>';
+ modal.querySelector('button').onclick=rmlCloseEmployeeDownload;document.body.append(modal);
+ const status=modal.querySelector('#rmlEmployeeDownloadStatus'),result=modal.querySelector('#rmlEmployeeDownloadResult');
+ const check=()=>{
+  if(task.signal.aborted)throw new Error('Téléchargement annulé.');
+  if(currentUser?.id!==userId||!rmlEmployeeCanTourMap()||Number(employeeAccount.team_number)!==team)throw new Error('Le compte ou l’équipe a changé. Reconnectez-vous avant de télécharger le dossier.');
+ };
+ try{
+  const allowed=await rmlTourVisibleJobs();check();
+  const job=allowed.find(item=>String(item.id)===String(jobId));
+  if(!job)throw new Error('Ce chantier n’est pas attribué à votre équipe dans le planning actuel.');
+  const response=await sb.rpc('erp_get_my_job_folder',{p_chantier_id:String(jobId)});check();
+  if(response.error)throw response.error;
+  const folder=Array.isArray(response.data)?response.data[0]:response.data;
+  if(!folder||folder.authorized===false)throw new Error('Ce dossier n’est pas autorisé pour votre équipe.');
+  status.textContent='Chargement de la préparation et de l’historique…';
+  const [dailyResponse,historyResponse]=await Promise.all([
+   sb.rpc('erp_v16_get_daily_report',{p_chantier_id:String(jobId),p_date:job.assignment_date}),
+   sb.rpc('erp_get_job_install_reports_history',{p_chantier_id:String(jobId)})
+  ]);check();
+  if(dailyResponse.error||historyResponse.error)throw new Error('Dossier incomplet : '+(dailyResponse.error||historyResponse.error).message);
+  const zip=new JSZip(),documents=Array.isArray(folder.documents)?folder.documents:[],files=[];
+  for(let index=0;index<documents.length;index++){
+   check();
+   const document=documents[index];
+   if(!document.storage_path||(document.chantier_id!=null&&String(document.chantier_id)!==String(jobId)))throw new Error('Document invalide dans ce dossier : '+(document.file_name||'sans nom'));
+   status.textContent='Téléchargement '+(index+1)+' / '+documents.length+' — '+(document.file_name||'Document');
+   const signed=await sb.storage.from(DOC_BUCKET).createSignedUrl(document.storage_path,300);check();
+   if(signed.error||!signed.data?.signedUrl)throw new Error((document.file_name||'Document')+' : '+(signed.error?.message||'Lien indisponible'));
+   const timer=setTimeout(()=>task.abort(),120000);
+   let file;
+   try{
+    const downloaded=await fetch(signed.data.signedUrl,{signal:task.signal});
+    if(!downloaded.ok)throw new Error((document.file_name||'Document')+' : téléchargement impossible ('+downloaded.status+').');
+    file=await downloaded.blob();
+   }finally{clearTimeout(timer);}
+   check();
+   const path='Documents/'+String(index+1).padStart(3,'0')+'-'+rmlOfflineFilename(document.file_name||'document');
+   zip.file(path,file);files.push({path,document});
+  }
+  status.textContent='Vérification finale du dossier…';
+  const verification=await sb.rpc('erp_get_my_job_folder',{p_chantier_id:String(jobId)});check();
+  const verifiedFolder=Array.isArray(verification.data)?verification.data[0]:verification.data;
+  if(verification.error||!verifiedFolder||verifiedFolder.authorized===false)throw new Error('Les droits du dossier n’ont pas pu être confirmés. Réessayez avec une connexion active.');
+  const verifiedDocuments=Array.isArray(verifiedFolder.documents)?verifiedFolder.documents:[];
+  const fileKeys=list=>list.map(item=>String(item.id||'')+'|'+String(item.storage_path||'')).sort().join('\n');
+  if(fileKeys(verifiedDocuments)!==fileKeys(documents))throw new Error('Les documents ont changé pendant le téléchargement. Relancez pour obtenir le dossier complet à jour.');
+  const savedAt=new Date();
+  const sheet=rmlOfflineSheet(job,folder,dailyResponse.data,Array.isArray(historyResponse.data)?historyResponse.data:[],files,team,savedAt);
+  zip.file('Fiche-chantier.html',sheet);
+  zip.file('Fiche-chantier.txt',rmlOfflineText(sheet));
+  status.textContent='Création du dossier ZIP…';
+  const blob=await zip.generateAsync({type:'blob',compression:'STORE'},metadata=>{check();status.textContent='Création du dossier ZIP — '+Math.round(metadata.percent)+' %';});check();
+  rmlEmployeeDownloadUrl=URL.createObjectURL(blob);
+  const link=document.createElement('a');link.className='btn ok';link.href=rmlEmployeeDownloadUrl;
+  link.download='Chantier-'+rmlOfflineFilename(job.nom)+'-'+savedAt.toISOString().slice(0,10)+'.zip';
+  link.textContent='Enregistrer le dossier ZIP sur cet appareil';result.append(link);
+  const help=document.createElement('p');help.textContent='Sur iPhone / iPad, enregistrez dans Fichiers, puis « Sur mon iPhone » ou « Sur mon iPad ». Touchez le ZIP pour le décompresser. Ouvrez Fiche-chantier.txt et le dossier Documents sans réseau. Sur ordinateur, ouvrez également Fiche-chantier.html pour la présentation imprimable.';result.append(help);
+  status.textContent='Dossier prêt — fiche, suivi, historique et '+files.length+' fichier(s). Cliquez sur le bouton pour l’enregistrer avant de partir.';
+ }catch(error){
+  if(modal.isConnected){status.textContent='Téléchargement non terminé : '+(task.signal.aborted?'annulation ou délai dépassé.':error.message)+' Relancez le téléchargement avec une connexion active.';status.style.color='#b91c1c';}
+ }finally{if(rmlEmployeeDownloadTask===task)rmlEmployeeDownloadTask=null;}
+}
+document.getElementById('logoutBtn').addEventListener('click',rmlCloseEmployeeDownload);
+
 </script>
 </body>
 </html>
