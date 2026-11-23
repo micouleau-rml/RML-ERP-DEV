@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46.1</title>
+<title>RML ERP — V46.2</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -769,7 +769,7 @@ body.rml-preparation-preview-open{overflow:hidden}
 #clientForm [hidden],#clientEditTools [hidden]{display:none!important}
 .rml-client-type-switch{display:flex;gap:12px;padding:12px;background:#eaf3fc;border:1px solid #bdd5ec;border-radius:14px}
 .rml-client-type-switch button{flex:1;min-height:48px}
-</style></head>
+</style><style>.rml-employee-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;overflow-wrap:anywhere}@media(max-width:1100px){.rml-employee-week{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:600px){.rml-employee-week{grid-template-columns:1fr}}</style></head>
 <body>
 <div id="erpSaveToast" class="erp-save-toast" role="status" aria-live="polite"></div>
 <div id="loginOverlay" class="login-overlay">
@@ -792,7 +792,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.1</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.2</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -877,9 +877,9 @@ body.rml-preparation-preview-open{overflow:hidden}
 </section>
 <section id="employeePortal" class="view">
   <div class="panel">
-    <div class="employee-hero"><div><h2 style="margin:0">Mon espace salarié</h2><div class="muted">Vos chantiers, feuilles chantier, documents et photos terrain.</div></div><button class="btn secondary" type="button" onclick="loadEmployeePortal()">Actualiser</button></div>
+    <div class="employee-hero"><div><h2 id="employeePortalTitle" style="margin:0">Espace technicien</h2><div class="muted">Vos chantiers, feuilles chantier, documents et photos terrain.</div></div><button class="btn secondary" type="button" onclick="loadEmployeePortal()">Actualiser</button></div>
     <div class="panel" id="employeeMileagePanel" style="margin:12px 0;padding:15px"><h3 style="margin:0 0 8px">Kilométrage du fourgon — fin de journée</h3><div class="muted">Saisissez le kilométrage total affiché au compteur, et non les kilomètres parcourus aujourd’hui. La valeur sera transmise à Maintenance.</div><div class="grid2" style="margin-top:12px"><div class="field"><label>Fourgon (nom et immatriculation)</label><select id="employeeMileageVehicle"><option value="">Chargement des fourgons…</option></select></div><div class="field"><label>Kilométrage total au compteur</label><input id="employeeMileageTotal" type="number" min="0" step="1" inputmode="numeric" placeholder="Ex. 125430"></div></div><div class="actions" style="margin-top:10px"><button class="btn ok rml-mileage-save" type="button" onclick="saveEmployeeMileage()">Enregistrer le kilométrage</button></div><div id="employeeMileageStatus" class="muted" style="margin-top:8px"></div></div><div id="employeePortalStatus" class="notice" style="margin-top:12px">Chargement…</div>
-    <button id="employeeTourMapBtn" class="btn" type="button" hidden style="margin:12px 0;background:#087b72;color:white" onclick="go('rmlTour')">Carte de tournée — mes chantiers</button><div id="employeePortalList" class="employee-grid"></div>
+    <button id="employeeTourMapBtn" class="btn" type="button" hidden style="margin:12px 0;background:#087b72;color:white" onclick="go('rmlTour')">Carte de tournée — mes chantiers</button><div id="employeeWeeklyPlanning" style="margin:16px 0" hidden></div><div id="employeePortalList" class="employee-grid"></div>
   </div>
 </section>
 <section id="clients" class="view"><div class="panel client-panel">
@@ -4537,6 +4537,24 @@ function rmlTeamLabel(number){return Number(number)===8?'Atelier':'Équipe '+num
 function roleLabel(r){return ({administrateur:'Administrateur',direction:'Direction',collaborateur:'Collaborateur',chef_equipe:'Chef d’équipe',ouvrier:'Ouvrier',atelier:'Atelier',lecture:'Lecture seule',sous_traitant:'Sous-traitant'})[r]||r||'—'}
 function isSubcontractorUser(){return currentAccess?.role==='sous_traitant'}
 function isEmployeeUser(){return ['ouvrier','chef_equipe'].includes(currentAccess?.role)}
+function rmlEmployeeSpaceLabel(account=employeeAccount){
+ const team=Number(account?.team_number);
+ return Number.isInteger(team)&&team>=1&&team<=7?'Équipe technicien '+team:team===8?'Équipe atelier':'Espace technicien';
+}
+function rmlEmployeePlanningDays(){
+ const team=Number(employeeAccount?.team_number);
+ return Number.isInteger(team)&&team>=1&&team<=7?6:30;
+}
+function rmlEmployeePlanningRows(rows,start,end,team){
+ return (rows||[]).filter(r=>r.chantier_id&&Number(r.team_number)===team&&typeof r.assignment_date==='string'&&r.assignment_date>=start&&r.assignment_date<=end);
+}
+function rmlEmployeeWeekHtml(rows,start){
+ const dates=Array.from({length:7},(_,i)=>{const d=new Date(start+'T12:00:00');d.setDate(d.getDate()+i);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')});
+ return '<h3 style="margin:0 0 12px">Planning de votre équipe — 7 jours</h3><div class="rml-employee-week">'+dates.map(date=>{
+  const dayRows=[...new Map(rows.filter(r=>r.assignment_date===date).map(r=>[r.chantier_id,r])).values()];
+  return '<div class="analysis-card" style="padding:12px;background:'+(date===start?'#e8f3ff':'#f8fafc')+'"><strong>'+esc(new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'short'}))+'</strong>'+ (dayRows.length?dayRows.map(r=>'<div style="margin-top:10px;border-top:1px solid #d9e1ea;padding-top:8px"><b>'+esc(r.chantier_nom||'Chantier')+'</b><div>'+esc(r.client_nom||'')+'</div></div>').join(''):'<div class="muted" style="margin-top:10px">Aucun chantier attribué</div>')+'</div>';
+ }).join('')+'</div><p class="muted">Les fiches détaillées de vos chantiers sont disponibles ci-dessous.</p>';
+}
 function rmlEmployeeCanTourMap(){
  const team=Number(employeeAccount?.team_number);
  return !!currentAccess?.active&&isEmployeeUser()&&employeeAccount?.auth_user_id===currentUser?.id&&employeeAccount?.active===true&&Number.isInteger(team)&&team>=1&&team<=7;
@@ -4545,6 +4563,10 @@ function rmlCanTourMap(){
  return isEmployeeUser()?rmlEmployeeCanTourMap():!isSubcontractorUser()&&hasPerm('chantiers');
 }
 function rmlUpdateEmployeeTourAccess(){
+ if(isEmployeeUser()){
+  const title=document.getElementById('employeePortalTitle');if(title)title.textContent=rmlEmployeeSpaceLabel();
+  const home=document.querySelector('#mainNav [data-view="dashboard"]');if(home)home.textContent=rmlEmployeeSpaceLabel();
+ }
  const visible=rmlEmployeeCanTourMap();
  const button=document.getElementById('employeeTourMapBtn');
  if(button)button.hidden=!visible;
@@ -4561,7 +4583,7 @@ async function rmlTourVisibleJobs(){
  employeeAccount=account||null;
  rmlUpdateEmployeeTourAccess();
  if(!rmlEmployeeCanTourMap())return [];
- const start=employeeTodayISO(),end=employeePlusDaysISO(30),team=Number(account.team_number);
+ const start=employeeTodayISO(),end=employeePlusDaysISO(rmlEmployeePlanningDays()),team=Number(account.team_number);
  const {data:rows,error}=await sb.rpc('erp_get_my_team_planning',{p_start:start,p_end:end});
  if(error)throw error;
  if(currentUser?.id!==userId||!rmlEmployeeCanTourMap())return [];
@@ -4580,7 +4602,7 @@ function applyAccessUI(){
   rmlUpdateEmployeeTourAccess();
   if(isSubcontractorUser()||isEmployeeUser()){
     document.querySelectorAll('#mainNav button').forEach(b=>b.style.display='none');
-    const homeBtn=document.querySelector('#mainNav [data-view="dashboard"]');if(homeBtn){homeBtn.style.display='';homeBtn.textContent='Mon espace'}
+    const homeBtn=document.querySelector('#mainNav [data-view="dashboard"]');if(homeBtn){homeBtn.style.display='';homeBtn.textContent=isEmployeeUser()?rmlEmployeeSpaceLabel():'Mon espace'}
     rmlUpdateEmployeeTourAccess();
     const a8=document.getElementById('rmlAtelier8Nav');if(a8&&isEmployeeUser()&&Number(employeeAccount?.team_number)===8)a8.style.display='inline-flex';
     const employeeClientsBtn=document.querySelector('#mainNav [data-view="clients"]');if(employeeClientsBtn)employeeClientsBtn.style.display=hasPerm('clients')?'':'none';
@@ -4750,20 +4772,27 @@ async function saveEmployeeMileage(){
 }
 async function loadEmployeePortal(){
  if(!isEmployeeUser())return;
+ const userId=currentUser?.id;
+ const week=document.getElementById('employeeWeeklyPlanning');if(week){week.hidden=true;week.innerHTML='';}
+ employeeAssignments=[];
  employeePortalStatus.className='notice';employeePortalStatus.textContent='Chargement de votre planning…';employeePortalList.innerHTML='';
  try{
-  const {data:link,error:le}=await sb.from('erp_employee_accounts').select('*').eq('auth_user_id',currentUser.id).eq('active',true).maybeSingle();if(le)throw le;
+  const {data:link,error:le}=await sb.from('erp_employee_accounts').select('*').eq('auth_user_id',userId).eq('active',true).maybeSingle();if(le)throw le;
+  if(currentUser?.id!==userId||!isEmployeeUser())return;
   employeeAccount=link||null;rmlUpdateEmployeeTourAccess();const mileagePanel=document.getElementById('employeeMileagePanel');if(mileagePanel)mileagePanel.style.display=Number(employeeAccount?.team_number)===8?'none':'';if(Number(employeeAccount?.team_number)!==8)loadEmployeeMileageVehicles();if(Number(employeeAccount?.team_number)===8){const a8=document.getElementById('rmlAtelier8Nav');if(a8)a8.style.display='inline-flex';}
   if(!employeeAccount){employeePortalStatus.className='notice warn';employeePortalStatus.textContent='Votre compte salarié n’est pas encore rattaché à une équipe permanente. Demandez à un administrateur de choisir votre équipe dans Utilisateurs & accès.';return}
-  const start=employeeTodayISO(),end=employeePlusDaysISO(30),teamNumber=Number(employeeAccount.team_number);
+  const start=employeeTodayISO(),end=employeePlusDaysISO(rmlEmployeePlanningDays()),teamNumber=Number(employeeAccount.team_number);
   const {data:rows,error:pe}=await sb.rpc('erp_get_my_team_planning',{p_start:start,p_end:end});if(pe)throw pe;
-  employeeAssignments=(rows||[]).map(r=>({date:r.assignment_date,chantier_id:r.chantier_id,team_number:r.team_number}));
+  if(currentUser?.id!==userId||!isEmployeeUser()||Number(employeeAccount?.team_number)!==teamNumber)return;
+  const visibleRows=rmlEmployeePlanningRows(rows,start,end,teamNumber);
+  employeeAssignments=visibleRows.map(r=>({date:r.assignment_date,chantier_id:r.chantier_id,team_number:r.team_number}));
   employeeAssignments.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   const jobs=[];const clients=[];const seenJobs=new Set(),seenClients=new Set();
-  (rows||[]).forEach(r=>{if(r.chantier_id&&!seenJobs.has(r.chantier_id)){seenJobs.add(r.chantier_id);jobs.push({id:r.chantier_id,client_id:r.client_id,nom:r.chantier_nom,adresse:r.chantier_adresse,contact_nom:r.contact_nom,contact_telephone:r.contact_telephone,notes:r.chantier_notes,statut:r.chantier_statut})}if(r.client_id&&!seenClients.has(r.client_id)){seenClients.add(r.client_id);clients.push({id:r.client_id,nom:r.client_nom})}});
+  visibleRows.forEach(r=>{if(r.chantier_id&&!seenJobs.has(r.chantier_id)){seenJobs.add(r.chantier_id);jobs.push({id:r.chantier_id,client_id:r.client_id,nom:r.chantier_nom,adresse:r.chantier_adresse,contact_nom:r.contact_nom,contact_telephone:r.contact_telephone,notes:r.chantier_notes,statut:r.chantier_statut})}if(r.client_id&&!seenClients.has(r.client_id)){seenClients.add(r.client_id);clients.push({id:r.client_id,nom:r.client_nom})}});
   db.chantiers=jobs;db.clients=clients;
-  employeePortalStatus.className='notice';employeePortalStatus.textContent=`${employeeAccount.team_number?rmlTeamLabel(employeeAccount.team_number):'Salarié'} · ${employeeAssignments.length} affectation(s) aujourd’hui et dans les 30 prochains jours.`;
-  if(!employeeAssignments.length){employeePortalList.innerHTML='<div class="empty">Aucun chantier ne vous est actuellement affecté dans le planning sur les 30 prochains jours.</div>';return}
+  employeePortalStatus.className='notice';employeePortalStatus.textContent=`${rmlEmployeeSpaceLabel()} · ${employeeAssignments.length} affectation(s) ${rmlEmployeePlanningDays()===6?'sur les 7 prochains jours, aujourd’hui inclus':'aujourd’hui et dans les 30 prochains jours'}.`;
+  if(week&&rmlEmployeePlanningDays()===6){week.hidden=false;week.innerHTML=rmlEmployeeWeekHtml(visibleRows,start);}
+  if(!employeeAssignments.length){employeePortalList.innerHTML='<div class="empty">Aucun chantier attribué à votre équipe sur la période affichée.</div>';return}
   const grouped=new Map();employeeAssignments.forEach(a=>{const k=a.date+'|'+a.chantier_id;if(!grouped.has(k))grouped.set(k,a)});
   employeePortalList.innerHTML=[...grouped.values()].map(a=>{const j=jobs.find(x=>x.id===a.chantier_id),c=clients.find(x=>x.id===j?.client_id),today=a.date===start,future=a.date>start;return `<div class="employee-job ${today?'today':future?'future':''}"><div class="employee-date">${today?'AUJOURD’HUI · ':future?'À VENIR · ':''}${new Date(a.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'2-digit',month:'long'})}</div><h3 style="margin:0 0 5px">${esc(j?.nom||'Chantier')}</h3><div><strong>${esc(c?.nom||'')}</strong></div>${j?.adresse?`<div class="muted">${esc(j.adresse)}</div>`:''}${j?.contact_nom?`<div style="margin-top:7px"><strong>Contact :</strong> ${esc(j.contact_nom)} ${esc(j.contact_telephone||'')}</div>`:''}${j?.notes?`<div class="notice" style="margin-top:9px">${esc(j.notes)}</div>`:''}<div class="actions" style="margin-top:12px">${rmlEmployeeCanTourMap()?`<button class="btn ok" type="button" onclick="rmlDownloadEmployeeJob('${j?.id||''}')">Télécharger hors connexion</button>`:''}<button class="btn rml-job-docs" onclick="openEmployeeJobFolder('${j?.id||''}','${a.date}')">Feuille chantier / Documents</button>${String(j?.statut||'').toLowerCase()==='sav'?`<button class="btn ok" type="button" onclick="rmlSavOpen('${j?.id||''}')">Fiche SAV / signature client</button>`:''}<button class="btn secondary rml-job-history" onclick="openJobHistory('${j?.id||''}')">Historique interventions</button>${currentAccess?.role==='chef_equipe'?`<button class="btn secondary" onclick="openSuivi('${j?.id||''}')">Suivi chantier</button>`:''}</div></div>`}).join('');
  }catch(err){console.error(err);employeePortalStatus.className='notice danger';employeePortalStatus.textContent='Espace salarié indisponible : '+err.message}
@@ -8735,7 +8764,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V46.1';
+const RML_ERP_VERSION='V46.2';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
@@ -10604,7 +10633,7 @@ const v42NavTimer=setInterval(()=>{rmlV42Nav();if(v42$('rmlV42Nav')&&rmlV42Allow
       summary.id='rmlTourJobSummary';
       byId('rmlTourMapHome').prepend(summary);
     }
-    summary.textContent=(employeeView?rmlTeamLabel(employeeAccount.team_number)+' · Vos chantiers attribués, aujourd’hui et dans les 30 prochains jours · ':'')+(jobs.length-missing)+' chantier(s) sur la carte'+(missing?' · '+missing+' adresse(s) à préciser ou indisponibles':'');
+    summary.textContent=(employeeView?rmlTeamLabel(employeeAccount.team_number)+' · Vos chantiers attribués, sur les 7 prochains jours, aujourd’hui inclus · ':'')+(jobs.length-missing)+' chantier(s) sur la carte'+(missing?' · '+missing+' adresse(s) à préciser ou indisponibles':'');
   }
   window.rmlOpenTourMap = () => {
     chantierLoad?.abort();
