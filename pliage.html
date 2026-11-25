@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="RML Pliage"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
-<title>RML PLIAGE ERP — V44.12</title>
+<title>RML PLIAGE ERP — V44.13</title>
 <style>
 :root{--card:#ffffff;--text:#17202a;--muted:#687684;--line:#d9e1ea;--accent:#0f62fe;--accent2:#0a4ecc;--danger:#c62828;--ok:#157347;--shadow:0 12px 30px rgba(18,36,56,.08);--radius:18px}
 *{box-sizing:border-box}
@@ -1865,7 +1865,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
     <div class="brand">
       
       <div class="brand-text">
-        <h1>RML PLIAGE ALU · V44.12</h1>
+        <h1>RML PLIAGE ALU · V44.13</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
       </div>
@@ -9166,12 +9166,17 @@ if(quotePdfBtn){
         .screen-actions{position:fixed;right:18px;top:16px;bottom:auto;display:flex;gap:8px;padding:9px;background:rgba(255,255,255,.96);border:1px solid #cbd5df;border-radius:12px;box-shadow:0 8px 24px rgba(15,23,42,.16)}
         .screen-actions button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer}
         .screen-actions #printPlansAction{background:#0f62fe;color:#fff}.screen-actions button:last-child{background:#e8edf2;color:#17324a}
+        @media screen{
+          html{overflow:auto;overscroll-behavior:none;scroll-behavior:auto}
+          body{overflow:visible}
+          .plan{overflow:clip}
+        }
         @media print{
           html,body{background:#fff;padding:0}
           .page{margin:0;width:196mm;height:283mm}
           .screen-actions{display:none}
         }
-      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.12</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
+      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.13</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
       <script>
         document.getElementById("printPlansAction").addEventListener("click",()=>window.print());
         document.getElementById("closePlansAction").addEventListener("click",()=>window.close());
