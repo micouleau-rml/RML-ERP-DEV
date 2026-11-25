@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46.11</title>
+<title>RML ERP — V46.12</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -792,7 +792,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.11</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.12</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3910,10 +3910,10 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
  <div class="modal-head"><h3>Affecter un chantier / créer le contrat</h3><button class="close" data-close="subAssignModal">Fermer</button></div>
  <input id="subAssignSubId" type="hidden"><input id="subAssignId" type="hidden">
  <div class="sub-contract-top"><div class="sub-contract-section-title">Chantier et prestation</div>
- <div class="field">
+ <div class="field" style="position:relative" onfocusout="if(!this.contains(event.relatedTarget))clearSubAssignClientSuggestions()">
   <label for="subAssignJobSearch">Rechercher un client ou un chantier</label>
-  <input id="subAssignJobSearch" type="search" placeholder="Nom du client, chantier ou adresse…" autocomplete="off" aria-controls="subAssignClientSuggestions" oninput="filterSubAssignJobs()" onkeydown="subAssignSearchKey(event)">
-  <div id="subAssignClientSuggestions" hidden role="group" aria-label="Clients suggérés" style="flex-wrap:wrap;gap:6px"></div>
+  <input id="subAssignJobSearch" type="search" placeholder="Nom du client, chantier ou adresse…" autocomplete="off" aria-controls="subAssignClientSuggestions" oninput="filterSubAssignJobs()" onfocus="renderSubAssignClientSuggestions()" onkeydown="subAssignSearchKey(event)">
+  <div id="subAssignClientSuggestions" hidden role="group" aria-label="Résultats de recherche" onkeydown="subAssignSearchKey(event)" style="position:absolute;top:100%;inset-inline:0;z-index:5;max-height:220px;overflow:auto;background:#fff;border:1px solid #a8c4df;border-radius:9px;box-shadow:0 6px 14px #173c6229"></div>
  </div>
  <div class="grid2 sub-assign-grid"><div class="field"><label>Client</label><select id="subAssignClient"></select></div><div class="field"><label>Chantier</label><select id="subAssignJob"></select></div></div>
  <div class="grid2"><div class="field"><label>Date prévue</label><input id="subAssignDate" type="date"></div><div class="field"><label>Montant du contrat HT (€)</label><input id="subAssignAmount" type="number" step="0.01" min="0"></div></div>
@@ -6923,59 +6923,86 @@ async function deleteSubcontractor(id){
  const {error}=await sb.from('erp_subcontractors').delete().eq('id',id);if(error){alert(error.message);return}await loadSubcontractors();
 }
 let subAssignAllJobs=[];
+function subAssignSearchWords(value){
+ return normalizeSearch(value).match(/[a-z0-9]+/g)||[];
+}
+function subAssignMatches(words,query){
+ return query.every(term=>words.some(word=>word.startsWith(term)));
+}
+function subAssignEligibleJobs(){
+ return subAssignAllJobs.filter(j=>['actif','attente'].includes(j.statut));
+}
+function subAssignJobMatches(job,clientName,query){
+ return subAssignMatches(subAssignSearchWords([job.nom,clientName,job.adresse].filter(Boolean).join(' ')),query);
+}
 function fillSubAssignJobOptions(selected=''){
  const cid=subAssignClient.value;
- const q=normalizeSearch(subAssignJobSearch.value);
- let jobs=subAssignAllJobs.filter(j=>['actif','attente'].includes(j.statut));
- if(cid)jobs=jobs.filter(j=>j.client_id===cid);
- if(q)jobs=jobs.filter(j=>{const c=db.clients.find(x=>x.id===j.client_id);return normalizeSearch([c?.nom,j.nom,j.adresse].filter(Boolean).join(' ')).includes(q)});
- fillSelect(subAssignJob,jobs,'Choisir un chantier','id',j=>j.nom||db.clients.find(x=>x.id===j.client_id)?.nom||'Chantier');
- if(selected&&jobs.some(j=>j.id===selected))subAssignJob.value=selected;
+ const query=subAssignSearchWords(subAssignJobSearch.value);
+ const clients=new Map(db.clients.map(client=>[String(client.id),client.nom]));
+ const jobs=subAssignEligibleJobs().filter(job=>
+  (!cid||String(job.client_id)===cid)&&subAssignJobMatches(job,clients.get(String(job.client_id)),query)
+ );
+ fillSelect(subAssignJob,jobs,jobs.length?'Choisir un chantier':'Aucun chantier actif ou en attente','id',j=>j.nom||clients.get(String(j.client_id))||'Chantier');
+ if(selected&&jobs.some(j=>String(j.id)===String(selected)))subAssignJob.value=String(selected);
  rmlUpdateSubAddress();
 }
 function clearSubAssignClientSuggestions(){
  const list=document.getElementById('subAssignClientSuggestions');
  list.hidden=true;
- list.style.display='';
  list.replaceChildren();
 }
-function renderSubAssignClientSuggestions(query){
+function renderSubAssignClientSuggestions(){
  clearSubAssignClientSuggestions();
- if(!query)return;
+ const query=subAssignSearchWords(subAssignJobSearch.value);
+ if(!query.length)return;
  const list=document.getElementById('subAssignClientSuggestions');
- const eligible=new Set(subAssignAllJobs.filter(j=>['actif','attente'].includes(j.statut)).map(j=>String(j.client_id)));
- const prefix=[],other=[];
- for(const client of clientSorted()){
-  if(!eligible.has(String(client.id)))continue;
-  const name=normalizeSearch(client.nom);
-  if(name.split(/[^a-z0-9]+/).some(word=>word.startsWith(query))||name.startsWith(query))prefix.push(client);
-  else if(query.length>1&&name.includes(query))other.push(client);
- }
- for(const client of [...prefix,...other].slice(0,10)){
+ const clients=new Map(db.clients.map(client=>[String(client.id),client.nom]));
+ const matchingClients=clientSorted().filter(client=>subAssignMatches(subAssignSearchWords(client.nom),query)).slice(0,10);
+ const matchingJobs=subAssignEligibleJobs().filter(job=>subAssignJobMatches(job,clients.get(String(job.client_id)),query)).slice(0,15);
+ const addResult=(label,clientId,jobId)=>{
   const button=document.createElement('button');
   button.type='button';
   button.className='btn secondary';
-  button.textContent=client.nom;
+  button.style.cssText='display:block;width:100%;text-align:left;border-radius:0;white-space:normal';
+  button.textContent=label;
+  button.addEventListener('mousedown',event=>event.preventDefault());
   button.addEventListener('click',()=>{
    subAssignJobSearch.value='';
-   subAssignClient.value=String(client.id);
-   subAssignClient.onchange();
+   subAssignClient.value=String(clientId||'');
+   selectSubAssignClient();
+   if(jobId){subAssignJob.value=String(jobId);subAssignJob.onchange()}
    subAssignJob.focus();
   });
   list.append(button);
+ };
+ for(const client of matchingClients)addResult('Client · '+client.nom,client.id);
+ for(const job of matchingJobs){
+  const client=clients.get(String(job.client_id));
+  addResult('Chantier · '+(job.nom||job.adresse||'Sans nom')+(client?' — '+client:''),job.client_id,job.id);
  }
- if(list.childElementCount){list.hidden=false;list.style.display='flex'}
+ if(!list.childElementCount){
+  const message=document.createElement('p');
+  message.className='muted';
+  message.style.margin='8px 12px';
+  message.textContent='Aucun client ni chantier actif ou en attente trouvé.';
+  list.append(message);
+ }
+ list.hidden=false;
 }
 function subAssignSearchKey(event){
  const list=document.getElementById('subAssignClientSuggestions');
- if(event.key==='Escape'&&!list.hidden){
+ if(list.hidden)return;
+ if(event.key==='Escape'){
   event.preventDefault();
   event.stopPropagation();
+  subAssignJobSearch.focus();
   clearSubAssignClientSuggestions();
  }
- if(event.key==='ArrowDown'&&!list.hidden){
-  event.preventDefault();
-  list.firstElementChild.focus();
+ if(event.key==='ArrowDown'||event.key==='ArrowUp'){
+  const target=event.key==='ArrowDown'
+   ? (event.target===subAssignJobSearch?list.querySelector('button'):event.target.nextElementSibling)
+   : (event.target===subAssignJobSearch?null:event.target.previousElementSibling||subAssignJobSearch);
+  if(target){event.preventDefault();target.focus()}
  }
 }
 function refreshSubAssignJobSelection(){
@@ -6985,10 +7012,9 @@ function refreshSubAssignJobSelection(){
  if(previous&&previous!==subAssignJob.value)rml408Reset();
 }
 function filterSubAssignJobs(){
- const q=normalizeSearch(subAssignJobSearch.value);
  subAssignClient.value='';
  refreshSubAssignJobSelection();
- renderSubAssignClientSuggestions(q);
+ renderSubAssignClientSuggestions();
 }
 function selectSubAssignClient(){
  clearSubAssignClientSuggestions();
@@ -8830,7 +8856,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V46.11';
+const RML_ERP_VERSION='V46.12';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
