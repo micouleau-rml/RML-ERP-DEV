@@ -242,6 +242,11 @@ th{background:#f8fafc}
 .history-danger-zone .note{color:#991b1b}
 .history-delete-btn{border-color:#ef4444 !important;color:#b91c1c !important}
 
+  .supplier-family-order-row{display:flex;align-items:center;gap:8px;padding:8px 0}
+  .supplier-family-drag-handle{cursor:grab;user-select:none;padding:8px 12px;font-size:20px}
+  .supplier-family-drag-handle:active{cursor:grabbing}
+  .supplier-family-order-row[data-drop-position="before"]{box-shadow:inset 0 3px #2563eb}
+  .supplier-family-order-row[data-drop-position="after"]{box-shadow:inset 0 -3px #2563eb}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2873,9 +2878,56 @@ function moveSupplierFamily(supplierIndex, familyIndex, direction){
   const to = from + direction;
   if(from < 0 || to < 0 || to >= families.length) return;
   [families[from],families[to]] = [families[to],families[from]];
-  localStorage.setItem(supplierFamilyOrderKey(supplier.name), JSON.stringify(families.map(supplierFamilyId)));
+  saveSupplierFamilyOrder(supplier, families);
   openSupplier(supplierIndex);
   document.getElementById("family-order-" + familyIndex + "-" + (to === 0 ? 1 : to === families.length - 1 ? -1 : direction))?.focus();
+}
+
+function saveSupplierFamilyOrder(supplier, families){
+  localStorage.setItem(supplierFamilyOrderKey(supplier.name), JSON.stringify(families.map(supplierFamilyId)));
+}
+
+function startSupplierFamilyDrag(event, familyIndex){
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", String(familyIndex));
+  event.currentTarget.closest("[data-family-order-list]").dataset.draggedFamily = String(familyIndex);
+}
+
+function endSupplierFamilyDrag(list){
+  delete list.dataset.draggedFamily;
+  list.querySelectorAll("[data-drop-position]").forEach(row => delete row.dataset.dropPosition);
+}
+
+function markSupplierFamilyDrop(event){
+  const row = event.currentTarget;
+  const source = row.parentElement.dataset.draggedFamily;
+  if(source === undefined || source === row.dataset.familyOrderIndex) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  const bounds = row.getBoundingClientRect();
+  row.dataset.dropPosition = event.clientY < bounds.top + bounds.height / 2 ? "before" : "after";
+}
+
+function dropSupplierFamily(event, supplierIndex){
+  const row = event.currentTarget;
+  const list = row.parentElement;
+  const source = list.dataset.draggedFamily;
+  const position = row.dataset.dropPosition;
+  if(source === undefined || !position) return;
+  event.preventDefault();
+  endSupplierFamilyDrag(list);
+  const supplier = getSuppliers()[supplierIndex];
+  if(!supplier || editingSupplierFamilies !== supplier.name) return;
+  const families = orderedSupplierFamilies(supplier);
+  const from = families.findIndex(family => String(family.index) === source);
+  const target = families.find(family => String(family.index) === row.dataset.familyOrderIndex);
+  if(from < 0 || !target || families[from] === target) return;
+  const [moved] = families.splice(from,1);
+  const to = families.indexOf(target) + (position === "after" ? 1 : 0);
+  if(to === from) return;
+  families.splice(to,0,moved);
+  saveSupplierFamilyOrder(supplier,families);
+  openSupplier(supplierIndex);
 }
 
 function openSupplier(index){
@@ -2896,7 +2948,11 @@ function openSupplier(index){
   const buttons = families.map((obj,position) => {
     const fam = obj.fam;
     if(editing){
-      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0">
+      return `<div class="supplier-family-order-row" data-family-order-index="${obj.index}"
+        ondragover="markSupplierFamilyDrop(event)" ondragleave="if(!this.contains(event.relatedTarget))delete this.dataset.dropPosition"
+        ondrop="dropSupplierFamily(event,${index})">
+        <span draggable="true" class="supplier-family-drag-handle" title="Glisser pour déplacer"
+          ondragstart="startSupplierFamilyDrag(event,${obj.index})" aria-hidden="true">☰</span>
         <strong style="flex:1">${esc(fam.name)}</strong>
         <button class="btn neutral" style="width:auto" id="family-order-${obj.index}--1" aria-label="Monter ${esc(fam.name)}"
           onclick="moveSupplierFamily(${index},${obj.index},-1)" ${position===0?"disabled":""}>↑</button>
@@ -2927,7 +2983,9 @@ function openSupplier(index){
 
 </div>
     ${families.length > 1 ? `<button class="btn neutral" onclick="toggleSupplierFamilyOrder(${index})">${editing?"Terminer":"Réorganiser les familles"}</button>` : ""}
-    ${buttons ? `<div class="${editing?"":"grid"}">${buttons}</div>` : `<div class="empty">Aucun produit affecté pour l’instant à ce fournisseur.</div>`}
+    ${buttons ? (editing
+      ? `<p class="note">Glissez les familles avec la poignée ☰.</p><div data-family-order-list ondragend="endSupplierFamilyDrag(this)">${buttons}</div>`
+      : `<div class="grid">${buttons}</div>`) : `<div class="empty">Aucun produit affecté pour l’instant à ce fournisseur.</div>`}
     <p class="note">Sélectionnez ensuite une famille pour saisir les quantités.</p>
     <div class="bottom-actions">
   <button class="btn neutral"
