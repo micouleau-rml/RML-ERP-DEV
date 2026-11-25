@@ -6341,9 +6341,14 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
     }
   }
 
+  const V66_CATALOG_META_KEY = "rml_supplier_catalog_meta_v62";
+
   async function v66WriteDelta(key){
     let value = localStorage.getItem(key);
     const old=await v66FindDeltaRow(key);
+    if(key===V66_CATALOG_META_KEY){
+      value=window.rmlMergeCatalogMeta(old?.data?.v66Value);
+    }
     if(key===RML_HISTORY_TOMBSTONES_KEY && old && old.data){
       if(window.V668_TOMBSTONES_REPLACE_ONCE){
         window.V668_TOMBSTONES_REPLACE_ONCE=false;
@@ -6427,6 +6432,27 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
   // V66.16 : utilisé par le bouton Supprimer. Le marqueur de suppression est
   // envoyé avant la liste d'historique afin qu'une ancienne copie cloud ne
   // puisse pas être fusionnée et réapparaître entre les deux opérations.
+  window.rmlSyncSupplierCatalogNow = async function(){
+    if(!supabaseCloud || !navigator.onLine || !v64BootstrapComplete) return false;
+    if(v66DeltaRunning || v61PushRunning) return false;
+    v66DeltaRunning=true;
+    try{
+      const remote=await v66FindDeltaRow(CUSTOM_PRODUCTS_KEY);
+      await v66WriteDelta(V66_CATALOG_META_KEY);
+      if(remote?.data) v65StoreProducts(window.rmlMergeCatalogProducts(remote.data.v66Value));
+      window.v62EnforceCatalogMeta();
+      await v66WriteDelta(CUSTOM_PRODUCTS_KEY);
+      V66_CHANGED_KEYS.delete(V66_CATALOG_META_KEY);
+      V66_CHANGED_KEYS.delete(CUSTOM_PRODUCTS_KEY);
+      v61SetIndicator("ok","catalogue fournisseur synchronisé");
+      return true;
+    }catch(error){
+      console.error("Synchronisation du catalogue fournisseur",error);
+      v61SetIndicator("error","catalogue fournisseur en attente");
+      return false;
+    }finally{v66DeltaRunning=false;}
+  };
+
   window.rmlSyncHistoryDeletionNow = async function(){
     if(!supabaseCloud || !navigator.onLine){
       v61SetIndicator("offline","suppression enregistrée • envoi en attente");
@@ -7005,7 +7031,8 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
               const k=String(remote.v66Key), v=remote.v66Value;
               if((v6613OrderLocked() && v6613ProtectedOrderKey(k)) || keepLocalOrder(k,remote)) return;
               v61ApplyingRemote=true;
-              if(k===CUSTOM_PRODUCTS_KEY){ if(v===null) v65StoreProducts("[]"); else v65StoreProducts(String(v)); }
+              if(k===CUSTOM_PRODUCTS_KEY){ v65StoreProducts(window.rmlMergeCatalogProducts(v)); }
+              else if(k===V66_CATALOG_META_KEY){ window.rmlMergeCatalogMeta(v); window.v62EnforceCatalogMeta(); }
               else if(k===RML_HISTORY_TOMBSTONES_KEY){ if(v===null) nativeSetItem.call(localStorage,k,"[]"); else nativeSetItem.call(localStorage,k,String(v)); rmlFilterDeletedHistoryNow(); }
               else if(k===HISTORY_KEY){ receiveCloudHistory(v); }
               else if(v===null) nativeRemoveItem.call(localStorage,k); else nativeSetItem.call(localStorage,k,String(v));
@@ -7037,12 +7064,20 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
     let n=0;
     v61ApplyingRemote=true;
     try{
-      for(const row of (Array.isArray(data)?data:[])){
+      const rows=Array.isArray(data)?data:[];
+      for(const row of rows){
+        const delta=row?.data;
+        if(delta?.v66Type===V66_DELTA_TAG && delta.sharedKey===CLOUD_SHARED_KEY && delta.v66Key===V66_CATALOG_META_KEY){
+          window.rmlMergeCatalogMeta(delta.v66Value);
+        }
+      }
+      for(const row of rows){
         const d=row&&row.data;
         if(!d || d.v66Type!==V66_DELTA_TAG || d.sharedKey!==CLOUD_SHARED_KEY || !d.v66Key) continue;
         const k=String(d.v66Key), v=d.v66Value;
         if((v6613OrderLocked() && v6613ProtectedOrderKey(k)) || keepLocalOrder(k,d)) continue;
-        if(k===CUSTOM_PRODUCTS_KEY){ if(v===null) v65StoreProducts("[]"); else v65StoreProducts(String(v)); }
+        if(k===CUSTOM_PRODUCTS_KEY){ v65StoreProducts(window.rmlMergeCatalogProducts(v)); }
+        else if(k===V66_CATALOG_META_KEY){ window.rmlMergeCatalogMeta(v); window.v62EnforceCatalogMeta(); }
         else if(k===RML_HISTORY_TOMBSTONES_KEY){
           if(v===null) nativeSetItem.call(localStorage,k,"[]"); else nativeSetItem.call(localStorage,k,String(v));
           rmlFilterDeletedHistoryNow();
@@ -7877,10 +7912,59 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
 (function(){
   const META_KEY = 'rml_supplier_catalog_meta_v62';
   const CUSTOM_KEYS = ['rml_custom_products','commande_fournisseur_custom_products_v1'];
+  const PENDING_KEY = 'v61_supplier_catalog_pending';
+  let syncingCatalog=false;
+  function pendingSuppliers(){
+    return new Set(JSON.parse(localStorage.getItem(PENDING_KEY)||'[]'));
+  }
+  function queueSuppliers(keys){
+    localStorage.setItem(PENDING_KEY,JSON.stringify([...new Set([...pendingSuppliers(),...keys])]));
+  }
   const norm = v => String(v==null?'':v).trim();
   const skey = v => norm(v).toUpperCase();
   function loadMeta(){ try{ const x=JSON.parse(localStorage.getItem(META_KEY)||'{}'); return x&&typeof x==='object'?x:{}; }catch(e){ return {}; } }
   function saveMeta(m){ try{ localStorage.setItem(META_KEY,JSON.stringify(m||{})); }catch(e){} }
+  window.rmlMergeCatalogMeta=function(raw){
+    const meta=loadMeta();
+    let remote={};
+    try{ remote=JSON.parse(raw||'{}')||{}; }catch(e){}
+    for(const [key,value] of Object.entries(remote)){
+      if(Number(value?.generation||0)>Number(meta[key]?.generation||0)) meta[key]=value;
+    }
+    const merged=JSON.stringify(meta);
+    if(merged!==localStorage.getItem(META_KEY)) localStorage.setItem(META_KEY,merged);
+    return merged;
+  };
+  window.rmlMergeCatalogProducts=function(raw){
+    const meta=loadMeta();
+    const incoming=JSON.parse(raw||'[]');
+    if(!Array.isArray(incoming)) throw new Error('Catalogue fournisseur invalide');
+    const pending=pendingSuppliers();
+    const current=pending.size?parseProducts():[];
+    const incomingGenerations=new Map();
+    for(const product of incoming){
+      if(!product?.imported)continue;
+      const key=skey(product.supplier);
+      incomingGenerations.set(key,Math.max(incomingGenerations.get(key)||0,Number(product.catalog_generation_v62||0)));
+    }
+    const allowed=product=>!product?.imported||Number(product.catalog_generation_v62||0)>=Number(meta[skey(product.supplier)]?.generation||0);
+    const products=incoming.filter(allowed);
+    for(const product of current){
+      if(!product?.imported||!pending.has(skey(product.supplier))||!allowed(product))continue;
+      const generation=Number(product.catalog_generation_v62||0);
+      if(generation>(incomingGenerations.get(skey(product.supplier))||0)) products.push(product);
+    }
+    return JSON.stringify(products);
+  };
+  async function syncCatalog(){
+    if(syncingCatalog||!pendingSuppliers().size)return false;
+    syncingCatalog=true;
+    try{
+      const ok=await window.rmlSyncSupplierCatalogNow();
+      if(ok)localStorage.removeItem(PENDING_KEY);
+      return ok;
+    }finally{syncingCatalog=false;}
+  }
   function setMeta(supplier, action, generation){
     const k=skey(supplier); if(!k) return 0;
     const m=loadMeta();
@@ -7952,7 +8036,12 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
         try{ remoteMeta=JSON.parse((payload&&payload.storage&&payload.storage[META_KEY])||'{}')||{}; }catch(e){}
         const merged={...localMeta};
         Object.keys(remoteMeta).forEach(k=>{ const l=merged[k]||{},r=remoteMeta[k]||{}; if(Number(r.generation||0)>Number(l.generation||0)) merged[k]=r; });
-        if(payload&&payload.storage) payload.storage[META_KEY]=JSON.stringify(merged);
+        if(payload?.storage){
+          payload.storage[META_KEY]=window.rmlMergeCatalogMeta(JSON.stringify(merged));
+          if(Object.prototype.hasOwnProperty.call(payload.storage,CUSTOM_KEYS[0])){
+            payload.storage[CUSTOM_KEYS[0]]=window.rmlMergeCatalogProducts(payload.storage[CUSTOM_KEYS[0]]);
+          }
+        }
       }catch(e){}
       const result=baseApply.apply(this,arguments); try{enforceCatalogMeta()}catch(e){} return result;
     };
@@ -7966,13 +8055,16 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
       const r=prevDeleteProduct.apply(this,arguments); forcePush(); return r;
     };
   }
-  window.deleteImportedProductsBySupplier=function(supplierName){
+  window.deleteImportedProductsBySupplier=async function(supplierName){
+    if(syncingCatalog){alert('La synchronisation du catalogue est en cours. Réessaie dans un instant.');return;}
     const supplier=norm(supplierName); if(!supplier){alert('Aucun fournisseur sélectionné.');return;}
     if(!confirm('Supprimer définitivement tous les produits importés du fournisseur '+supplier+' ?')) return;
     const before=parseProducts().filter(p=>p&&p.imported&&skey(p.supplier)===skey(supplier)).length;
-    markDeleteCatalog(supplier); forcePush();
+    queueSuppliers([skey(supplier)]);
+    markDeleteCatalog(supplier);
     try{ if(typeof goSettings==='function'){goSettings();if(typeof setSettingsSection==='function')setSettingsSection('fournisseurs');} }catch(e){}
-    alert(before+' produit(s) importé(s) supprimé(s) définitivement pour '+supplier+'.\n\nLa suppression va se propager aux autres appareils.');
+    const ok=await syncCatalog();
+    alert(before+' produit(s) importé(s) retiré(s) pour '+supplier+'.\n\n'+(ok?'Suppression synchronisée.':'Synchronisation en attente.'));
   };
   const prevDeleteSupplier=window.deleteSupplier;
   if(typeof prevDeleteSupplier==='function'){
@@ -7987,7 +8079,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
     const reader=new FileReader(); const clean=v=>String(v==null?'':v).trim();
     reader.onload=async function(e){
       try{
-        localStorage.setItem('v61_import_lock','1'); localStorage.setItem('v61_force_push','1');
+        if(syncingCatalog) throw new Error('La synchronisation du catalogue est en cours. Réessaie dans un instant.');
         const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}),sh=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sh,{defval:''});
         if(!rows.length) throw new Error('Fichier vide');
         const existing=parseProducts(),bySupplier={};
@@ -8000,6 +8092,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
           bySupplier[k].seen.add(dedupe); bySupplier[k].rows.push({row,familyLabel,familySource,designation,color,ref,unit});
         });
         const keys=Object.keys(bySupplier); if(!keys.length) throw new Error('Aucune ligne exploitable');
+        queueSuppliers(keys);
         let merged=existing.slice(); const imported=[];
         for(const k of keys){
           const group=bySupplier[k],generation=setMeta(group.supplier,'catalog-import');
@@ -8010,17 +8103,22 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeCo
             merged.push(p); imported.push(p);
           }
         }
-        writeProducts(merged); try{if(typeof syncCustomProductPricesToState==='function')syncCustomProductPricesToState()}catch(e){} enforceCatalogMeta(); forcePush();
-        let ok=false; for(let i=0;i<24;i++){ try{if(typeof window.v61SyncNow==='function')await window.v61SyncNow()}catch(e){} if(localStorage.getItem('v61_sync_pending')!=='1'){ok=true;break;} await new Promise(r=>setTimeout(r,330)); }
-        if(ok){ localStorage.removeItem('v61_import_lock'); alert('✅ Nouvelle liste enregistrée et synchronisée pour : '+[...new Set(imported.map(p=>p.supplier))].join(', ')); location.reload(); }
-        else alert('✅ Nouvelle liste enregistrée localement. La synchronisation cloud va continuer automatiquement.');
+        writeProducts(merged);
+        try{if(typeof syncCustomProductPricesToState==='function')syncCustomProductPricesToState()}catch(e){}
+        enforceCatalogMeta();
+        const ok=await syncCatalog();
+        window.v61RefreshUiFromStorage?.();
+        if(typeof setSettingsSection==='function')setSettingsSection('fournisseurs');
+        alert((ok?'Nouvelle liste synchronisée pour : ':'Nouvelle liste enregistrée localement, synchronisation en attente pour : ')+[...new Set(imported.map(p=>p.supplier))].join(', '));
       }catch(err){ console.error('V62 import',err); alert('❌ Erreur import Excel : '+(err.message||err)); }
       finally{ try{event.target.value=''}catch(e){} }
     };
     reader.readAsArrayBuffer(file);
   };
   try{enforceCatalogMeta()}catch(e){}
-  window.addEventListener('online',()=>{try{enforceCatalogMeta();forcePush()}catch(e){}});
+  window.addEventListener('online',syncCatalog);
+  window.addEventListener('focus',syncCatalog);
+  setInterval(syncCatalog,5000);
   window.v62CatalogMeta=loadMeta; window.v62EnforceCatalogMeta=enforceCatalogMeta;
 })();
 </script>
