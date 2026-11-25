@@ -9032,16 +9032,13 @@ if(quotePdfBtn){
       }
       return {side:ret.side,vertices,lip};
     });
-    // La vue d’ensemble conserve la longueur réelle. Le détail isole un tronçon
-    // pour agrandir la section sans déformer les plis ni les petits retours.
-    function renderProjection(start,end,area,walls,detailSide){
-      const yaw=(detailSide?48:32)*Math.PI/180;
-      const elevation=(detailSide?37:24)*Math.PI/180;
+    function renderProjection(area){
+      const yaw=32*Math.PI/180;
+      const elevation=24*Math.PI/180;
       const sinYaw=Math.sin(yaw),cosYaw=Math.cos(yaw);
       const sinElevation=Math.sin(elevation),cosElevation=Math.cos(elevation);
-      const reverse=detailSide==="right";
       const project=p=>{
-        const z=reverse?end-p.z:p.z-start;
+        const z=p.z;
         const toward=p.x*cosYaw-z*sinYaw;
         return {
           x:p.x*sinYaw+z*cosYaw,
@@ -9049,9 +9046,9 @@ if(quotePdfBtn){
           depth:toward*cosElevation-p.y*sinElevation
         };
       };
-      const near=raw.map(p=>project(vertex(p,reverse?end:start)));
-      const far=raw.map(p=>project(vertex(p,reverse?start:end)));
-      const projectedWalls=walls.map(wall=>({
+      const near=raw.map(p=>project(vertex(p,0)));
+      const far=raw.map(p=>project(vertex(p,depth)));
+      const projectedWalls=ends.map(wall=>({
         side:wall.side,
         vertices:wall.vertices.map(project),
         lip:wall.lip?.map(project)
@@ -9077,26 +9074,15 @@ if(quotePdfBtn){
           svg:face([near[i],near[i+1],far[i+1],far[i]],fill,"#23435f",1.15)
         };
       }).sort((a,b)=>a.depth-b.depth);
-      const nearSide=reverse?"right":"left";
-      const edge=`<polyline points="${points(near)}" fill="none" stroke="#132e47" stroke-width="${detailSide?2.3:1.5}" stroke-linecap="round" stroke-linejoin="round"/>`;
-      return projectedWalls.filter(wall=>wall.side!==nearSide).map(wallSvg).join("")
+      const edge=`<polyline points="${points(near)}" fill="none" stroke="#132e47" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+      return projectedWalls.filter(wall=>wall.side==="right").map(wallSvg).join("")
         +panels.map(panel=>panel.svg).join("")
-        +edge+projectedWalls.filter(wall=>wall.side===nearSide).map(wallSvg).join("");
+        +edge+projectedWalls.filter(wall=>wall.side==="left").map(wallSvg).join("");
     }
 
-    const detailWidth=260,detailX=W-detailWidth-22;
-    const main=renderProjection(0,depth,{x:30,y:33,width:detailX-48,height:108},ends);
-    const detailSide=ends[0]?.side||"left";
-    const detailLength=Math.min(depth,Math.max(profileW,Math.max(...raw.map(p=>p.y))-Math.min(...raw.map(p=>p.y)))*.65);
-    const detailStart=detailSide==="right"?depth-detailLength:0;
-    const detailEnd=detailSide==="right"?depth:detailLength;
-    const detail=renderProjection(detailStart,detailEnd,{x:detailX+14,y:54,width:detailWidth-28,height:80},ends.filter(wall=>wall.side===detailSide),detailSide);
-    const sideView=`<g aria-label="Vue 3D de la pièce et détail du profil">
+    const sideView=`<g aria-label="Vue 3D de la pièce">
       <text x="22" y="20" class="info-title">VUE 3D DE LA PIÈCE${endReturns.length?" — RETOURS EN BLEU":""}</text>
-      ${main}
-      <rect x="${detailX}" y="28" width="${detailWidth}" height="114" rx="8" fill="#f5f8fb" stroke="#c7d2dc"/>
-      <text x="${detailX+12}" y="46" class="info">DÉTAIL DU PROFIL${ends.length?" · "+(detailSide==="left"?"BOUT GAUCHE":"BOUT DROIT"):""}</text>
-      ${detail}
+      ${renderProjection({x:30,y:29,width:W-60,height:115})}
       ${endFoldLines.map((line,i)=>`<text x="${22+i*W/2}" y="155" class="info">${esc(line)}</text>`).join("")}
       <line x1="22" y1="164" x2="${W-22}" y2="164" stroke="#c7d2dc"/>
     </g>`;
