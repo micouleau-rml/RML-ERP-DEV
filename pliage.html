@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="RML Pliage"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
-<title>RML PLIAGE ERP — V44.13</title>
+<title>RML PLIAGE ERP — V44.14</title>
 <style>
 :root{--card:#ffffff;--text:#17202a;--muted:#687684;--line:#d9e1ea;--accent:#0f62fe;--accent2:#0a4ecc;--danger:#c62828;--ok:#157347;--shadow:0 12px 30px rgba(18,36,56,.08);--radius:18px}
 *{box-sizing:border-box}
@@ -1865,7 +1865,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
     <div class="brand">
       
       <div class="brand-text">
-        <h1>RML PLIAGE ALU · V44.13</h1>
+        <h1>RML PLIAGE ALU · V44.14</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
       </div>
@@ -9014,7 +9014,7 @@ if(quotePdfBtn){
     );
     const sideViewHeight=170;
     const depth=Math.max(1,lengthMm||profileW);
-    const project=(p,z)=>({x:p.x*.68+z,y:p.y-p.x*.42-z*.22});
+    const vertex=(p,z)=>({x:p.x,y:p.y,z});
     const ends=endReturns.map(ret=>{
       const isLeft=ret.side==="left";
       const z=isLeft?0:depth;
@@ -9022,22 +9022,41 @@ if(quotePdfBtn){
       const rise=(ret.direction==="bas"?1:-1)*ret.height*Math.sin(angle);
       const tipZ=z+(isLeft?1:-1)*ret.height*Math.cos(angle);
       const a=raw[longestIndex],b=raw[longestIndex+1];
-      const vertices=[project(a,z),project(b,z),project({x:b.x,y:b.y+rise},tipZ),project({x:a.x,y:a.y+rise},tipZ)];
+      const vertices=[vertex(a,z),vertex(b,z),vertex({x:b.x,y:b.y+rise},tipZ),vertex({x:a.x,y:a.y+rise},tipZ)];
       let lip=null;
       if(ret.lip){
         const lipAngle=angle-(Math.PI-55*Math.PI/180);
         const dz=(isLeft?1:-1)*12*Math.cos(lipAngle);
         const dy=(ret.direction==="bas"?1:-1)*12*Math.sin(lipAngle);
-        lip=[vertices[3],vertices[2],project({x:b.x,y:b.y+rise+dy},tipZ+dz),project({x:a.x,y:a.y+rise+dy},tipZ+dz)];
+        lip=[vertices[3],vertices[2],vertex({x:b.x,y:b.y+rise+dy},tipZ+dz),vertex({x:a.x,y:a.y+rise+dy},tipZ+dz)];
       }
       return {side:ret.side,vertices,lip};
     });
     // La vue d’ensemble conserve la longueur réelle. Le détail isole un tronçon
     // pour agrandir la section sans déformer les plis ni les petits retours.
-    function renderProjection(start,end,area,walls,detail=false){
-      const left=raw.map(p=>project(p,start));
-      const right=raw.map(p=>project(p,end));
-      const all=[...left,...right,...walls.flatMap(wall=>[...wall.vertices,...(wall.lip||[])])];
+    function renderProjection(start,end,area,walls,detailSide){
+      const yaw=(detailSide?48:32)*Math.PI/180;
+      const elevation=(detailSide?37:24)*Math.PI/180;
+      const sinYaw=Math.sin(yaw),cosYaw=Math.cos(yaw);
+      const sinElevation=Math.sin(elevation),cosElevation=Math.cos(elevation);
+      const reverse=detailSide==="right";
+      const project=p=>{
+        const z=reverse?end-p.z:p.z-start;
+        const toward=p.x*cosYaw-z*sinYaw;
+        return {
+          x:p.x*sinYaw+z*cosYaw,
+          y:p.y*cosElevation+toward*sinElevation,
+          depth:toward*cosElevation-p.y*sinElevation
+        };
+      };
+      const near=raw.map(p=>project(vertex(p,reverse?end:start)));
+      const far=raw.map(p=>project(vertex(p,reverse?start:end)));
+      const projectedWalls=walls.map(wall=>({
+        side:wall.side,
+        vertices:wall.vertices.map(project),
+        lip:wall.lip?.map(project)
+      }));
+      const all=[...near,...far,...projectedWalls.flatMap(wall=>[...wall.vertices,...(wall.lip||[])])];
       const x0=Math.min(...all.map(p=>p.x)),x1=Math.max(...all.map(p=>p.x));
       const y0=Math.min(...all.map(p=>p.y)),y1=Math.max(...all.map(p=>p.y));
       const fit=Math.min(area.width/Math.max(1,x1-x0),area.height/Math.max(1,y1-y0));
@@ -9051,15 +9070,18 @@ if(quotePdfBtn){
       const panels=raw.slice(1).map((p,i)=>{
         const a=raw[i];
         const dx=p.x-a.x,dy=p.y-a.y;
-        const lighting=(dx*.65-dy*.76)/(Math.hypot(dx,dy)||1);
-        const fill=lighting>.25?"#e2ebf2":lighting<-.25?"#91abc1":"#b6cadb";
-        return {depth:(a.x+p.x)+.27*(a.y+p.y),svg:face([left[i],left[i+1],right[i+1],right[i]],fill,"#23435f",1.15)};
+        const lighting=Math.abs(dx*.83+dy*.55)/(Math.hypot(dx,dy)||1);
+        const fill=lighting>.75?"#dce8f1":lighting<.6?"#8ca8c0":"#b4c9da";
+        return {
+          depth:(near[i].depth+near[i+1].depth)/2,
+          svg:face([near[i],near[i+1],far[i+1],far[i]],fill,"#23435f",1.15)
+        };
       }).sort((a,b)=>a.depth-b.depth);
-      const edge=(vertices,strong)=>`<polyline points="${points(vertices)}" fill="none" stroke="${strong?"#132e47":"#57748d"}" stroke-width="${strong?2.5:1.2}" stroke-linecap="round" stroke-linejoin="round"/>`;
-      return walls.filter(wall=>wall.side==="right").map(wallSvg).join("")
+      const nearSide=reverse?"right":"left";
+      const edge=`<polyline points="${points(near)}" fill="none" stroke="#132e47" stroke-width="${detailSide?2.3:1.5}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      return projectedWalls.filter(wall=>wall.side!==nearSide).map(wallSvg).join("")
         +panels.map(panel=>panel.svg).join("")
-        +edge(right,detail&&start>0)+edge(left,detail&&start===0)
-        +walls.filter(wall=>wall.side==="left").map(wallSvg).join("");
+        +edge+projectedWalls.filter(wall=>wall.side===nearSide).map(wallSvg).join("");
     }
 
     const detailWidth=260,detailX=W-detailWidth-22;
@@ -9068,7 +9090,7 @@ if(quotePdfBtn){
     const detailLength=Math.min(depth,Math.max(profileW,Math.max(...raw.map(p=>p.y))-Math.min(...raw.map(p=>p.y)))*.65);
     const detailStart=detailSide==="right"?depth-detailLength:0;
     const detailEnd=detailSide==="right"?depth:detailLength;
-    const detail=renderProjection(detailStart,detailEnd,{x:detailX+14,y:54,width:detailWidth-28,height:80},ends.filter(wall=>wall.side===detailSide),true);
+    const detail=renderProjection(detailStart,detailEnd,{x:detailX+14,y:54,width:detailWidth-28,height:80},ends.filter(wall=>wall.side===detailSide),detailSide);
     const sideView=`<g aria-label="Vue 3D de la pièce et détail du profil">
       <text x="22" y="20" class="info-title">VUE 3D DE LA PIÈCE${endReturns.length?" — RETOURS EN BLEU":""}</text>
       ${main}
@@ -9176,7 +9198,7 @@ if(quotePdfBtn){
           .page{margin:0;width:196mm;height:283mm}
           .screen-actions{display:none}
         }
-      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.13</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
+      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.14</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
       <script>
         document.getElementById("printPlansAction").addEventListener("click",()=>window.print());
         document.getElementById("closePlansAction").addEventListener("click",()=>window.close());
