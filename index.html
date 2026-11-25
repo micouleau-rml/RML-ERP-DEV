@@ -6929,8 +6929,18 @@ function subAssignSearchWords(value){
 function subAssignMatches(words,query){
  return query.every(term=>words.some(word=>word.startsWith(term)));
 }
+const subAssignJobStatuses=new Map([
+ ['actif','Actif'],
+ ['attente','En attente'],
+ ['en_cours','En cours'],
+ ['opr','OPR'],
+ ['sav','SAV']
+]);
 function subAssignEligibleJobs(){
- return subAssignAllJobs.filter(j=>['actif','attente'].includes(j.statut));
+ return subAssignAllJobs.filter(job=>subAssignJobStatuses.has(job.statut));
+}
+function subAssignJobLabel(job, fallback){
+ return (job.nom||job.adresse||fallback||'Chantier')+' · '+subAssignJobStatuses.get(job.statut);
 }
 function subAssignJobMatches(job,clientName,query){
  return subAssignMatches(subAssignSearchWords([job.nom,clientName,job.adresse].filter(Boolean).join(' ')),query);
@@ -6942,7 +6952,7 @@ function fillSubAssignJobOptions(selected=''){
  const jobs=subAssignEligibleJobs().filter(job=>
   (!cid||String(job.client_id)===cid)&&subAssignJobMatches(job,clients.get(String(job.client_id)),query)
  );
- fillSelect(subAssignJob,jobs,jobs.length?'Choisir un chantier':'Aucun chantier actif ou en attente','id',j=>j.nom||clients.get(String(j.client_id))||'Chantier');
+ fillSelect(subAssignJob,jobs,jobs.length?'Choisir un chantier':'Aucun chantier correspondant','id',j=>subAssignJobLabel(j,clients.get(String(j.client_id))));
  if(selected&&jobs.some(j=>String(j.id)===String(selected)))subAssignJob.value=String(selected);
  rmlUpdateSubAddress();
 }
@@ -6978,13 +6988,13 @@ function renderSubAssignClientSuggestions(){
  for(const client of matchingClients)addResult('Client · '+client.nom,client.id);
  for(const job of matchingJobs){
   const client=clients.get(String(job.client_id));
-  addResult('Chantier · '+(job.nom||job.adresse||'Sans nom')+(client?' — '+client:''),job.client_id,job.id);
+  addResult('Chantier · '+subAssignJobLabel(job)+(client?' — '+client:''),job.client_id,job.id);
  }
  if(!list.childElementCount){
   const message=document.createElement('p');
   message.className='muted';
   message.style.margin='8px 12px';
-  message.textContent='Aucun client ni chantier actif ou en attente trouvé.';
+  message.textContent='Aucun client ni chantier correspondant.';
   list.append(message);
  }
  list.hidden=false;
