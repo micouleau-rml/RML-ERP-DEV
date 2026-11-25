@@ -2836,6 +2836,48 @@ function goHome(){
 }
 
 
+let editingSupplierFamilies = "";
+
+function supplierFamilyOrderKey(supplier){
+  return "rml_family_order_" + encodeURIComponent(supplier);
+}
+
+function supplierFamilyId({fam}){
+  return JSON.stringify([Boolean(fam.original_name), fam.original_name || fam.name]);
+}
+
+function orderedSupplierFamilies(supplier){
+  let saved = [];
+  try{
+    const order = JSON.parse(localStorage.getItem(supplierFamilyOrderKey(supplier.name)) || "[]");
+    if(Array.isArray(order)) saved = order;
+  }catch(error){ console.warn("Ordre des familles illisible", error); }
+  const positions = new Map(saved.map((id,index) => [id,index]));
+  return [...supplier.families].sort((a,b) =>
+    (positions.get(supplierFamilyId(a)) ?? Infinity) - (positions.get(supplierFamilyId(b)) ?? Infinity)
+  );
+}
+
+function toggleSupplierFamilyOrder(index){
+  const supplier = getSuppliers()[index];
+  if(!supplier) return;
+  editingSupplierFamilies = editingSupplierFamilies === supplier.name ? "" : supplier.name;
+  openSupplier(index);
+}
+
+function moveSupplierFamily(supplierIndex, familyIndex, direction){
+  const supplier = getSuppliers()[supplierIndex];
+  if(!supplier || editingSupplierFamilies !== supplier.name) return;
+  const families = orderedSupplierFamilies(supplier);
+  const from = families.findIndex(family => family.index === familyIndex);
+  const to = from + direction;
+  if(from < 0 || to < 0 || to >= families.length) return;
+  [families[from],families[to]] = [families[to],families[from]];
+  localStorage.setItem(supplierFamilyOrderKey(supplier.name), JSON.stringify(families.map(supplierFamilyId)));
+  openSupplier(supplierIndex);
+  document.getElementById("family-order-" + familyIndex + "-" + (to === 0 ? 1 : to === families.length - 1 ? -1 : direction))?.focus();
+}
+
 function openSupplier(index){
   const suppliers = getSuppliers();
   const supplier = suppliers[index];
@@ -2848,8 +2890,20 @@ function openSupplier(index){
   document.getElementById("settings")?.classList.add("hidden");
   document.getElementById("recap").classList.add("hidden");
 
-  const buttons = supplier.families.map(obj => {
+  if(editingSupplierFamilies !== supplier.name) editingSupplierFamilies = "";
+  const editing = editingSupplierFamilies === supplier.name;
+  const families = orderedSupplierFamilies(supplier);
+  const buttons = families.map((obj,position) => {
     const fam = obj.fam;
+    if(editing){
+      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0">
+        <strong style="flex:1">${esc(fam.name)}</strong>
+        <button class="btn neutral" style="width:auto" id="family-order-${obj.index}--1" aria-label="Monter ${esc(fam.name)}"
+          onclick="moveSupplierFamily(${index},${obj.index},-1)" ${position===0?"disabled":""}>↑</button>
+        <button class="btn neutral" style="width:auto" id="family-order-${obj.index}-1" aria-label="Descendre ${esc(fam.name)}"
+          onclick="moveSupplierFamily(${index},${obj.index},1)" ${position===families.length-1?"disabled":""}>↓</button>
+      </div>`;
+    }
     const selected = fam.items.filter(it => Number((state[keyOf(fam.name, it.label)] || {}).qty || 0) > 0).length;
     const familyButtonColor = (fam.items.find(it => it.button_color) || {}).button_color || fam.family_color || "#475569";
     return `<button class="btn" style="background:${familyButtonColor};color:#fff;border-color:${familyButtonColor}" onclick="openFamily(${obj.index})">
@@ -2872,7 +2926,8 @@ function openSupplier(index){
     onclick="resetSupplierData('${esc(supplier.name)}')">Supprimer la commande</button>
 
 </div>
-    ${buttons ? `<div class="grid">${buttons}</div>` : `<div class="empty">Aucun produit affecté pour l’instant à ce fournisseur.</div>`}
+    ${families.length > 1 ? `<button class="btn neutral" onclick="toggleSupplierFamilyOrder(${index})">${editing?"Terminer":"Réorganiser les familles"}</button>` : ""}
+    ${buttons ? `<div class="${editing?"":"grid"}">${buttons}</div>` : `<div class="empty">Aucun produit affecté pour l’instant à ce fournisseur.</div>`}
     <p class="note">Sélectionnez ensuite une famille pour saisir les quantités.</p>
     <div class="bottom-actions">
   <button class="btn neutral"
