@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="RML Pliage"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
-<title>RML PLIAGE ERP — V44.11</title>
+<title>RML PLIAGE ERP — V44.12</title>
 <style>
 :root{--card:#ffffff;--text:#17202a;--muted:#687684;--line:#d9e1ea;--accent:#0f62fe;--accent2:#0a4ecc;--danger:#c62828;--ok:#157347;--shadow:0 12px 30px rgba(18,36,56,.08);--radius:18px}
 *{box-sizing:border-box}
@@ -1865,7 +1865,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
     <div class="brand">
       
       <div class="brand-text">
-        <h1>RML PLIAGE ALU · V44.11</h1>
+        <h1>RML PLIAGE ALU · V44.12</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
       </div>
@@ -9013,12 +9013,8 @@ if(quotePdfBtn){
       `${label} : ${height.toLocaleString("fr-FR")} mm · ${angle.toLocaleString("fr-FR")}° · ${direction}${lip?" · repli intérieur 12 mm à 55°":""}`
     );
     const sideViewHeight=170;
-    // Projection oblique du profil extrudé. Les retours se replient sur
-    // les deux arêtes du fond, aux extrémités de la longueur finie.
     const depth=Math.max(1,lengthMm||profileW);
-    const project=(p,z)=>({x:p.x*.56+z,y:p.y+p.x*.21-z*.19});
-    const left=raw.map(p=>project(p,0));
-    const right=raw.map(p=>project(p,depth));
+    const project=(p,z)=>({x:p.x*.68+z,y:p.y-p.x*.42-z*.22});
     const ends=endReturns.map(ret=>{
       const isLeft=ret.side==="left";
       const z=isLeft?0:depth;
@@ -9027,33 +9023,60 @@ if(quotePdfBtn){
       const tipZ=z+(isLeft?1:-1)*ret.height*Math.cos(angle);
       const a=raw[longestIndex],b=raw[longestIndex+1];
       const vertices=[project(a,z),project(b,z),project({x:b.x,y:b.y+rise},tipZ),project({x:a.x,y:a.y+rise},tipZ)];
+      let lip=null;
       if(ret.lip){
-        // Angle intérieur de 55° : poursuivre la paroi vers le centre.
         const lipAngle=angle-(Math.PI-55*Math.PI/180);
         const dz=(isLeft?1:-1)*12*Math.cos(lipAngle);
         const dy=(ret.direction==="bas"?1:-1)*12*Math.sin(lipAngle);
-        vertices.lip=[vertices[3],vertices[2],project({x:b.x,y:b.y+rise+dy},tipZ+dz),project({x:a.x,y:a.y+rise+dy},tipZ+dz)];
+        lip=[vertices[3],vertices[2],project({x:b.x,y:b.y+rise+dy},tipZ+dz),project({x:a.x,y:a.y+rise+dy},tipZ+dz)];
       }
-      return vertices;
+      return {side:ret.side,vertices,lip};
     });
-    const all=[...left,...right,...ends.flat(),...ends.flatMap(vertices=>vertices.lip||[])];
-    const x0=Math.min(...all.map(p=>p.x)),x1=Math.max(...all.map(p=>p.x));
-    const y0=Math.min(...all.map(p=>p.y)),y1=Math.max(...all.map(p=>p.y));
-    const fit=Math.min((W-56)/Math.max(1,x1-x0),108/Math.max(1,y1-y0));
-    const points=vertices=>vertices.map(p=>
-      `${(W/2+(p.x-(x0+x1)/2)*fit).toFixed(1)},${(84+(p.y-(y0+y1)/2)*fit).toFixed(1)}`
-    ).join(" ");
-    const faces=left.slice(1).map((p,i)=>
-      `<polygon points="${points([left[i],p,right[i+1],right[i]])}" fill="${i===longestIndex?"#e5edf4":"#cbd9e5"}" stroke="#17324a" stroke-width="1.4"/>`
-    );
-    const wall=vertices=>`<polygon points="${points(vertices)}" fill="#91b9ff" fill-opacity=".72" stroke="#0b51c5" stroke-width="2"/>`+(vertices.lip?`<polygon points="${points(vertices.lip)}" fill="#5387d9" stroke="#0b51c5" stroke-width="1.5"/>`:"");
-    const sideView=`<g aria-label="Vue 3D de la pièce">
+    // La vue d’ensemble conserve la longueur réelle. Le détail isole un tronçon
+    // pour agrandir la section sans déformer les plis ni les petits retours.
+    function renderProjection(start,end,area,walls,detail=false){
+      const left=raw.map(p=>project(p,start));
+      const right=raw.map(p=>project(p,end));
+      const all=[...left,...right,...walls.flatMap(wall=>[...wall.vertices,...(wall.lip||[])])];
+      const x0=Math.min(...all.map(p=>p.x)),x1=Math.max(...all.map(p=>p.x));
+      const y0=Math.min(...all.map(p=>p.y)),y1=Math.max(...all.map(p=>p.y));
+      const fit=Math.min(area.width/Math.max(1,x1-x0),area.height/Math.max(1,y1-y0));
+      const points=vertices=>vertices.map(p=>
+        `${(area.x+area.width/2+(p.x-(x0+x1)/2)*fit).toFixed(1)},${(area.y+area.height/2+(p.y-(y0+y1)/2)*fit).toFixed(1)}`
+      ).join(" ");
+      const face=(vertices,fill,stroke,width)=>
+        `<polygon points="${points(vertices)}" fill="${fill}" stroke="${stroke}" stroke-width="${width}" stroke-linejoin="round"/>`;
+      const wallSvg=wall=>face(wall.vertices,"#91b9ff","#124a9c",1.5)
+        +(wall.lip?face(wall.lip,"#4f82d4","#124a9c",1.4):"");
+      const panels=raw.slice(1).map((p,i)=>{
+        const a=raw[i];
+        const dx=p.x-a.x,dy=p.y-a.y;
+        const lighting=(dx*.65-dy*.76)/(Math.hypot(dx,dy)||1);
+        const fill=lighting>.25?"#e2ebf2":lighting<-.25?"#91abc1":"#b6cadb";
+        return {depth:(a.x+p.x)+.27*(a.y+p.y),svg:face([left[i],left[i+1],right[i+1],right[i]],fill,"#23435f",1.15)};
+      }).sort((a,b)=>a.depth-b.depth);
+      const edge=(vertices,strong)=>`<polyline points="${points(vertices)}" fill="none" stroke="${strong?"#132e47":"#57748d"}" stroke-width="${strong?2.5:1.2}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      return walls.filter(wall=>wall.side==="right").map(wallSvg).join("")
+        +panels.map(panel=>panel.svg).join("")
+        +edge(right,detail&&start>0)+edge(left,detail&&start===0)
+        +walls.filter(wall=>wall.side==="left").map(wallSvg).join("");
+    }
+
+    const detailWidth=260,detailX=W-detailWidth-22;
+    const main=renderProjection(0,depth,{x:30,y:33,width:detailX-48,height:108},ends);
+    const detailSide=ends[0]?.side||"left";
+    const detailLength=Math.min(depth,Math.max(profileW,Math.max(...raw.map(p=>p.y))-Math.min(...raw.map(p=>p.y)))*.65);
+    const detailStart=detailSide==="right"?depth-detailLength:0;
+    const detailEnd=detailSide==="right"?depth:detailLength;
+    const detail=renderProjection(detailStart,detailEnd,{x:detailX+14,y:54,width:detailWidth-28,height:80},ends.filter(wall=>wall.side===detailSide),true);
+    const sideView=`<g aria-label="Vue 3D de la pièce et détail du profil">
       <text x="22" y="20" class="info-title">VUE 3D DE LA PIÈCE${endReturns.length?" — RETOURS EN BLEU":""}</text>
-      ${endReturns.map((ret,i)=>ret.side==="right"?wall(ends[i]):"").join("")}
-      ${faces.join("")}
-      ${endReturns.map((ret,i)=>ret.side==="left"?wall(ends[i]):"").join("")}
-      ${endFoldLines.map((line,i)=>`<text x="${22+i*W/2}" y="151" class="info">${esc(line)}</text>`).join("")}
-      <line x1="22" y1="162" x2="${W-22}" y2="162" stroke="#c7d2dc"/>
+      ${main}
+      <rect x="${detailX}" y="28" width="${detailWidth}" height="114" rx="8" fill="#f5f8fb" stroke="#c7d2dc"/>
+      <text x="${detailX+12}" y="46" class="info">DÉTAIL DU PROFIL${ends.length?" · "+(detailSide==="left"?"BOUT GAUCHE":"BOUT DROIT"):""}</text>
+      ${detail}
+      ${endFoldLines.map((line,i)=>`<text x="${22+i*W/2}" y="155" class="info">${esc(line)}</text>`).join("")}
+      <line x1="22" y1="164" x2="${W-22}" y2="164" stroke="#c7d2dc"/>
     </g>`;
     const endFoldStartY=Math.min(H-110,Math.max(100,76+(profile.angles||[]).length*18+6));
     const blankLengthMm=Math.round(getPieceCalepinageLength(piece).cutLength)||lengthMm;
@@ -9148,7 +9171,7 @@ if(quotePdfBtn){
           .page{margin:0;width:196mm;height:283mm}
           .screen-actions{display:none}
         }
-      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.11</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
+      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.12</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
       <script>
         document.getElementById("printPlansAction").addEventListener("click",()=>window.print());
         document.getElementById("closePlansAction").addEventListener("click",()=>window.close());
