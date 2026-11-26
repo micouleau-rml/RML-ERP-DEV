@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="RML Pliage"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
-<title>RML PLIAGE ERP — V44.9</title>
+<title>RML PLIAGE ERP — V44.14</title>
 <style>
 :root{--card:#ffffff;--text:#17202a;--muted:#687684;--line:#d9e1ea;--accent:#0f62fe;--accent2:#0a4ecc;--danger:#c62828;--ok:#157347;--shadow:0 12px 30px rgba(18,36,56,.08);--radius:18px}
 *{box-sizing:border-box}
@@ -1865,7 +1865,7 @@ button{min-height:46px;border-radius:14px;touch-action:manipulation}.actions{gap
     <div class="brand">
       
       <div class="brand-text">
-        <h1>RML PLIAGE ALU · V44.9</h1>
+        <h1>RML PLIAGE ALU · V44.14</h1>
         <div class="subline">by Micouleau &amp; Lhérisson</div>
         <div class="baseline">Gouttière · Couvertine · Sous face · Pliage à façon · Clôture et portail en aluminium laqué</div>
       </div>
@@ -9012,52 +9012,80 @@ if(quotePdfBtn){
     const endFoldLines=endReturns.map(({label,height,angle,direction,lip})=>
       `${label} : ${height.toLocaleString("fr-FR")} mm · ${angle.toLocaleString("fr-FR")}° · ${direction}${lip?" · repli intérieur 12 mm à 55°":""}`
     );
-    const sideViewHeight=endReturns.length?170:0;
-    let sideView="";
-    if(endReturns.length){
-      // Projection oblique du profil extrudé. Les retours se replient sur
-      // les deux arêtes du fond, aux extrémités de la longueur finie.
-      const depth=Math.max(1,lengthMm||profileW);
-      const project=(p,z)=>({x:p.x*.56+z,y:p.y+p.x*.21-z*.19});
-      const left=raw.map(p=>project(p,0));
-      const right=raw.map(p=>project(p,depth));
-      const ends=endReturns.map(ret=>{
-        const isLeft=ret.side==="left";
-        const z=isLeft?0:depth;
-        const angle=Math.max(1,Math.min(179,ret.angle))*Math.PI/180;
-        const rise=(ret.direction==="bas"?1:-1)*ret.height*Math.sin(angle);
-        const tipZ=z+(isLeft?1:-1)*ret.height*Math.cos(angle);
-        const a=raw[longestIndex],b=raw[longestIndex+1];
-        const vertices=[project(a,z),project(b,z),project({x:b.x,y:b.y+rise},tipZ),project({x:a.x,y:a.y+rise},tipZ)];
-        if(ret.lip){
-          // Angle intérieur de 55° : poursuivre la paroi vers le centre.
-          const lipAngle=angle-(Math.PI-55*Math.PI/180);
-          const dz=(isLeft?1:-1)*12*Math.cos(lipAngle);
-          const dy=(ret.direction==="bas"?1:-1)*12*Math.sin(lipAngle);
-          vertices.lip=[vertices[3],vertices[2],project({x:b.x,y:b.y+rise+dy},tipZ+dz),project({x:a.x,y:a.y+rise+dy},tipZ+dz)];
-        }
-        return vertices;
-      });
-      const all=[...left,...right,...ends.flat(),...ends.flatMap(vertices=>vertices.lip||[])];
+    const sideViewHeight=170;
+    const depth=Math.max(1,lengthMm||profileW);
+    const vertex=(p,z)=>({x:p.x,y:p.y,z});
+    const ends=endReturns.map(ret=>{
+      const isLeft=ret.side==="left";
+      const z=isLeft?0:depth;
+      const angle=Math.max(1,Math.min(179,ret.angle))*Math.PI/180;
+      const rise=(ret.direction==="bas"?1:-1)*ret.height*Math.sin(angle);
+      const tipZ=z+(isLeft?1:-1)*ret.height*Math.cos(angle);
+      const a=raw[longestIndex],b=raw[longestIndex+1];
+      const vertices=[vertex(a,z),vertex(b,z),vertex({x:b.x,y:b.y+rise},tipZ),vertex({x:a.x,y:a.y+rise},tipZ)];
+      let lip=null;
+      if(ret.lip){
+        const lipAngle=angle-(Math.PI-55*Math.PI/180);
+        const dz=(isLeft?1:-1)*12*Math.cos(lipAngle);
+        const dy=(ret.direction==="bas"?1:-1)*12*Math.sin(lipAngle);
+        lip=[vertices[3],vertices[2],vertex({x:b.x,y:b.y+rise+dy},tipZ+dz),vertex({x:a.x,y:a.y+rise+dy},tipZ+dz)];
+      }
+      return {side:ret.side,vertices,lip};
+    });
+    function renderProjection(area){
+      const yaw=32*Math.PI/180;
+      const elevation=24*Math.PI/180;
+      const sinYaw=Math.sin(yaw),cosYaw=Math.cos(yaw);
+      const sinElevation=Math.sin(elevation),cosElevation=Math.cos(elevation);
+      const project=p=>{
+        const z=p.z;
+        const toward=p.x*cosYaw-z*sinYaw;
+        return {
+          x:p.x*sinYaw+z*cosYaw,
+          y:p.y*cosElevation+toward*sinElevation,
+          depth:toward*cosElevation-p.y*sinElevation
+        };
+      };
+      const near=raw.map(p=>project(vertex(p,0)));
+      const far=raw.map(p=>project(vertex(p,depth)));
+      const projectedWalls=ends.map(wall=>({
+        side:wall.side,
+        vertices:wall.vertices.map(project),
+        lip:wall.lip?.map(project)
+      }));
+      const all=[...near,...far,...projectedWalls.flatMap(wall=>[...wall.vertices,...(wall.lip||[])])];
       const x0=Math.min(...all.map(p=>p.x)),x1=Math.max(...all.map(p=>p.x));
       const y0=Math.min(...all.map(p=>p.y)),y1=Math.max(...all.map(p=>p.y));
-      const fit=Math.min((W-56)/Math.max(1,x1-x0),108/Math.max(1,y1-y0));
+      const fit=Math.min(area.width/Math.max(1,x1-x0),area.height/Math.max(1,y1-y0));
       const points=vertices=>vertices.map(p=>
-        `${(W/2+(p.x-(x0+x1)/2)*fit).toFixed(1)},${(84+(p.y-(y0+y1)/2)*fit).toFixed(1)}`
+        `${(area.x+area.width/2+(p.x-(x0+x1)/2)*fit).toFixed(1)},${(area.y+area.height/2+(p.y-(y0+y1)/2)*fit).toFixed(1)}`
       ).join(" ");
-      const faces=left.slice(1).map((p,i)=>
-        `<polygon points="${points([left[i],p,right[i+1],right[i]])}" fill="${i===longestIndex?"#e5edf4":"#cbd9e5"}" stroke="#17324a" stroke-width="1.4"/>`
-      );
-      const wall=vertices=>`<polygon points="${points(vertices)}" fill="#91b9ff" fill-opacity=".72" stroke="#0b51c5" stroke-width="2"/>`+(vertices.lip?`<polygon points="${points(vertices.lip)}" fill="#5387d9" stroke="#0b51c5" stroke-width="1.5"/>`:"");
-      sideView=`<g aria-label="Vue de la pièce avec ses retours">
-        <text x="22" y="20" class="info-title">VUE DE LA PIÈCE — RETOURS EN BLEU</text>
-        ${endReturns.map((ret,i)=>ret.side==="right"?wall(ends[i]):"").join("")}
-        ${faces.join("")}
-        ${endReturns.map((ret,i)=>ret.side==="left"?wall(ends[i]):"").join("")}
-        ${endFoldLines.map((line,i)=>`<text x="${22+i*W/2}" y="151" class="info">${esc(line)}</text>`).join("")}
-        <line x1="22" y1="162" x2="${W-22}" y2="162" stroke="#c7d2dc"/>
-      </g>`;
+      const face=(vertices,fill,stroke,width)=>
+        `<polygon points="${points(vertices)}" fill="${fill}" stroke="${stroke}" stroke-width="${width}" stroke-linejoin="round"/>`;
+      const wallSvg=wall=>face(wall.vertices,"#91b9ff","#124a9c",1.5)
+        +(wall.lip?face(wall.lip,"#4f82d4","#124a9c",1.4):"");
+      const panels=raw.slice(1).map((p,i)=>{
+        const a=raw[i];
+        const dx=p.x-a.x,dy=p.y-a.y;
+        const lighting=Math.abs(dx*.83+dy*.55)/(Math.hypot(dx,dy)||1);
+        const fill=lighting>.75?"#dce8f1":lighting<.6?"#8ca8c0":"#b4c9da";
+        return {
+          depth:(near[i].depth+near[i+1].depth)/2,
+          svg:face([near[i],near[i+1],far[i+1],far[i]],fill,"#23435f",1.15)
+        };
+      }).sort((a,b)=>a.depth-b.depth);
+      const edge=`<polyline points="${points(near)}" fill="none" stroke="#132e47" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+      return projectedWalls.filter(wall=>wall.side==="right").map(wallSvg).join("")
+        +panels.map(panel=>panel.svg).join("")
+        +edge+projectedWalls.filter(wall=>wall.side==="left").map(wallSvg).join("");
     }
+
+    const sideView=`<g aria-label="Vue 3D de la pièce">
+      <text x="22" y="20" class="info-title">VUE 3D DE LA PIÈCE${endReturns.length?" — RETOURS EN BLEU":""}</text>
+      ${renderProjection({x:30,y:29,width:W-60,height:115})}
+      ${endFoldLines.map((line,i)=>`<text x="${22+i*W/2}" y="155" class="info">${esc(line)}</text>`).join("")}
+      <line x1="22" y1="164" x2="${W-22}" y2="164" stroke="#c7d2dc"/>
+    </g>`;
     const endFoldStartY=Math.min(H-110,Math.max(100,76+(profile.angles||[]).length*18+6));
     const blankLengthMm=Math.round(getPieceCalepinageLength(piece).cutLength)||lengthMm;
     const developed=Number(piece.developed||bp.result?.rounded||0);
@@ -9073,7 +9101,7 @@ if(quotePdfBtn){
         <span><strong>Épaisseur</strong> ${esc(thicknessLabel)}</span>
         <span>Qté : ${qty}</span>
       </div>
-      <svg viewBox="0 0 ${W} ${H+sideViewHeight}" role="img" aria-label="Plan 2D coté de ${esc(name)}">
+      <svg viewBox="0 0 ${W} ${H+sideViewHeight}" role="img" aria-label="Vue 3D et plan coté de ${esc(name)}">
         <style>
           .profile{fill:none;stroke:#17324a;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round}
           .color-arrow line,.color-arrow path{fill:none;stroke:#d62828;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
@@ -9119,8 +9147,8 @@ if(quotePdfBtn){
     const client=getCurrentClient()?.name||"";
     const header=`<header class="sheet-head"><span><strong>Client</strong> ${esc(client||"—")}</span><span><strong>Réf. chantier</strong> ${esc(project||"—")}</span></header>`;
     const pages=[];
-    for(let i=0;i<selected.length;i+=3){
-      const group=selected.slice(i,i+3);
+    for(let i=0;i<selected.length;i+=2){
+      const group=selected.slice(i,i+2);
       const large=group.length===1;
       pages.push(`<div class="page${large?" single-plan":""}">${header}${group.map(x=>svgForPiece(x.p,x.i,large)).join("")}</div>`);
     }
@@ -9135,7 +9163,7 @@ if(quotePdfBtn){
         *{box-sizing:border-box}
         html,body{margin:0;padding:0;font-family:Arial,sans-serif;color:#111;background:#eef2f6}
         body{padding:82px 14px 14px 28px}
-        .page{width:196mm;height:283mm;margin:0 auto 14px;background:#fff;display:grid;grid-template-rows:14mm repeat(3,minmax(0,1fr));gap:3mm;page-break-after:always}
+        .page{width:196mm;height:283mm;margin:0 auto 14px;background:#fff;display:grid;grid-template-rows:14mm repeat(2,minmax(0,1fr));gap:3mm;page-break-after:always}
         .page.single-plan{grid-template-rows:14mm 125mm}
         .sheet-head{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:4mm;border-bottom:1px solid #8798a8;font-size:11pt;line-height:1.2;overflow-wrap:anywhere}
         .sheet-head strong{margin-right:1.5mm;color:#17324a}
@@ -9146,12 +9174,17 @@ if(quotePdfBtn){
         .screen-actions{position:fixed;right:18px;top:16px;bottom:auto;display:flex;gap:8px;padding:9px;background:rgba(255,255,255,.96);border:1px solid #cbd5df;border-radius:12px;box-shadow:0 8px 24px rgba(15,23,42,.16)}
         .screen-actions button{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer}
         .screen-actions #printPlansAction{background:#0f62fe;color:#fff}.screen-actions button:last-child{background:#e8edf2;color:#17324a}
+        @media screen{
+          html{overflow:auto;overscroll-behavior:none;scroll-behavior:auto}
+          body{overflow:visible}
+          .plan{overflow:clip}
+        }
         @media print{
           html,body{background:#fff;padding:0}
           .page{margin:0;width:196mm;height:283mm}
           .screen-actions{display:none}
         }
-      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.9</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
+      </style></head><body>${pages.join("")}<div class="screen-actions"><span style="align-self:center;font-weight:700;color:#17324a">V44.14</span><button id="printPlansAction">Imprimer / Enregistrer PDF</button><button id="closePlansAction">Fermer</button></div>
       <script>
         document.getElementById("printPlansAction").addEventListener("click",()=>window.print());
         document.getElementById("closePlansAction").addEventListener("click",()=>window.close());
@@ -9307,6 +9340,18 @@ if(quotePdfBtn){
     if(localStorage.getItem(SYNC_BACKUP_KEY)!==raw)
       throw new Error("La sauvegarde Pliage a changé pendant la migration. Réessayez.");
     nativeRemoveItem.call(localStorage,SYNC_BACKUP_KEY);
+  }
+  async function migrateLegacyProjectBackups(){
+    const keys=Object.keys(localStorage).filter(key=>key.startsWith("rml_pliage_projects_backup_v109_"));
+    for(const key of keys){
+      const raw=localStorage.getItem(key);
+      if(raw===null)continue;
+      const saved=await syncSnapshotGet(key);
+      if(saved!==undefined && saved!==raw)continue;
+      if(saved===undefined)await syncSnapshotPut(key,raw);
+      if(await syncSnapshotGet(key)===raw && localStorage.getItem(key)===raw)
+        nativeRemoveItem.call(localStorage,key);
+    }
   }
   const initialBackupMigration=migrateSyncBackup().catch(error=>{
     console.warn("Migration Pliage différée. La sauvegarde locale est conservée.",error);
@@ -9540,16 +9585,7 @@ if(quotePdfBtn){
         clients=[...locals.client.values()].map(normalizeClient);
         if(!clients.length)clients=structuredClone(defaultClients);
         nativeSetItem.call(localStorage,STORAGE_KEY_CLIENTS,JSON.stringify(clients));
-        // V109 : copie de sécurité non destructive avant toute mise à jour distante.
-        // Cette copie est locale à l'appareil et ne remplace pas une sauvegarde Supabase.
-        try{
-          const oldProjects=localStorage.getItem(PROJECTS_KEY);
-          const incomingProjects=JSON.stringify([...locals.project.values()]);
-          if(oldProjects && oldProjects!==incomingProjects && JSON.parse(oldProjects).length){
-            const backupKey="rml_pliage_projects_backup_v109_"+new Date().toISOString();
-            nativeSetItem.call(localStorage,backupKey,oldProjects);
-          }
-        }catch(error){console.warn("Sauvegarde pré-synchronisation impossible",error);}
+        // syncNow a déjà vérifié la sauvegarde des projets dans IndexedDB.
         nativeSetItem.call(localStorage,PROJECTS_KEY,JSON.stringify([...locals.project.values()]));
         nativeSetItem.call(localStorage,PROJECT_FOLDERS_KEY,JSON.stringify([...locals.folder.values()]));
         nativeSetItem.call(localStorage,STORAGE_KEY_BEND_LIBRARY,JSON.stringify([...locals.settings.values()].filter(item=>item?.kind==="bend_library_model")));
@@ -9604,6 +9640,9 @@ if(quotePdfBtn){
     syncing=true;
     setSyncStatus("Synchronisation sécurisée en cours…");
     try{
+      // Déplacer les copies historiques avant les écritures métier.
+      await initialBackupMigration;
+      await migrateLegacyProjectBackups();
       const workspace=encodeURIComponent(config.workspace);
       const base=`${TABLE}?workspace_id=eq.${workspace}&select=workspace_id,entity_type,entity_id,payload,updated_at,deleted&order=updated_at.asc`;
       let remote=[];
@@ -9663,7 +9702,6 @@ if(quotePdfBtn){
       // Ne supprime pas les anciennes sauvegardes déjà présentes.
       if(incoming.length){
         const backup={at:now(),clients:localStorage.getItem(STORAGE_KEY_CLIENTS),projects:localStorage.getItem(PROJECTS_KEY),folders:localStorage.getItem(PROJECT_FOLDERS_KEY),settings:localStorage.getItem(STORAGE_KEY_BEND_LIBRARY),pending:loadPending()};
-        await initialBackupMigration;
         await migrateSyncBackup();
         await storeVerifiedSyncBackup(JSON.stringify(backup));
       }
