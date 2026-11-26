@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46.14</title>
+<title>RML ERP — V46.15</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -792,7 +792,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.14</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.15</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -3979,7 +3979,7 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
  <details id="subAdvancedClauses"><summary style="cursor:pointer;font-weight:700;padding:12px 0">Clauses contractuelles — options avancées (ouvrir uniquement si nécessaire)</summary><div class="field"><label>Clauses du contrat</label><div class="muted" style="margin-bottom:8px">Toutes les clauses sont modifiables avant signature. Le chantier peut être affecté avant la signature.</div>
 
  <div id="subClauseEditor"></div><div class="actions"><button class="btn secondary" type="button" onclick="addSubClause()">+ Ajouter une clause</button><button class="btn secondary" type="button" onclick="resetSubClauses()">Réinitialiser le modèle</button></div></div></details>
- <div class="actions" style="margin:10px 0 14px;position:sticky;top:0;z-index:5;background:white;padding:10px 0;border-bottom:1px solid #dbe3ed"><button id="subAssignConfirmBtn" class="btn" type="button" style="background:#187245;color:white" onclick="saveSubAssignment(true)">✓ Affecter le chantier</button><button class="btn secondary" type="button" onclick="rmlPreviewSubDraft()" style="background:#e5f0ff;color:#123b65;border:1px solid #90b5e7">Prévisualiser le contrat</button><button id="subAssignSaveBtn" class="btn secondary" type="button" onclick="saveSubAssignment(false)">Enregistrer le brouillon</button><button class="btn secondary" type="button" data-close="subAssignModal">Fermer</button></div>
+ <div class="actions" style="margin:10px 0 14px;position:sticky;top:0;z-index:5;background:white;padding:10px 0;border-bottom:1px solid #dbe3ed"><button id="subAssignConfirmBtn" class="btn" type="button" style="background:#187245;color:white" onclick="saveSubAssignment(true)">✓ Affecter le chantier</button><button class="btn secondary" type="button" onclick="rmlPreviewSubDraft()" style="background:#e5f0ff;color:#123b65;border:1px solid #90b5e7">Prévisualiser le contrat</button><button id="subAssignSaveBtn" class="btn secondary" type="button" onclick="saveSubAssignment(false)">Enregistrer le brouillon</button><button id="subAssignDeleteBtn" class="btn danger" type="button" hidden onclick="deleteSubAssignmentDraft(subAssignId.value,true)">Supprimer le contrat</button><button class="btn secondary" type="button" data-close="subAssignModal">Fermer</button></div>
 </div></div>
 
 <div class="modal" id="subClauseEditModal"><div class="modal-card" style="max-width:900px"><div class="modal-head"><h3>Modifier le contrat de sous-traitance</h3><button class="close" data-close="subClauseEditModal">Fermer</button></div><input id="subClauseEditContractId" type="hidden"><div class="notice" style="margin-top:12px">Le contrat reprend le modèle que vous avez fourni. Tous les articles restent modifiables tant que le contrat n’est pas signé.</div><div id="subExistingClauseEditor"></div><div class="actions"><button class="btn secondary" onclick="addExistingSubClause()">+ Ajouter une clause</button><button class="btn" onclick="saveExistingSubClauses()">Enregistrer le contrat</button></div></div></div><div class="modal" id="subContractModal"><div class="modal-card" style="max-width:820px">
@@ -6910,7 +6910,7 @@ async function rmlDeleteSubContractAdmin(id){
  if(error||!data?.length){alert('Suppression impossible : '+(error?.message||'Suppression non autorisée par Supabase.'));return;}
  await loadSubcontractors();alert('Contrat supprimé. Le chantier et le sous-traitant sont conservés.');
 }
-async function deleteSubAssignmentDraft(id){
+async function deleteSubAssignmentDraft(id,closeEditor=false){
  if(!hasPerm('sous_traitants')||isSubcontractorUser()){alert('Vous ne disposez pas des droits pour supprimer ce contrat.');return}
  const a=erpSubAssignments.find(x=>x.id===id);
  if(!a){alert('Contrat introuvable. Actualisez la liste.');return}
@@ -6930,6 +6930,7 @@ async function deleteSubAssignmentDraft(id){
   const {data:deleted,error}=await sb.from('erp_subcontract_assignments').delete().eq('id',id).eq('status','brouillon').is('signature_data',null).is('rml_signature_data',null).is('signed_at',null).is('rml_signed_at',null).select('id');
   if(error)throw error;
   if(!deleted?.length){alert('Suppression non confirmée. Vérifiez les autorisations Supabase ou l’état du contrat.');return}
+  if(closeEditor&&subAssignId.value===id)closeModal('subAssignModal');
   await loadSubcontractors();
   alert('Contrat brouillon supprimé. Le chantier et le sous-traitant sont conservés.');
  }catch(e){alert('Impossible de supprimer le contrat : '+(e?.message||e));}
@@ -7455,6 +7456,7 @@ function openSubAssignment(id){
  subAssignDate.value='';subAssignAmount.value='';subAssignWork.value='';rml408Reset();rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
  subClauseDraft=cloneDefaultSubClauses();renderSubClauseEditor();rmlQuickContractDefaults();
  subAssignSaveBtn.textContent='Enregistrer le brouillon';
+ document.getElementById('subAssignDeleteBtn').hidden=true;
  openModal('subAssignModal');
 }
 function editSubAssignment(id){
@@ -7474,6 +7476,7 @@ function editSubAssignment(id){
  subAssignWork.value=rml41CleanText(a.work_description||'');rml408Reset();rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
  subClauseDraft=rml41CleanClauses(subClausesFromAssignment(a)).map(x=>({...x}));renderSubClauseEditor();rmlQuickContractDefaults();rml411Restore(subClauseDraft);
  subAssignSaveBtn.textContent='Enregistrer les modifications';
+ document.getElementById('subAssignDeleteBtn').hidden=!(a.status==='brouillon'&&!a.signature_data&&!a.rml_signature_data&&!a.signed_at&&!a.rml_signed_at);
  openModal('subAssignModal');
 }
 function rmlContractPreviewFrame(){
@@ -7578,7 +7581,27 @@ async function saveSubAssignmentChecked(row,id){
  if(!verified||verified.updated_at!==saved.updated_at)throw new Error('Impossible de confirmer les données enregistrées dans Supabase.');
  return verified;
 }
+const SUB_ASSIGN_DUPLICATE_MESSAGE='Chantier déjà attribué à ce sous-traitant. Indiquez deux dates d’intervention différentes pour créer une autre affectation.';
+let subAssignmentSaving=false;
+async function checkSubAssignmentDuplicate(row,id){
+ if(!row.chantier_id)return;
+ const current=id&&erpSubAssignments.find(assignment=>String(assignment.id)===id);
+ if(current&&String(current.chantier_id)===String(row.chantier_id)
+    &&String(current.subcontractor_id)===String(row.subcontractor_id)
+    &&(current.planned_date||null)===(row.planned_date||null))return;
+ let query=sb.from('erp_subcontract_assignments').select('id')
+  .eq('chantier_id',row.chantier_id).eq('subcontractor_id',row.subcontractor_id);
+ if(id)query=query.neq('id',id);
+ if(row.planned_date)query=query.or('planned_date.is.null,planned_date.eq.'+row.planned_date);
+ const {data,error}=await query.limit(1);
+ if(error)throw error;
+ if(data?.length)throw new Error('Chantier déjà attribué');
+}
 async function showSubAssignmentSaveError(error){
+ if(error?.message==='Chantier déjà attribué'){
+  alert(SUB_ASSIGN_DUPLICATE_MESSAGE);
+  return;
+ }
  let detail=error?.message||String(error);
  if(/permission denied|42501|row.level.security/i.test(detail)){
   try{
@@ -7589,6 +7612,7 @@ async function showSubAssignmentSaveError(error){
  alert('Enregistrement du contrat impossible : '+detail);
 }
 async function saveSubAssignment(confirmAssignment=false){
+ if(subAssignmentSaving){alert('Attribution déjà en cours.');return}
  const sid=subAssignSubId.value,jid=subAssignJob.value;
  if(!sid){alert('Sous-traitant introuvable.');return}
  // Un brouillon peut être enregistré même si le chantier ou les travaux ne sont pas encore renseignés.
@@ -7599,12 +7623,21 @@ async function saveSubAssignment(confirmAssignment=false){
  if(jid)row.chantier_id=jid;
  const id=subAssignId.value;
  if(!id&&!jid){alert('Pour créer le premier brouillon, choisissez au minimum un chantier. Vous pourrez compléter toutes les autres informations plus tard.');return}
+ const buttons=['subAssignConfirmBtn','subAssignSaveBtn','subAssignDeleteBtn'].map(id=>document.getElementById(id));
+ subAssignmentSaving=true;
+ buttons.forEach(button=>button.disabled=true);
  try{
+  await checkSubAssignmentDuplicate(row,id);
   if(!id)delete row.updated_at;
   await saveSubAssignmentChecked(row,id);
- }catch(error){await showSubAssignmentSaveError(error);return}
- closeModal('subAssignModal');await loadSubcontractors();
- alert(confirmAssignment?'Chantier affecté au sous-traitant. Contrat enregistré et vérifié dans Supabase.':'Modifications du contrat enregistrées et vérifiées dans Supabase.');
+  closeModal('subAssignModal');
+  await loadSubcontractors();
+  alert(confirmAssignment?'Chantier affecté au sous-traitant. Contrat enregistré et vérifié dans Supabase.':'Modifications du contrat enregistrées et vérifiées dans Supabase.');
+ }catch(error){await showSubAssignmentSaveError(error)}
+ finally{
+  subAssignmentSaving=false;
+  buttons.forEach(button=>button.disabled=false);
+ }
 }
 let subExistingClauseDraft=[];
 function renderExistingSubClauseEditor(){subExistingClauseEditor.innerHTML=subExistingClauseDraft.map((x,i)=>String(x.title||'').trim()===RML41_ANNEX?'':`<div class="sub-clause-edit"><div class="sub-clause-head"><input value="${esc(x.title||'')}" oninput="subExistingClauseDraft[${i}].title=this.value"><button class="btn danger" type="button" onclick="removeExistingSubClause(${i})">Supprimer</button></div><textarea oninput="subExistingClauseDraft[${i}].text=this.value">${esc(x.text||'')}</textarea></div>`).join('')}
@@ -8910,7 +8943,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V46.14';
+const RML_ERP_VERSION='V46.15';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
