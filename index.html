@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46.4</title>
+<title>RML ERP — V46.16</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -792,7 +792,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.4</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.16</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -926,7 +926,7 @@ body.rml-preparation-preview-open{overflow:hidden}
   </div>
 </section>
 
-<section id="atelier" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Devis pliage</h2><div class="muted">Application RML Pliage ALU complète intégrée à l’ERP DEV.</div></div></div><iframe id="pliageAppFrame" class="full-module-frame" src="pliage.html?v=44.9" title="RML Pliage ALU" onload="epurePliageHeader()"></iframe></div></section>
+<section id="atelier" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Devis pliage</h2><div class="muted">Application RML Pliage ALU complète intégrée à l’ERP DEV.</div></div></div><iframe id="pliageAppFrame" class="full-module-frame" src="pliage.html?v=44.14" title="RML Pliage ALU" onload="epurePliageHeader()"></iframe></div></section>
 <section id="atelierPliage8" class="view"><div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><h2>Fabrication pliage — ATELIER RML</h2><p class="muted">Commandes envoyées depuis RML Pliage · fabrication et suivi des quantités.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" onclick="rmlShowDocumentOrder()">+ Nouvelle commande sur document</button><button class="btn secondary" type="button" onclick="rmlLoadAtelier8()">Actualiser</button></div></div><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0"><label><input type="checkbox" id="rmlAtelier8Archives" onchange="rmlLoadAtelier8()"> Afficher les fabrications terminées</label><input id="rmlAtelier8Search" placeholder="Rechercher client, référence, pièce…" oninput="rmlRenderAtelier8()" style="flex:1;min-width:220px;padding:10px;border:1px solid #cbd5e1;border-radius:9px"></div><label style="display:inline-flex;gap:8px;align-items:center;margin-bottom:10px">Trier par <select id="rmlAtelier8Sort" onchange="rmlRenderAtelier8()"><option value="publication">Publication (récentes d’abord)</option><option value="disponibilite">Mise à disposition (plus proche)</option><option value="modification">Dernière modification</option></select></label><div id="rmlAtelier8Status" class="notice">Chargement…</div><div id="rmlAtelier8List"></div></div></section>
 <section id="heures" class="view"><div class="panel module-full-panel"><div class="erp-module-head"><div><h2>Heures & Absences</h2><div class="muted">Application RML Heures de référence ouverte directement dans l’ERP DEV.</div></div></div><iframe class="full-module-frame" srcdoc="&lt;!doctype html&gt;
 &lt;html lang=&quot;fr&quot;&gt;
@@ -3763,11 +3763,11 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
 <section id="commandes" class="view">
   <div class="panel" style="padding:10px">
     <div class="toolbar" style="margin-bottom:10px">
-      <div style="flex:1"><h2 style="margin:0">Commandes fournisseurs</h2><div id="commandesContext" class="muted" style="margin-top:4px">Application Commandes V18 intégrée dans RML ERP DEV.</div></div>
+      <div style="flex:1"><h2 style="margin:0">Commandes fournisseurs</h2><div id="commandesContext" class="muted" style="margin-top:4px">Application Commandes V42.86.6 intégrée dans RML ERP DEV.</div></div>
       <button class="btn secondary" type="button" onclick="go('dashboard')">← Retour accueil</button>
     </div>
     
-    <iframe id="commandesFrame" title="RML Commandes fournisseurs" src="commandes.html?v=42.86.2"></iframe>
+    <iframe id="commandesFrame" title="RML Commandes fournisseurs" src="commandes.html?v=42.86.6"></iframe>
   </div>
 </section>
 <section id="documents" class="view"><div class="panel"><div class="docs-head"><div><h2>Documents</h2><div class="muted">Documents classés par client et chantier. Fichiers stockés dans Supabase Storage ERP DEV.</div></div><button class="btn secondary" onclick="loadDocuments()">Actualiser</button></div><div class="upload-box"><strong>Ajouter un document</strong><div class="field" style="margin-top:10px"><label>Rechercher un client ou un chantier</label><input id="docAddContextSearch" type="search" placeholder="Nom du client, chantier ou adresse…" oninput="searchAddDocumentContext()"></div><div class="upload-grid" style="margin-top:10px"><div class="field"><label>Client</label><select id="docClient"></select></div><div class="field"><label>Chantier</label><select id="docJob"></select></div><div class="field"><label>Catégorie</label><select id="docCategory"><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div></div><div class="field"><label>Fichier</label><input id="docFile" type="file"></div><div class="field"><label>Note</label><input id="docNote" placeholder="Description facultative"></div><div class="field"><label><input id="docEmployeeVisible" type="checkbox"> Mettre également ce document à disposition des salariés affectés au chantier</label></div><div class="field"><label>Mettre ce document à disposition de</label><div id="docSubRecipients" class="sub-contract" style="padding:10px;margin-top:4px"><span class="muted">Sélectionnez d’abord un chantier.</span></div></div><button class="btn" onclick="uploadDocument()">Ajouter le document</button></div><div class="docs-filters" style="margin-top:16px"><select id="docFilterClient" onchange="docFilterClientChanged()"></select><select id="docFilterJob" onchange="renderDocuments()"></select><select id="docFilterCategory" onchange="renderDocuments()"><option value="">Toutes les catégories</option><option>Plan</option><option>Photo</option><option>PPSPS</option><option>Attestation</option><option>Bon</option><option>Rapport</option><option>Technique</option><option>Administratif</option><option>Autre</option></select></div><div id="documentsStatus" class="notice">Chargement…</div><div id="documentsList" class="doc-list" style="margin-top:12px"></div></div></section>
@@ -3910,13 +3910,18 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
  <div class="modal-head"><h3>Affecter un chantier / créer le contrat</h3><button class="close" data-close="subAssignModal">Fermer</button></div>
  <input id="subAssignSubId" type="hidden"><input id="subAssignId" type="hidden">
  <div class="sub-contract-top"><div class="sub-contract-section-title">Chantier et prestation</div>
- <div class="field"><label>Rechercher un chantier</label><input id="subAssignJobSearch" type="search" placeholder="Nom du client, chantier ou adresse…" oninput="filterSubAssignJobs()"></div>
+ <div class="field" style="position:relative" onfocusout="if(!this.contains(event.relatedTarget))clearSubAssignClientSuggestions()">
+  <label for="subAssignJobSearch">Rechercher un client ou un chantier</label>
+  <input id="subAssignJobSearch" type="search" placeholder="Nom du client, chantier ou adresse…" autocomplete="off" aria-controls="subAssignClientSuggestions" oninput="filterSubAssignJobs()" onfocus="renderSubAssignClientSuggestions()" onkeydown="subAssignSearchKey(event)">
+  <div id="subAssignClientSuggestions" hidden role="group" aria-label="Résultats de recherche" onkeydown="subAssignSearchKey(event)" style="position:absolute;top:100%;inset-inline:0;z-index:5;max-height:220px;overflow:auto;background:#fff;border:1px solid #a8c4df;border-radius:9px;box-shadow:0 6px 14px #173c6229"></div>
+ </div>
  <div class="grid2 sub-assign-grid"><div class="field"><label>Client</label><select id="subAssignClient"></select></div><div class="field"><label>Chantier</label><select id="subAssignJob"></select></div></div>
  <div class="grid2"><div class="field"><label>Date prévue</label><input id="subAssignDate" type="date"></div><div class="field"><label>Montant du contrat HT (€)</label><input id="subAssignAmount" type="number" step="0.01" min="0"></div></div>
  <div id="rmlSubCalc" class="panel" style="padding:13px;margin:12px 0;border:2px solid #85b5e1;border-radius:12px;background:#f3f8ff">
  <h3 style="margin:0 0 8px;color:#153d61">Calcul prévisionnel de sous-traitance</h3>
  <p class="muted">Produits de la préparation du chantier. Décochez ceux confiés à une autre équipe. Les tarifs sont indépendants du modèle de gouttière ou de descente.</p>
  <div class="actions"><button type="button" class="btn secondary" onclick="rml408Load()">Récupérer les produits du chantier</button><button type="button" class="btn secondary" onclick="rml408Toggle(false)">Tout exclure</button><button type="button" class="btn secondary" onclick="rml408Toggle(true)">Tout inclure</button></div>
+ <div id="rml408LoadStatus" class="muted" role="status"></div>
  <div id="rml408Rows" style="margin-top:9px"><span class="muted">Choisissez un chantier puis cliquez sur « Récupérer les produits ».</span></div>
  <div style="margin-top:12px"><button type="button" class="btn secondary" onclick="rml409Add()">+ Ajouter des travaux supplémentaires</button><div class="muted" style="margin-top:4px">Modifiez librement les quantités, les unités, les forfaits et les prix. Les modifications et les lignes retirées ne changent pas la préparation du chantier. Pour retrouver les produits retirés, cliquez sur « Récupérer les produits du chantier ».</div></div>
  <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:end"><label style="flex:1;min-width:135px">Journées prévues<input id="rml408Days" type="number" min="0" step="0.5" value="0" oninput="rml408Total()"></label><label style="flex:1;min-width:135px">Prix par journée HT (€)<input id="rml408DayPrice" type="number" min="0" step="0.01" value="0" oninput="rml408Total()"></label></div>
@@ -3974,7 +3979,7 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
  <details id="subAdvancedClauses"><summary style="cursor:pointer;font-weight:700;padding:12px 0">Clauses contractuelles — options avancées (ouvrir uniquement si nécessaire)</summary><div class="field"><label>Clauses du contrat</label><div class="muted" style="margin-bottom:8px">Toutes les clauses sont modifiables avant signature. Le chantier peut être affecté avant la signature.</div>
 
  <div id="subClauseEditor"></div><div class="actions"><button class="btn secondary" type="button" onclick="addSubClause()">+ Ajouter une clause</button><button class="btn secondary" type="button" onclick="resetSubClauses()">Réinitialiser le modèle</button></div></div></details>
- <div class="actions" style="margin:10px 0 14px;position:sticky;top:0;z-index:5;background:white;padding:10px 0;border-bottom:1px solid #dbe3ed"><button id="subAssignConfirmBtn" class="btn" type="button" style="background:#187245;color:white" onclick="saveSubAssignment(true)">✓ Affecter le chantier</button><button class="btn secondary" type="button" onclick="rmlPreviewSubDraft()" style="background:#e5f0ff;color:#123b65;border:1px solid #90b5e7">Prévisualiser le contrat</button><button id="subAssignSaveBtn" class="btn secondary" type="button" onclick="saveSubAssignment(false)">Enregistrer le brouillon</button><button class="btn secondary" type="button" data-close="subAssignModal">Fermer</button></div>
+ <div class="actions" style="margin:10px 0 14px;position:sticky;top:0;z-index:5;background:white;padding:10px 0;border-bottom:1px solid #dbe3ed"><button id="subAssignConfirmBtn" class="btn" type="button" style="background:#187245;color:white" onclick="saveSubAssignment(true)">✓ Affecter le chantier</button><button class="btn secondary" type="button" onclick="rmlPreviewSubDraft()" style="background:#e5f0ff;color:#123b65;border:1px solid #90b5e7">Prévisualiser le contrat</button><button id="subAssignSaveBtn" class="btn secondary" type="button" onclick="saveSubAssignment(false)">Enregistrer le brouillon</button><button id="subAssignDeleteBtn" class="btn danger" type="button" hidden onclick="deleteSubAssignmentDraft(subAssignId.value,true)">Supprimer le contrat</button><button class="btn secondary" type="button" data-close="subAssignModal">Fermer</button></div>
 </div></div>
 
 <div class="modal" id="subClauseEditModal"><div class="modal-card" style="max-width:900px"><div class="modal-head"><h3>Modifier le contrat de sous-traitance</h3><button class="close" data-close="subClauseEditModal">Fermer</button></div><input id="subClauseEditContractId" type="hidden"><div class="notice" style="margin-top:12px">Le contrat reprend le modèle que vous avez fourni. Tous les articles restent modifiables tant que le contrat n’est pas signé.</div><div id="subExistingClauseEditor"></div><div class="actions"><button class="btn secondary" onclick="addExistingSubClause()">+ Ajouter une clause</button><button class="btn" onclick="saveExistingSubClauses()">Enregistrer le contrat</button></div></div></div><div class="modal" id="subContractModal"><div class="modal-card" style="max-width:820px">
@@ -4328,6 +4333,17 @@ function printPreparation(){if(!currentPrepJobId)return;const job=db.chantiers.f
 
 
 function prepNumber(v){const n=Number(String(v??'').replace(/\s/g,'').replace(',','.'));return Number.isFinite(n)?n:0}
+function prepLinearQuantity(value){
+  const input=String(value??'').trim().toLowerCase();
+  const terms=input.split('+');
+  let total=0;
+  for(const term of terms){
+    const match=term.match(/^\s*(?:(\d+)\s*[x×*]\s*)?(\d+(?:[.,]\d+)?)\s*(?:m\s*l?\.?|mètres?(?:\s+linéaires?)?)?\s*$/u);
+    if(!match)return null;
+    total+=Number(match[1]??1)*Number(match[2].replace(',','.'));
+  }
+  return Number.isFinite(total)?Math.round(total*1e6)/1e6:null;
+}
 function prepLineName(section,r){
   const labels={gouttieres:'Gouttière',accessoires_gouttieres:'Accessoire gouttière',descentes:'Descente',accessoires_descentes:'Accessoire descente',couvertines:'Couvertine',accessoires_couvertines:'Accessoire couvertine',bandeaux:'Bandeau',sous_faces:'Sous-face',pliage:'Pliage',zinguerie:'Zinguerie'};
   let parts=[];
@@ -4339,13 +4355,18 @@ function prepLineName(section,r){
   return detail?`${labels[section]||section} — ${detail}`:(labels[section]||section);
 }
 function prepUnit(section,row={}){if(['pliage','zinguerie'].includes(section))return String(row.unit||'u').toLowerCase();return ['gouttieres','descentes','couvertines'].includes(section)?'ml':'u'}
-function preparationNeeds(payload){
+function preparationNeeds(payload,{includeUnquantified=false}={}){
   const out=[],sections=payload?.sections||{};
-  Object.entries(sections).forEach(([section,rows])=>(rows||[]).forEach((r,idx)=>{
-    const qty=prepNumber(r.qty); if(!qty)return;
+  Object.entries(sections).forEach(([section,rows])=>(Array.isArray(rows)?rows:[]).forEach((r,idx)=>{
+    if(!r)return;
+    const linear=['gouttieres','descentes','couvertines'].includes(section);
+    const qty=linear?(prepLinearQuantity(r.qty)??0):prepNumber(r.qty);
+    const designation=[r.type,r.shape,r.dimension,r.width,r.hook].some(value=>String(value??'').trim());
+    if(!qty&&(!includeUnquantified||!designation))return;
     const nom=prepLineName(section,r),unite=prepUnit(section,r);
     const key=[section,r.type||'',r.shape||'',r.dimension||'',r.width||'',r.hook||'',r.color||'',idx].join('|');
-    out.push({key,section,nom,unite,total:qty,color:r.color||'',note:r.note||''});
+    out.push({key,section,nom,unite,total:qty,color:r.color||'',note:r.note||'',
+      ...(includeUnquantified&&!qty&&String(r.qty??'').trim()?{sourceQuantity:String(r.qty).trim()}:{})});
   }));
   return out;
 }
@@ -4535,6 +4556,7 @@ async function rml353DeleteStockProduct(id){
 }
 function rmlTeamLabel(number){return Number(number)===8?'Atelier':'Équipe '+number}
 function roleLabel(r){return ({administrateur:'Administrateur',direction:'Direction',collaborateur:'Collaborateur',chef_equipe:'Chef d’équipe',ouvrier:'Ouvrier',atelier:'Atelier',lecture:'Lecture seule',sous_traitant:'Sous-traitant'})[r]||r||'—'}
+function canSignRmlContract(){return ['administrateur','direction'].includes(currentAccess?.role)}
 function isSubcontractorUser(){return currentAccess?.role==='sous_traitant'}
 function isEmployeeUser(){return ['ouvrier','chef_equipe'].includes(currentAccess?.role)}
 function rmlEmployeeSpaceLabel(account=employeeAccount){
@@ -5777,7 +5799,10 @@ async function applyCompanySearchResult(i){
   if(res.error){alert('Erreur Supabase : '+res.error.message+'\nVérifie que le SQL V0.10.1 a bien été exécuté.');return}
   closeModal('companySearchModal');await refreshData();openClientFolder(c.id);
 }
-function openClientFolder(id){const c=db.clients.find(x=>x.id===id);if(!c)return;const jobs=db.chantiers.filter(j=>j.client_id===id).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));const linked=!!c.pennylane_customer_id;clientFolderTitle.textContent=c.nom;clientFolderContent.innerHTML=`<div class="client-folder-actions">${hasPerm('clients')?`<button class="btn client-primary-action client-edit-action" onclick="editClient('${c.id}')">✎ Modifier le client</button><button class="btn client-primary-action client-portal-action" onclick="openCompanySearch('${c.id}')">⌕ Rechercher sur le Portail des entreprises</button><button class="btn client-primary-action client-portal-action" onclick="openClientPappers('${c.id}')">⌕ Pappers</button>`:''}${hasPerm('chantiers')?`<button class="btn client-primary-action client-job-action" onclick="closeModal('clientFolderModal');prefillJob('${c.id}')">+ Nouveau chantier</button>`:''}${hasPerm('clients')?`<button class="btn secondary" onclick="toggleClient('${c.id}');closeModal('clientFolderModal')">${c.actif?'Archiver':'Réactiver'}</button><button class="btn danger" onclick="deleteClient('${c.id}')">Supprimer</button>`:''}</div><div class="panel" style="margin:0 0 14px"><div class="grid2"><div><strong>Client</strong><div class="muted">${esc(c.nom)}</div></div><div><strong>Code RML</strong><div class="muted">${esc(c.code||'')}</div></div><div><strong>Catégorie</strong><div class="muted">${esc(c.categorie||'Non classé')}</div></div><div><strong>Responsable</strong><div class="muted">${esc(c.responsable||'Non renseigné')}</div></div><div><strong>Téléphone</strong><div class="muted">${esc(c.telephone||'Non renseigné')}</div></div><div><strong>E-mail</strong><div class="muted">${esc(c.email||'Non renseigné')}</div></div><div><strong>SIREN</strong><div class="muted">${esc(c.siren||'Non renseigné')}</div></div><div><strong>SIRET du siège</strong><div class="muted">${esc(c.siret||'Non renseigné')}</div></div><div class="full"><strong>Adresse</strong><div class="muted">${esc(c.adresse||'Non renseignée')}</div></div>${c.notes?`<div class="full"><strong>Notes</strong><div class="muted">${esc(c.notes)}</div></div>`:''}</div></div><div class="pennylane-box" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><strong>Pennylane</strong><div class="muted" style="margin-top:3px">Architecture V0.10.1 préparée pour le rapprochement et la future synchronisation API.</div></div><span class="pennylane-state ${linked?'linked':''}">${linked?'Lié · ID '+esc(c.pennylane_customer_id):pennylaneReady()?'Non synchronisé':'Migration SQL V0.10.1 à appliquer'}</span></div>${c.pennylane_external_reference?`<div class="muted" style="margin-top:8px">Référence externe : ${esc(c.pennylane_external_reference)}</div>`:''}</div><h3 style="color:var(--navy);margin:8px 0 12px">Chantiers de ce client (${jobs.length})</h3>${jobs.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Chantier</th><th>Adresse</th><th>Statut</th><th>Date</th></tr></thead><tbody>${jobs.map(j=>`<tr class="client-row" tabindex="0" onclick="closeModal('clientFolderModal');openJob('${j.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><strong>${esc(j.nom)}</strong></td><td>${esc(j.adresse||'')}</td><td><span class="status ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}">${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</span></td><td>${formatDateFR(j.date_debut)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun chantier pour ce client.</div>'}`;openModal('clientFolderModal')}
+function rmlClientDisplayNotes(raw){
+ return String(raw||'').replace(/\n?\[RML_(?:CLIENT_IDENTITY_V1|CLIENT_PAYMENT_V1|LIVRAISON_V1):[^\]\r\n]*\]/g,'').trim();
+}
+function openClientFolder(id){const c=db.clients.find(x=>x.id===id);if(!c)return;const jobs=db.chantiers.filter(j=>j.client_id===id).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));const visibleNotes=rmlClientDisplayNotes(c.notes);const linked=!!c.pennylane_customer_id;clientFolderTitle.textContent=c.nom;clientFolderContent.innerHTML=`<div class="client-folder-actions">${hasPerm('clients')?`<button class="btn client-primary-action client-edit-action" onclick="editClient('${c.id}')">✎ Modifier le client</button><button class="btn client-primary-action client-portal-action" onclick="openCompanySearch('${c.id}')">⌕ Rechercher sur le Portail des entreprises</button><button class="btn client-primary-action client-portal-action" onclick="openClientPappers('${c.id}')">⌕ Pappers</button>`:''}${hasPerm('chantiers')?`<button class="btn client-primary-action client-job-action" onclick="closeModal('clientFolderModal');prefillJob('${c.id}')">+ Nouveau chantier</button>`:''}${hasPerm('clients')?`<button class="btn secondary" onclick="toggleClient('${c.id}');closeModal('clientFolderModal')">${c.actif?'Archiver':'Réactiver'}</button><button class="btn danger" onclick="deleteClient('${c.id}')">Supprimer</button>`:''}</div><div class="panel" style="margin:0 0 14px"><div class="grid2"><div><strong>Client</strong><div class="muted">${esc(c.nom)}</div></div><div><strong>Code RML</strong><div class="muted">${esc(c.code||'')}</div></div><div><strong>Catégorie</strong><div class="muted">${esc(c.categorie||'Non classé')}</div></div><div><strong>Responsable</strong><div class="muted">${esc(c.responsable||'Non renseigné')}</div></div><div><strong>Téléphone</strong><div class="muted">${esc(c.telephone||'Non renseigné')}</div></div><div><strong>E-mail</strong><div class="muted">${esc(c.email||'Non renseigné')}</div></div><div><strong>SIREN</strong><div class="muted">${esc(c.siren||'Non renseigné')}</div></div><div><strong>SIRET du siège</strong><div class="muted">${esc(c.siret||'Non renseigné')}</div></div><div class="full"><strong>Adresse</strong><div class="muted">${esc(c.adresse||'Non renseignée')}</div></div>${visibleNotes?`<div class="full"><strong>Notes</strong><div class="muted" style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(visibleNotes)}</div></div>`:''}</div></div><div class="pennylane-box" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><strong>Pennylane</strong><div class="muted" style="margin-top:3px">Architecture V0.10.1 préparée pour le rapprochement et la future synchronisation API.</div></div><span class="pennylane-state ${linked?'linked':''}">${linked?'Lié · ID '+esc(c.pennylane_customer_id):pennylaneReady()?'Non synchronisé':'Migration SQL V0.10.1 à appliquer'}</span></div>${c.pennylane_external_reference?`<div class="muted" style="margin-top:8px">Référence externe : ${esc(c.pennylane_external_reference)}</div>`:''}</div><h3 style="color:var(--navy);margin:8px 0 12px">Chantiers de ce client (${jobs.length})</h3>${jobs.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Chantier</th><th>Adresse</th><th>Statut</th><th>Date</th></tr></thead><tbody>${jobs.map(j=>`<tr class="client-row" tabindex="0" onclick="closeModal('clientFolderModal');openJob('${j.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><strong>${esc(j.nom)}</strong></td><td>${esc(j.adresse||'')}</td><td><span class="status ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}">${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</span></td><td>${formatDateFR(j.date_debut)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun chantier pour ce client.</div>'}`;openModal('clientFolderModal')}
 function clientInitial(name){const s=clientDirectoryName(name).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();if(!s)return '#';const ch=s[0];return /[A-Z]/.test(ch)?ch:/[0-9]/.test(ch)?'0-9':'#'}
 function buildClientAlphabet(){if(!window.clientAlphabet)return;const letters=['TOUS','0-9',...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];clientAlphabet.innerHTML=letters.map(l=>`<button type="button" class="client-letter ${clientAlpha===l?'active':''}" data-letter="${l}">${l==='TOUS'?'Tous':l}</button>`).join('');clientAlphabet.querySelectorAll('[data-letter]').forEach(b=>b.onclick=()=>{clientAlpha=b.dataset.letter;buildClientAlphabet();renderClients()})}
 function renderClients(){buildClientAlphabet();const rows=getVisibleClientRows();if(window.clientResultCount)clientResultCount.textContent=`${rows.length} client${rows.length>1?'s':''}`;if(window.clientLetterLabel)clientLetterLabel.textContent=clientAlpha==='TOUS'?'Tous':clientAlpha;if(!rows.length){clientsTable.innerHTML='<div class="empty">Aucun client correspondant.</div>';return}const counts=new Map();db.chantiers.forEach(j=>counts.set(j.client_id,(counts.get(j.client_id)||0)+1));clientsTable.innerHTML='<div class="tablewrap"><table class="table clients-compact"><thead><tr><th>Client</th><th>Catégorie</th><th>Responsable</th><th>Contact</th><th>Adresse</th><th>Chantiers</th><th></th></tr></thead><tbody>'+rows.map(c=>`<tr class="client-row" tabindex="0" onclick="openClientFolder('${c.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><span class="client-status-dot ${c.actif?'':'archived'}"></span><strong>${esc(c.nom)}</strong><br><span class="muted">${esc(c.code||'')}${c.pennylane_customer_id?' · Pennylane lié':''}</span></td><td>${esc(c.categorie||'Non classé')}</td><td>${esc(c.responsable||'')}</td><td>${esc(c.telephone||'')}${c.telephone&&c.email?'<br>':''}${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td><td><strong>${counts.get(c.id)||0}</strong></td><td class="client-chevron">›</td></tr>`).join('')+'</tbody></table></div>'}
@@ -5847,7 +5872,7 @@ async function openCommandes(jobId=null){
   const job=jobId?db.chantiers.find(j=>j.id===jobId):null;
   const client=job?db.clients.find(c=>c.id===job.client_id):null;
   const ctx=document.getElementById('commandesContext');
-  if(ctx)ctx.textContent=job?`${client?.nom||''} — ${job.nom||''} · prévision matériaux issue de Préparation`:'Application Commandes V18 intégrée dans RML ERP DEV.';
+  if(ctx)ctx.textContent=job?`${client?.nom||''} — ${job.nom||''} · prévision matériaux issue de Préparation`:'Application Commandes V42.86.6 intégrée dans RML ERP DEV.';
   try{closeModal('jobCardModal')}catch(e){}
   go('commandes');
   setTimeout(()=>window.sizeCommandesFrame?.(),0);
@@ -6201,7 +6226,7 @@ async function rmlV4212LoadSignatures(){
  const list=document.getElementById('rmlV4212SignatureList');
  const count=document.getElementById('rmlV4212SignatureCount');
  if(!panel||!list||!count)return;
- if(!currentUser||currentAccess?.role!=='administrateur'){
+ if(!currentUser||!canSignRmlContract()||!hasPerm('sous_traitants')){
   panel.style.display='none';return;
  }
  panel.style.display='block';
@@ -6888,7 +6913,7 @@ async function rmlDeleteSubContractAdmin(id){
  if(error||!data?.length){alert('Suppression impossible : '+(error?.message||'Suppression non autorisée par Supabase.'));return;}
  await loadSubcontractors();alert('Contrat supprimé. Le chantier et le sous-traitant sont conservés.');
 }
-async function deleteSubAssignmentDraft(id){
+async function deleteSubAssignmentDraft(id,closeEditor=false){
  if(!hasPerm('sous_traitants')||isSubcontractorUser()){alert('Vous ne disposez pas des droits pour supprimer ce contrat.');return}
  const a=erpSubAssignments.find(x=>x.id===id);
  if(!a){alert('Contrat introuvable. Actualisez la liste.');return}
@@ -6908,6 +6933,7 @@ async function deleteSubAssignmentDraft(id){
   const {data:deleted,error}=await sb.from('erp_subcontract_assignments').delete().eq('id',id).eq('status','brouillon').is('signature_data',null).is('rml_signature_data',null).is('signed_at',null).is('rml_signed_at',null).select('id');
   if(error)throw error;
   if(!deleted?.length){alert('Suppression non confirmée. Vérifiez les autorisations Supabase ou l’état du contrat.');return}
+  if(closeEditor&&subAssignId.value===id)closeModal('subAssignModal');
   await loadSubcontractors();
   alert('Contrat brouillon supprimé. Le chantier et le sous-traitant sont conservés.');
  }catch(e){alert('Impossible de supprimer le contrat : '+(e?.message||e));}
@@ -6918,25 +6944,112 @@ async function deleteSubcontractor(id){
  const {error}=await sb.from('erp_subcontractors').delete().eq('id',id);if(error){alert(error.message);return}await loadSubcontractors();
 }
 let subAssignAllJobs=[];
+function subAssignSearchWords(value){
+ return normalizeSearch(value).match(/[a-z0-9]+/g)||[];
+}
+function subAssignMatches(words,query){
+ return query.every(term=>words.some(word=>word.startsWith(term)));
+}
+const subAssignJobStatuses=new Map([
+ ['actif','Actif'],
+ ['attente','En attente'],
+ ['en_cours','En cours'],
+ ['opr','OPR'],
+ ['sav','SAV']
+]);
+function subAssignEligibleJobs(){
+ return subAssignAllJobs.filter(job=>subAssignJobStatuses.has(job.statut));
+}
+function subAssignJobLabel(job, fallback){
+ return (job.nom||job.adresse||fallback||'Chantier')+' · '+subAssignJobStatuses.get(job.statut);
+}
+function subAssignJobMatches(job,clientName,query){
+ return subAssignMatches(subAssignSearchWords([job.nom,clientName,job.adresse].filter(Boolean).join(' ')),query);
+}
 function fillSubAssignJobOptions(selected=''){
  const cid=subAssignClient.value;
- const q=normalizeSearch(subAssignJobSearch.value);
- let jobs=subAssignAllJobs.filter(j=>['actif','attente'].includes(j.statut));
- if(cid)jobs=jobs.filter(j=>j.client_id===cid);
- if(q)jobs=jobs.filter(j=>{const c=db.clients.find(x=>x.id===j.client_id);return normalizeSearch([c?.nom,j.nom,j.adresse].filter(Boolean).join(' ')).includes(q)});
- fillSelect(subAssignJob,jobs,'Choisir un chantier','id',j=>j.nom||db.clients.find(x=>x.id===j.client_id)?.nom||'Chantier');
- if(selected&&jobs.some(j=>j.id===selected))subAssignJob.value=selected;
+ const query=subAssignSearchWords(subAssignJobSearch.value);
+ const clients=new Map(db.clients.map(client=>[String(client.id),client.nom]));
+ const jobs=subAssignEligibleJobs().filter(job=>
+  (!cid||String(job.client_id)===cid)&&subAssignJobMatches(job,clients.get(String(job.client_id)),query)
+ );
+ fillSelect(subAssignJob,jobs,jobs.length?'Choisir un chantier':'Aucun chantier correspondant','id',j=>subAssignJobLabel(j,clients.get(String(j.client_id))));
+ if(selected&&jobs.some(j=>String(j.id)===String(selected)))subAssignJob.value=String(selected);
  rmlUpdateSubAddress();
 }
-function filterSubAssignJobs(){
- const q=normalizeSearch(subAssignJobSearch.value);
- if(q){
-  const hits=subAssignAllJobs.filter(j=>{const c=db.clients.find(x=>x.id===j.client_id);return ['actif','attente'].includes(j.statut)&&normalizeSearch([c?.nom,j.nom,j.adresse].filter(Boolean).join(' ')).includes(q)});
-  const clientIds=[...new Set(hits.map(j=>j.client_id))];
-  if(clientIds.length===1)subAssignClient.value=clientIds[0];
-  else if(clientIds.length>1)subAssignClient.value='';
+function clearSubAssignClientSuggestions(){
+ const list=document.getElementById('subAssignClientSuggestions');
+ list.hidden=true;
+ list.replaceChildren();
+}
+function renderSubAssignClientSuggestions(){
+ clearSubAssignClientSuggestions();
+ const query=subAssignSearchWords(subAssignJobSearch.value);
+ if(!query.length)return;
+ const list=document.getElementById('subAssignClientSuggestions');
+ const clients=new Map(db.clients.map(client=>[String(client.id),client.nom]));
+ const matchingClients=clientSorted().filter(client=>subAssignMatches(subAssignSearchWords(client.nom),query)).slice(0,10);
+ const matchingJobs=subAssignEligibleJobs().filter(job=>subAssignJobMatches(job,clients.get(String(job.client_id)),query)).slice(0,15);
+ const addResult=(label,clientId,jobId)=>{
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='btn secondary';
+  button.style.cssText='display:block;width:100%;text-align:left;border-radius:0;white-space:normal';
+  button.textContent=label;
+  button.addEventListener('mousedown',event=>event.preventDefault());
+  button.addEventListener('click',()=>{
+   subAssignJobSearch.value='';
+   subAssignClient.value=String(clientId||'');
+   selectSubAssignClient();
+   if(jobId){subAssignJob.value=String(jobId);subAssignJob.onchange()}
+   subAssignJob.focus();
+  });
+  list.append(button);
+ };
+ for(const client of matchingClients)addResult('Client · '+client.nom,client.id);
+ for(const job of matchingJobs){
+  const client=clients.get(String(job.client_id));
+  addResult('Chantier · '+subAssignJobLabel(job)+(client?' — '+client:''),job.client_id,job.id);
  }
- fillSubAssignJobOptions();rmlFillSubAssignmentDate();
+ if(!list.childElementCount){
+  const message=document.createElement('p');
+  message.className='muted';
+  message.style.margin='8px 12px';
+  message.textContent='Aucun client ni chantier correspondant.';
+  list.append(message);
+ }
+ list.hidden=false;
+}
+function subAssignSearchKey(event){
+ const list=document.getElementById('subAssignClientSuggestions');
+ if(list.hidden)return;
+ if(event.key==='Escape'){
+  event.preventDefault();
+  event.stopPropagation();
+  subAssignJobSearch.focus();
+  clearSubAssignClientSuggestions();
+ }
+ if(event.key==='ArrowDown'||event.key==='ArrowUp'){
+  const target=event.key==='ArrowDown'
+   ? (event.target===subAssignJobSearch?list.querySelector('button'):event.target.nextElementSibling)
+   : (event.target===subAssignJobSearch?null:event.target.previousElementSibling||subAssignJobSearch);
+  if(target){event.preventDefault();target.focus()}
+ }
+}
+function refreshSubAssignJobSelection(){
+ const previous=subAssignJob.value;
+ fillSubAssignJobOptions();
+ rmlFillSubAssignmentDate();
+ if(previous&&previous!==subAssignJob.value)rml408Reset();
+}
+function filterSubAssignJobs(){
+ subAssignClient.value='';
+ refreshSubAssignJobSelection();
+ renderSubAssignClientSuggestions();
+}
+function selectSubAssignClient(){
+ clearSubAssignClientSuggestions();
+ refreshSubAssignJobSelection();
 }
 function rmlSubToggleConditional(){const e=document.getElementById('subQuickRetentionRateWrap');if(e)e.style.display=document.getElementById('subQuickRetention')?.value==='OUI'?'':'none'}
 function rmlSubApplyAdditionalChoices(clauses){
@@ -7188,9 +7301,36 @@ function rml409Qty(i,value){const n=rml408Lines[i];if(!n)return;n.total=Math.max
 function rml409Unit(i,value){const n=rml408Lines[i];if(n)n.unite=value;rml408Total()}
 function rml409Name(i,value){const n=rml408Lines[i];if(n)n.nom=value}
 function rml409Delete(i){rml408Lines.splice(i,1);rml408Render()}
-function rml408Reset(){rml408Lines=[];const box=document.getElementById('rml408Rows');if(box)box.innerHTML='<span class="muted">Cliquez sur « Récupérer les produits du chantier ».</span>';const days=document.getElementById('rml408Days');if(days)days.value=0;const price=document.getElementById('rml408DayPrice');if(price)price.value=rml408Who()==='stephane'?150:0;rml408Total()}
-async function rml408Load(){const jid=subAssignJob.value,box=document.getElementById('rml408Rows');if(!jid){alert('Sélectionnez d’abord un chantier.');return}box.textContent='Lecture de la préparation…';const {data,error}=await sb.from('erp_modules_data').select('payload').eq('chantier_id',jid).eq('module','preparation').eq('entity_type','chantier').eq('deleted',false).order('updated_at',{ascending:false}).limit(1);if(error){box.textContent='Lecture impossible : '+error.message;return}const payload=data?.[0]?.payload;if(!payload){box.textContent='Aucune préparation enregistrée pour ce chantier.';return}const who=rml408Who(),rates=rml408Tariffs[who]||{};rml408Lines=preparationNeeds(payload).map(n=>{const cat=rml408Category(n);const rate=rates[cat];return {...n,cat,selected:rate!=null,price:rate??0,missing:rate==null}});rml408Render()}
-function rml408Render(){const box=document.getElementById('rml408Rows');if(!rml408Lines.length){box.textContent='Aucun produit chargé. Vous pouvez ajouter des travaux supplémentaires.';rml408Total();return}box.innerHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th>Inclure</th><th>Produit / prestation</th><th>Quantité</th><th>Unité</th><th>Prix HT/unité</th><th>Total HT</th><th></th></tr></thead><tbody>'+rml408Lines.map((n,i)=>`<tr style="border-top:1px solid #cbd5e1"><td><input type="checkbox" ${n.selected?'checked':''} onchange="rml408Lines[${i}].selected=this.checked;rml408Total()"></td><td>${n.custom?`<input aria-label="Désignation des travaux supplémentaires" style="min-width:180px;width:100%" value="${esc(n.nom)}" oninput="rml409Name(${i},this.value)">`:esc(n.nom)}${n.missing?'<br><small style="color:#a35b00">Tarif à renseigner</small>':''}</td><td><input aria-label="Quantité" style="width:85px;min-width:75px" type="number" min="0" step="any" value="${n.total}" oninput="rml409Qty(${i},this.value)"></td><td><select aria-label="Unité" style="min-width:85px" onchange="rml409Unit(${i},this.value)">${['ml','m²','u','forfait','jour','heure'].map(u=>`<option value="${u}" ${n.unite===u?'selected':''}>${u}</option>`).join('')}</select></td><td><input aria-label="Prix unitaire HT" style="min-width:85px;width:95px" type="number" min="0" step="0.01" value="${n.price}" oninput="rml408Lines[${i}].price=Number(this.value)||0;rml408Total()"></td><td id="rml408Line${i}"></td><td><button type="button" class="btn secondary" style="color:#a11b1b;border-color:#d9a0a0" onclick="rml409Delete(${i})" aria-label="Retirer cette ligne du calcul">Retirer</button></td></tr>`).join('')+'</tbody></table></div>';rml408Total()}
+let rml408LoadRequest=0;
+function rml408Reset(){++rml408LoadRequest;document.getElementById('rml408LoadStatus').textContent='';rml408Lines=[];const box=document.getElementById('rml408Rows');if(box)box.innerHTML='<span class="muted">Cliquez sur « Récupérer les produits du chantier ».</span>';const days=document.getElementById('rml408Days');if(days)days.value=0;const price=document.getElementById('rml408DayPrice');if(price)price.value=rml408Who()==='stephane'?150:0;rml408Total()}
+async function rml408Load(){
+ const jid=subAssignJob.value;
+ if(!jid){alert('Sélectionnez d’abord un chantier.');return}
+ const request=++rml408LoadRequest;
+ const status=document.getElementById('rml408LoadStatus');
+ status.textContent='Lecture de la préparation…';
+ const isCurrent=()=>request===rml408LoadRequest&&jid===subAssignJob.value;
+ try{
+  const {data,error}=await sb.from('erp_modules_data').select('payload')
+   .eq('chantier_id',jid).eq('module','preparation').eq('entity_type','chantier')
+   .eq('entity_id',jid).eq('deleted',false).maybeSingle();
+  if(!isCurrent())return;
+  if(error)throw error;
+  if(!data?.payload){status.textContent='Aucune préparation enregistrée pour ce chantier.';return}
+  const rates=rml408Tariffs[rml408Who()]||{};
+  rml408Lines=preparationNeeds(data.payload,{includeUnquantified:true}).map(line=>{
+   const cat=rml408Category(line),rate=rates[cat];
+   return {...line,cat,selected:rate!=null&&line.total>0,price:rate??0,missing:rate==null,quantityMissing:!line.total};
+  });
+  const unquantified=rml408Lines.filter(line=>line.quantityMissing).length;
+  status.textContent=rml408Lines.length+' ligne(s) récupérée(s) de la préparation.'
+   +(unquantified?' '+unquantified+' sans quantité à compléter.':'');
+  rml408Render();
+ }catch(error){
+  if(isCurrent())status.textContent='Lecture impossible : '+error.message;
+ }
+}
+function rml408Render(){const box=document.getElementById('rml408Rows');if(!rml408Lines.length){box.textContent='Aucun produit chargé. Vous pouvez ajouter des travaux supplémentaires.';rml408Total();return}box.innerHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr><th>Inclure</th><th>Produit / prestation</th><th>Quantité</th><th>Unité</th><th>Prix HT/unité</th><th>Total HT</th><th></th></tr></thead><tbody>'+rml408Lines.map((n,i)=>`<tr style="border-top:1px solid #cbd5e1"><td><input type="checkbox" ${n.selected?'checked':''} onchange="rml408Lines[${i}].selected=this.checked;rml408Total()"></td><td>${n.custom?`<input aria-label="Désignation des travaux supplémentaires" style="min-width:180px;width:100%" value="${esc(n.nom)}" oninput="rml409Name(${i},this.value)">`:esc(n.nom)}${n.missing?'<br><small style="color:#a35b00">Tarif à renseigner</small>':''}${n.quantityMissing&&!n.total?`<br><small style="color:#a35b00">Quantité à renseigner${n.sourceQuantity?' · Préparation : '+esc(n.sourceQuantity):''}</small>`:''}</td><td><input aria-label="Quantité" style="width:85px;min-width:75px" type="number" min="0" step="any" value="${n.total}" oninput="rml409Qty(${i},this.value)"></td><td><select aria-label="Unité" style="min-width:85px" onchange="rml409Unit(${i},this.value)">${['ml','m²','u','forfait','jour','heure'].map(u=>`<option value="${u}" ${n.unite===u?'selected':''}>${u}</option>`).join('')}</select></td><td><input aria-label="Prix unitaire HT" style="min-width:85px;width:95px" type="number" min="0" step="0.01" value="${n.price}" oninput="rml408Lines[${i}].price=Number(this.value)||0;rml408Total()"></td><td id="rml408Line${i}"></td><td><button type="button" class="btn secondary" style="color:#a11b1b;border-color:#d9a0a0" onclick="rml409Delete(${i})" aria-label="Retirer cette ligne du calcul">Retirer</button></td></tr>`).join('')+'</tbody></table></div>';rml408Total()}
 function rml408Toggle(v){rml408Lines.forEach(x=>x.selected=v);rml408Render()}
 function rml408Total(){let total=0;for(let i=0;i<rml408Lines.length;i++){const n=rml408Lines[i],amount=n.selected?n.total*n.price:0;total+=amount;const cell=document.getElementById('rml408Line'+i);if(cell)cell.textContent=amount.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'}total+=(Number(document.getElementById('rml408Days')?.value)||0)*(Number(document.getElementById('rml408DayPrice')?.value)||0);const el=document.getElementById('rml408Total');if(el)el.textContent='Total prévisionnel : '+total.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' € HT';return total}
 // V41 : séparer le descriptif des travaux de l'annexe financière, sans répétition.
@@ -7312,12 +7452,14 @@ function openSubAssignment(id){
  if(!erpSubcontractors.some(x=>String(x.id)===String(id))){alert('Sous-traitant introuvable. Actualisez la liste avant de créer le contrat.');return}
  subAssignId.value='';subAssignSubId.value=id;subAssignAllJobs=[...db.chantiers];
  fillSelect(subAssignClient,clientSorted(),'Tous les clients');
- subAssignClient.onchange=()=>{fillSubAssignJobOptions();rmlFillSubAssignmentDate()};
+ subAssignClient.onchange=selectSubAssignClient;
+ clearSubAssignClientSuggestions();
  subAssignJob.onchange=()=>{rmlFillSubAssignmentDate();rml408Reset()};
  subAssignJobSearch.value='';subAssignClient.value='';fillSubAssignJobOptions();
  subAssignDate.value='';subAssignAmount.value='';subAssignWork.value='';rml408Reset();rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
  subClauseDraft=cloneDefaultSubClauses();renderSubClauseEditor();rmlQuickContractDefaults();
  subAssignSaveBtn.textContent='Enregistrer le brouillon';
+ document.getElementById('subAssignDeleteBtn').hidden=true;
  openModal('subAssignModal');
 }
 function editSubAssignment(id){
@@ -7326,7 +7468,8 @@ function editSubAssignment(id){
  if(!erpSubcontractors.some(x=>String(x.id)===String(a.subcontractor_id))){alert('Le sous-traitant de ce contrat est introuvable.');return}
  subAssignId.value=a.id;subAssignSubId.value=a.subcontractor_id;subAssignAllJobs=[...db.chantiers];
  fillSelect(subAssignClient,clientSorted(),'Tous les clients');
- subAssignClient.onchange=()=>{fillSubAssignJobOptions();rmlFillSubAssignmentDate()};
+ subAssignClient.onchange=selectSubAssignClient;
+ clearSubAssignClientSuggestions();
  subAssignJob.onchange=()=>{rmlFillSubAssignmentDate();rml408Reset()};
  const j=db.chantiers.find(x=>x.id===a.chantier_id);
  subAssignClient.value=j?.client_id||'';subAssignJobSearch.value='';
@@ -7336,6 +7479,7 @@ function editSubAssignment(id){
  subAssignWork.value=rml41CleanText(a.work_description||'');rml408Reset();rmlUpdateSubAddress();document.getElementById('subAdvancedClauses').open=false;
  subClauseDraft=rml41CleanClauses(subClausesFromAssignment(a)).map(x=>({...x}));renderSubClauseEditor();rmlQuickContractDefaults();rml411Restore(subClauseDraft);
  subAssignSaveBtn.textContent='Enregistrer les modifications';
+ document.getElementById('subAssignDeleteBtn').hidden=!(a.status==='brouillon'&&!a.signature_data&&!a.rml_signature_data&&!a.signed_at&&!a.rml_signed_at);
  openModal('subAssignModal');
 }
 function rmlContractPreviewFrame(){
@@ -7440,7 +7584,27 @@ async function saveSubAssignmentChecked(row,id){
  if(!verified||verified.updated_at!==saved.updated_at)throw new Error('Impossible de confirmer les données enregistrées dans Supabase.');
  return verified;
 }
+const SUB_ASSIGN_DUPLICATE_MESSAGE='Chantier déjà attribué à ce sous-traitant. Indiquez deux dates d’intervention différentes pour créer une autre affectation.';
+let subAssignmentSaving=false;
+async function checkSubAssignmentDuplicate(row,id){
+ if(!row.chantier_id)return;
+ const current=id&&erpSubAssignments.find(assignment=>String(assignment.id)===id);
+ if(current&&String(current.chantier_id)===String(row.chantier_id)
+    &&String(current.subcontractor_id)===String(row.subcontractor_id)
+    &&(current.planned_date||null)===(row.planned_date||null))return;
+ let query=sb.from('erp_subcontract_assignments').select('id')
+  .eq('chantier_id',row.chantier_id).eq('subcontractor_id',row.subcontractor_id);
+ if(id)query=query.neq('id',id);
+ if(row.planned_date)query=query.or('planned_date.is.null,planned_date.eq.'+row.planned_date);
+ const {data,error}=await query.limit(1);
+ if(error)throw error;
+ if(data?.length)throw new Error('Chantier déjà attribué');
+}
 async function showSubAssignmentSaveError(error){
+ if(error?.message==='Chantier déjà attribué'){
+  alert(SUB_ASSIGN_DUPLICATE_MESSAGE);
+  return;
+ }
  let detail=error?.message||String(error);
  if(/permission denied|42501|row.level.security/i.test(detail)){
   try{
@@ -7451,6 +7615,7 @@ async function showSubAssignmentSaveError(error){
  alert('Enregistrement du contrat impossible : '+detail);
 }
 async function saveSubAssignment(confirmAssignment=false){
+ if(subAssignmentSaving){alert('Attribution déjà en cours.');return}
  const sid=subAssignSubId.value,jid=subAssignJob.value;
  if(!sid){alert('Sous-traitant introuvable.');return}
  // Un brouillon peut être enregistré même si le chantier ou les travaux ne sont pas encore renseignés.
@@ -7461,12 +7626,21 @@ async function saveSubAssignment(confirmAssignment=false){
  if(jid)row.chantier_id=jid;
  const id=subAssignId.value;
  if(!id&&!jid){alert('Pour créer le premier brouillon, choisissez au minimum un chantier. Vous pourrez compléter toutes les autres informations plus tard.');return}
+ const buttons=['subAssignConfirmBtn','subAssignSaveBtn','subAssignDeleteBtn'].map(id=>document.getElementById(id));
+ subAssignmentSaving=true;
+ buttons.forEach(button=>button.disabled=true);
  try{
+  await checkSubAssignmentDuplicate(row,id);
   if(!id)delete row.updated_at;
   await saveSubAssignmentChecked(row,id);
- }catch(error){await showSubAssignmentSaveError(error);return}
- closeModal('subAssignModal');await loadSubcontractors();
- alert(confirmAssignment?'Chantier affecté au sous-traitant. Contrat enregistré et vérifié dans Supabase.':'Modifications du contrat enregistrées et vérifiées dans Supabase.');
+  closeModal('subAssignModal');
+  await loadSubcontractors();
+  alert(confirmAssignment?'Chantier affecté au sous-traitant. Contrat enregistré et vérifié dans Supabase.':'Modifications du contrat enregistrées et vérifiées dans Supabase.');
+ }catch(error){await showSubAssignmentSaveError(error)}
+ finally{
+  subAssignmentSaving=false;
+  buttons.forEach(button=>button.disabled=false);
+ }
 }
 let subExistingClauseDraft=[];
 function renderExistingSubClauseEditor(){subExistingClauseEditor.innerHTML=subExistingClauseDraft.map((x,i)=>String(x.title||'').trim()===RML41_ANNEX?'':`<div class="sub-clause-edit"><div class="sub-clause-head"><input value="${esc(x.title||'')}" oninput="subExistingClauseDraft[${i}].title=this.value"><button class="btn danger" type="button" onclick="removeExistingSubClause(${i})">Supprimer</button></div><textarea oninput="subExistingClauseDraft[${i}].text=this.value">${esc(x.text||'')}</textarea></div>`).join('')}
@@ -7523,7 +7697,7 @@ function openSubContract(id){
  if(isSubcontractorUser())rml413RenderDetails(a);else{const panel=document.getElementById('rml413DetailPanel');if(panel)panel.style.display='none';}
  subSignerName.value=a.signer_name||sub?.contact_name||'';subSignerRole.value=a.signer_role||'';
  openModal('subContractModal');setTimeout(()=>{setupSubSignaturePad();if(a.signature_data){drawSavedSignature(a.signature_data)}else clearSubSignature();const signed=!!a.signature_data;subEditClausesActions.style.display=(signed||isSubcontractorUser())?'none':'flex';subSignBtn.disabled=signed;subSignBtn.textContent=signed?'Signature sous-traitant enregistrée':'Signer et valider le contrat';subSignerName.disabled=signed;subSignerRole.disabled=signed;document.getElementById('subAcceptanceBox').style.display=signed?'none':'flex';document.getElementById('subAcceptanceSaved').style.display=signed?'block':'none';document.getElementById('subAcceptanceCheck').checked=signed;subSignaturePad.style.pointerEvents=signed?'none':'auto';
- const canRml=!isSubcontractorUser()&&(currentAccess?.role==='administrateur'||currentAccess?.role==='direction');rmlSignatureWrap.style.display=(signed&&canRml)?'block':'none';rmlSignerName.value=a.rml_signer_name||'';rmlSignerRole.value=a.rml_signer_role||'Gérant';setupRmlSignaturePad();if(a.rml_signature_data)drawSavedRmlSignature(a.rml_signature_data);else clearRmlSignature();rmlSignBtn.disabled=!!a.rml_signature_data;rmlSignBtn.textContent=a.rml_signature_data?'Signature RML enregistrée':'Signer pour RML';rmlSignerName.disabled=!!a.rml_signature_data;rmlSignerRole.disabled=!!a.rml_signature_data;rmlSignaturePad.style.pointerEvents=a.rml_signature_data?'none':'auto';rmlClearSignBtn.style.display=a.rml_signature_data?'none':'inline-block';},60);
+ rmlSignatureWrap.style.display=(signed&&canSignRmlContract())?'block':'none';rmlSignerName.value=a.rml_signer_name||'';rmlSignerRole.value=a.rml_signer_role||'Gérant';setupRmlSignaturePad();if(a.rml_signature_data)drawSavedRmlSignature(a.rml_signature_data);else clearRmlSignature();rmlSignBtn.disabled=!!a.rml_signature_data;rmlSignBtn.textContent=a.rml_signature_data?'Signature RML enregistrée':'Signer pour RML';rmlSignerName.disabled=!!a.rml_signature_data;rmlSignerRole.disabled=!!a.rml_signature_data;rmlSignaturePad.style.pointerEvents=a.rml_signature_data?'none':'auto';rmlClearSignBtn.style.display=a.rml_signature_data?'none':'inline-block';},60);
 }
 function setupSubSignaturePad(){
  const c=subSignaturePad,dpr=Math.max(window.devicePixelRatio||1,1),r=c.getBoundingClientRect();c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111827';
@@ -7634,7 +7808,7 @@ let rmlSignatureDrawing=false,rmlSignatureDirty=false;
 function setupRmlSignaturePad(){const c=document.getElementById('rmlSignaturePad');if(!c||c.offsetParent===null)return;const dpr=Math.max(window.devicePixelRatio||1,1),r=c.getBoundingClientRect();c.width=Math.max(1,Math.floor(r.width*dpr));c.height=Math.max(1,Math.floor(r.height*dpr));const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111827';const point=e=>{const rr=c.getBoundingClientRect(),t=e.touches?.[0]||e;return{x:t.clientX-rr.left,y:t.clientY-rr.top}};c.onpointerdown=e=>{rmlSignatureDrawing=true;rmlSignatureDirty=true;const p=point(e);ctx.beginPath();ctx.moveTo(p.x,p.y);c.setPointerCapture?.(e.pointerId)};c.onpointermove=e=>{if(!rmlSignatureDrawing)return;const p=point(e);ctx.lineTo(p.x,p.y);ctx.stroke()};c.onpointerup=c.onpointercancel=()=>rmlSignatureDrawing=false}
 function clearRmlSignature(){const c=document.getElementById('rmlSignaturePad');if(!c)return;c.getContext('2d').clearRect(0,0,c.width,c.height);rmlSignatureDirty=false}
 function drawSavedRmlSignature(data){const img=new Image();img.onload=()=>{const c=document.getElementById('rmlSignaturePad'),ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height)};img.src=data;rmlSignatureDirty=false}
-async function signRmlContract(){const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a||!a.signature_data){alert('Le sous-traitant doit signer le contrat avant RML.');return}if(a.rml_signature_data)return;if(isSubcontractorUser()||!['administrateur','direction'].includes(currentAccess?.role)){alert('Signature RML réservée à la direction.');return}const name=rmlSignerName.value.trim(),role=rmlSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire RML.');return}if(!rmlSignatureDirty){alert('Veuillez signer dans le cadre RML avant de valider.');return}if(!confirm('Valider définitivement la signature RML de ce contrat ?'))return;const rml_signature_data=rmlSignaturePad.toDataURL('image/png'),rml_signed_at=new Date().toISOString();const {data,error}=await sb.from('erp_subcontract_assignments').update({rml_signer_name:name,rml_signer_role:role||null,rml_signature_data,rml_signed_at,updated_at:rml_signed_at}).eq('id',id).select('id,rml_signer_name,rml_signer_role,rml_signature_data,rml_signed_at').maybeSingle();if(error){alert('Signature RML non enregistrée : '+error.message);return}if(!data?.rml_signature_data){alert("La signature RML n'a pas été enregistrée dans Supabase.");return}closeModal('subContractModal');await loadSubcontractors();await rmlV4210Offer(id);}
+async function signRmlContract(){const id=subContractId.value,a=erpSubAssignments.find(x=>x.id===id);if(!a||!a.signature_data){alert('Le sous-traitant doit signer le contrat avant RML.');return}if(a.rml_signature_data)return;if(!canSignRmlContract()){alert('Signature RML réservée à la direction.');return}const name=rmlSignerName.value.trim(),role=rmlSignerRole.value.trim();if(!name){alert('Renseignez le nom du signataire RML.');return}if(!rmlSignatureDirty){alert('Veuillez signer dans le cadre RML avant de valider.');return}if(!confirm('Valider définitivement la signature RML de ce contrat ?'))return;const rml_signature_data=rmlSignaturePad.toDataURL('image/png'),rml_signed_at=new Date().toISOString();const {data,error}=await sb.from('erp_subcontract_assignments').update({rml_signer_name:name,rml_signer_role:role||null,rml_signature_data,rml_signed_at,updated_at:rml_signed_at}).eq('id',id).select('id,rml_signer_name,rml_signer_role,rml_signature_data,rml_signed_at').maybeSingle();if(error){alert('Signature RML non enregistrée : '+error.message);return}if(!data?.rml_signature_data){alert("La signature RML n'a pas été enregistrée dans Supabase.");return}closeModal('subContractModal');await loadSubcontractors();await rmlV4210Offer(id);}
 let erpDocuments=[];
 function clientSorted(){return [...db.clients].filter(c=>c.actif!==false).sort((a,b)=>(a.nom||'').localeCompare(b.nom||'','fr'))}
 function jobsForClient(cid){return db.chantiers.filter(j=>!cid||j.client_id===cid).filter(j=>j.statut!=='archive').sort((a,b)=>(a.nom||'').localeCompare(b.nom||'','fr'))}
@@ -8772,7 +8946,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V46.4';
+const RML_ERP_VERSION='V46.16';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
