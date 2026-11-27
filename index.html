@@ -883,7 +883,11 @@ body.rml-preparation-preview-open{overflow:hidden}
   </div>
 </section>
 <section id="clients" class="view"><div class="panel client-panel">
-<div class="client-head"><div><h2>Clients</h2><div class="muted">Clique directement sur un client pour ouvrir son dossier.</div></div><button class="btn" id="newClientBtn">+ Nouveau client</button></div>
+<div class="client-head"><div><h2>Clients et fournisseurs</h2></div><button class="btn" id="newClientBtn">+ Nouveau client</button></div>
+<div id="clientDirectoryTabs" class="actions" role="group" aria-label="Type de fiche">
+ <button id="clientDirectoryClients" type="button" class="btn" aria-pressed="true" onclick="setClientDirectoryTab(false)">Clients</button>
+ <button id="clientDirectorySuppliers" type="button" class="btn secondary" aria-pressed="false" onclick="setClientDirectoryTab(true)">Fournisseurs</button>
+</div>
 <div class="client-filters"><input id="clientSearch" placeholder="Rechercher un client, responsable, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option><option>SAV</option></select><details class="client-tools"><summary>Import / Outils</summary><div class="client-tools-menu"><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="exportClientsBtn" type="button" onclick="exportClientsExcel()">Exporter Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer le dernier import Excel</button></div></details><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div>
 <div id="clientAlphabet" class="client-alphabet" aria-label="Classement alphabétique"></div>
 <div class="client-list-meta"><span id="clientResultCount">0 client</span><span class="muted">Sélection : <b id="clientLetterLabel">Tous</b></span></div>
@@ -4995,7 +4999,13 @@ async function onSignedIn(){
 }
 logoutBtn.onclick=async()=>{employeeAccount=null;employeeAssignments=[];rmlUpdateEmployeeTourAccess();await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
 async function resetClientForm({deferCode=false}={}){clientForm.reset();rmlSetClientType('professionnel');rmlContactLoad('');clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';if(!deferCode){try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)}};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools){clientEditTools.style.display='flex';}if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='none';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='none';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Créer le client';window.rmlClientNewSnapshot=JSON.stringify(readClientForm());updateClientDraftStatus()}
-newClientBtn.onclick=async()=>{if(!hasPerm('clients'))return;await resetClientForm();openModal('clientModal')}
+newClientBtn.onclick=async()=>{
+ if(!hasPerm('clients'))return;
+ const supplier=showDirectorySuppliers;
+ await resetClientForm();
+ if(supplier){renderProfessionSelect('Fournisseur');clientModalTitle.textContent='Nouveau fournisseur'}
+ openModal('clientModal');
+}
 async function generateClientCodes(count=1){
   const {data,error}=await sb.from('erp_clients').select('code');
   if(error)throw error;
@@ -5232,6 +5242,7 @@ clientForm.onsubmit=async e=>{
     setTimeout(()=>jobNom.focus(),50);
   }
   if(created&&wasNew&&!contextualCreation){
+    showDirectorySuppliers=isSupplierClient(created);
     clientSearch.value='';
     clientFilter.value='actifs';
     clientCategoryFilter.value='';
@@ -5243,7 +5254,31 @@ clientForm.onsubmit=async e=>{
 function clientDirectoryName(value){
   return String(value||'').trim().replace(/^(?:mr|m|mme|mlle)\.?\s+(?=\S)/i,'');
 }
-function getVisibleClientRows(){const q=clientSearch.value.trim().toLowerCase(),f=clientFilter.value,cat=clientCategoryFilter.value;return db.clients.filter(c=>{const hit=!q||[c.nom,c.code,c.responsable,c.categorie,c.telephone,c.email,c.adresse,c.siren,c.siret].join(' ').toLowerCase().includes(q);const stat=f==='tous'||(f==='actifs'&&c.actif)||(f==='archives'&&!c.actif);const catOk=!cat||c.categorie===cat;const alphaOk=clientAlpha==='TOUS'||clientInitial(c.nom)===clientAlpha;return hit&&stat&&catOk&&alphaOk}).sort((a,b)=>clientDirectoryName(a.nom).localeCompare(clientDirectoryName(b.nom),'fr',{sensitivity:'base'}))}
+let showDirectorySuppliers=false;
+function isSupplierClient(client){
+ return ['fournisseur','fournisseur mp'].includes(normalizeSearch(client?.categorie));
+}
+function setClientDirectoryTab(suppliers){
+ showDirectorySuppliers=suppliers;
+ clientSearch.value='';
+ clientCategoryFilter.value='';
+ clientAlpha='TOUS';
+ renderClients();
+}
+function renderClientDirectoryTabs(){
+ const suppliers=showDirectorySuppliers;
+ for(const [id,selected] of [['clientDirectoryClients',!suppliers],['clientDirectorySuppliers',suppliers]]){
+  const button=document.getElementById(id);
+  button.setAttribute('aria-pressed',String(selected));
+  button.classList.toggle('secondary',!selected);
+ }
+ newClientBtn.textContent=suppliers?'+ Nouveau fournisseur':'+ Nouveau client';
+ clientSearch.placeholder=suppliers?'Rechercher un fournisseur, responsable, téléphone, e-mail…':'Rechercher un client, responsable, téléphone, e-mail…';
+ for(const option of clientFilter.options){
+  option.textContent=({actifs:suppliers?'Fournisseurs actifs':'Clients actifs',tous:suppliers?'Tous les fournisseurs':'Tous les clients',archives:suppliers?'Fournisseurs archivés':'Clients archivés'})[option.value];
+ }
+}
+function getVisibleClientRows(){const q=clientSearch.value.trim().toLowerCase(),f=clientFilter.value,cat=clientCategoryFilter.value;return db.clients.filter(c=>{const hit=!q||[c.nom,c.code,c.responsable,c.categorie,c.telephone,c.email,c.adresse,c.siren,c.siret].join(' ').toLowerCase().includes(q);const stat=f==='tous'||(f==='actifs'&&c.actif)||(f==='archives'&&!c.actif);const catOk=!cat||c.categorie===cat;const alphaOk=clientAlpha==='TOUS'||clientInitial(c.nom)===clientAlpha;return hit&&stat&&catOk&&alphaOk&&isSupplierClient(c)===showDirectorySuppliers}).sort((a,b)=>clientDirectoryName(a.nom).localeCompare(clientDirectoryName(b.nom),'fr',{sensitivity:'base'}))}
 function updateClientEditNav(){if(!window.clientEditNav)return;const id=clientId.value;if(!id){clientEditNav.style.display='none';clientEditTools.style.display='none';return}const rows=getVisibleClientRows(),i=rows.findIndex(c=>c.id===id);clientEditNav.style.display='flex';clientEditTools.style.display='flex';clientEditPosition.textContent=i>=0?`${i+1} / ${rows.length}`:'Client';clientPrevBtn.disabled=i<=0;clientNextBtn.disabled=i<0||i>=rows.length-1;updateClientDraftStatus()}
 function loadClientIntoEdit(c){
   clientFormLoading=true;
@@ -5802,7 +5837,7 @@ async function applyCompanySearchResult(i){
 function openClientFolder(id){const c=db.clients.find(x=>x.id===id);if(!c)return;const jobs=db.chantiers.filter(j=>j.client_id===id).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));const linked=!!c.pennylane_customer_id;clientFolderTitle.textContent=c.nom;clientFolderContent.innerHTML=`<div class="client-folder-actions">${hasPerm('clients')?`<button class="btn client-primary-action client-edit-action" onclick="editClient('${c.id}')">✎ Modifier le client</button><button class="btn client-primary-action client-portal-action" onclick="openCompanySearch('${c.id}')">⌕ Rechercher sur le Portail des entreprises</button><button class="btn client-primary-action client-portal-action" onclick="openClientPappers('${c.id}')">⌕ Pappers</button>`:''}${hasPerm('chantiers')?`<button class="btn client-primary-action client-job-action" onclick="closeModal('clientFolderModal');prefillJob('${c.id}')">+ Nouveau chantier</button>`:''}${hasPerm('clients')?`<button class="btn secondary" onclick="toggleClient('${c.id}');closeModal('clientFolderModal')">${c.actif?'Archiver':'Réactiver'}</button><button class="btn danger" onclick="deleteClient('${c.id}')">Supprimer</button>`:''}</div><div class="panel" style="margin:0 0 14px"><div class="grid2"><div><strong>Client</strong><div class="muted">${esc(c.nom)}</div></div><div><strong>Code RML</strong><div class="muted">${esc(c.code||'')}</div></div><div><strong>Catégorie</strong><div class="muted">${esc(c.categorie||'Non classé')}</div></div><div><strong>Responsable</strong><div class="muted">${esc(c.responsable||'Non renseigné')}</div></div><div><strong>Téléphone</strong><div class="muted">${esc(c.telephone||'Non renseigné')}</div></div><div><strong>E-mail</strong><div class="muted">${esc(c.email||'Non renseigné')}</div></div><div><strong>SIREN</strong><div class="muted">${esc(c.siren||'Non renseigné')}</div></div><div><strong>SIRET du siège</strong><div class="muted">${esc(c.siret||'Non renseigné')}</div></div><div class="full"><strong>Adresse</strong><div class="muted">${esc(c.adresse||'Non renseignée')}</div></div>${c.notes?`<div class="full"><strong>Notes</strong><div class="muted">${esc(c.notes)}</div></div>`:''}</div></div><div class="pennylane-box" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><strong>Pennylane</strong><div class="muted" style="margin-top:3px">Architecture V0.10.1 préparée pour le rapprochement et la future synchronisation API.</div></div><span class="pennylane-state ${linked?'linked':''}">${linked?'Lié · ID '+esc(c.pennylane_customer_id):pennylaneReady()?'Non synchronisé':'Migration SQL V0.10.1 à appliquer'}</span></div>${c.pennylane_external_reference?`<div class="muted" style="margin-top:8px">Référence externe : ${esc(c.pennylane_external_reference)}</div>`:''}</div><h3 style="color:var(--navy);margin:8px 0 12px">Chantiers de ce client (${jobs.length})</h3>${jobs.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Chantier</th><th>Adresse</th><th>Statut</th><th>Date</th></tr></thead><tbody>${jobs.map(j=>`<tr class="client-row" tabindex="0" onclick="closeModal('clientFolderModal');openJob('${j.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><strong>${esc(j.nom)}</strong></td><td>${esc(j.adresse||'')}</td><td><span class="status ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}">${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</span></td><td>${formatDateFR(j.date_debut)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun chantier pour ce client.</div>'}`;openModal('clientFolderModal')}
 function clientInitial(name){const s=clientDirectoryName(name).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();if(!s)return '#';const ch=s[0];return /[A-Z]/.test(ch)?ch:/[0-9]/.test(ch)?'0-9':'#'}
 function buildClientAlphabet(){if(!window.clientAlphabet)return;const letters=['TOUS','0-9',...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];clientAlphabet.innerHTML=letters.map(l=>`<button type="button" class="client-letter ${clientAlpha===l?'active':''}" data-letter="${l}">${l==='TOUS'?'Tous':l}</button>`).join('');clientAlphabet.querySelectorAll('[data-letter]').forEach(b=>b.onclick=()=>{clientAlpha=b.dataset.letter;buildClientAlphabet();renderClients()})}
-function renderClients(){buildClientAlphabet();const rows=getVisibleClientRows();if(window.clientResultCount)clientResultCount.textContent=`${rows.length} client${rows.length>1?'s':''}`;if(window.clientLetterLabel)clientLetterLabel.textContent=clientAlpha==='TOUS'?'Tous':clientAlpha;if(!rows.length){clientsTable.innerHTML='<div class="empty">Aucun client correspondant.</div>';return}const counts=new Map();db.chantiers.forEach(j=>counts.set(j.client_id,(counts.get(j.client_id)||0)+1));clientsTable.innerHTML='<div class="tablewrap"><table class="table clients-compact"><thead><tr><th>Client</th><th>Catégorie</th><th>Responsable</th><th>Contact</th><th>Adresse</th><th>Chantiers</th><th></th></tr></thead><tbody>'+rows.map(c=>`<tr class="client-row" tabindex="0" onclick="openClientFolder('${c.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><span class="client-status-dot ${c.actif?'':'archived'}"></span><strong>${esc(c.nom)}</strong><br><span class="muted">${esc(c.code||'')}${c.pennylane_customer_id?' · Pennylane lié':''}</span></td><td>${esc(c.categorie||'Non classé')}</td><td>${esc(c.responsable||'')}</td><td>${esc(c.telephone||'')}${c.telephone&&c.email?'<br>':''}${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td><td><strong>${counts.get(c.id)||0}</strong></td><td class="client-chevron">›</td></tr>`).join('')+'</tbody></table></div>'}
+function renderClients(){renderClientDirectoryTabs();buildClientAlphabet();const kind=showDirectorySuppliers?'fournisseur':'client';const rows=getVisibleClientRows();if(window.clientResultCount)clientResultCount.textContent=`${rows.length} ${kind}${rows.length>1?'s':''}`;if(window.clientLetterLabel)clientLetterLabel.textContent=clientAlpha==='TOUS'?'Tous':clientAlpha;if(!rows.length){clientsTable.innerHTML='<div class="empty">Aucun '+kind+' correspondant.</div>';return}const counts=new Map();db.chantiers.forEach(j=>counts.set(j.client_id,(counts.get(j.client_id)||0)+1));clientsTable.innerHTML='<div class="tablewrap"><table class="table clients-compact"><thead><tr><th>'+ (showDirectorySuppliers?'Fournisseur':'Client') +'</th><th>Catégorie</th><th>Responsable</th><th>Contact</th><th>Adresse</th><th>Chantiers</th><th></th></tr></thead><tbody>'+rows.map(c=>`<tr class="client-row" tabindex="0" onclick="openClientFolder('${c.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><span class="client-status-dot ${c.actif?'':'archived'}"></span><strong>${esc(c.nom)}</strong><br><span class="muted">${esc(c.code||'')}${c.pennylane_customer_id?' · Pennylane lié':''}</span></td><td>${esc(c.categorie||'Non classé')}</td><td>${esc(c.responsable||'')}</td><td>${esc(c.telephone||'')}${c.telephone&&c.email?'<br>':''}${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td><td><strong>${counts.get(c.id)||0}</strong></td><td class="client-chevron">›</td></tr>`).join('')+'</tbody></table></div>'}
 clientSearch.oninput=renderClients;clientFilter.onchange=renderClients;clientCategoryFilter.onchange=renderClients;
 function fillClientSelect(selected='',query=''){const q=String(query||'').trim().toLowerCase();const active=db.clients.filter(c=>(c.actif||c.id===selected)&&(!q||[c.nom,c.code,c.adresse].join(' ').toLowerCase().includes(q))).sort((a,b)=>a.nom.localeCompare(b.nom,'fr')).slice(0,120);jobClient.innerHTML='<option value="">'+(q?'Sélectionner parmi les résultats…':'Sélectionner un client…')+'</option>'+active.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.nom)}${c.code?' — '+esc(c.code):''}</option>`).join('');if(selected&&!active.some(c=>c.id===selected)){const c=db.clients.find(c=>c.id===selected);if(c)jobClient.insertAdjacentHTML('beforeend',`<option value="${c.id}" selected>${esc(c.nom)}</option>`)}}
 function initJobClientSearch(selected=''){if(!window.jobClientSearch)return;const c=selected?db.clients.find(c=>c.id===selected):null;jobClientSearch.value=c?.nom||'';fillClientSelect(selected,jobClientSearch.value);jobClientSearch.oninput=()=>fillClientSelect('',jobClientSearch.value)}
@@ -9843,7 +9878,7 @@ function rmlV42TypeChanged(){
 function rmlV427Load(selected){
  const sel=v42$('v427SupplierSelect');
  const keep=String(selected??sel.value);
- const suppliers=clientSorted().filter(client=>['fournisseur','fournisseur mp'].includes(normalizeSearch(client.categorie)));
+ const suppliers=clientSorted().filter(isSupplierClient);
  fillSelect(sel,suppliers,suppliers.length?'— Choisir un fournisseur —':'Aucun fournisseur enregistré dans Clients');
  sel.value=suppliers.some(client=>String(client.id)===keep)?keep:'';
 }
@@ -9957,7 +9992,7 @@ function rmlTradeClientSearchKey(event){
 function rmlV421Clients(){
  const sel=v42$('v421ClientSelect');if(!sel)return;
  const old=sel.value,q=v42$('v421ClientSearch')?.value||'';
- const clients=(db.clients||[]).filter(c=>rmlTradeClientMatches(c,q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr'));
+ const clients=(db.clients||[]).filter(c=>!isSupplierClient(c)&&rmlTradeClientMatches(c,q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr'));
  sel.innerHTML='<option value="">— Choisir un client existant —</option>'+clients.map(c=>`<option value="${v42E(c.id)}">${v42E(c.nom)} — ${v42E(rmlV421Address(c))}</option>`).join('');
  if(clients.some(c=>String(c.id)===old))sel.value=old;
  rmlTradeShowClientSuggestions(clients);
