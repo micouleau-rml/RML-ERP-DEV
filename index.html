@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46.18</title>
+<title>RML ERP — V46.21</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -792,7 +792,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.18</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.21</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -883,7 +883,11 @@ body.rml-preparation-preview-open{overflow:hidden}
   </div>
 </section>
 <section id="clients" class="view"><div class="panel client-panel">
-<div class="client-head"><div><h2>Clients</h2><div class="muted">Clique directement sur un client pour ouvrir son dossier.</div></div><button class="btn" id="newClientBtn">+ Nouveau client</button></div>
+<div class="client-head"><div><h2>Clients et fournisseurs</h2></div><button class="btn" id="newClientBtn">+ Nouveau client</button></div>
+<div id="clientDirectoryTabs" class="actions" role="group" aria-label="Type de fiche">
+ <button id="clientDirectoryClients" type="button" class="btn" aria-pressed="true" onclick="setClientDirectoryTab(false)">Clients</button>
+ <button id="clientDirectorySuppliers" type="button" class="btn secondary" aria-pressed="false" onclick="setClientDirectoryTab(true)">Fournisseurs</button>
+</div>
 <div class="client-filters"><input id="clientSearch" placeholder="Rechercher un client, responsable, téléphone, e-mail…"><select id="clientFilter"><option value="actifs">Clients actifs</option><option value="tous">Tous les clients</option><option value="archives">Clients archivés</option></select><select id="clientCategoryFilter"><option value="">Toutes les catégories</option><option>Architecte</option><option>Maître d’œuvre</option><option>Charpentier</option><option>Maçon</option><option>Constructeur maison</option><option>Constructeur métallique</option><option>Professionnel divers</option><option>Particulier</option><option>SAV</option></select><details class="client-tools"><summary>Import / Outils</summary><div class="client-tools-menu"><button class="btn secondary" id="importClientsBtn">Importer Excel</button><button class="btn secondary" id="exportClientsBtn" type="button" onclick="exportClientsExcel()">Exporter Excel</button><button class="btn secondary" id="importChantierBackupBtn">Importer sauvegarde Chantier</button><button class="btn danger" id="deleteLastImportBtn">Supprimer le dernier import Excel</button></div></details><input id="clientExcelFile" type="file" accept=".xlsx,.xls" hidden><input id="chantierBackupFile" type="file" accept=".json,application/json" hidden></div>
 <div id="clientAlphabet" class="client-alphabet" aria-label="Classement alphabétique"></div>
 <div class="client-list-meta"><span id="clientResultCount">0 client</span><span class="muted">Sélection : <b id="clientLetterLabel">Tous</b></span></div>
@@ -3835,7 +3839,7 @@ document.addEventListener(&#x27;DOMContentLoaded&#x27;,()=&gt;{
 </div></div>
 <section id="analyse" class="view"><div class="panel"><div class="analyse-head"><div><h2>Analyse chantier</h2><div class="muted">Synthèse des données déjà reliées au chantier dans ERP DEV.</div></div><button class="btn secondary" onclick="loadAnalysis()">Actualiser</button></div><div class="field" style="margin-top:12px"><label>Rechercher</label><input id="analysisSearch" placeholder="Rechercher un client ou un chantier…" oninput="searchAnalysisContext()"></div><div class="grid2" style="margin-top:12px"><div class="field"><label>Client</label><select id="analysisClient"></select></div><div class="field"><label>Chantier</label><select id="analysisJob"></select></div></div><div id="analysisStatus" class="notice">Sélectionnez un chantier.</div><div id="analysisContent"></div><div id="financePanel" style="margin-top:16px"></div></div></section>
 <section id="users" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Utilisateurs & droits d’accès</h2><div class="muted" style="margin-top:4px">Choisis les modules visibles pour chaque utilisateur.</div></div><button class="btn secondary" id="refreshUsersBtn">Actualiser</button></div><div class="notice" style="margin-bottom:12px">Pour créer un nouveau compte, ajoute d’abord l’utilisateur dans <strong>Supabase → Authentication → Users</strong>. Il apparaîtra ici dès que son accès est enregistré dans Supabase. Tu peux lui attribuer le rôle Collaborateur et définir ses droits module par module.</div><div id="usersTable"></div></div></section>
-<section id="rmlCatalogView" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2>Modifier produits — catalogue général</h2><p class="muted">Réservé à l’administrateur. Modifiez les noms, ajoutez, dupliquez ou supprimez des produits, et déplacez-les avec la poignée ☰ pour changer leur ordre, puis cliquez sur Enregistrer les modifications. Les préparations déjà enregistrées ne sont pas modifiées.</p></div><button class="btn ok" onclick="rmlSaveCatalog()">Enregistrer les modifications</button></div><div class="actions" style="margin:10px 0"><button class="btn secondary" type="button" onclick="rmlImportPrepProducts()">Récupérer les produits de mes préparations</button></div><div id="rmlCatalogStatus" class="notice">Chargement du catalogue…</div><div id="rmlCatalogEditor"></div><div class="actions"><button class="btn ok" onclick="rmlSaveCatalog()">Enregistrer les modifications</button></div></div></section><section id="security" class="view"><div class="panel" id="rmlV37Simulator" style="margin-top:16px;border:2px solid #2563eb"><h2>V39 · Simulateur ADMIN — salariés et sous-traitants</h2><p class="muted">Tests depuis Mac, sans changer de compte. Seuls les chantiers autorisés explicitement dans Supabase comme chantiers de test peuvent recevoir des écritures. La fonction SQL V37 doit être installée avant tout enregistrement.</p><div class="grid2"><div class="field"><label>Profil simulé</label><select id="v37Kind" onchange="v37Refresh()"><option value="team">Équipe salariée</option><option value="sub">Sous-traitant</option></select></div><div class="field"><label>Équipe / sous-traitant</label><select id="v37Actor" onchange="v37ShowJob()"></select></div><div class="field"><label>Date simulée</label><input type="date" id="v37Date" onchange="v37Refresh()"></div><div class="field"><label>Affichage</label><select id="v37Device" onchange="v37Resize()"><option value="desktop">Mac</option><option value="tablet">Tablette</option><option value="phone">iPhone</option></select></div><div class="field"><label>Chantier de test</label><select id="v37Job" onchange="v37ShowJob()"></select></div></div><div class="actions"><button type="button" class="btn secondary" onclick="v37Refresh()">Actualiser les affectations</button><button type="button" class="btn secondary" onclick="v37CheckBackend()">Vérifier la connexion V37</button></div><div id="v37Status" class="notice" role="status">Sélectionnez une équipe, une date et un chantier de test.</div><div id="v37DeviceFrame" style="margin:16px auto;padding:16px;border:2px solid #cbd5e1;border-radius:18px;max-width:100%;box-sizing:border-box"><div id="v37Preview"></div><div id="v373Tabs" class="actions" style="display:none;gap:6px;margin:12px 0;flex-wrap:wrap"></div><div id="v373ReadOnly" style="display:none"></div><div id="v37HoursForm" style="display:none;border-top:1px solid #cbd5e1;padding-top:14px;margin-top:14px"><h3>Heures chantier — écriture Supabase réelle</h3><div class="grid2"><div class="field"><label>Heures (0 à 24)</label><input type="number" min="0" max="24" step="0.25" id="v37Hours"></div><div class="field"><label>Observation de test</label><input id="v37Note" maxlength="500" placeholder="Simulation V37"></div></div><button type="button" class="btn ok" onclick="v37SaveHours()">Enregistrer les heures dans Supabase</button></div></div><p class="muted">V39 : aperçu fidèle des espaces salarié et sous-traitant, consultation des données réelles de la fiche chantier, navigation terrain et test des heures. Les affectations affichées ne sont pas une garantie de planning exhaustif. Seul l’enregistrement des heures de salariés est activé via la fonction SQL sécurisée. Les autres rubriques consultent les documents, comptes rendus et affectations réels sans modifier aucune donnée.</p></div><div class="panel" id="rmlNavEditorPanel" style="margin-top:16px"><h2>Organisation des modules</h2><p class="muted">Réorganiser les modules du menu ERP. Réservé à l’administrateur.</p></div><div class="panel" id="rmlSupabaseMonitor" style="margin-top:16px"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Consommation Supabase</h2><p class="muted">Offre Free — surveillance administrateur. Compteurs d'enregistrements actualisés automatiquement ; quotas officiels à renseigner depuis Supabase Usage.</p></div><button type="button" class="btn secondary" onclick="rmlMonitorRefresh()">Actualiser les compteurs</button></div><div id="rmlMonitorCounts" class="notice">Ouvrez cette rubrique pour consulter les compteurs.</div><p class="muted" style="margin-top:12px">Saisissez les volumes relevés dans <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase → Usage</a>. Ces valeurs sont manuelles et ne représentent pas une mesure automatique en temps réel.</p><div class="grid2" id="rmlMonitorInputs"><div class="field"><label>Base de données utilisée (Mo / 500 Mo)</label><input type="number" id="rmlQuotaDb" min="0" step="0.1" placeholder="Ex. 125"></div><div class="field"><label>Stockage fichiers utilisé (Go / 1 Go)</label><input type="number" id="rmlQuotaStorage" min="0" step="0.001" placeholder="Ex. 0.250"></div><div class="field"><label>Transfert mensuel utilisé (Go / 5 Go)</label><input type="number" id="rmlQuotaTransfer" min="0" step="0.001" placeholder="Ex. 1.5"></div></div><div class="actions" style="margin:10px 0"><button class="btn ok" type="button" onclick="rmlMonitorSave()">Enregistrer les relevés</button></div><div id="rmlMonitorQuotaDisplay" aria-live="polite"></div><p class="muted">Alertes à 70 %, 85 % et 95 %. Surveillance configurée pour l’offre Free (base 0,5 Go, stockage 1 Go, bande passante 5 Go, valeurs indicatives). Vérifiez les quotas applicables à votre projet dans Supabase → Usage. Le transfert mensuel peut comporter plusieurs catégories de trafic ; reportez la valeur correspondant au quota de 5 Go. Les relevés sont conservés uniquement dans ce navigateur ; aucune clé secrète n'est utilisée.</p></div><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte en lecture seule les tables connues et accessibles. Ce fichier ne constitue pas une sauvegarde exhaustive de Supabase : les tables non répertoriées, les lignes masquées par RLS, Storage et Authentication sont exclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Archive partielle des tables connues et fichiers Storage accessibles. Une sauvegarde exhaustive nécessite un export administrateur côté Supabase (base, Storage et configuration).</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
+<section id="rmlCatalogView" class="view"><div class="panel"><div class="toolbar"><div style="flex:1"><h2>Modifier produits — catalogue général</h2><p class="muted">Réservé à l’administrateur. Modifiez les noms, ajoutez, dupliquez ou supprimez des produits, et déplacez-les avec la poignée ☰ pour changer leur ordre, puis cliquez sur Enregistrer les modifications. Les préparations déjà enregistrées ne sont pas modifiées.</p></div><button class="btn ok" type="button" data-rml-catalog-save onclick="rmlSaveCatalog()">Enregistrer les modifications</button></div><div class="actions" style="margin:10px 0"><button class="btn secondary" type="button" onclick="rmlImportPrepProducts()">Récupérer les produits de mes préparations</button></div><div id="rmlCatalogStatus" class="notice">Chargement du catalogue…</div><div id="rmlCatalogEditor"></div><div class="actions"><button class="btn ok" type="button" data-rml-catalog-save onclick="rmlSaveCatalog()">Enregistrer les modifications</button><span id="rmlCatalogSaveStatus" role="status" aria-atomic="true"></span></div></div></section><section id="security" class="view"><div class="panel" id="rmlV37Simulator" style="margin-top:16px;border:2px solid #2563eb"><h2>V39 · Simulateur ADMIN — salariés et sous-traitants</h2><p class="muted">Tests depuis Mac, sans changer de compte. Seuls les chantiers autorisés explicitement dans Supabase comme chantiers de test peuvent recevoir des écritures. La fonction SQL V37 doit être installée avant tout enregistrement.</p><div class="grid2"><div class="field"><label>Profil simulé</label><select id="v37Kind" onchange="v37Refresh()"><option value="team">Équipe salariée</option><option value="sub">Sous-traitant</option></select></div><div class="field"><label>Équipe / sous-traitant</label><select id="v37Actor" onchange="v37ShowJob()"></select></div><div class="field"><label>Date simulée</label><input type="date" id="v37Date" onchange="v37Refresh()"></div><div class="field"><label>Affichage</label><select id="v37Device" onchange="v37Resize()"><option value="desktop">Mac</option><option value="tablet">Tablette</option><option value="phone">iPhone</option></select></div><div class="field"><label>Chantier de test</label><select id="v37Job" onchange="v37ShowJob()"></select></div></div><div class="actions"><button type="button" class="btn secondary" onclick="v37Refresh()">Actualiser les affectations</button><button type="button" class="btn secondary" onclick="v37CheckBackend()">Vérifier la connexion V37</button></div><div id="v37Status" class="notice" role="status">Sélectionnez une équipe, une date et un chantier de test.</div><div id="v37DeviceFrame" style="margin:16px auto;padding:16px;border:2px solid #cbd5e1;border-radius:18px;max-width:100%;box-sizing:border-box"><div id="v37Preview"></div><div id="v373Tabs" class="actions" style="display:none;gap:6px;margin:12px 0;flex-wrap:wrap"></div><div id="v373ReadOnly" style="display:none"></div><div id="v37HoursForm" style="display:none;border-top:1px solid #cbd5e1;padding-top:14px;margin-top:14px"><h3>Heures chantier — écriture Supabase réelle</h3><div class="grid2"><div class="field"><label>Heures (0 à 24)</label><input type="number" min="0" max="24" step="0.25" id="v37Hours"></div><div class="field"><label>Observation de test</label><input id="v37Note" maxlength="500" placeholder="Simulation V37"></div></div><button type="button" class="btn ok" onclick="v37SaveHours()">Enregistrer les heures dans Supabase</button></div></div><p class="muted">V39 : aperçu fidèle des espaces salarié et sous-traitant, consultation des données réelles de la fiche chantier, navigation terrain et test des heures. Les affectations affichées ne sont pas une garantie de planning exhaustif. Seul l’enregistrement des heures de salariés est activé via la fonction SQL sécurisée. Les autres rubriques consultent les documents, comptes rendus et affectations réels sans modifier aucune donnée.</p></div><div class="panel" id="rmlNavEditorPanel" style="margin-top:16px"><h2>Organisation des modules</h2><p class="muted">Réorganiser les modules du menu ERP. Réservé à l’administrateur.</p></div><div class="panel" id="rmlSupabaseMonitor" style="margin-top:16px"><div class="toolbar"><div style="flex:1"><h2 style="margin:0">Consommation Supabase</h2><p class="muted">Offre Free — surveillance administrateur. Compteurs d'enregistrements actualisés automatiquement ; quotas officiels à renseigner depuis Supabase Usage.</p></div><button type="button" class="btn secondary" onclick="rmlMonitorRefresh()">Actualiser les compteurs</button></div><div id="rmlMonitorCounts" class="notice">Ouvrez cette rubrique pour consulter les compteurs.</div><p class="muted" style="margin-top:12px">Saisissez les volumes relevés dans <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase → Usage</a>. Ces valeurs sont manuelles et ne représentent pas une mesure automatique en temps réel.</p><div class="grid2" id="rmlMonitorInputs"><div class="field"><label>Base de données utilisée (Mo / 500 Mo)</label><input type="number" id="rmlQuotaDb" min="0" step="0.1" placeholder="Ex. 125"></div><div class="field"><label>Stockage fichiers utilisé (Go / 1 Go)</label><input type="number" id="rmlQuotaStorage" min="0" step="0.001" placeholder="Ex. 0.250"></div><div class="field"><label>Transfert mensuel utilisé (Go / 5 Go)</label><input type="number" id="rmlQuotaTransfer" min="0" step="0.001" placeholder="Ex. 1.5"></div></div><div class="actions" style="margin:10px 0"><button class="btn ok" type="button" onclick="rmlMonitorSave()">Enregistrer les relevés</button></div><div id="rmlMonitorQuotaDisplay" aria-live="polite"></div><p class="muted">Alertes à 70 %, 85 % et 95 %. Surveillance configurée pour l’offre Free (base 0,5 Go, stockage 1 Go, bande passante 5 Go, valeurs indicatives). Vérifiez les quotas applicables à votre projet dans Supabase → Usage. Le transfert mensuel peut comporter plusieurs catégories de trafic ; reportez la valeur correspondant au quota de 5 Go. Les relevés sont conservés uniquement dans ce navigateur ; aucune clé secrète n'est utilisée.</p></div><div class="panel" id="rmlFullBackupPanel" style="margin-top:16px"><h2>Sauvegarde complète ERP — JSON</h2><p class="muted">Exporte en lecture seule les tables connues et accessibles. Ce fichier ne constitue pas une sauvegarde exhaustive de Supabase : les tables non répertoriées, les lignes masquées par RLS, Storage et Authentication sont exclus.</p><button class="btn ok" id="rmlFullBackupBtn" type="button" onclick="rmlExportFullERP()">Télécharger la sauvegarde JSON</button><div id="rmlFullBackupStatus" class="notice" style="margin-top:10px">Aucune sauvegarde lancée.</div><div style="margin-top:12px"><button class="btn ok" id="rmlZipBackupBtn" type="button" onclick="rmlExportERPZip()">Télécharger la sauvegarde intégrale ZIP (données + fichiers)</button><p class="muted">Archive partielle des tables connues et fichiers Storage accessibles. Une sauvegarde exhaustive nécessite un export administrateur côté Supabase (base, Storage et configuration).</p></div></div><div class="panel"><h2>Sécurité / Réinitialisation</h2><div class="reset-warning"><strong>ZONE ADMINISTRATEUR — ERP DEV UNIQUEMENT</strong><br>Ces fonctions suppriment des données du projet <strong>RML ERP DEV</strong>. Elles ne touchent pas aux applications RML actuellement en production. Les comptes de connexion et les droits utilisateurs sont conservés, même lors d’une réinitialisation complète.</div><div id="resetStats" class="notice" style="margin-bottom:14px">Chargement des compteurs…</div><div class="reset-grid"><div class="reset-card"><h3>Données des modules</h3><p>Supprime toutes les données enregistrées dans les modules ERP (préparations chantier et futurs modules), sans supprimer les clients ni les chantiers.</p><button class="btn danger" type="button" onclick="requestReset('modules')">Réinitialiser les modules</button></div><div class="reset-card"><h3>Imports Excel clients</h3><p>Supprime tous les clients issus d'imports Excel ainsi que leurs chantiers et données de modules associés. Les clients créés manuellement sont conservés.</p><button class="btn danger" type="button" onclick="requestReset('imports')">Réinitialiser les imports Excel</button></div><div class="reset-card"><h3>Clients & chantiers</h3><p>Supprime tous les clients, tous les chantiers et toutes les données des modules. Les utilisateurs et leurs droits restent en place.</p><button class="btn danger" type="button" onclick="requestReset('business')">Réinitialiser clients & chantiers</button></div><div class="reset-card danger-zone"><h3>Réinitialisation complète ERP DEV</h3><p>Remet à zéro toutes les données métier de l'ERP DEV : modules, chantiers et clients. Les comptes Supabase Authentication et les droits d'accès sont volontairement conservés.</p><button class="btn danger" type="button" onclick="requestReset('full')">RÉINITIALISATION COMPLÈTE</button></div></div><div id="resetLog" class="reset-log"></div></div></section>
 
 <section id="page-forecast" class="view">
   <div class="card" id="forecastDedicatedCard">
@@ -4071,7 +4075,7 @@ const heuresSb=window.supabase.createClient(HEURES_SUPABASE_URL,HEURES_SUPABASE_
 window.rmlHeuresSupabaseClient=heuresSb;
 window.rmlResolveHeuresClient(heuresSb);
 let db={clients:[],chantiers:[],users:[]};
-const DEFAULT_PROFESSIONS=['Architecte','Maître d’œuvre','Charpentier','Maçon','Constructeur maison','Constructeur métallique','Professionnel divers','Particulier','Étancheur','Plombier','Zingueur','Couvreur','Menuisier','Plieur','Poseur gouttière alu','Revendeur','Fournisseur MP','SAV'];
+const DEFAULT_PROFESSIONS=['Architecte','Maître d’œuvre','Charpentier','Maçon','Constructeur maison','Constructeur métallique','Professionnel divers','Particulier','Étancheur','Plombier','Zingueur','Couvreur','Menuisier','Plieur','Poseur gouttière alu','Revendeur','Fournisseur','Fournisseur MP','SAV'];
 let clientProfessions=[...DEFAULT_PROFESSIONS];
 function professionSort(a,b){return a.localeCompare(b,'fr',{sensitivity:'base'})}
 function renderProfessionSelect(keepValue){
@@ -4219,8 +4223,52 @@ async function rmlImportPrepProducts(){
   rmlCatalogStatus(found?`${found} produit(s) récupéré(s) depuis ${checked} préparation(s). Vérifiez les noms, puis cliquez sur « Enregistrer les modifications » pour les sauvegarder dans Supabase.`:`${checked} préparation(s) consultée(s). Aucun nouveau nom de produit à ajouter. Les noms déjà présents sont conservés.`);
  }catch(e){rmlCatalogStatus('Récupération impossible : '+e.message+' (aucune modification enregistrée).',true);}
 }
-async function rmlOpenCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}go('rmlCatalogView');const ok=await rmlLoadCatalog();rmlRenderCatalog();if(ok)rmlCatalogStatus('Catalogue chargé. Modifiez les produits puis enregistrez.');rmlCatalogMarkClean();}
-async function rmlSaveCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return false;}const products={};for(const key of Object.keys(PREP_CATALOG)){const box=document.querySelector('[data-rml-catalog="'+key+'"]');const vals=[...(box?.querySelectorAll('input')||[])].map(e=>e.value.trim()).filter(Boolean);if(new Set(vals.map(v=>v.toLocaleLowerCase('fr'))).size!==vals.length){rmlCatalogStatus('Doublon détecté dans « '+RML_CATALOG_LABELS[key]+' ».',true);return false;}products[key]=vals;}rmlCatalogStatus('Enregistrement dans Supabase…');try{const {error}=await sb.from('erp_prep_catalog').upsert({id:1,products,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'id'});if(error)throw error;rmlApplyCatalog(products);rmlCatalogMarkClean();rmlCatalogStatus('Modifications enregistrées dans Supabase. Les nouvelles préparations utiliseront le catalogue actualisé.');return true;}catch(e){rmlCatalogStatus('Enregistrement impossible : '+e.message+'. Vérifiez que le script SQL V31.6 a été exécuté.',true);return false;}}
+async function rmlOpenCatalog(){if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return;}go('rmlCatalogView');$('rmlCatalogSaveStatus').textContent='';const ok=await rmlLoadCatalog();rmlRenderCatalog();if(ok)rmlCatalogStatus('Catalogue chargé. Modifiez les produits puis enregistrez.');rmlCatalogMarkClean();}
+function rmlCatalogSaveStatus(message,state){
+ const isError=state==='error';
+ rmlCatalogStatus(message,isError);
+ const status=$('rmlCatalogSaveStatus');
+ status.textContent=message;
+ status.style.color=isError?'#ad2424':state==='success'?'#17643c':'';
+}
+let rmlCatalogSaving=false;
+async function rmlSaveCatalog(){
+ if(!rmlCatalogAdmin()){alert('Réservé à l’administrateur.');return false;}
+ if(rmlCatalogSaving)return false;
+ const products={};
+ for(const key of Object.keys(PREP_CATALOG)){
+  const box=document.querySelector('[data-rml-catalog="'+key+'"]');
+  const vals=[...(box?.querySelectorAll('input')||[])].map(input=>input.value.trim()).filter(Boolean);
+  if(new Set(vals.map(value=>value.toLocaleLowerCase('fr'))).size!==vals.length){
+   rmlCatalogSaveStatus('Doublon détecté dans « '+RML_CATALOG_LABELS[key]+' ».','error');
+   return false;
+  }
+  products[key]=vals;
+ }
+ const snapshot=rmlCatalogSnapshot();
+ const buttons=document.querySelectorAll('[data-rml-catalog-save]');
+ buttons.forEach(button=>button.disabled=true);
+ rmlCatalogSaving=true;
+ rmlCatalogSaveStatus('Enregistrement dans Supabase…','pending');
+ try{
+  const {data,error}=await sb.from('erp_prep_catalog')
+   .upsert({id:1,products,updated_by:currentUser.id,updated_at:new Date().toISOString()},{onConflict:'id'})
+   .select('id').single();
+  if(error)throw error;
+  if(data?.id!==1)throw new Error('La sauvegarde n’a pas été confirmée par Supabase.');
+  rmlApplyCatalog(products);
+  rmlCatalogSavedSnapshot=snapshot;
+  const savedAll=!rmlCatalogHasChanges();
+  rmlCatalogSaveStatus(savedAll?'✓ Modifications enregistrées dans Supabase.':'✓ Catalogue enregistré. Des modifications plus récentes restent à enregistrer.','success');
+  return savedAll;
+ }catch(error){
+  rmlCatalogSaveStatus('Enregistrement impossible : '+error.message,'error');
+  return false;
+ }finally{
+  rmlCatalogSaving=false;
+  buttons.forEach(button=>button.disabled=false);
+ }
+}
 const PREP_SCHEMAS={
  gouttieres:{label:'Gouttières',headers:['Type','Couleur','Quantité / ML','Observations'],fields:[['type','select',PREP_CATALOG.gouttieres],['color','select',PREP_COLORS],['qty','text'],['note','text']]},
  accessoires_gouttieres:{label:'Accessoires gouttières',headers:['Accessoire','Couleur','Quantité','Observations'],fields:[['type','select',PREP_CATALOG.accessoires_gouttieres],['color','select',PREP_COLORS],['qty','number'],['note','text']]},
@@ -4995,7 +5043,13 @@ async function onSignedIn(){
 }
 logoutBtn.onclick=async()=>{employeeAccount=null;employeeAssignments=[];rmlUpdateEmployeeTourAccess();await sb.auth.signOut();currentUser=null;currentAccess=null;db={clients:[],chantiers:[],users:[]};renderAll();userPill.textContent='Utilisateur : —';setSync(false,'Supabase : déconnecté');loginOverlay.classList.remove('hidden');loginPassword.value=''};
 async function resetClientForm({deferCode=false}={}){clientForm.reset();rmlSetClientType('professionnel');rmlContactLoad('');clientId.value='';clientModalTitle.textContent='Nouveau client';clientCode.value='';if(window.clientSiren)clientSiren.value='';if(window.clientSiret)clientSiret.value='';if(!deferCode){try{[clientCode.value]=await generateClientCodes(1)}catch(err){console.error(err)}};if(window.clientEditNav)clientEditNav.style.display='none';if(window.clientEditTools){clientEditTools.style.display='flex';}if(window.clientDeleteFromEditBtn)clientDeleteFromEditBtn.style.display='none';if(window.clientSaveBatchBtn)clientSaveBatchBtn.style.display='none';const submit=clientForm.querySelector('button[type=submit]');if(submit)submit.textContent='Créer le client';window.rmlClientNewSnapshot=JSON.stringify(readClientForm());updateClientDraftStatus()}
-newClientBtn.onclick=async()=>{if(!hasPerm('clients'))return;await resetClientForm();openModal('clientModal')}
+newClientBtn.onclick=async()=>{
+ if(!hasPerm('clients'))return;
+ const supplier=showDirectorySuppliers;
+ await resetClientForm();
+ if(supplier){renderProfessionSelect('Fournisseur');clientModalTitle.textContent='Nouveau fournisseur'}
+ openModal('clientModal');
+}
 async function generateClientCodes(count=1){
   const {data,error}=await sb.from('erp_clients').select('code');
   if(error)throw error;
@@ -5232,6 +5286,7 @@ clientForm.onsubmit=async e=>{
     setTimeout(()=>jobNom.focus(),50);
   }
   if(created&&wasNew&&!contextualCreation){
+    showDirectorySuppliers=isSupplierClient(created);
     clientSearch.value='';
     clientFilter.value='actifs';
     clientCategoryFilter.value='';
@@ -5243,7 +5298,53 @@ clientForm.onsubmit=async e=>{
 function clientDirectoryName(value){
   return String(value||'').trim().replace(/^(?:mr|m|mme|mlle)\.?\s+(?=\S)/i,'');
 }
-function getVisibleClientRows(){const q=clientSearch.value.trim().toLowerCase(),f=clientFilter.value,cat=clientCategoryFilter.value;return db.clients.filter(c=>{const hit=!q||[c.nom,c.code,c.responsable,c.categorie,c.telephone,c.email,c.adresse,c.siren,c.siret].join(' ').toLowerCase().includes(q);const stat=f==='tous'||(f==='actifs'&&c.actif)||(f==='archives'&&!c.actif);const catOk=!cat||c.categorie===cat;const alphaOk=clientAlpha==='TOUS'||clientInitial(c.nom)===clientAlpha;return hit&&stat&&catOk&&alphaOk}).sort((a,b)=>clientDirectoryName(a.nom).localeCompare(clientDirectoryName(b.nom),'fr',{sensitivity:'base'}))}
+let showDirectorySuppliers=false;
+function isSupplierCategory(client){
+ return ['fournisseur','fournisseur mp'].includes(normalizeSearch(client?.categorie));
+}
+function isSupplierClient(client){
+ return isSupplierCategory(client)||client?.also_supplier===true;
+}
+async function toggleClientSupplierRole(id,button){
+ if(!hasPerm('clients')||button.disabled)return;
+ const client=db.clients.find(row=>String(row.id)===String(id));
+ if(!client||isSupplierCategory(client))return;
+ const alsoSupplier=client.also_supplier!==true;
+ button.disabled=true;
+ try{
+  const {data,error}=await sb.from('erp_clients').update({also_supplier:alsoSupplier})
+   .eq('id',id).select('id,also_supplier').maybeSingle();
+  if(error)throw error;
+  if(!data||data.also_supplier!==alsoSupplier)throw new Error('La modification n’a pas été confirmée.');
+  client.also_supplier=data.also_supplier;
+  renderClients();
+  rmlV427Load();
+  openClientFolder(client.id);
+ }catch(error){
+  alert('Impossible de modifier le rôle fournisseur : '+error.message);
+ }finally{button.disabled=false}
+}
+function setClientDirectoryTab(suppliers){
+ showDirectorySuppliers=suppliers;
+ clientSearch.value='';
+ clientCategoryFilter.value='';
+ clientAlpha='TOUS';
+ renderClients();
+}
+function renderClientDirectoryTabs(){
+ const suppliers=showDirectorySuppliers;
+ for(const [id,selected] of [['clientDirectoryClients',!suppliers],['clientDirectorySuppliers',suppliers]]){
+  const button=document.getElementById(id);
+  button.setAttribute('aria-pressed',String(selected));
+  button.classList.toggle('secondary',!selected);
+ }
+ newClientBtn.textContent=suppliers?'+ Nouveau fournisseur':'+ Nouveau client';
+ clientSearch.placeholder=suppliers?'Rechercher un fournisseur, responsable, téléphone, e-mail…':'Rechercher un client, responsable, téléphone, e-mail…';
+ for(const option of clientFilter.options){
+  option.textContent=({actifs:suppliers?'Fournisseurs actifs':'Clients actifs',tous:suppliers?'Tous les fournisseurs':'Tous les clients',archives:suppliers?'Fournisseurs archivés':'Clients archivés'})[option.value];
+ }
+}
+function getVisibleClientRows(){const q=clientSearch.value.trim().toLowerCase(),f=clientFilter.value,cat=clientCategoryFilter.value;return db.clients.filter(c=>{const hit=!q||[c.nom,c.code,c.responsable,c.categorie,c.telephone,c.email,c.adresse,c.siren,c.siret].join(' ').toLowerCase().includes(q);const stat=f==='tous'||(f==='actifs'&&c.actif)||(f==='archives'&&!c.actif);const catOk=!cat||c.categorie===cat;const alphaOk=clientAlpha==='TOUS'||clientInitial(c.nom)===clientAlpha;return hit&&stat&&catOk&&alphaOk&&(showDirectorySuppliers?isSupplierClient(c):!isSupplierCategory(c))}).sort((a,b)=>clientDirectoryName(a.nom).localeCompare(clientDirectoryName(b.nom),'fr',{sensitivity:'base'}))}
 function updateClientEditNav(){if(!window.clientEditNav)return;const id=clientId.value;if(!id){clientEditNav.style.display='none';clientEditTools.style.display='none';return}const rows=getVisibleClientRows(),i=rows.findIndex(c=>c.id===id);clientEditNav.style.display='flex';clientEditTools.style.display='flex';clientEditPosition.textContent=i>=0?`${i+1} / ${rows.length}`:'Client';clientPrevBtn.disabled=i<=0;clientNextBtn.disabled=i<0||i>=rows.length-1;updateClientDraftStatus()}
 function loadClientIntoEdit(c){
   clientFormLoading=true;
@@ -5802,10 +5903,10 @@ async function applyCompanySearchResult(i){
 function rmlClientDisplayNotes(raw){
  return String(raw||'').replace(/\n?\[RML_(?:CLIENT_IDENTITY_V1|CLIENT_PAYMENT_V1|LIVRAISON_V1):[^\]\r\n]*\]/g,'').trim();
 }
-function openClientFolder(id){const c=db.clients.find(x=>x.id===id);if(!c)return;const jobs=db.chantiers.filter(j=>j.client_id===id).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));const visibleNotes=rmlClientDisplayNotes(c.notes);const linked=!!c.pennylane_customer_id;clientFolderTitle.textContent=c.nom;clientFolderContent.innerHTML=`<div class="client-folder-actions">${hasPerm('clients')?`<button class="btn client-primary-action client-edit-action" onclick="editClient('${c.id}')">✎ Modifier le client</button><button class="btn client-primary-action client-portal-action" onclick="openCompanySearch('${c.id}')">⌕ Rechercher sur le Portail des entreprises</button><button class="btn client-primary-action client-portal-action" onclick="openClientPappers('${c.id}')">⌕ Pappers</button>`:''}${hasPerm('chantiers')?`<button class="btn client-primary-action client-job-action" onclick="closeModal('clientFolderModal');prefillJob('${c.id}')">+ Nouveau chantier</button>`:''}${hasPerm('clients')?`<button class="btn secondary" onclick="toggleClient('${c.id}');closeModal('clientFolderModal')">${c.actif?'Archiver':'Réactiver'}</button><button class="btn danger" onclick="deleteClient('${c.id}')">Supprimer</button>`:''}</div><div class="panel" style="margin:0 0 14px"><div class="grid2"><div><strong>Client</strong><div class="muted">${esc(c.nom)}</div></div><div><strong>Code RML</strong><div class="muted">${esc(c.code||'')}</div></div><div><strong>Catégorie</strong><div class="muted">${esc(c.categorie||'Non classé')}</div></div><div><strong>Responsable</strong><div class="muted">${esc(c.responsable||'Non renseigné')}</div></div><div><strong>Téléphone</strong><div class="muted">${esc(c.telephone||'Non renseigné')}</div></div><div><strong>E-mail</strong><div class="muted">${esc(c.email||'Non renseigné')}</div></div><div><strong>SIREN</strong><div class="muted">${esc(c.siren||'Non renseigné')}</div></div><div><strong>SIRET du siège</strong><div class="muted">${esc(c.siret||'Non renseigné')}</div></div><div class="full"><strong>Adresse</strong><div class="muted">${esc(c.adresse||'Non renseignée')}</div></div>${visibleNotes?`<div class="full"><strong>Notes</strong><div class="muted" style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(visibleNotes)}</div></div>`:''}</div></div><div class="pennylane-box" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><strong>Pennylane</strong><div class="muted" style="margin-top:3px">Architecture V0.10.1 préparée pour le rapprochement et la future synchronisation API.</div></div><span class="pennylane-state ${linked?'linked':''}">${linked?'Lié · ID '+esc(c.pennylane_customer_id):pennylaneReady()?'Non synchronisé':'Migration SQL V0.10.1 à appliquer'}</span></div>${c.pennylane_external_reference?`<div class="muted" style="margin-top:8px">Référence externe : ${esc(c.pennylane_external_reference)}</div>`:''}</div><h3 style="color:var(--navy);margin:8px 0 12px">Chantiers de ce client (${jobs.length})</h3>${jobs.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Chantier</th><th>Adresse</th><th>Statut</th><th>Date</th></tr></thead><tbody>${jobs.map(j=>`<tr class="client-row" tabindex="0" onclick="closeModal('clientFolderModal');openJob('${j.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><strong>${esc(j.nom)}</strong></td><td>${esc(j.adresse||'')}</td><td><span class="status ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}">${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</span></td><td>${formatDateFR(j.date_debut)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun chantier pour ce client.</div>'}`;openModal('clientFolderModal')}
+function openClientFolder(id){const c=db.clients.find(x=>x.id===id);if(!c)return;const jobs=db.chantiers.filter(j=>j.client_id===id).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'));const visibleNotes=rmlClientDisplayNotes(c.notes);const linked=!!c.pennylane_customer_id;clientFolderTitle.textContent=c.nom;clientFolderContent.innerHTML=`<div class="client-folder-actions">${hasPerm('clients')&&!isSupplierCategory(c)?`<button type="button" class="btn secondary" aria-pressed="${c.also_supplier===true}" onclick="toggleClientSupplierRole('${esc(c.id)}',this)">${c.also_supplier===true?'Retirer de la liste fournisseurs':'Ajouter aussi aux fournisseurs'}</button>`:''}${hasPerm('clients')?`<button class="btn client-primary-action client-edit-action" onclick="editClient('${c.id}')">✎ Modifier le client</button><button class="btn client-primary-action client-portal-action" onclick="openCompanySearch('${c.id}')">⌕ Rechercher sur le Portail des entreprises</button><button class="btn client-primary-action client-portal-action" onclick="openClientPappers('${c.id}')">⌕ Pappers</button>`:''}${hasPerm('chantiers')?`<button class="btn client-primary-action client-job-action" onclick="closeModal('clientFolderModal');prefillJob('${c.id}')">+ Nouveau chantier</button>`:''}${hasPerm('clients')?`<button class="btn secondary" onclick="toggleClient('${c.id}');closeModal('clientFolderModal')">${c.actif?'Archiver':'Réactiver'}</button><button class="btn danger" onclick="deleteClient('${c.id}')">Supprimer</button>`:''}</div><div class="panel" style="margin:0 0 14px"><div class="grid2"><div><strong>Client</strong><div class="muted">${esc(c.nom)}</div></div><div><strong>Code RML</strong><div class="muted">${esc(c.code||'')}</div></div><div><strong>Catégorie</strong><div class="muted">${esc(c.categorie||'Non classé')}</div></div><div><strong>Responsable</strong><div class="muted">${esc(c.responsable||'Non renseigné')}</div></div><div><strong>Téléphone</strong><div class="muted">${esc(c.telephone||'Non renseigné')}</div></div><div><strong>E-mail</strong><div class="muted">${esc(c.email||'Non renseigné')}</div></div><div><strong>SIREN</strong><div class="muted">${esc(c.siren||'Non renseigné')}</div></div><div><strong>SIRET du siège</strong><div class="muted">${esc(c.siret||'Non renseigné')}</div></div><div class="full"><strong>Adresse</strong><div class="muted">${esc(c.adresse||'Non renseignée')}</div></div>${visibleNotes?`<div class="full"><strong>Notes</strong><div class="muted" style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(visibleNotes)}</div></div>`:''}</div></div><div class="pennylane-box" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><div><strong>Pennylane</strong><div class="muted" style="margin-top:3px">Architecture V0.10.1 préparée pour le rapprochement et la future synchronisation API.</div></div><span class="pennylane-state ${linked?'linked':''}">${linked?'Lié · ID '+esc(c.pennylane_customer_id):pennylaneReady()?'Non synchronisé':'Migration SQL V0.10.1 à appliquer'}</span></div>${c.pennylane_external_reference?`<div class="muted" style="margin-top:8px">Référence externe : ${esc(c.pennylane_external_reference)}</div>`:''}</div><h3 style="color:var(--navy);margin:8px 0 12px">Chantiers de ce client (${jobs.length})</h3>${jobs.length?`<div class="tablewrap"><table class="table"><thead><tr><th>Chantier</th><th>Adresse</th><th>Statut</th><th>Date</th></tr></thead><tbody>${jobs.map(j=>`<tr class="client-row" tabindex="0" onclick="closeModal('clientFolderModal');openJob('${j.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><strong>${esc(j.nom)}</strong></td><td>${esc(j.adresse||'')}</td><td><span class="status ${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}">${esc(({en_cours:'En cours',attente:'En attente',actif:'Actif',termine:'Terminé',archive:'Archivé',sav:'SAV'}[j.statut]||j.statut))}</span></td><td>${formatDateFR(j.date_debut)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Aucun chantier pour ce client.</div>'}`;openModal('clientFolderModal')}
 function clientInitial(name){const s=clientDirectoryName(name).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();if(!s)return '#';const ch=s[0];return /[A-Z]/.test(ch)?ch:/[0-9]/.test(ch)?'0-9':'#'}
 function buildClientAlphabet(){if(!window.clientAlphabet)return;const letters=['TOUS','0-9',...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];clientAlphabet.innerHTML=letters.map(l=>`<button type="button" class="client-letter ${clientAlpha===l?'active':''}" data-letter="${l}">${l==='TOUS'?'Tous':l}</button>`).join('');clientAlphabet.querySelectorAll('[data-letter]').forEach(b=>b.onclick=()=>{clientAlpha=b.dataset.letter;buildClientAlphabet();renderClients()})}
-function renderClients(){buildClientAlphabet();const rows=getVisibleClientRows();if(window.clientResultCount)clientResultCount.textContent=`${rows.length} client${rows.length>1?'s':''}`;if(window.clientLetterLabel)clientLetterLabel.textContent=clientAlpha==='TOUS'?'Tous':clientAlpha;if(!rows.length){clientsTable.innerHTML='<div class="empty">Aucun client correspondant.</div>';return}const counts=new Map();db.chantiers.forEach(j=>counts.set(j.client_id,(counts.get(j.client_id)||0)+1));clientsTable.innerHTML='<div class="tablewrap"><table class="table clients-compact"><thead><tr><th>Client</th><th>Catégorie</th><th>Responsable</th><th>Contact</th><th>Adresse</th><th>Chantiers</th><th></th></tr></thead><tbody>'+rows.map(c=>`<tr class="client-row" tabindex="0" onclick="openClientFolder('${c.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><span class="client-status-dot ${c.actif?'':'archived'}"></span><strong>${esc(c.nom)}</strong><br><span class="muted">${esc(c.code||'')}${c.pennylane_customer_id?' · Pennylane lié':''}</span></td><td>${esc(c.categorie||'Non classé')}</td><td>${esc(c.responsable||'')}</td><td>${esc(c.telephone||'')}${c.telephone&&c.email?'<br>':''}${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td><td><strong>${counts.get(c.id)||0}</strong></td><td class="client-chevron">›</td></tr>`).join('')+'</tbody></table></div>'}
+function renderClients(){renderClientDirectoryTabs();buildClientAlphabet();const kind=showDirectorySuppliers?'fournisseur':'client';const rows=getVisibleClientRows();if(window.clientResultCount)clientResultCount.textContent=`${rows.length} ${kind}${rows.length>1?'s':''}`;if(window.clientLetterLabel)clientLetterLabel.textContent=clientAlpha==='TOUS'?'Tous':clientAlpha;if(!rows.length){clientsTable.innerHTML='<div class="empty">Aucun '+kind+' correspondant.</div>';return}const counts=new Map();db.chantiers.forEach(j=>counts.set(j.client_id,(counts.get(j.client_id)||0)+1));clientsTable.innerHTML='<div class="tablewrap"><table class="table clients-compact"><thead><tr><th>'+ (showDirectorySuppliers?'Fournisseur':'Client') +'</th><th>Catégorie</th><th>Responsable</th><th>Contact</th><th>Adresse</th><th>Chantiers</th><th></th></tr></thead><tbody>'+rows.map(c=>`<tr class="client-row" tabindex="0" onclick="openClientFolder('${c.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><span class="client-status-dot ${c.actif?'':'archived'}"></span><strong>${esc(c.nom)}</strong><br><span class="muted">${esc(c.code||'')}${c.pennylane_customer_id?' · Pennylane lié':''}</span></td><td>${esc(c.categorie||'Non classé')}</td><td>${esc(c.responsable||'')}</td><td>${esc(c.telephone||'')}${c.telephone&&c.email?'<br>':''}${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td><td><strong>${counts.get(c.id)||0}</strong></td><td class="client-chevron">›</td></tr>`).join('')+'</tbody></table></div>'}
 clientSearch.oninput=renderClients;clientFilter.onchange=renderClients;clientCategoryFilter.onchange=renderClients;
 function fillClientSelect(selected='',query=''){const q=String(query||'').trim().toLowerCase();const active=db.clients.filter(c=>(c.actif||c.id===selected)&&(!q||[c.nom,c.code,c.adresse].join(' ').toLowerCase().includes(q))).sort((a,b)=>a.nom.localeCompare(b.nom,'fr')).slice(0,120);jobClient.innerHTML='<option value="">'+(q?'Sélectionner parmi les résultats…':'Sélectionner un client…')+'</option>'+active.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.nom)}${c.code?' — '+esc(c.code):''}</option>`).join('');if(selected&&!active.some(c=>c.id===selected)){const c=db.clients.find(c=>c.id===selected);if(c)jobClient.insertAdjacentHTML('beforeend',`<option value="${c.id}" selected>${esc(c.nom)}</option>`)}}
 function initJobClientSearch(selected=''){if(!window.jobClientSearch)return;const c=selected?db.clients.find(c=>c.id===selected):null;jobClientSearch.value=c?.nom||'';fillClientSelect(selected,jobClientSearch.value);jobClientSearch.oninput=()=>fillClientSelect('',jobClientSearch.value)}
@@ -8949,7 +9050,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V46.18';
+const RML_ERP_VERSION='V46.21';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
@@ -9658,12 +9759,11 @@ v373RenderTab=function(){v377OldRender();const read=document.getElementById('v37
 <section class="v42section v42addresses"><h3>1 · Destinataire et livraison</h3><div class="v42grid">
 <div><label>Date</label><input type="date" id="v42Date"></div><div><label>Statut</label><select id="v42State"><option value="brouillon">Brouillon</option><option value="emis">Émis</option><option value="livre">Livré</option></select></div>
 <div><div id="rmlTradeCreateClient" class="v42client-create"><strong>Client absent du répertoire ?</strong><button type="button" onclick="rmlTradeNewClient()">+ Créer un nouveau client</button></div><label id="v42PartyLabel">Fournisseur</label><input id="v42Party" placeholder="Nom du destinataire"><div id="rmlTradePaymentBox" hidden><label for="rmlTradePayment">Moyen de paiement du devis</label><select id="rmlTradePayment"><option value="">Non renseigné</option><option>Virement</option><option>Chèque</option><option>Espèces</option></select></div><div id="v427SupplierBox" style="margin-top:8px">
-<label>Fournisseurs enregistrés</label>
+<label for="v427SupplierSelect">Fournisseurs enregistrés dans Clients</label>
 <select id="v427SupplierSelect" onchange="rmlV427Pick()"><option value="">— Choisir un fournisseur —</option></select>
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
-<button type="button" onclick="rmlV427Save()">+ Enregistrer ce fournisseur</button>
-<button type="button" class="v42gray" onclick="rmlV427Remove()">Supprimer le fournisseur sélectionné</button>
-</div><small>Renseigne le nom et l'adresse ci-dessous, puis enregistre le fournisseur pour les prochains bons.</small>
+<button id="rmlTradeCreateSupplier" type="button" onclick="rmlTradeNewClient(true)">+ Créer une fiche fournisseur</button>
+</div><small>Les fiches classées « Fournisseur » ou « Fournisseur MP » dans le module Clients sont proposées ici.</small>
 </div><div id="v421ClientBox" style="display:none;margin-top:7px"><label>Choisir dans les fiches clients enregistrées</label><p id="rmlTradeClientsStatus" role="status" class="v42hint"></p><button type="button" class="v42gray" onclick="rmlTradeLoadClients()">Actualiser les clients</button><label for="v421ClientSearch">Rechercher par nom d’entreprise ou de client</label><input id="v421ClientSearch" placeholder="Tapez le nom de l’entreprise ou du client…" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="rmlTradeClientSuggestions" aria-expanded="false" oninput="rmlV421Clients()" onfocus="rmlV421Clients()" onkeydown="rmlTradeClientSearchKey(event)"><div id="rmlTradeClientMatchesHint" class="v42hint" role="status" aria-live="polite">Tapez le nom de l’entreprise ou du client pour afficher les propositions.</div><div id="rmlTradeClientSuggestions" role="listbox" aria-label="Clients proposés" hidden></div><select id="v421ClientSelect" hidden onchange="rmlV421PickClient()"><option value="">— Choisir un client —</option></select></div></div>
 <div><label>Adresse postale du destinataire</label><textarea id="v42Address" rows="2"></textarea></div>
 <div><label>Chantier (facultatif)</label><select id="v42Job" onchange="rmlV42JobChanged()"></select></div>
@@ -9698,19 +9798,25 @@ const v42E=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'
 const v42N=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 
 window.rmlTradeClientContext=false;
-async function rmlTradeNewClient(){
+async function rmlTradeNewClient(supplier=false){
  if(!hasPerm('clients')){alert('Vous n’avez pas le droit de créer un client.');return}
  const modal=document.getElementById('clientModal');
  if(window.rmlTradeClientContext&&modal?.classList.contains('open')){document.getElementById('clientNom')?.focus();return}
- const button=document.querySelector('#rmlTradeCreateClient button');if(button)button.disabled=true;
+ const button=supplier?v42$('rmlTradeCreateSupplier'):document.querySelector('#rmlTradeCreateClient button');if(button)button.disabled=true;
  try{
-  window.rmlTradeClientContext=true;clientCreationFromJob=false;
+  window.rmlTradeClientContext=supplier?'supplier':'client';clientCreationFromJob=false;
   // Aucun appel réseau avant l’ouverture : le code sera attribué à l’enregistrement.
   await resetClientForm({deferCode:true});
+  if(supplier){
+   renderProfessionSelect('Fournisseur');
+   clientModalTitle.textContent='Nouveau fournisseur';
+   clientNom.value=v42$('v42Party').value.trim();
+   clientAdresse.value=v42$('v42Address').value.trim();
+  }
   v42$('rmlV42Layer').style.display='none';
   openModal('clientModal');
   const submit=clientForm.querySelector('button[type=submit]');
-  if(submit)submit.textContent='Créer le client et revenir au bon';
+  if(submit)submit.textContent=supplier?'Créer le fournisseur et revenir au bon':'Créer le client et revenir au bon';
   clientNom.focus();
  }catch(e){rmlTradeClientReturn();alert('Impossible d’ouvrir la fiche client : '+e.message)}
  finally{if(button)button.disabled=false}
@@ -9721,10 +9827,18 @@ function rmlTradeClientReturn(){
  v42$('rmlV42Layer').style.display='block';
 }
 function rmlTradeClientCreated(client){
- if(!window.rmlTradeClientContext)return;
+ const context=window.rmlTradeClientContext;
+ if(!context)return;
  rmlTradeClientReturn();
+ if(!(db.clients||[]).some(c=>String(c.id)===String(client.id)))db.clients.push(client);
+ if(context==='supplier'){
+  rmlV427Load(client.id);
+  v42$('v42Party').value=client.nom||'';
+  v42$('v42Address').value=rmlV421Address(client);
+  rmlV42Msg('Fiche fournisseur enregistrée dans Clients.');
+  return;
+ }
  if(v42$('v42Type').value!=='BC'){
-  if(!(db.clients||[]).some(c=>String(c.id)===String(client.id)))db.clients.push(client);
   v42$('v421ClientSearch').value='';
   rmlV421Clients();v42$('v421ClientSelect').value=String(client.id);
   rmlV421PickClient();
@@ -9825,6 +9939,7 @@ function rmlV42TypeChanged(){
  v42$('v42PartyLabel').textContent=client?'Client':'Fournisseur';
  v42$('v421ClientBox').style.display=client?'':'none';
  v42$('v427SupplierBox').style.display=client?'none':'';
+ v42$('rmlTradeCreateSupplier').hidden=!hasPerm('clients');
  v42$('v42SignatureBox').style.display=bl?'':'none';
  const priced=bl&&v42$('rmlBLPriced').checked;
  v42$('rmlBLPricing').style.display=bl?'':'none';
@@ -9832,37 +9947,19 @@ function rmlV42TypeChanged(){
  document.querySelectorAll('#rmlV42Editor .v42Price').forEach(el=>el.style.display=bl&&!priced?'none':'');
  rmlV42Total();
 }
-let rmlV427Suppliers=[];
-async function rmlV427Load(){
- try{
-  const {data,error}=await sb.from('erp_trade_suppliers').select('id,name,address').order('name');
-  if(error)throw error;
-  rmlV427Suppliers=data||[];
-  const sel=v42$('v427SupplierSelect');
-  sel.innerHTML='<option value="">— Choisir un fournisseur —</option>'+rmlV427Suppliers.map(x=>`<option value="${v42E(x.id)}">${v42E(x.name)}</option>`).join('');
- }catch(e){rmlV42Msg('Liste des fournisseurs indisponible : exécute le SQL V42.11. '+e.message,true)}
+function rmlV427Load(selected){
+ const sel=v42$('v427SupplierSelect');
+ const keep=String(selected??sel.value);
+ const suppliers=clientSorted().filter(isSupplierClient);
+ fillSelect(sel,suppliers,suppliers.length?'— Choisir un fournisseur —':'Aucun fournisseur enregistré dans Clients');
+ sel.value=suppliers.some(client=>String(client.id)===keep)?keep:'';
 }
 function rmlV427Pick(){
- const x=rmlV427Suppliers.find(y=>y.id===v42$('v427SupplierSelect').value);
- if(!x)return;
- v42$('v42Party').value=x.name;
- v42$('v42Address').value=x.address||'';
-}
-async function rmlV427Save(){
- const name=v42$('v42Party').value.trim(),address=v42$('v42Address').value.trim();
- if(!name){rmlV42Msg('Saisis le nom du fournisseur.',true);return}
- try{
-  const existing=rmlV427Suppliers.find(x=>x.name.toLocaleLowerCase('fr')===name.toLocaleLowerCase('fr'));
-  const q=existing?sb.from('erp_trade_suppliers').update({address}).eq('id',existing.id):sb.from('erp_trade_suppliers').insert({name,address});
-  const {data,error}=await q.select('id').single();if(error)throw error;
-  await rmlV427Load();v42$('v427SupplierSelect').value=data.id;
-  rmlV42Msg('Fournisseur enregistré dans Supabase.');
- }catch(e){rmlV42Msg('Enregistrement du fournisseur impossible : '+e.message,true)}
-}
-async function rmlV427Remove(){
- const id=v42$('v427SupplierSelect').value;if(!id)return;
- if(!confirm('Supprimer ce fournisseur du répertoire ? Les bons déjà enregistrés seront conservés.'))return;
- try{const {error}=await sb.from('erp_trade_suppliers').delete().eq('id',id);if(error)throw error;await rmlV427Load();rmlV42Msg('Fournisseur supprimé du répertoire.')}catch(e){rmlV42Msg('Suppression impossible : '+e.message,true)}
+ const id=v42$('v427SupplierSelect').value;
+ const supplier=id&&db.clients.find(client=>String(client.id)===id);
+ if(!supplier)return;
+ v42$('v42Party').value=supplier.nom||'';
+ v42$('v42Address').value=rmlV421Address(supplier);
 }
 let rmlBLDeliveryAuto='';
 function rmlBLJobAddress(j){return [j?.adresse||j?.address,j?.code_postal||j?.cp,j?.ville].filter(Boolean).join(', ')}
@@ -9967,7 +10064,7 @@ function rmlTradeClientSearchKey(event){
 function rmlV421Clients(){
  const sel=v42$('v421ClientSelect');if(!sel)return;
  const old=sel.value,q=v42$('v421ClientSearch')?.value||'';
- const clients=(db.clients||[]).filter(c=>rmlTradeClientMatches(c,q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr'));
+ const clients=(db.clients||[]).filter(c=>!isSupplierCategory(c)&&rmlTradeClientMatches(c,q)).sort((a,b)=>String(a.nom||'').localeCompare(String(b.nom||''),'fr'));
  sel.innerHTML='<option value="">— Choisir un client existant —</option>'+clients.map(c=>`<option value="${v42E(c.id)}">${v42E(c.nom)} — ${v42E(rmlV421Address(c))}</option>`).join('');
  if(clients.some(c=>String(c.id)===old))sel.value=old;
  rmlTradeShowClientSuggestions(clients);
@@ -11009,7 +11106,12 @@ function rmlJobCalendarOpen(id){
 function rmlJobCalendarMove(delta){rmlJobCalendarMonth=new Date(rmlJobCalendarMonth.getFullYear(),rmlJobCalendarMonth.getMonth()+delta,1,12);rmlJobCalendarRender();}
 function rmlJobCalendarChoose(value){
  const field=document.getElementById(rmlJobCalendarField);if(!field)return;
- field.value=value;field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}));
+ field.value=value;
+ if(rmlJobCalendarField==='jobDebut'&&value){
+  const end=document.getElementById('jobFin');
+  end.value=value;end.dispatchEvent(new Event('input',{bubbles:true}));end.dispatchEvent(new Event('change',{bubbles:true}));
+ }
+ field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}));
  rmlJobDateSync();rmlJobCalendarClose();
 }
 function rmlJobCalendarRender(){
