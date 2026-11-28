@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46.28</title>
+<title>RML ERP — V46.29</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -801,7 +801,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.28</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.29</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -6396,11 +6396,59 @@ function rmlInstallPliageSettingsFeedback(){
  },true);
 }
 
+function rmlClarifyPliageFoldControls(){
+ const frame=document.getElementById('pliageAppFrame'),d=frame?.contentDocument,w=frame?.contentWindow;
+ if(!d||d.getElementById('rmlFoldControlsStyle'))return;
+ const style=d.createElement('style');style.id='rmlFoldControlsStyle';
+ style.textContent=`
+ .bend-end-folds{padding:14px!important;border:1px solid #a9c8e7!important;border-radius:14px!important;background:#eaf3fb!important}
+ .bend-end-folds-title{font-size:17px!important;font-weight:800!important;color:#153b5b!important;margin-bottom:8px!important}
+ .bend-end-fold-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+ .bend-end-fold-row{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;align-items:start!important;padding:12px!important;border:1px solid #c3d6e8!important;border-radius:12px!important;background:#fff!important;min-width:0!important}
+ .bend-end-fold-row .bend-end-toggle{grid-column:1/-1!important;display:flex!important;gap:9px!important;align-items:center!important;font-size:16px!important;font-weight:800!important;color:#153b5b!important;background:#edf4fc!important;padding:10px!important;border-radius:8px!important}
+ .bend-end-fold-row .rml-bend-field{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:6px!important;min-width:0!important;font-size:14px!important;color:#334155!important}
+ .bend-end-fold-row .rml-bend-field input,.bend-end-fold-row .rml-bend-field select{box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:100%!important;padding:9px!important;height:42px!important;font-size:16px!important}
+ .bend-end-fold-row input[type=checkbox]{width:19px!important;height:19px!important;flex-shrink:0!important}
+ .bend-end-fold-row .rml-bend-return{grid-column:1/-1!important;display:flex!important;align-items:center!important;gap:9px!important;flex-wrap:wrap!important;line-height:1.5!important;font-size:14px!important;color:#6d4d08!important;background:#fff5dc!important;padding:10px!important;border:1px solid #edcf85!important;border-radius:8px!important}
+ .rml-bend-help{font-size:14px!important;line-height:1.5!important;color:#486078!important;margin:6px 0 12px!important}
+ .rml-profile-fold-help{padding:12px!important;border:1px solid #b6d2eb!important;border-radius:10px!important;background:#edf5ff!important;color:#153b5b!important;font-size:14px!important;line-height:1.5!important;margin:14px 0 10px!important}
+ .bend-piece-length-field{padding:12px!important;margin-bottom:12px!important;background:#f4f8fc!important;border:1px solid #c5d8e8!important;border-radius:10px!important}
+ @media(max-width:480px){.bend-end-fold-row{grid-template-columns:minmax(0,1fr)!important}.bend-end-fold-row .rml-bend-field{grid-column:1!important}}
+ `;
+ d.head.appendChild(style);
+ const apply=()=>{
+  d.querySelectorAll('.bend-end-fold-row').forEach(row=>{
+   if(row.dataset.rmlFoldLayout)return;row.dataset.rmlFoldLayout='1';
+   row.querySelectorAll('label').forEach(label=>{
+    const control=label.querySelector('input,select');if(!control||label.classList.contains('bend-end-toggle'))return;
+    if(control.type==='checkbox'){label.classList.add('rml-bend-return');return;}
+    const titles={Height:'Hauteur du relevé (mm)',Angle:'Angle du relevé (°)',Direction:'Sens du relevé'};
+    const kind=Object.keys(titles).find(suffix=>control.id.endsWith(suffix));if(!kind)return;
+    const title=d.createElement('span');title.textContent=titles[kind];label.replaceChildren(title,control);label.classList.add('rml-bend-field');
+   });
+  });
+  d.querySelectorAll('.bend-end-folds').forEach(block=>{
+   if(block.querySelector('.rml-bend-help'))return;
+   const title=block.querySelector('.bend-end-folds-title');if(!title)return;
+   title.textContent='Relevés et replis aux extrémités';
+   const help=d.createElement('p');help.className='rml-bend-help';help.textContent='Cochez le bout concerné, puis réglez le relevé. L’option « Repli intérieur 12 mm à 55° » se choisit séparément pour chaque bout.';title.after(help);
+  });
+  d.querySelectorAll('.bend-table-wrap').forEach(wrap=>{
+   if(!wrap.querySelector('#bendSegmentsBody')||wrap.previousElementSibling?.classList.contains('rml-profile-fold-help'))return;
+   const help=d.createElement('div');help.className='rml-profile-fold-help';
+   const strong=d.createElement('strong');strong.textContent='Plis du profil · pli écrasé';
+   const text=d.createElement('div');text.textContent='La colonne « Pli écrasé » s’applique au pli suivant la cote de la ligne. Les relevés et replis en bout se règlent dans les cadres ci-dessus.';help.append(strong,text);wrap.before(help);
+  });
+ };
+ apply();new w.MutationObserver(apply).observe(d.body,{childList:true,subtree:true});
+}
+
 function epurePliageHeader(){
  try{
   rmlProtectPliageSettings();
   rmlInstallPliageClientSearch();
   rmlInstallPliageSettingsFeedback();
+  rmlClarifyPliageFoldControls();
   const f=document.getElementById('pliageAppFrame'),d=f?.contentDocument;if(!d)return;
   const all=[...d.querySelectorAll('body *')];
   const badge=all.find(el=>/^VERSION\s*101$/i.test((el.textContent||'').trim())&&el.children.length===0);
@@ -9211,7 +9259,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V46.28';
+const RML_ERP_VERSION='V46.29';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
