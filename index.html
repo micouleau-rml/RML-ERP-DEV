@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46.22</title>
+<title>RML ERP — V46.23</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -800,7 +800,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.22</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.23</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -5314,7 +5314,7 @@ clientForm.onsubmit=async e=>{
   if(created&&wasNew&&clientCreationFromJob){
     clientCreationFromJob=false;
     const newId=created.id||'';
-    if(newId){fillClientSelect(newId,'');jobClient.value=newId;const c=db.clients.find(x=>x.id===newId);jobClientSearch.value=c?.nom||created.nom||''}
+    if(newId){fillClientSelect(newId,'');jobClient.value=newId;const c=db.clients.find(x=>x.id===newId);jobClientSearch.value=c?.nom||created.nom||'';rmlJobClientAddress()}
     openModal('jobModal');
     setTimeout(()=>jobNom.focus(),50);
   }
@@ -5942,13 +5942,34 @@ function buildClientAlphabet(){if(!window.clientAlphabet)return;const letters=['
 function renderClients(){renderClientDirectoryTabs();buildClientAlphabet();const kind=showDirectorySuppliers?'fournisseur':'client';const rows=getVisibleClientRows();if(window.clientResultCount)clientResultCount.textContent=`${rows.length} ${kind}${rows.length>1?'s':''}`;if(window.clientLetterLabel)clientLetterLabel.textContent=clientAlpha==='TOUS'?'Tous':clientAlpha;if(!rows.length){clientsTable.innerHTML='<div class="empty">Aucun '+kind+' correspondant.</div>';return}const counts=new Map();db.chantiers.forEach(j=>counts.set(j.client_id,(counts.get(j.client_id)||0)+1));clientsTable.innerHTML='<div class="tablewrap"><table class="table clients-compact"><thead><tr><th>'+ (showDirectorySuppliers?'Fournisseur':'Client') +'</th><th>Catégorie</th><th>Responsable</th><th>Contact</th><th>Adresse</th><th>Chantiers</th><th></th></tr></thead><tbody>'+rows.map(c=>`<tr class="client-row" tabindex="0" onclick="openClientFolder('${c.id}')" onkeydown="if(event.key==='Enter'){this.click()}"><td><span class="client-status-dot ${c.actif?'':'archived'}"></span><strong>${esc(c.nom)}</strong><br><span class="muted">${esc(c.code||'')}${c.pennylane_customer_id?' · Pennylane lié':''}</span></td><td>${esc(c.categorie||'Non classé')}</td><td>${esc(c.responsable||'')}</td><td>${esc(c.telephone||'')}${c.telephone&&c.email?'<br>':''}${esc(c.email||'')}</td><td>${esc(c.adresse||'')}</td><td><strong>${counts.get(c.id)||0}</strong></td><td class="client-chevron">›</td></tr>`).join('')+'</tbody></table></div>'}
 clientSearch.oninput=renderClients;clientFilter.onchange=renderClients;clientCategoryFilter.onchange=renderClients;
 function fillClientSelect(selected='',query=''){const q=String(query||'').trim().toLowerCase();const active=db.clients.filter(c=>(c.actif||c.id===selected)&&(!q||[c.nom,c.code,c.adresse].join(' ').toLowerCase().includes(q))).sort((a,b)=>a.nom.localeCompare(b.nom,'fr')).slice(0,120);jobClient.innerHTML='<option value="">'+(q?'Sélectionner parmi les résultats…':'Sélectionner un client…')+'</option>'+active.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.nom)}${c.code?' — '+esc(c.code):''}</option>`).join('');if(selected&&!active.some(c=>c.id===selected)){const c=db.clients.find(c=>c.id===selected);if(c)jobClient.insertAdjacentHTML('beforeend',`<option value="${c.id}" selected>${esc(c.nom)}</option>`)}}
-function initJobClientSearch(selected=''){if(!window.jobClientSearch)return;const c=selected?db.clients.find(c=>c.id===selected):null;jobClientSearch.value=c?.nom||'';fillClientSelect(selected,jobClientSearch.value);jobClientSearch.oninput=()=>fillClientSelect('',jobClientSearch.value)}
+function rmlJobClientAddress(){
+ if(jobId.value)return;
+ const client=db.clients.find(c=>String(c.id)===String(jobClient.value));
+ const identity=client?rmlClientIdentityFields(client.notes):{type:''};
+ const particular=client&&(identity.type?identity.type==='particulier':!!(splitClientCivilite(client.nom).civilite||/particulier/i.test(client.categorie||'')));
+ const address=particular?String(client.adresse||'').trim():'';
+ const previous=jobAdresse.dataset.clientAddress||'';
+ // Une adresse saisie volontairement reste libre ; seule l'adresse reprise automatiquement suit le client.
+ if(!jobAdresse.value.trim()||jobAdresse.value===previous){
+  jobAdresse.value=address;
+  jobAdresse.dataset.clientAddress=address;
+ }else jobAdresse.dataset.clientAddress='';
+}
+function initJobClientSearch(selected=''){
+ if(!window.jobClientSearch)return;
+ const c=selected?db.clients.find(c=>c.id===selected):null;
+ jobClientSearch.value=c?.nom||'';
+ fillClientSelect(selected,jobClientSearch.value);
+ jobClient.onchange=rmlJobClientAddress;
+ jobClientSearch.oninput=()=>{fillClientSelect('',jobClientSearch.value);rmlJobClientAddress()};
+ rmlJobClientAddress();
+}
 const RML_ACTIVITIES={gouttiere:'Gouttière',couvertine:'Couvertine',atelier:'Atelier',bardage:'Bardage',tableau_menuiserie:'Tableau de menuiserie',descentes:'Descentes',bandeau:'Bandeau',lambris:'Lambris'};
 function rmlJobActivities(j){const v=j?.categories_activite;return Array.isArray(v)?v.filter(x=>RML_ACTIVITIES[x]):[]}
 function rmlReadActivityChoices(){return [...document.querySelectorAll('#jobActivityChoices input:checked')].map(x=>x.value)}
 function rmlSetActivityChoices(v){const chosen=new Set(Array.isArray(v)?v:[]);document.querySelectorAll('#jobActivityChoices input').forEach(x=>x.checked=chosen.has(x.value))}
 function rmlActivitiesHtml(j){const a=rmlJobActivities(j);return (a.length?a.map(x=>RML_ACTIVITIES[x]):['Non classé']).map(x=>'<span class="status" style="margin:2px">'+esc(x)+'</span>').join('')}
-function resetJobForm(){jobEditSnapshot='';jobForm.reset();jobId.value='';jobModalTitle.textContent='Nouveau chantier';jobModalHelp.textContent='3 informations suffisent pour créer le chantier. Les autres renseignements peuvent être ajoutés plus tard.';jobSubmitBtn.textContent='Créer et ouvrir le chantier';jobAdvanced.open=false;initJobClientSearch();jobStatut.value='actif';rmlSetActivityChoices([]);document.getElementById('jobFicheType').value='preparation'}
+function resetJobForm(){jobEditSnapshot='';jobForm.reset();jobId.value='';jobAdresse.dataset.clientAddress='';jobModalTitle.textContent='Nouveau chantier';jobModalHelp.textContent='3 informations suffisent pour créer le chantier. Les autres renseignements peuvent être ajoutés plus tard.';jobSubmitBtn.textContent='Créer et ouvrir le chantier';jobAdvanced.open=false;initJobClientSearch();jobStatut.value='actif';rmlSetActivityChoices([]);document.getElementById('jobFicheType').value='preparation'}
 newJobBtn.onclick=()=>{if(!hasPerm('chantiers'))return;resetJobForm();openModal('jobModal')}
 jobCreateClientBtn.onclick=async()=>{if(!hasPerm('clients')){alert('Tu n’as pas l’autorisation de créer un client.');return}clientCreationFromJob=true;await resetClientForm();openModal('clientModal');setTimeout(()=>clientNom.focus(),50)}
 function prefillJob(client){if(!hasPerm('chantiers'))return;go('chantiers');resetJobForm();initJobClientSearch(client);openModal('jobModal')}
@@ -9083,7 +9104,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V46.22';
+const RML_ERP_VERSION='V46.23';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
