@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=0102">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png?v=0102">
 <link rel="manifest" href="manifest.json?v=0102">
-<title>RML ERP — V46.26</title>
+<title>RML ERP — V46.27</title>
 <script>
 window.rmlHeuresClientReady=new Promise(resolve=>{window.rmlResolveHeuresClient=resolve});
 </script>
@@ -801,7 +801,7 @@ body.rml-preparation-preview-open{overflow:hidden}
     <div id="recoveryError" class="login-error"></div>
   </form>
 </div>
-<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.26</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
+<header><div class="header rml-new-header"><div class="brand rml-left-brand"><h1>ERP</h1><div id="rmlVersionPublishedBadge" aria-label="Version publiée">RML ERP · V46.27</div><span id="rmlVersionHeader" hidden>V32</span></div><div class="rml-center-title">RML GOUTTIÈRE ALU</div><div class="rml-header-spacer" aria-hidden="true"></div></div></header>
 <main>
 <div class="statusbar"><div id="syncPill" class="pill warn">Supabase : connexion…</div><div id="userPill" class="pill">Utilisateur : —</div><button id="logoutBtn" class="btn danger rml-logout-prominent" >Déconnexion</button></div>
 <div id="rmlModuleHomeBar"><button type="button" class="btn secondary" onclick="go('dashboard')">← Retour accueil</button><button id="rmlCloseJobSheet" type="button" class="btn secondary" hidden onclick="closePreparation()">Fermer — Retour aux chantiers</button><button id="rmlReturnTourMap" type="button" class="btn secondary" hidden onclick="rmlReturnToTourMap()">← Retour sur la carte</button></div><nav id="mainNav"><button class="active" data-view="dashboard">Accueil</button><button data-view="clients">Clients</button><button type="button" id="rmlV42Nav" onclick="rmlV42Open()" style="display:none;background:#0c7194;color:white">BL / BC / Devis</button><button data-view="chantiers">Chantiers</button><button type="button" data-perm-nav="suivi" onclick="openSuiviSelector()">Suivi chantier</button><button type="button" data-perm-nav="commandes" onclick="openCommandes()">Commandes fournisseurs</button><button type="button" data-perm-nav="stock" onclick="openStock()">Stock</button><button data-view="atelier" data-perm-nav="pliage">Devis pliage</button><button data-view="atelierPliage8" id="rmlAtelier8Nav" type="button" style="display:none">Fabrication pliage</button><button data-view="heures" data-perm-nav="heures">Heures</button><button data-view="planning" data-perm-nav="planning">Planning équipes</button><button data-view="equipes" id="teamsNavBtn" style="display:none">Équipes</button><button class="nav-maint-v1920" data-view="maintenance" data-perm-nav="materiel">Maintenance</button><button class="nav-docs-v1920" data-view="documents" data-perm-nav="documents">Documents</button><button class="nav-subcontractors-colored" data-view="sous-traitants" data-perm-nav="sous_traitants">Sous-traitants</button><button data-view="analyse" data-perm-nav="analyse" class="nav-analysis-colored">Analyse chantier</button><button onclick="openForecastPage()" class="nav-upcoming-colored">Commandes à venir</button><button id="rmlCatalogNav" class="nav-catalog-colored" type="button" onclick="rmlOpenCatalog()" style="display:none">Modifier produits</button><button id="usersNavBtn" data-view="users" style="display:none" class="nav-users-colored">Utilisateurs & accès</button><button id="securityNavBtn" data-view="security" style="display:none" class="nav-security-colored">Sécurité / Réinitialisation</button><button type="button" data-view="rmlTour" data-perm-nav="chantiers" style="display:none">Carte de tournée</button></nav><div id="rmlNavEditor" style="display:none;margin:8px 0 15px;text-align:right"><button id="rmlNavEditBtn" type="button" class="btn secondary" style="font-size:13px">Réorganiser les modules</button><button id="rmlNavResetBtn" type="button" class="btn secondary" style="font-size:13px;display:none">Ordre initial</button><span id="rmlNavEditHint" style="display:none;font-size:12px;margin-left:10px">Glissez les boutons pour les déplacer. Cliquez sur Terminer pour enregistrer.</span></div>
@@ -6336,9 +6336,35 @@ function rmlProtectPliageSettings(){
  }).observe(modal,{attributes:true,attributeFilter:['class']});
 }
 
+function rmlInstallPliageClientSearch(){
+ const frame=document.getElementById('pliageAppFrame'),d=frame?.contentDocument,w=frame?.contentWindow;
+ const select=d?.getElementById('selectedClient');
+ if(!select||d.getElementById('rmlPliageClientSearch'))return;
+ const box=d.createElement('div');box.className='field col-12';
+ box.innerHTML='<label for="rmlPliageClientSearch">Rechercher un client / mémo tarifaire</label><input id="rmlPliageClientSearch" type="search" autocomplete="off" placeholder="Saisir le nom du client…" aria-controls="rmlPliageClientResults"><div id="rmlPliageClientResults" hidden style="max-height:260px;overflow-y:auto"></div><div id="rmlPliageClientSearchStatus" role="status" aria-live="polite" style="font-size:14px;margin-top:4px"></div>';
+ const anchor=select.closest('.field')||select;anchor.before(box);
+ const input=box.querySelector('input'),results=box.querySelector('#rmlPliageClientResults'),status=box.querySelector('[role="status"]');
+ const key=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('fr').trim();
+ const render=()=>{
+  results.replaceChildren();const query=key(input.value);results.hidden=!query;results.style.display=query?'block':'none';status.textContent='';if(!query)return;
+  const words=query.split(/\s+/);
+  const matches=[...select.options].filter(option=>option.value&&!option.disabled&&words.every(word=>key(option.textContent).includes(word)));
+  status.textContent=matches.length?matches.length+' client(s) trouvé(s).'+(matches.length>50?' Affinez la recherche pour afficher les autres résultats.':''):'Aucun client correspondant.';
+  for(const option of matches.slice(0,50)){
+   const button=d.createElement('button');button.type='button';button.className='btn-light';button.textContent=option.textContent;button.style.cssText='display:block;width:100%;text-align:left;margin:6px 0;padding:10px';
+   button.addEventListener('click',()=>{select.value=option.value;select.dispatchEvent(new w.Event('change',{bubbles:true}));input.value='';render();select.focus()});
+   results.appendChild(button);
+  }
+ };
+ input.addEventListener('input',render);
+ input.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='ArrowDown'){e.preventDefault();results.querySelector('button')?.focus()}if(e.key==='Escape'){e.stopPropagation();input.value='';render()}});
+ new w.MutationObserver(()=>{if(input.value)render()}).observe(select,{childList:true,subtree:true,characterData:true});
+}
+
 function epurePliageHeader(){
  try{
   rmlProtectPliageSettings();
+  rmlInstallPliageClientSearch();
   const f=document.getElementById('pliageAppFrame'),d=f?.contentDocument;if(!d)return;
   const all=[...d.querySelectorAll('body *')];
   const badge=all.find(el=>/^VERSION\s*101$/i.test((el.textContent||'').trim())&&el.children.length===0);
@@ -9149,7 +9175,7 @@ async function openJobHistory(jobId){
 <script>
 
 /* RML ERP V27 — Analyse financière. Données protégées dans une table dédiée (SQL V23). */
-const RML_ERP_VERSION='V46.26';
+const RML_ERP_VERSION='V46.27';
 const rmlFinNum=v=>{const n=Number(String(v??'').replace(',','.'));return Number.isFinite(n)?n:0};
 const rmlFinEur=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(n||0);
 let rmlFinData=null,rmlFinSettings=null;
